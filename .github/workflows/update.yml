@@ -1,0 +1,53 @@
+name: Generate operator allowlist
+
+on:
+  schedule:
+    - cron: '8 8 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-go@v6
+        with:
+          go-version: '1.26'
+      - name: Download sources, generate lists, and validate
+        shell: bash
+        run: |
+          set -euo pipefail
+          source_dir="$(mktemp -d)"
+          trap 'rm -rf "$source_dir"' EXIT
+          base='https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists'
+          curl -fsSL "$base/chinanet.txt" -o "$source_dir/chinanet.txt"
+          curl -fsSL "$base/cmcc.txt" -o "$source_dir/cmcc.txt"
+          curl -fsSL "$base/unicom.txt" -o "$source_dir/unicom.txt"
+          curl -fsSL 'https://raw.githubusercontent.com/lionsoul2014/ip2region/master/data/ipv4_source.txt' -o "$source_dir/ip2region_ipv4_source.txt"
+          rezmoss_base='https://raw.githubusercontent.com/rezmoss/cloud-provider-ip-addresses/main'
+          curl -fsSL "$rezmoss_base/alibaba/alibaba_ips_merged_v4.txt" -o "$source_dir/rezmoss_alibaba.txt"
+          curl -fsSL "$rezmoss_base/tencent/tencent_ips_merged_v4.txt" -o "$source_dir/rezmoss_tencent.txt"
+          curl -fsSL "$rezmoss_base/huawei/huawei_ips_merged_v4.txt" -o "$source_dir/rezmoss_huawei.txt"
+          curl -fsSL "$rezmoss_base/baidu/baidu_ips_merged_v4.txt" -o "$source_dir/rezmoss_baidu.txt"
+          ipdata_base='https://raw.githubusercontent.com/axpwx/IP-Data/master/provider'
+          curl -fsSL "$ipdata_base/aliyun-cidr-ipv4.txt" -o "$source_dir/ipdata_aliyun.txt"
+          curl -fsSL "$ipdata_base/tencent-cidr-ipv4.txt" -o "$source_dir/ipdata_tencent.txt"
+          curl -fsSL "$ipdata_base/huawei-cidr-ipv4.txt" -o "$source_dir/ipdata_huawei.txt"
+          curl -fsSL "$ipdata_base/ucloud-cidr-ipv4.txt" -o "$source_dir/ipdata_ucloud.txt"
+          curl -fsSL "$ipdata_base/ksyun-cidr-ipv4.txt" -o "$source_dir/ipdata_ksyun.txt"
+          curl -fsSL "$ipdata_base/baidu-cidr-ipv4.txt" -o "$source_dir/ipdata_baidu.txt"
+          curl -fsSL "$ipdata_base/jdcloud-cidr-ipv4.txt" -o "$source_dir/ipdata_jdcloud.txt"
+          go run ./cmd/build --sources "$source_dir"
+          go run ./cmd/verify --sources "$source_dir"
+      - name: Commit generated lists
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A data
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m 'chore: update cn operator allowlist'
+          git push
