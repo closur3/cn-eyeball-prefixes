@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-07-15T10:10:42.788675308Z",
-  "scope": "ACL list; IPv4; mainland China; retains China Telecom, China Mobile, and China Unicom only after excluding CIDRs listed by either cloud-provider source: rezmoss (Alibaba, Tencent, Huawei, Baidu) or IP-Data (Alibaba, Tencent, Huawei, UCloud, Kingsoft, Baidu, JD Cloud); does not attempt to identify or exclude IDC addresses within operators' address space",
+  "generated_at": "2026-07-15T11:47:33.165819844Z",
+  "scope": "ACL list; IPv4; mainland China; retains China Telecom, China Mobile, and China Unicom only when also present in china-operator-ip's origin-only China list, then excludes CIDRs listed by either cloud-provider source: rezmoss (Alibaba, Tencent, Huawei, Baidu) or IP-Data (Alibaba, Tencent, Huawei, UCloud, Kingsoft, Baidu, JD Cloud); does not attempt to identify or exclude IDC addresses within operators' address space",
   "sources": [
     {
       "name": "chinanet",
@@ -16,6 +16,11 @@
       "name": "unicom",
       "url": "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/unicom.txt",
       "sha256": "00b98a1cb3e2ae088f68f3c58da1d1424b5e4ad3495e66f0a43487a7f68fab07"
+    },
+    {
+      "name": "china",
+      "url": "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/china.txt",
+      "sha256": "67581a53be686677e0c6fb24db84d5fd3cf9d3759cca423c6886c7f604073e9e"
     },
     {
       "name": "ip2region_ipv4_source",
@@ -82,16 +87,16 @@
     {
       "name": "CN",
       "path": "cn.txt",
-      "cidr_count": 5298,
-      "address_count": 255875583,
-      "sha256": "1029799bf6bec4a8f5e287fa188cfcc9f81860de43eb72eea030e2d9ca2e92f7"
+      "cidr_count": 5241,
+      "address_count": 255769343,
+      "sha256": "b7db3c2d2f3ea5c7735e3991529041c9ed0ae35b92f06c76210af9ca0d973bcc"
     },
     {
       "name": "北京市",
       "path": "provinces/beijing.txt",
-      "cidr_count": 3918,
-      "address_count": 21351724,
-      "sha256": "ec8bfb6431a5d45f7385ab896c3ad6753b5aa5b4c1dcf6ea59003887312e5adf"
+      "cidr_count": 3907,
+      "address_count": 21285420,
+      "sha256": "a40750d46393b87ce5625889a30e7a4402d940052d9716d08c5c34bf0f4a6bf5"
     },
     {
       "name": "天津市",
@@ -145,9 +150,9 @@
     {
       "name": "上海市",
       "path": "provinces/shanghai.txt",
-      "cidr_count": 1624,
-      "address_count": 13019983,
-      "sha256": "a397f3f2dfd3ea1243ec95757ae34069c1dd89a17e9fec5013e6536218f90c50"
+      "cidr_count": 1622,
+      "address_count": 13019215,
+      "sha256": "e4908b25772afb8fc093173150f42a1ad25ec6c6c1579702bd28d9fce39c24e8"
     },
     {
       "name": "江苏省",
@@ -229,9 +234,9 @@
     {
       "name": "海南省",
       "path": "provinces/hainan.txt",
-      "cidr_count": 133,
-      "address_count": 1798009,
-      "sha256": "b4b1c0c0b87fcc1f01648f07425586a6db724acc27ea9c59ef0a11c471ef4a4a"
+      "cidr_count": 146,
+      "address_count": 1796729,
+      "sha256": "dd2546ad316b963ed726974a8554b95d24d0b648947724bfd41eaaa16a384842"
     },
     {
       "name": "重庆市",
