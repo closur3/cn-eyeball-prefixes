@@ -91,6 +91,7 @@ var urls = map[string]string{
 	"chinanet":              "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/chinanet.txt",
 	"cmcc":                  "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/cmcc.txt",
 	"unicom":                "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/unicom.txt",
+	"china":                 "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/china.txt",
 	"ip2region_ipv4_source": "https://raw.githubusercontent.com/lionsoul2014/ip2region/master/data/ipv4_source.txt",
 	"rezmoss_alibaba":       "https://raw.githubusercontent.com/rezmoss/cloud-provider-ip-addresses/main/alibaba/alibaba_ips_merged_v4.txt",
 	"rezmoss_tencent":       "https://raw.githubusercontent.com/rezmoss/cloud-provider-ip-addresses/main/tencent/tencent_ips_merged_v4.txt",
@@ -155,6 +156,29 @@ func subtract(in, excluded []span) []span {
 		}
 		if !covered {
 			out = append(out, span{pos, r.hi})
+		}
+	}
+	return out
+}
+
+func intersect(a, b []span) []span {
+	a, b = merge(a), merge(b)
+	var out []span
+	for i, j := 0, 0; i < len(a) && j < len(b); {
+		lo, hi := a[i].lo, a[i].hi
+		if b[j].lo > lo {
+			lo = b[j].lo
+		}
+		if b[j].hi < hi {
+			hi = b[j].hi
+		}
+		if lo <= hi {
+			out = append(out, span{lo, hi})
+		}
+		if a[i].hi < b[j].hi {
+			i++
+		} else {
+			j++
 		}
 	}
 	return out
@@ -277,6 +301,10 @@ func main() {
 		}
 		ranges[o] = r
 	}
+	chinaRanges, e := cidrs(filepath.Join(*src, "china.txt"))
+	if e != nil {
+		panic(e)
+	}
 	var cloudRanges []span
 	for _, source := range cloudSources {
 		r, e := cidrs(filepath.Join(*src, source+".txt"))
@@ -287,6 +315,7 @@ func main() {
 	}
 	cloudRanges = merge(cloudRanges)
 	for _, o := range operators {
+		ranges[o] = intersect(ranges[o], chinaRanges)
 		ranges[o] = subtract(ranges[o], cloudRanges)
 	}
 
@@ -340,9 +369,9 @@ func main() {
 
 	m := manifest{
 		GeneratedAt: time.Now().UTC().Format(time.RFC3339Nano),
-		Scope:       "ACL list; IPv4; mainland China; retains China Telecom, China Mobile, and China Unicom only after excluding CIDRs listed by either cloud-provider source: rezmoss (Alibaba, Tencent, Huawei, Baidu) or IP-Data (Alibaba, Tencent, Huawei, UCloud, Kingsoft, Baidu, JD Cloud); does not attempt to identify or exclude IDC addresses within operators' address space",
+		Scope:       "ACL list; IPv4; mainland China; retains China Telecom, China Mobile, and China Unicom only when also present in china-operator-ip's origin-only China list, then excludes CIDRs listed by either cloud-provider source: rezmoss (Alibaba, Tencent, Huawei, Baidu) or IP-Data (Alibaba, Tencent, Huawei, UCloud, Kingsoft, Baidu, JD Cloud); does not attempt to identify or exclude IDC addresses within operators' address space",
 	}
-	for _, o := range append(append(operators, "ip2region_ipv4_source"), cloudSources...) {
+	for _, o := range append(append(operators, "china", "ip2region_ipv4_source"), cloudSources...) {
 		sourcePath := filepath.Join(*src, o+".txt")
 		sum, e := sha(sourcePath)
 		if e != nil {

@@ -73,9 +73,21 @@ func assertNoOverlap(a, b []span) {
 	}
 }
 
+func assertContained(a, b []span) {
+	for i, j := 0, 0; i < len(a); {
+		for j < len(b) && b[j].hi < a[i].lo {
+			j++
+		}
+		if j == len(b) || b[j].lo > a[i].lo || b[j].hi < a[i].hi {
+			panic("cn.txt contains a CIDR absent from the origin-only China list")
+		}
+		i++
+	}
+}
+
 func main() {
 	data := flag.String("data", "data", "data directory")
-	sources := flag.String("sources", "", "source directory containing cloud provider CIDRs")
+	sources := flag.String("sources", "", "source directory")
 	flag.Parse()
 	if *sources == "" {
 		panic("--sources is required")
@@ -98,6 +110,8 @@ func main() {
 	for _, source := range cloudSources {
 		cloudRanges = append(cloudRanges, readCIDRs(filepath.Join(*sources, source+".txt"), false)...)
 	}
-	assertNoOverlap(readCIDRs(filepath.Join(*data, "cn.txt"), true), merge(cloudRanges))
-	fmt.Println("OK: lists are valid, ordered CIDR lists; cn.txt excludes all cloud provider CIDRs.")
+	cnRanges := readCIDRs(filepath.Join(*data, "cn.txt"), true)
+	assertContained(cnRanges, readCIDRs(filepath.Join(*sources, "china.txt"), false))
+	assertNoOverlap(cnRanges, merge(cloudRanges))
+	fmt.Println("OK: lists are valid, ordered CIDR lists; cn.txt is contained in the origin-only China list and excludes all cloud provider CIDRs.")
 }

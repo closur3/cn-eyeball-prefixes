@@ -16,7 +16,7 @@
 
 ## 生成规则
 
-- 运营商归属完全采用 [gaoyifan/china-operator-ip](https://github.com/gaoyifan/china-operator-ip/tree/ip-lists) `ip-lists` 分支的 `chinanet.txt`、`cmcc.txt` 与 `unicom.txt`。
+- 运营商候选采用 [gaoyifan/china-operator-ip](https://github.com/gaoyifan/china-operator-ip/tree/ip-lists) `ip-lists` 分支的 `chinanet.txt`、`cmcc.txt` 与 `unicom.txt`；仅保留同时出现在该上游 `china.txt`（起源 ASN 为中国 ASN）的 CIDR，以排除仅在路由中途经过运营商 ASN 的误收项。
 - 云厂商排除项同时采用 [rezmoss/cloud-provider-ip-addresses](https://github.com/rezmoss/cloud-provider-ip-addresses) 的阿里、腾讯、华为、百度 IPv4 CIDR 文件，以及 [axpwx/IP-Data](https://github.com/axpwx/IP-Data) 的阿里云、腾讯云、华为云、UCloud、金山云、百度智能云和京东云独立 IPv4 CIDR 文件。任一来源显式列出即排除；不使用 IP-Data 的 `all-cidr` 集合，也不以 IP2region 或 IDC/托管标签进行推断。
 - 省级归属采用 [lionsoul2014/ip2region](https://github.com/lionsoul2014/ip2region) 的 IPv4 源数据；它只用于地域切分，不参与运营商判定。
 - 仅处理 IPv4 和中国大陆 31 个省级行政区；非中国大陆地址及无法归入省级行政区的网段不进入省级文件。
