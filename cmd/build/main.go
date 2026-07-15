@@ -202,7 +202,11 @@ func operatorRanges(path string) (map[string][]span, error) {
 	if e != nil {
 		return nil, e
 	}
-	ispOperator := map[string]string{"电信": "chinanet", "移动": "cmcc", "联通": "unicom"}
+	ispOperator := map[string]string{
+		"电信": "chinanet", "中国电信": "chinanet",
+		"移动": "cmcc", "中国移动": "cmcc",
+		"联通": "unicom", "中国联通": "unicom",
+	}
 	out := map[string][]span{}
 	for _, line := range strings.Split(strings.TrimSpace(string(b)), "\n") {
 		x := strings.Split(line, "|")
