@@ -16,7 +16,7 @@
 
 ## 生成规则
 
-- 运营商候选采用 [lionsoul2014/ip2region](https://github.com/lionsoul2014/ip2region) IPv4 源数据中 ISP 字段精确为“电信”“中国电信”“移动”“中国移动”“联通”或“中国联通”的中国大陆地址；仅保留同时出现在 [gaoyifan/china-operator-ip](https://github.com/gaoyifan/china-operator-ip/tree/ip-lists) `ip-lists` 分支 `china.txt`（起源 ASN 为中国 ASN）的 CIDR，以排除异常路由与非中国起源地址。
+- 运营商候选采用 [lionsoul2014/ip2region](https://github.com/lionsoul2014/ip2region) IPv4 源数据中归属中国电信、中国移动或中国联通的中国大陆地址；仅保留同时出现在 [gaoyifan/china-operator-ip](https://github.com/gaoyifan/china-operator-ip/tree/ip-lists) `ip-lists` 分支 `china.txt`（起源 ASN 为中国 ASN）的 CIDR，以排除异常路由与非中国起源地址。
 - 云厂商排除项同时采用 [rezmoss/cloud-provider-ip-addresses](https://github.com/rezmoss/cloud-provider-ip-addresses) 的阿里、腾讯、华为、百度 IPv4 CIDR 文件，以及 [axpwx/IP-Data](https://github.com/axpwx/IP-Data) 的阿里云、腾讯云、华为云、UCloud、金山云、百度智能云和京东云独立 IPv4 CIDR 文件。任一来源显式列出即排除；不使用 IP-Data 的 `all-cidr` 集合，也不以 IDC/托管标签进行推断。
 - 省级归属同样采用 ip2region IPv4 源数据。
 - 仅处理 IPv4 和中国大陆 31 个省级行政区；非中国大陆地址及无法归入省级行政区的网段不进入省级文件。
