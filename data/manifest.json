@@ -1,11 +1,11 @@
 {
-  "generated_at": "2026-07-16T10:19:24.995519989Z",
+  "generated_at": "2026-07-17T10:07:31.692501115Z",
   "scope": "ACL list; IPv4; mainland China; retains CIDRs labelled China Telecom, China Mobile, or China Unicom by ip2region only when also present in china-operator-ip's origin-only China list, then excludes CIDRs listed by either cloud-provider source: rezmoss (Alibaba, Tencent, Huawei, Baidu) or IP-Data (Alibaba, Tencent, Huawei, UCloud, Kingsoft, Baidu, JD Cloud); does not attempt to identify or exclude IDC addresses within operators' address space",
   "sources": [
     {
       "name": "china",
       "url": "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/china.txt",
-      "sha256": "35346061b18239ac83efa777670a84deaf027bdfa01cc1cb1cf6ae5d05089063"
+      "sha256": "c05f19cc04c00b458de84bd1e5cb9028a1902b3dd490c1ae588afc60ed9f06d7"
     },
     {
       "name": "ip2region_ipv4_source",
@@ -15,7 +15,7 @@
     {
       "name": "rezmoss_alibaba",
       "url": "https://raw.githubusercontent.com/rezmoss/cloud-provider-ip-addresses/main/alibaba/alibaba_ips_merged_v4.txt",
-      "sha256": "c3315414a6e1ec0eb2060f08d886ca8cc4bdb9b34866abefb5fa8ff68f76f848"
+      "sha256": "8a65c2d8d19aee4c7f2e01c59cba01e7928917e73a17a75b82329cc2e7ec52c3"
     },
     {
       "name": "rezmoss_tencent",
@@ -25,7 +25,7 @@
     {
       "name": "rezmoss_huawei",
       "url": "https://raw.githubusercontent.com/rezmoss/cloud-provider-ip-addresses/main/huawei/huawei_ips_merged_v4.txt",
-      "sha256": "55aa49a15991996ac1a3682748e0d82c449c4c5c176534407bedd8aee142a349"
+      "sha256": "0f1daa5886100b435167f215b303b47fa4aaefa5d159a25e67a2b852117c49ef"
     },
     {
       "name": "rezmoss_baidu",
