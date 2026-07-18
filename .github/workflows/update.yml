@@ -22,24 +22,51 @@ jobs:
           set -euo pipefail
           source_dir="$(mktemp -d)"
           trap 'rm -rf "$source_dir"' EXIT
+          curl_opts=(--fail --silent --show-error --location --retry 3)
           base='https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists'
-          curl -fsSL "$base/china.txt" -o "$source_dir/china.txt"
-          curl -fsSL 'https://raw.githubusercontent.com/lionsoul2014/ip2region/master/data/ipv4_source.txt' -o "$source_dir/ip2region_ipv4_source.txt"
-          rezmoss_base='https://raw.githubusercontent.com/rezmoss/cloud-provider-ip-addresses/main'
-          curl -fsSL "$rezmoss_base/alibaba/alibaba_ips_merged_v4.txt" -o "$source_dir/rezmoss_alibaba.txt"
-          curl -fsSL "$rezmoss_base/tencent/tencent_ips_merged_v4.txt" -o "$source_dir/rezmoss_tencent.txt"
-          curl -fsSL "$rezmoss_base/huawei/huawei_ips_merged_v4.txt" -o "$source_dir/rezmoss_huawei.txt"
-          curl -fsSL "$rezmoss_base/baidu/baidu_ips_merged_v4.txt" -o "$source_dir/rezmoss_baidu.txt"
+          curl "${curl_opts[@]}" "$base/china.txt" -o "$source_dir/china.txt"
+          curl "${curl_opts[@]}" 'https://iptoasn.com/data/ip2asn-v4.tsv.gz' -o "$source_dir/iptoasn_ipv4.tsv.gz"
+          curl "${curl_opts[@]}" 'https://ftp.apnic.net/apnic/whois/apnic.db.inetnum.gz' -o "$source_dir/apnic_inetnum.gz"
+          curl "${curl_opts[@]}" 'https://ftp.apnic.net/apnic/whois/apnic.db.aut-num.gz' -o "$source_dir/apnic_autnum.gz"
+          curl "${curl_opts[@]}" 'https://ftp.apnic.net/apnic/whois/apnic.db.organisation.gz' -o "$source_dir/apnic_organisation.gz"
+          curl "${curl_opts[@]}" 'https://ftp.apnic.net/apnic/whois/apnic.db.route.gz' -o "$source_dir/apnic_route.gz"
+          curl "${curl_opts[@]}" 'https://www.ris.ripe.net/dumps/riswhoisdump.IPv4.gz' -o "$source_dir/riswhois_ipv4.gz"
+          curl "${curl_opts[@]}" 'https://raw.githubusercontent.com/lionsoul2014/ip2region/master/data/ipv4_source.txt' -o "$source_dir/ip2region_ipv4_source.txt"
           ipdata_base='https://raw.githubusercontent.com/axpwx/IP-Data/master/provider'
-          curl -fsSL "$ipdata_base/aliyun-cidr-ipv4.txt" -o "$source_dir/ipdata_aliyun.txt"
-          curl -fsSL "$ipdata_base/tencent-cidr-ipv4.txt" -o "$source_dir/ipdata_tencent.txt"
-          curl -fsSL "$ipdata_base/huawei-cidr-ipv4.txt" -o "$source_dir/ipdata_huawei.txt"
-          curl -fsSL "$ipdata_base/ucloud-cidr-ipv4.txt" -o "$source_dir/ipdata_ucloud.txt"
-          curl -fsSL "$ipdata_base/ksyun-cidr-ipv4.txt" -o "$source_dir/ipdata_ksyun.txt"
-          curl -fsSL "$ipdata_base/baidu-cidr-ipv4.txt" -o "$source_dir/ipdata_baidu.txt"
-          curl -fsSL "$ipdata_base/jdcloud-cidr-ipv4.txt" -o "$source_dir/ipdata_jdcloud.txt"
-          go run ./cmd/build --sources "$source_dir"
-          go run ./cmd/verify --sources "$source_dir"
+          curl "${curl_opts[@]}" "$ipdata_base/aliyun-cidr-ipv4.txt" -o "$source_dir/ipdata_aliyun.txt"
+          curl "${curl_opts[@]}" "$ipdata_base/tencent-cidr-ipv4.txt" -o "$source_dir/ipdata_tencent.txt"
+          curl "${curl_opts[@]}" "$ipdata_base/huawei-cidr-ipv4.txt" -o "$source_dir/ipdata_huawei.txt"
+          curl "${curl_opts[@]}" "$ipdata_base/ucloud-cidr-ipv4.txt" -o "$source_dir/ipdata_ucloud.txt"
+          curl "${curl_opts[@]}" "$ipdata_base/ksyun-cidr-ipv4.txt" -o "$source_dir/ipdata_ksyun.txt"
+          curl "${curl_opts[@]}" "$ipdata_base/baidu-cidr-ipv4.txt" -o "$source_dir/ipdata_baidu.txt"
+          curl "${curl_opts[@]}" "$ipdata_base/jdcloud-cidr-ipv4.txt" -o "$source_dir/ipdata_jdcloud.txt"
+          while IFS= read -r file; do
+            if [[ ! -s "$file" ]]; then echo "empty source: $file" >&2; exit 1; fi
+          done < <(find "$source_dir" -type f)
+          if (( $(stat -c '%s' "$source_dir/apnic_inetnum.gz") < 10000000 )); then
+            echo 'APNIC inetnum source is unexpectedly small' >&2
+            exit 1
+          fi
+          if (( $(stat -c '%s' "$source_dir/apnic_organisation.gz") < 100000 )); then
+            echo 'APNIC organisation source is unexpectedly small' >&2
+            exit 1
+          fi
+          if (( $(stat -c '%s' "$source_dir/apnic_autnum.gz") < 1000000 )); then
+            echo 'APNIC aut-num source is unexpectedly small' >&2
+            exit 1
+          fi
+          if (( $(stat -c '%s' "$source_dir/apnic_route.gz") < 1000000 )); then
+            echo 'APNIC route source is unexpectedly small' >&2
+            exit 1
+          fi
+          if (( $(stat -c '%s' "$source_dir/riswhois_ipv4.gz") < 1000000 )); then
+            echo 'RIPE RISWhois source is unexpectedly small' >&2
+            exit 1
+          fi
+          go test ./...
+          go vet ./...
+          go run ./cmd/build --sources "$source_dir" --operator-config config/operators.json
+          go run ./cmd/verify --sources "$source_dir" --operator-config config/operators.json
       - name: Commit generated lists
         shell: bash
         run: |

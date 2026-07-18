@@ -1,0 +1,149 @@
+{
+  "operators": {
+    "chinanet": {
+      "description_patterns": [
+        "china ?telecom",
+        "chinanet"
+      ],
+      "include_asns": {
+        "4847": "China Telecom Beijing provincial network; public description is China Networks Inter-Exchange"
+      }
+    },
+    "cmcc": {
+      "description_patterns": [
+        "china mobile",
+        "cmnet",
+        "tietong"
+      ],
+      "include_asns": {}
+    },
+    "unicom": {
+      "description_patterns": [
+        "unicom",
+        "cnc"
+      ],
+      "include_asns": {}
+    }
+  },
+  "exclude_description_rules": [
+    {
+      "pattern": "idc",
+      "reason": "ASN description explicitly identifies a dedicated IDC network"
+    },
+    {
+      "pattern": "(?:^|[^a-z])cdn(?:[^a-z]|$)",
+      "reason": "ASN description explicitly identifies a dedicated CDN network"
+    },
+    {
+      "pattern": "cloud",
+      "reason": "ASN description explicitly identifies a dedicated cloud network"
+    },
+    {
+      "pattern": "\\bdata[ -]?cent(?:er|re)\\b",
+      "reason": "ASN description explicitly identifies a dedicated data-center network"
+    },
+    {
+      "pattern": "\\bcolocation\\b|\\bhosting\\b",
+      "reason": "ASN description explicitly identifies a dedicated hosting or colocation network"
+    },
+    {
+      "pattern": "(?:^|[^a-z])iot(?:[^a-z]|$)|\\binternet of things\\b|(?:^|[^a-z0-9])m2m(?:[^a-z0-9]|$)",
+      "reason": "ASN description explicitly identifies a dedicated IoT or M2M network"
+    },
+    {
+      "pattern": "\\bcybersecurity\\b|\\bnetwork[ -]?security\\b",
+      "reason": "ASN description explicitly identifies a dedicated cybersecurity network"
+    },
+    {
+      "pattern": "(?:^|[^a-z])oa(?:[^a-z]|$)|\\boffice automation\\b",
+      "reason": "ASN description explicitly identifies an internal office-automation network"
+    }
+  ],
+  "exclude_apnic_inetnum_rules": [
+    {
+      "pattern": "idc(?:[^a-z0-9]|$)|\\binternet data cent(?:er|re)\\b",
+      "reason": "APNIC inetnum registration explicitly identifies an IDC network"
+    },
+    {
+      "pattern": "\\bdata[ -]?cent(?:er|re)\\b",
+      "reason": "APNIC inetnum registration explicitly identifies a data-center network"
+    },
+    {
+      "pattern": "\\bhosting\\b|\\bco[ -]?location\\b",
+      "reason": "APNIC inetnum registration explicitly identifies a hosting or colocation network"
+    },
+    {
+      "pattern": "(?:^|[^a-z0-9])(?:21vianet|cnisp)(?:[^a-z0-9]|$)",
+      "reason": "APNIC inetnum registration explicitly identifies 21Vianet or CNISP"
+    },
+    {
+      "pattern": "\\bcloud computing\\b",
+      "reason": "APNIC inetnum registration explicitly identifies a cloud-computing network"
+    },
+    {
+      "pattern": "(?:^|[^a-z0-9])cdn(?:[^a-z0-9]|$)|\\bcontent (?:delivery|distribution) network\\b",
+      "reason": "APNIC inetnum registration explicitly identifies a CDN network"
+    },
+    {
+      "pattern": "(?:^|[^a-z0-9])vps(?:[^a-z0-9]|$)|\\bvirtual private servers?\\b|\\bserver[ -]?(?:hosting|farm|cent(?:er|re))\\b|\\bhosted servers?\\b|\\b(?:machine|computer|server)[ -]?room\\b",
+      "reason": "APNIC inetnum registration explicitly identifies a hosted-server or server-room network"
+    },
+    {
+      "pattern": "\\bcloud[ -]?(?:service|platform|data|hosting|server)s?\\b",
+      "reason": "APNIC inetnum registration explicitly identifies a cloud-service network"
+    },
+    {
+      "pattern": "(?:^|[^a-z0-9])(?:aliyun|qcloud|ucloud|ksyun|jdcloud|ctyun|qingcloud|volcengine|cloudflare|akamai|wangsu|chinanetcenter|baishancloud|sinnet|westclouddata|nwcd)(?:[^a-z0-9]|$)|\\bbeijing guanghuan xinwang(?:[ |.,-]+digital technology)?\\b|\\b(?:alibaba|huawei|tencent|baidu|kingsoft|jingdong|jd|tianyi|china telecom|china unicom|china mobile|google|oracle|ibm)[ -]?(?:ai[ -]?)?cloud\\b|\\bamazon web services\\b|\\bmicrosoft azure\\b|\\bvolcano engine\\b",
+      "reason": "APNIC inetnum registration explicitly identifies a known cloud or CDN brand"
+    },
+    {
+      "pattern": "\\bhuawei[ -]?(?:(?:3com|symantec)[ -]?(?:tech|technology)|software[ -]?technology|(?:technologies|technology|technique)[ -]?(?:co(?:mpany)?|inc))(?:[., ]+(?:ltd|limited))?\\b|\\bbeijing[ -]?baidu[ -]?(?:network information technology|netcom science and technology)[ -]?co(?:mpany)?(?:[., ]+(?:ltd|limited))?\\b|\\bbaidu online network technology\\b|\\bbaidu[ -]?co(?:mpany)?[., ]+(?:ltd|limited)\\b|\\balibaba(?:\\.com|[ -]com)?[ -]?(?:\\(china\\)|china)[ -]?(?:(?:network|networking|net|web)[ -]?)?(?:technology[ -]?)?(?:co(?:mpany)?(?:[., ]+(?:ltd|limited))?|ltd[.]com)\\b",
+      "reason": "APNIC inetnum registration explicitly identifies a qualified Huawei, Baidu, or Alibaba corporate network"
+    },
+    {
+      "pattern": "\\b(?:leased|dedicated|private|special)[ -]?(?:line|circuit)s?\\b",
+      "reason": "APNIC inetnum registration explicitly identifies a dedicated line or circuit"
+    },
+    {
+      "pattern": "(?:^|[^a-z0-9])(?:mpls|ip[ -]?vpn|vpn)(?:[^a-z0-9]|$)",
+      "reason": "APNIC inetnum registration explicitly identifies an MPLS or VPN network"
+    },
+    {
+      "pattern": "(?:^|[^a-z0-9])(?:iot|m2m)(?:[^a-z0-9]|$)|\\binternet of things\\b",
+      "reason": "APNIC inetnum registration explicitly identifies an IoT or M2M network"
+    },
+    {
+      "pattern": "\\b(?:e[ -]?government|government (?:extranet|intranet|affairs network))\\b",
+      "reason": "APNIC inetnum registration explicitly identifies a government private network"
+    },
+    {
+      "pattern": "\\b(?:anti[ -]?ddos|ddos|scrubbing cent(?:er|re)|cybersecurity|network security)\\b",
+      "reason": "APNIC inetnum registration explicitly identifies a security or DDoS network"
+    },
+    {
+      "pattern": "\\boa[ -]?(?:system|server|network|office|address|dept)\\b|\\boffice (?:automation|application) (?:system|network|server)\\b",
+      "reason": "APNIC inetnum registration explicitly identifies an office-automation network"
+    },
+    {
+      "pattern": "\\b(?:video surveillance|surveillance network|monitoring network)\\b",
+      "reason": "APNIC inetnum registration explicitly identifies a surveillance or monitoring network"
+    },
+    {
+      "pattern": "(?:^|[^a-z0-9])cctv(?:[^a-z0-9]|$)|\\bchina central television\\b",
+      "reason": "APNIC inetnum registration explicitly identifies a CCTV media or institutional network"
+    }
+  ],
+  "exclude_asns": {
+    "4809": "China Telecom CN2 dedicated premium backbone; not treated as public subscriber egress",
+    "9929": "China Unicom Industrial Internet dedicated premium backbone; not treated as public subscriber egress",
+    "17442": "ChinaNetCenter/Wangsu CDN, not China Telecom",
+    "133118": "China Unicom Cloud Data Company network; IPtoASN description is only UNICOM-CN",
+    "133119": "China Unicom Cloud Data and third-party cloud/hosting network; IPtoASN description is only UNICOM-CN",
+    "134542": "China Unicom Cloud Data Company network; IPtoASN description is only UNICOM-GUIAN",
+    "137759": "MTS Systems China",
+    "138421": "China Unicom aggregation ASN originating Huawei Cloud, 51IDC, and other cloud/hosting prefixes; IPtoASN description is only CU-CN-AS",
+    "141771": "China Telecom aggregation ASN whose originated IPv4 space is almost entirely registered to Beijing Sankuai/Meituan and Huailai cloud data-center networks; IPtoASN description is only Zhangjiakou MAN",
+    "146806": "Beijing Yunlian Interactive Technology",
+    "146822": "Shenzhen Zhongyun Data Technology"
+  }
+}
