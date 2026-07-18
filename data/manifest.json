@@ -1,11 +1,11 @@
 {
-  "generated_at": "2026-07-17T10:07:31.692501115Z",
+  "generated_at": "2026-07-18T09:41:08.110531037Z",
   "scope": "ACL list; IPv4; mainland China; retains CIDRs labelled China Telecom, China Mobile, or China Unicom by ip2region only when also present in china-operator-ip's origin-only China list, then excludes CIDRs listed by either cloud-provider source: rezmoss (Alibaba, Tencent, Huawei, Baidu) or IP-Data (Alibaba, Tencent, Huawei, UCloud, Kingsoft, Baidu, JD Cloud); does not attempt to identify or exclude IDC addresses within operators' address space",
   "sources": [
     {
       "name": "china",
       "url": "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/china.txt",
-      "sha256": "c05f19cc04c00b458de84bd1e5cb9028a1902b3dd490c1ae588afc60ed9f06d7"
+      "sha256": "e45c79f6bb37188a5c99f552b1c044aa37bd880b643e64bdae177a722cc166fe"
     },
     {
       "name": "ip2region_ipv4_source",
@@ -25,7 +25,7 @@
     {
       "name": "rezmoss_huawei",
       "url": "https://raw.githubusercontent.com/rezmoss/cloud-provider-ip-addresses/main/huawei/huawei_ips_merged_v4.txt",
-      "sha256": "0f1daa5886100b435167f215b303b47fa4aaefa5d159a25e67a2b852117c49ef"
+      "sha256": "1c064bc3950f765e68472810bd62e11105ce84c642b2a3ac4921f014935805ab"
     },
     {
       "name": "rezmoss_baidu",
@@ -72,16 +72,16 @@
     {
       "name": "CN",
       "path": "cn.txt",
-      "cidr_count": 2588,
-      "address_count": 232768064,
-      "sha256": "b188b6408445525e0d59b6667d184fd96dd45b04ff4b17433368313bf13700f4"
+      "cidr_count": 2587,
+      "address_count": 232763968,
+      "sha256": "50b8eabab0afdc34bcc4cc5b322111ad576b673a4071d0069a23e8a2969a777a"
     },
     {
       "name": "北京市",
       "path": "provinces/beijing.txt",
-      "cidr_count": 2652,
-      "address_count": 14541163,
-      "sha256": "916f271270d0caf2a9ec7bebb05c130a9bf6a8b2613f55171dcb2315d7185cf8"
+      "cidr_count": 2651,
+      "address_count": 14537067,
+      "sha256": "f563e9e76c63f371602e618b2cf5ccaf8c0ec3facd3abffc70c07ffba8d4a7b5"
     },
     {
       "name": "天津市",
