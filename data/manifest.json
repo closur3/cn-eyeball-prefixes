@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-19T17:14:02.457172338Z",
+  "generated_at": "2026-07-19T17:35:04.022627234Z",
   "scope": "Best-effort ACL list; IPv4; mainland China; candidates for IPv4 addresses presented on the public Internet by ordinary Internet access users of China Telecom, China Mobile, or China Unicom, only when also present in china-operator-ip's origin-only China list; does not classify or protect addresses by household, individual, enterprise, or institutional customer type; explicitly subtracts dedicated premium backbone ASNs, cloud-provider CIDRs, strong APNIC registrations outside ordinary user access scope, portable and non-portable registrations linked through APNIC aut-num to a currently active independent ASN, registrations supported by both an independent legal-entity name and an exact APNIC aut-num link, origin-validated APNIC route objects, strongly linked independent APNIC route origins, and conservative RIPE RIS multi-observer MOAS evidence; unclear mixed-use, historical and MOAS space remains included",
   "sources": [
     {
@@ -17,8 +17,8 @@
     {
       "name": "iptoasn_ipv4",
       "url": "https://iptoasn.com/data/ip2asn-v4.tsv.gz",
-      "bytes": 6885253,
-      "sha256": "1b439ff04a81aa12080ba1aa434fc289cbf9f1bd33b5dfadbe70de9fba9c7c74"
+      "bytes": 6884617,
+      "sha256": "d0f01fc260077cedbf995b73efce67cef5d4dfba47d6d16b9ed1e8544b7b524c"
     },
     {
       "name": "apnic_organisation",
