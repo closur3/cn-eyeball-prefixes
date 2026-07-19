@@ -378,6 +378,13 @@ func intersect(a, b []span) []span {
 	return out
 }
 
+// overlapsSorted reports whether a normalized, address-sorted span set
+// intersects [lo, hi] without repeatedly sorting it for point queries.
+func overlapsSorted(rows []span, lo, hi uint32) bool {
+	i := sort.Search(len(rows), func(i int) bool { return rows[i].hi >= lo })
+	return i < len(rows) && rows[i].lo <= hi
+}
+
 func addressCount(rows []span) uint64 {
 	var count uint64
 	for _, row := range merge(rows) {
@@ -787,6 +794,12 @@ func main() {
 	if *src == "" {
 		panic("--sources is required")
 	}
+	pipelineStarted, phaseStarted := time.Now(), time.Now()
+	logPhase := func(name string) {
+		now := time.Now()
+		fmt.Printf("timing: %-28s %s\n", name, now.Sub(phaseStarted).Round(time.Millisecond))
+		phaseStarted = now
+	}
 
 	oldManifest, hasOldManifest := readManifest(filepath.Join(*out, "manifest.json"))
 
@@ -850,6 +863,7 @@ func main() {
 	}
 	cloudRanges = merge(cloudRanges)
 	postCloudCandidates := subtract(preCloudCandidates, cloudRanges)
+	logPhase("origin and cloud inputs")
 
 	orgNames, e := apnicorg.Parse(filepath.Join(*src, "apnic_organisation.gz"))
 	if e != nil {
@@ -954,6 +968,7 @@ func main() {
 	delegatedHolderRanges = merge(delegatedHolderRanges)
 	legalEntityHolderRanges = merge(legalEntityHolderRanges)
 	preRouteExcluded := merge(append(append([]span{}, cloudRanges...), apnicRanges...))
+	logPhase("APNIC inetnum and aut-num")
 
 	routeRecords, routeObjectCount, e := apnicroute.Parse(filepath.Join(*src, "apnic_route.gz"), orgNames)
 	if e != nil {
@@ -991,8 +1006,9 @@ func main() {
 		excludedPrefixes = append(excludedPrefixes, routeOriginExclusionMeta(candidate))
 	}
 	preRISExcluded = merge(append(preRISExcluded, routeOriginCandidateRanges...))
+	logPhase("APNIC route")
 
-	risRecords, risStats, e := riswhois.Parse(filepath.Join(*src, "riswhois_ipv4.gz"), func(lo, hi uint32) bool { return len(intersect(postCloudCandidates, []span{{lo, hi}})) != 0 })
+	risRecords, risStats, e := riswhois.Parse(filepath.Join(*src, "riswhois_ipv4.gz"), func(lo, hi uint32) bool { return overlapsSorted(postCloudCandidates, lo, hi) })
 	if e != nil {
 		panic(e)
 	}
@@ -1051,6 +1067,7 @@ func main() {
 	}
 	risRanges = merge(risRanges)
 	excludedRanges := merge(append(append([]span{}, preRISExcluded...), risRanges...))
+	logPhase("RIPE RISWhois")
 
 	sourceRank := map[string]int{}
 	for i, source := range cloudSources {
@@ -1136,6 +1153,7 @@ func main() {
 	if addressCount(provinceAttributed)*100 < addressCount(finalRanges)*90 {
 		panic("ip2region attributes fewer than 90% of final output addresses to provinces")
 	}
+	logPhase("final and province ranges")
 
 	if e := os.RemoveAll(*out); e != nil {
 		panic(e)
@@ -1227,4 +1245,6 @@ func main() {
 		m.GeneratedAt = oldManifest.GeneratedAt
 	}
 	writeManifest(filepath.Join(*out, "manifest.json"), m)
+	logPhase("write outputs and manifest")
+	fmt.Printf("timing: %-28s %s\n", "total", time.Since(pipelineStarted).Round(time.Millisecond))
 }

@@ -15,6 +15,7 @@ import (
 	"reflect"
 	"sort"
 	"strings"
+	"time"
 
 	"github.com/closur3/cn-operator-allowlist/internal/apnicautnum"
 	"github.com/closur3/cn-operator-allowlist/internal/apnicinetnum"
@@ -262,6 +263,13 @@ func intersect(a, b []span) []span {
 		}
 	}
 	return out
+}
+
+// overlapsSorted reports whether a normalized, address-sorted span set
+// intersects [lo, hi] without repeatedly sorting it for point queries.
+func overlapsSorted(rows []span, lo, hi uint32) bool {
+	i := sort.Search(len(rows), func(i int) bool { return rows[i].hi >= lo })
+	return i < len(rows) && rows[i].lo <= hi
 }
 
 func subtract(in, excluded []span) []span {
@@ -618,6 +626,12 @@ func main() {
 	if *sources == "" {
 		panic("--sources is required")
 	}
+	pipelineStarted, phaseStarted := time.Now(), time.Now()
+	logPhase := func(name string) {
+		now := time.Now()
+		fmt.Printf("timing: %-28s %s\n", name, now.Sub(phaseStarted).Round(time.Millisecond))
+		phaseStarted = now
+	}
 
 	provinceFiles, e := filepath.Glob(filepath.Join(*data, "provinces", "*.txt"))
 	if e != nil {
@@ -660,6 +674,7 @@ func main() {
 	assertContained(cnRanges, merge(allowedOperators))
 	preCloudCandidates := intersect(allowedOperators, chinaRanges)
 	postCloudCandidates := subtract(preCloudCandidates, cloudRanges)
+	logPhase("outputs, origin, and cloud")
 	orgNames, e := apnicorg.Parse(filepath.Join(*sources, "apnic_organisation.gz"))
 	if e != nil {
 		panic(e)
@@ -721,6 +736,7 @@ func main() {
 	delegatedHolderRanges := intersect(postCloudCandidates, matchedDelegatedRanges)
 	legalEntityHolderRanges := intersect(postCloudCandidates, matchedLegalEntityRanges)
 	preRouteExcluded := merge(append(append([]span{}, cloudRanges...), apnicRanges...))
+	logPhase("APNIC inetnum and aut-num")
 	routeRecords, routeObjects, e := apnicroute.Parse(filepath.Join(*sources, "apnic_route.gz"), orgNames)
 	if e != nil {
 		panic(e)
@@ -749,7 +765,8 @@ func main() {
 	preRISExcluded := merge(append(append([]span{}, preRouteExcluded...), routeRanges...))
 	routeOriginCandidates, routeOriginCandidateRanges := auditIndependentRouteOrigins(apnicAllSegments, routeSegments, subtract(preCloudCandidates, preRISExcluded), allowedByASN, autnumIndex, classifier, asnDescriptions)
 	preRISExcluded = merge(append(preRISExcluded, routeOriginCandidateRanges...))
-	risRecords, risStats, e := riswhois.Parse(filepath.Join(*sources, "riswhois_ipv4.gz"), func(lo, hi uint32) bool { return len(intersect(postCloudCandidates, []span{{lo, hi}})) != 0 })
+	logPhase("APNIC route")
+	risRecords, risStats, e := riswhois.Parse(filepath.Join(*sources, "riswhois_ipv4.gz"), func(lo, hi uint32) bool { return overlapsSorted(postCloudCandidates, lo, hi) })
 	if e != nil {
 		panic(e)
 	}
@@ -799,6 +816,7 @@ func main() {
 	}
 	risRanges = merge(risRanges)
 	excludedRanges := merge(append(append([]span{}, preRISExcluded...), risRanges...))
+	logPhase("RIPE RISWhois")
 	assertNoOverlap(cnRanges, excludedRanges, "cn.txt overlaps an explicit cloud, APNIC, independent route-origin, or strong RIS MOAS exclusion")
 	expectedCN := subtract(preCloudCandidates, excludedRanges)
 	assertEqual(cnRanges, expectedCN, "cn.txt address set does not equal the recomputed final output")
@@ -1074,6 +1092,8 @@ func main() {
 			panic("generated file is missing from manifest: " + path)
 		}
 	}
+	logPhase("output and manifest checks")
+	fmt.Printf("timing: %-28s %s\n", "total", time.Since(pipelineStarted).Round(time.Millisecond))
 	fmt.Println("OK: all lists and manifest metadata are valid; operator/province relations, China boundary, ASN policy, cloud CIDRs, APNIC inetnum, portable/delegated-holder aut-num, origin-validated and strongly linked independent route-origin exclusions, and conservative RIPE RIS MOAS exclusions hold.")
 }
 
