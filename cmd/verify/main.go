@@ -62,6 +62,7 @@ type cloudSourceMeta struct {
 
 type apnicSourceMeta struct {
 	RecordCount                int    `json:"record_count"`
+	RelevantRecordCount        int    `json:"relevant_record_count"`
 	MatchedWinningSegmentCount int    `json:"matched_winning_segment_count"`
 	EffectiveCIDRCount         int    `json:"effective_cidr_count"`
 	EffectiveAddressCount      uint64 `json:"effective_address_count"`
@@ -79,11 +80,12 @@ type delegatedHolderMeta struct {
 	EffectiveAddressCount      uint64 `json:"effective_address_count"`
 }
 type routeSourceMeta struct {
-	ObjectCount               int    `json:"object_count"`
-	WinningSegmentCount       int    `json:"winning_segment_count"`
-	OriginValidatedMatchCount int    `json:"origin_validated_match_count"`
-	EffectiveCIDRCount        int    `json:"effective_cidr_count"`
-	EffectiveAddressCount     uint64 `json:"effective_address_count"`
+	ObjectCount                 int    `json:"object_count"`
+	RelevantObjectCount         int    `json:"relevant_object_count"`
+	RelevantWinningSegmentCount int    `json:"relevant_winning_segment_count"`
+	OriginValidatedMatchCount   int    `json:"origin_validated_match_count"`
+	EffectiveCIDRCount          int    `json:"effective_cidr_count"`
+	EffectiveAddressCount       uint64 `json:"effective_address_count"`
 }
 
 type routeOriginAuditMeta struct {
@@ -270,6 +272,16 @@ func intersect(a, b []span) []span {
 func overlapsSorted(rows []span, lo, hi uint32) bool {
 	i := sort.Search(len(rows), func(i int) bool { return rows[i].hi >= lo })
 	return i < len(rows) && rows[i].lo <= hi
+}
+
+func relevantAPNICRecords(records []apnicinetnum.Record, candidates []span) []apnicinetnum.Record {
+	out := make([]apnicinetnum.Record, 0, len(records)/8)
+	for _, record := range records {
+		if overlapsSorted(candidates, record.Lo, record.Hi) {
+			out = append(out, record)
+		}
+	}
+	return out
 }
 
 func subtract(in, excluded []span) []span {
@@ -683,6 +695,8 @@ func main() {
 	if e != nil {
 		panic(e)
 	}
+	apnicRecordCount := len(apnicRecords)
+	apnicRecords = relevantAPNICRecords(apnicRecords, postCloudCandidates)
 	apnicinetnum.AttachOrganizationNames(apnicRecords, orgNames)
 	autnumRecords, e := apnicautnum.Parse(filepath.Join(*sources, "apnic_autnum.gz"))
 	if e != nil {
@@ -737,7 +751,7 @@ func main() {
 	legalEntityHolderRanges := intersect(postCloudCandidates, matchedLegalEntityRanges)
 	preRouteExcluded := merge(append(append([]span{}, cloudRanges...), apnicRanges...))
 	logPhase("APNIC inetnum and aut-num")
-	routeRecords, routeObjects, e := apnicroute.Parse(filepath.Join(*sources, "apnic_route.gz"), orgNames)
+	routeRecords, routeObjects, relevantRouteObjects, e := apnicroute.Parse(filepath.Join(*sources, "apnic_route.gz"), orgNames, func(lo, hi uint32) bool { return overlapsSorted(postCloudCandidates, lo, hi) })
 	if e != nil {
 		panic(e)
 	}
@@ -911,7 +925,7 @@ func main() {
 			panic("manifest cloud source metadata mismatch for " + name)
 		}
 	}
-	if m.APNICInetnum.RecordCount != len(apnicRecords) || m.APNICInetnum.MatchedWinningSegmentCount != purposeSegments || m.APNICInetnum.EffectiveCIDRCount != cidrCount(apnicPurposeRanges) || m.APNICInetnum.EffectiveAddressCount != addressCount(apnicPurposeRanges) {
+	if m.APNICInetnum.RecordCount != apnicRecordCount || m.APNICInetnum.RelevantRecordCount != len(apnicRecords) || m.APNICInetnum.MatchedWinningSegmentCount != purposeSegments || m.APNICInetnum.EffectiveCIDRCount != cidrCount(apnicPurposeRanges) || m.APNICInetnum.EffectiveAddressCount != addressCount(apnicPurposeRanges) {
 		panic("manifest APNIC inetnum metadata mismatch")
 	}
 	if m.APNICPortableHolders.AutnumRecordCount != len(autnumRecords) || m.APNICPortableHolders.MatchedWinningSegmentCount != portableSegments || m.APNICPortableHolders.EffectiveCIDRCount != cidrCount(portableHolderRanges) || m.APNICPortableHolders.EffectiveAddressCount != addressCount(portableHolderRanges) {
@@ -923,7 +937,7 @@ func main() {
 	if m.APNICIndependentLegalEntities.MatchedWinningSegmentCount != legalEntityHolderSegments || m.APNICIndependentLegalEntities.EffectiveCIDRCount != cidrCount(legalEntityHolderRanges) || m.APNICIndependentLegalEntities.EffectiveAddressCount != addressCount(legalEntityHolderRanges) {
 		panic("manifest APNIC independent legal-entity metadata mismatch")
 	}
-	if m.APNICRoute.ObjectCount != routeObjects || m.APNICRoute.WinningSegmentCount != len(routeSegments) || m.APNICRoute.OriginValidatedMatchCount != routeMatches || m.APNICRoute.EffectiveCIDRCount != cidrCount(routeRanges) || m.APNICRoute.EffectiveAddressCount != addressCount(routeRanges) {
+	if m.APNICRoute.ObjectCount != routeObjects || m.APNICRoute.RelevantObjectCount != relevantRouteObjects || m.APNICRoute.RelevantWinningSegmentCount != len(routeSegments) || m.APNICRoute.OriginValidatedMatchCount != routeMatches || m.APNICRoute.EffectiveCIDRCount != cidrCount(routeRanges) || m.APNICRoute.EffectiveAddressCount != addressCount(routeRanges) {
 		panic("manifest APNIC route metadata mismatch")
 	}
 	if !m.APNICRouteOriginAudit.Enforced || m.APNICRouteOriginAudit.CandidateEvidenceCount != len(routeOriginCandidates) || m.APNICRouteOriginAudit.CandidateCIDRCount != cidrCount(routeOriginCandidateRanges) || m.APNICRouteOriginAudit.CandidateAddressCount != addressCount(routeOriginCandidateRanges) || !reflect.DeepEqual(m.APNICRouteOriginAudit.Candidates, routeOriginCandidates) {

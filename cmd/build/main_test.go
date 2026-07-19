@@ -1,6 +1,10 @@
 package main
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/closur3/cn-operator-allowlist/internal/apnicinetnum"
+)
 
 func TestOverlapsSorted(t *testing.T) {
 	rows := []span{{10, 19}, {30, 39}, {50, 50}}
@@ -17,5 +21,13 @@ func TestOverlapsSorted(t *testing.T) {
 	}
 	if overlapsSorted(nil, 0, 100) {
 		t.Fatal("empty span set overlaps")
+	}
+}
+
+func TestRelevantAPNICRecords(t *testing.T) {
+	records := []apnicinetnum.Record{{Lo: 0, Hi: 9}, {Lo: 10, Hi: 19}, {Lo: 20, Hi: 29}}
+	got := relevantAPNICRecords(records, []span{{12, 15}, {25, 25}})
+	if len(got) != 2 || got[0].Lo != 10 || got[1].Lo != 20 {
+		t.Fatalf("unexpected relevant records: %#v", got)
 	}
 }
