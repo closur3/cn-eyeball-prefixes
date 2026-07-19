@@ -11,6 +11,10 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: generate-operator-allowlist-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   generate:
     runs-on: ubuntu-latest
