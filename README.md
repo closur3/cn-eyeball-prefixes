@@ -92,4 +92,6 @@ flowchart TD
 
 [GitHub Actions](.github/workflows/update.yml) 每天 UTC 08:08 执行，也可从 Actions 页面手动运行。
 
+仓库固定使用 `dev` 作为唯一开发分支，所有代码、规则、文档和工作流修改均先进入 `dev`；`main` 仅用于正式版本。推送非 `data/` 变更到 `dev` 会自动运行完整构建，Action 回写的纯数据提交不会重复触发工作流。
+
 工作流在 runner 工作区下的临时目录下载上游数据，拒绝空文件或异常小的 APNIC/RIS 数据，执行 Go 编译检查和静态检查，生成 `data/` 并逐条校验来源、阶段统计和排除依据；仅当列表内容、上游来源或统计信息变化时提交更新。上游源文件不会被提交到仓库，runner 结束后即被销毁。
