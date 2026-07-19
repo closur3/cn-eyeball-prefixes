@@ -79,9 +79,20 @@ func Parse(path string) ([]Record, error) {
 }
 
 func NewIndex(records []Record, active map[string]string) *Index {
+	return newIndex(records, active, true)
+}
+
+// NewRegistryIndex indexes every APNIC aut-num object, including ASNs that are
+// not present in the current IPtoASN snapshot. It is used only when another
+// independent registry signal is also present.
+func NewRegistryIndex(records []Record) *Index {
+	return newIndex(records, nil, false)
+}
+
+func newIndex(records []Record, active map[string]string, activeOnly bool) *Index {
 	x := &Index{map[string][]Record{}, map[string][]Record{}, map[string][]Record{}, map[string]Record{}, active}
 	for _, r := range records {
-		if active[r.ASN] == "" {
+		if activeOnly && active[r.ASN] == "" {
 			continue
 		}
 		x.byASN[r.ASN] = r

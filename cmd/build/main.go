@@ -216,22 +216,23 @@ type prefixExclusionMeta struct {
 }
 
 type manifest struct {
-	GeneratedAt           string                `json:"generated_at"`
-	Scope                 string                `json:"scope"`
-	Sources               []sourceMeta          `json:"sources"`
-	Stages                []stageMeta           `json:"stages"`
-	CloudSources          []cloudSourceMeta     `json:"cloud_sources"`
-	APNICInetnum          apnicSourceMeta       `json:"apnic_inetnum"`
-	APNICPortableHolders  portableHolderMeta    `json:"apnic_portable_holders"`
-	APNICDelegatedHolders delegatedHolderMeta   `json:"apnic_delegated_holders"`
-	APNICRoute            routeSourceMeta       `json:"apnic_route"`
-	APNICRouteOriginAudit routeOriginAuditMeta  `json:"apnic_route_origin_audit"`
-	RISWhois              risSourceMeta         `json:"ris_whois"`
-	ExcludedPrefixes      []prefixExclusionMeta `json:"excluded_prefixes"`
-	OperatorSummary       []operatorSummary     `json:"operator_summary"`
-	IncludedASNs          []includedASNMeta     `json:"included_asns"`
-	ExcludedASNs          []excludedASNMeta     `json:"excluded_asns"`
-	Lists                 []listMeta            `json:"lists"`
+	GeneratedAt                   string                `json:"generated_at"`
+	Scope                         string                `json:"scope"`
+	Sources                       []sourceMeta          `json:"sources"`
+	Stages                        []stageMeta           `json:"stages"`
+	CloudSources                  []cloudSourceMeta     `json:"cloud_sources"`
+	APNICInetnum                  apnicSourceMeta       `json:"apnic_inetnum"`
+	APNICPortableHolders          portableHolderMeta    `json:"apnic_portable_holders"`
+	APNICDelegatedHolders         delegatedHolderMeta   `json:"apnic_delegated_holders"`
+	APNICIndependentLegalEntities delegatedHolderMeta   `json:"apnic_independent_legal_entities"`
+	APNICRoute                    routeSourceMeta       `json:"apnic_route"`
+	APNICRouteOriginAudit         routeOriginAuditMeta  `json:"apnic_route_origin_audit"`
+	RISWhois                      risSourceMeta         `json:"ris_whois"`
+	ExcludedPrefixes              []prefixExclusionMeta `json:"excluded_prefixes"`
+	OperatorSummary               []operatorSummary     `json:"operator_summary"`
+	IncludedASNs                  []includedASNMeta     `json:"included_asns"`
+	ExcludedASNs                  []excludedASNMeta     `json:"excluded_asns"`
+	Lists                         []listMeta            `json:"lists"`
 }
 
 type province struct {
@@ -723,6 +724,10 @@ func cloudProvider(source string) string {
 
 func write(path string, rows []span) (fileMeta, error) {
 	lines := spanCIDRs(rows)
+	return writeLines(path, lines, addressCount(rows))
+}
+
+func writeLines(path string, lines []string, addresses uint64) (fileMeta, error) {
 	if e := os.MkdirAll(filepath.Dir(path), 0755); e != nil {
 		return fileMeta{}, e
 	}
@@ -733,7 +738,7 @@ func write(path string, rows []span) (fileMeta, error) {
 	if e != nil {
 		return fileMeta{}, e
 	}
-	return fileMeta{len(lines), addressCount(rows), sum}, nil
+	return fileMeta{len(lines), addresses, sum}, nil
 }
 
 func readManifest(path string) (manifest, bool) {
@@ -863,6 +868,7 @@ func main() {
 		panic(e)
 	}
 	autnumIndex := apnicautnum.NewIndex(autnumRecords, asnDescriptions)
+	registryAutnumIndex := apnicautnum.NewRegistryIndex(autnumRecords)
 	apnicAllSegments := apnicinetnum.ResolveAll(apnicRecords, func(record apnicinetnum.Record) apnicinetnum.Match {
 		result := classifier.ClassifyAPNICInetnum(apnicinetnum.SearchText(record))
 		if result.Excluded {
@@ -877,6 +883,10 @@ func main() {
 		if (status == "ALLOCATED NON-PORTABLE" || status == "ASSIGNED NON-PORTABLE") && independent {
 			return apnicinetnum.Match{Category: "apnic_delegated_holder", Reason: "Most-specific APNIC non-portable registration is linked to a currently active independent ASN", MatchedBy: "APNIC delegated holder linked through aut-num"}
 		}
+		registryLinks := independentAutnumLinks(record, registryAutnumIndex, classifier, asnDescriptions)
+		if (registrant.Operator == "" || registrant.Excluded) && classifier.IsIndependentLegalEntity(apnicinetnum.RegistrantText(record)) && len(registryLinks) != 0 {
+			return apnicinetnum.Match{Category: "apnic_independent_legal_entity_holder", Reason: "Most-specific APNIC registration names an independent legal entity and is exactly linked to an APNIC aut-num", MatchedBy: "APNIC legal entity plus exact aut-num org/netname link"}
+		}
 		return apnicinetnum.Match{}
 	})
 	apnicSegments := apnicinetnum.Matched(apnicAllSegments)
@@ -884,14 +894,16 @@ func main() {
 	for asn, record := range includedASNRecords {
 		postCloudByASN[asn] = subtract(intersect(record.ranges, chinaRanges), cloudRanges)
 	}
-	var apnicRanges, apnicPurposeRanges, portableHolderRanges, delegatedHolderRanges []span
-	purposeSegments, portableSegments, delegatedSegments := 0, 0, 0
+	var apnicRanges, apnicPurposeRanges, portableHolderRanges, delegatedHolderRanges, legalEntityHolderRanges []span
+	purposeSegments, portableSegments, delegatedSegments, legalEntityHolderSegments := 0, 0, 0, 0
 	for _, segment := range apnicSegments {
 		switch segment.Match.Category {
 		case "apnic_portable_holder":
 			portableSegments++
 		case "apnic_delegated_holder":
 			delegatedSegments++
+		case "apnic_independent_legal_entity_holder":
+			legalEntityHolderSegments++
 		default:
 			purposeSegments++
 		}
@@ -906,6 +918,8 @@ func main() {
 			portableHolderRanges = append(portableHolderRanges, effective...)
 		case "apnic_delegated_holder":
 			delegatedHolderRanges = append(delegatedHolderRanges, effective...)
+		case "apnic_independent_legal_entity_holder":
+			legalEntityHolderRanges = append(legalEntityHolderRanges, effective...)
 		default:
 			apnicPurposeRanges = append(apnicPurposeRanges, effective...)
 		}
@@ -914,8 +928,12 @@ func main() {
 			for _, cidr := range spanCIDRs(hits) {
 				prefix := netip.MustParsePrefix(cidr)
 				source := "apnic_inetnum"
-				if segment.Match.Category == "apnic_portable_holder" || segment.Match.Category == "apnic_delegated_holder" {
+				if segment.Match.Category == "apnic_portable_holder" || segment.Match.Category == "apnic_delegated_holder" || segment.Match.Category == "apnic_independent_legal_entity_holder" {
 					source = "apnic_autnum"
+				}
+				linkIndex := autnumIndex
+				if segment.Match.Category == "apnic_independent_legal_entity_holder" {
+					linkIndex = registryAutnumIndex
 				}
 				excludedPrefixes = append(excludedPrefixes, prefixExclusionMeta{
 					Source: source, Category: segment.Match.Category, CIDR: cidr,
@@ -925,7 +943,7 @@ func main() {
 					RegistryOrganizations: segment.Record.Organizations, RegistryMaintainers: segment.Record.Maintainers,
 					RegistryOrganizationNames: segment.Record.OrganizationNames,
 					RegistryStatus:            segment.Record.Status, RegistryLastModified: segment.Record.LastModified, MatchedBy: segment.Match.MatchedBy, Reason: segment.Match.Reason,
-					LinkedASNs: independentAutnumLinks(segment.Record, autnumIndex, classifier, asnDescriptions),
+					LinkedASNs: independentAutnumLinks(segment.Record, linkIndex, classifier, asnDescriptions),
 				})
 			}
 		}
@@ -934,6 +952,7 @@ func main() {
 	apnicPurposeRanges = merge(apnicPurposeRanges)
 	portableHolderRanges = merge(portableHolderRanges)
 	delegatedHolderRanges = merge(delegatedHolderRanges)
+	legalEntityHolderRanges = merge(legalEntityHolderRanges)
 	preRouteExcluded := merge(append(append([]span{}, cloudRanges...), apnicRanges...))
 
 	routeRecords, routeObjectCount, e := apnicroute.Parse(filepath.Join(*src, "apnic_route.gz"), orgNames)
@@ -1016,7 +1035,7 @@ func main() {
 				result := classifier.ClassifyAPNICInetnum(description)
 				if result.Excluded && matchedBy == "" {
 					matchedBy = result.MatchedBy + "; RIPE RIS multi-observer MOAS"
-					reason = "Alternate origin AS" + origin.ASN + " is strongly identified as non-public: " + result.Reason
+					reason = "Alternate origin AS" + origin.ASN + " is strongly identified as outside ordinary Internet user access scope: " + result.Reason
 				}
 			}
 			if matchedBy == "" {
@@ -1127,7 +1146,7 @@ func main() {
 
 	m := manifest{
 		GeneratedAt: time.Now().UTC().Format(time.RFC3339Nano),
-		Scope:       "Best-effort ACL list; IPv4; mainland China; retains prefixes originated by ASNs whose current IPtoASN descriptions identify China Telecom, China Mobile, or China Unicom, only when also present in china-operator-ip's origin-only China list; explicitly subtracts cloud-provider CIDRs, strong non-public-purpose APNIC registrations, portable and non-portable registrations linked through APNIC aut-num to a currently active independent ASN, origin-validated APNIC route objects, strongly linked independent APNIC route origins, and conservative RIPE RIS multi-observer MOAS evidence; unclear mixed-use, historical and MOAS space remains included",
+		Scope:       "Best-effort ACL list; IPv4; mainland China; candidates for IPv4 addresses presented on the public Internet by ordinary Internet access users of China Telecom, China Mobile, or China Unicom, only when also present in china-operator-ip's origin-only China list; does not classify or protect addresses by household, individual, enterprise, or institutional customer type; explicitly subtracts dedicated premium backbone ASNs, cloud-provider CIDRs, strong APNIC registrations outside ordinary user access scope, portable and non-portable registrations linked through APNIC aut-num to a currently active independent ASN, registrations supported by both an independent legal-entity name and an exact APNIC aut-num link, origin-validated APNIC route objects, strongly linked independent APNIC route origins, and conservative RIPE RIS multi-observer MOAS evidence; unclear mixed-use, historical and MOAS space remains included",
 		Stages: []stageMeta{
 			stage("operator_origin_candidates", originCandidates),
 			stage("china_origin_intersection", preCloudCandidates),
@@ -1135,6 +1154,7 @@ func main() {
 			stage("effective_apnic_prefix_exclusions", apnicPurposeRanges),
 			stage("effective_apnic_portable_holder_exclusions", portableHolderRanges),
 			stage("effective_apnic_delegated_holder_exclusions", delegatedHolderRanges),
+			stage("effective_apnic_independent_legal_entity_exclusions", legalEntityHolderRanges),
 			stage("effective_apnic_route_exclusions", routeRanges),
 			stage("effective_apnic_independent_route_origin_exclusions", routeOriginCandidateRanges),
 			stage("effective_ris_moas_exclusions", risRanges),
@@ -1146,13 +1166,14 @@ func main() {
 			RecordCount: len(apnicRecords), MatchedWinningSegmentCount: purposeSegments,
 			EffectiveCIDRCount: len(spanCIDRs(apnicPurposeRanges)), EffectiveAddressCount: addressCount(apnicPurposeRanges),
 		},
-		APNICPortableHolders:  portableHolderMeta{AutnumRecordCount: len(autnumRecords), MatchedWinningSegmentCount: portableSegments, EffectiveCIDRCount: len(spanCIDRs(portableHolderRanges)), EffectiveAddressCount: addressCount(portableHolderRanges)},
-		APNICDelegatedHolders: delegatedHolderMeta{MatchedWinningSegmentCount: delegatedSegments, EffectiveCIDRCount: len(spanCIDRs(delegatedHolderRanges)), EffectiveAddressCount: addressCount(delegatedHolderRanges)},
-		APNICRoute:            routeSourceMeta{ObjectCount: routeObjectCount, WinningSegmentCount: len(routeSegments), OriginValidatedMatchCount: routeValidatedMatches, EffectiveCIDRCount: len(spanCIDRs(routeRanges)), EffectiveAddressCount: addressCount(routeRanges)},
-		APNICRouteOriginAudit: routeOriginAuditMeta{Enforced: true, CandidateEvidenceCount: len(routeOriginCandidates), CandidateCIDRCount: len(spanCIDRs(routeOriginCandidateRanges)), CandidateAddressCount: addressCount(routeOriginCandidateRanges), Candidates: routeOriginCandidates},
-		RISWhois:              risSourceMeta{RowCount: risStats.Rows, PrefixCount: risStats.Prefixes, RelevantPrefixCount: risStats.RelevantPrefixes, WinningSegmentCount: len(risSegments), CandidateMOASSegmentCount: candidateMOAS, StrongEvidenceSegmentCount: strongMOAS, RetainedAmbiguousMOASSegmentCount: candidateMOAS - strongMOAS, EffectiveCIDRCount: len(spanCIDRs(risRanges)), EffectiveAddressCount: addressCount(risRanges)},
-		ExcludedPrefixes:      excludedPrefixes,
-		OperatorSummary:       summarizeOperators(includedASNs), IncludedASNs: includedASNs, ExcludedASNs: excludedASNs,
+		APNICPortableHolders:          portableHolderMeta{AutnumRecordCount: len(autnumRecords), MatchedWinningSegmentCount: portableSegments, EffectiveCIDRCount: len(spanCIDRs(portableHolderRanges)), EffectiveAddressCount: addressCount(portableHolderRanges)},
+		APNICDelegatedHolders:         delegatedHolderMeta{MatchedWinningSegmentCount: delegatedSegments, EffectiveCIDRCount: len(spanCIDRs(delegatedHolderRanges)), EffectiveAddressCount: addressCount(delegatedHolderRanges)},
+		APNICIndependentLegalEntities: delegatedHolderMeta{MatchedWinningSegmentCount: legalEntityHolderSegments, EffectiveCIDRCount: len(spanCIDRs(legalEntityHolderRanges)), EffectiveAddressCount: addressCount(legalEntityHolderRanges)},
+		APNICRoute:                    routeSourceMeta{ObjectCount: routeObjectCount, WinningSegmentCount: len(routeSegments), OriginValidatedMatchCount: routeValidatedMatches, EffectiveCIDRCount: len(spanCIDRs(routeRanges)), EffectiveAddressCount: addressCount(routeRanges)},
+		APNICRouteOriginAudit:         routeOriginAuditMeta{Enforced: true, CandidateEvidenceCount: len(routeOriginCandidates), CandidateCIDRCount: len(spanCIDRs(routeOriginCandidateRanges)), CandidateAddressCount: addressCount(routeOriginCandidateRanges), Candidates: routeOriginCandidates},
+		RISWhois:                      risSourceMeta{RowCount: risStats.Rows, PrefixCount: risStats.Prefixes, RelevantPrefixCount: risStats.RelevantPrefixes, WinningSegmentCount: len(risSegments), CandidateMOASSegmentCount: candidateMOAS, StrongEvidenceSegmentCount: strongMOAS, RetainedAmbiguousMOASSegmentCount: candidateMOAS - strongMOAS, EffectiveCIDRCount: len(spanCIDRs(risRanges)), EffectiveAddressCount: addressCount(risRanges)},
+		ExcludedPrefixes:              excludedPrefixes,
+		OperatorSummary:               summarizeOperators(includedASNs), IncludedASNs: includedASNs, ExcludedASNs: excludedASNs,
 	}
 	configSource, e := source(*operatorConfig, "operator_config", "", filepath.ToSlash(*operatorConfig))
 	if e != nil {

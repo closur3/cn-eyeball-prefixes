@@ -1,6 +1,11 @@
 name: Generate operator allowlist
 
 on:
+  push:
+    branches:
+      - dev
+    paths-ignore:
+      - 'data/**'
   schedule:
     - cron: '8 8 * * *'
   workflow_dispatch:
@@ -8,20 +13,28 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: generate-operator-allowlist-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   generate:
     runs-on: ubuntu-latest
+    env:
+      SOURCE_DIR: ${{ github.workspace }}/.tmp/cn-operator-sources
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-go@v6
         with:
           go-version: '1.26'
-      - name: Download sources, generate lists, and validate
+          cache: true
+      - name: Download sources
         shell: bash
         run: |
           set -euo pipefail
-          source_dir="$(mktemp -d)"
-          trap 'rm -rf "$source_dir"' EXIT
+          source_dir="$SOURCE_DIR"
+          rm -rf "$source_dir"
+          mkdir -p "$source_dir"
           curl_opts=(--fail --silent --show-error --location --retry 3)
           base='https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists'
           curl "${curl_opts[@]}" "$base/china.txt" -o "$source_dir/china.txt"
@@ -40,6 +53,12 @@ jobs:
           curl "${curl_opts[@]}" "$ipdata_base/ksyun-cidr-ipv4.txt" -o "$source_dir/ipdata_ksyun.txt"
           curl "${curl_opts[@]}" "$ipdata_base/baidu-cidr-ipv4.txt" -o "$source_dir/ipdata_baidu.txt"
           curl "${curl_opts[@]}" "$ipdata_base/jdcloud-cidr-ipv4.txt" -o "$source_dir/ipdata_jdcloud.txt"
+          du -h "$source_dir"/*
+      - name: Validate downloaded sources
+        shell: bash
+        run: |
+          set -euo pipefail
+          source_dir="$SOURCE_DIR"
           while IFS= read -r file; do
             if [[ ! -s "$file" ]]; then echo "empty source: $file" >&2; exit 1; fi
           done < <(find "$source_dir" -type f)
@@ -63,10 +82,14 @@ jobs:
             echo 'RIPE RISWhois source is unexpectedly small' >&2
             exit 1
           fi
-          go test ./...
-          go vet ./...
-          go run ./cmd/build --sources "$source_dir" --operator-config config/operators.json
-          go run ./cmd/verify --sources "$source_dir" --operator-config config/operators.json
+      - name: Run Go tests
+        run: go test ./...
+      - name: Run Go vet
+        run: go vet ./...
+      - name: Generate lists
+        run: go run ./cmd/build --sources "$SOURCE_DIR" --operator-config config/operators.json
+      - name: Verify generated lists
+        run: go run ./cmd/verify --sources "$SOURCE_DIR" --operator-config config/operators.json
       - name: Commit generated lists
         shell: bash
         run: |

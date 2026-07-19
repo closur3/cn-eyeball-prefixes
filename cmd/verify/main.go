@@ -177,17 +177,18 @@ type prefixExclusionMeta struct {
 }
 
 type manifest struct {
-	Sources               []sourceMeta          `json:"sources"`
-	Stages                []stageMeta           `json:"stages"`
-	CloudSources          []cloudSourceMeta     `json:"cloud_sources"`
-	APNICInetnum          apnicSourceMeta       `json:"apnic_inetnum"`
-	APNICPortableHolders  portableHolderMeta    `json:"apnic_portable_holders"`
-	APNICDelegatedHolders delegatedHolderMeta   `json:"apnic_delegated_holders"`
-	APNICRoute            routeSourceMeta       `json:"apnic_route"`
-	APNICRouteOriginAudit routeOriginAuditMeta  `json:"apnic_route_origin_audit"`
-	RISWhois              risSourceMeta         `json:"ris_whois"`
-	ExcludedPrefixes      []prefixExclusionMeta `json:"excluded_prefixes"`
-	Lists                 []listMeta            `json:"lists"`
+	Sources                       []sourceMeta          `json:"sources"`
+	Stages                        []stageMeta           `json:"stages"`
+	CloudSources                  []cloudSourceMeta     `json:"cloud_sources"`
+	APNICInetnum                  apnicSourceMeta       `json:"apnic_inetnum"`
+	APNICPortableHolders          portableHolderMeta    `json:"apnic_portable_holders"`
+	APNICDelegatedHolders         delegatedHolderMeta   `json:"apnic_delegated_holders"`
+	APNICIndependentLegalEntities delegatedHolderMeta   `json:"apnic_independent_legal_entities"`
+	APNICRoute                    routeSourceMeta       `json:"apnic_route"`
+	APNICRouteOriginAudit         routeOriginAuditMeta  `json:"apnic_route_origin_audit"`
+	RISWhois                      risSourceMeta         `json:"ris_whois"`
+	ExcludedPrefixes              []prefixExclusionMeta `json:"excluded_prefixes"`
+	Lists                         []listMeta            `json:"lists"`
 }
 
 type allowedASNRecord struct {
@@ -673,6 +674,7 @@ func main() {
 		panic(e)
 	}
 	autnumIndex := apnicautnum.NewIndex(autnumRecords, asnDescriptions)
+	registryAutnumIndex := apnicautnum.NewRegistryIndex(autnumRecords)
 	apnicAllSegments := apnicinetnum.ResolveAll(apnicRecords, func(record apnicinetnum.Record) apnicinetnum.Match {
 		result := classifier.ClassifyAPNICInetnum(apnicinetnum.SearchText(record))
 		if result.Excluded {
@@ -687,11 +689,15 @@ func main() {
 		if (status == "ALLOCATED NON-PORTABLE" || status == "ASSIGNED NON-PORTABLE") && independent {
 			return apnicinetnum.Match{Category: "apnic_delegated_holder", Reason: "Most-specific APNIC non-portable registration is linked to a currently active independent ASN", MatchedBy: "APNIC delegated holder linked through aut-num"}
 		}
+		registryLinks := independentAutnumLinks(record, registryAutnumIndex, classifier, asnDescriptions)
+		if (registrant.Operator == "" || registrant.Excluded) && classifier.IsIndependentLegalEntity(apnicinetnum.RegistrantText(record)) && len(registryLinks) != 0 {
+			return apnicinetnum.Match{Category: "apnic_independent_legal_entity_holder", Reason: "Most-specific APNIC registration names an independent legal entity and is exactly linked to an APNIC aut-num", MatchedBy: "APNIC legal entity plus exact aut-num org/netname link"}
+		}
 		return apnicinetnum.Match{}
 	})
 	apnicSegments := apnicinetnum.Matched(apnicAllSegments)
-	var matchedAPNICRanges, matchedPurposeRanges, matchedPortableRanges, matchedDelegatedRanges []span
-	purposeSegments, portableSegments, delegatedSegments := 0, 0, 0
+	var matchedAPNICRanges, matchedPurposeRanges, matchedPortableRanges, matchedDelegatedRanges, matchedLegalEntityRanges []span
+	purposeSegments, portableSegments, delegatedSegments, legalEntityHolderSegments := 0, 0, 0, 0
 	for _, segment := range apnicSegments {
 		matchedAPNICRanges = append(matchedAPNICRanges, span{segment.Lo, segment.Hi})
 		switch segment.Match.Category {
@@ -701,6 +707,9 @@ func main() {
 		case "apnic_delegated_holder":
 			delegatedSegments++
 			matchedDelegatedRanges = append(matchedDelegatedRanges, span{segment.Lo, segment.Hi})
+		case "apnic_independent_legal_entity_holder":
+			legalEntityHolderSegments++
+			matchedLegalEntityRanges = append(matchedLegalEntityRanges, span{segment.Lo, segment.Hi})
 		default:
 			purposeSegments++
 			matchedPurposeRanges = append(matchedPurposeRanges, span{segment.Lo, segment.Hi})
@@ -710,6 +719,7 @@ func main() {
 	apnicPurposeRanges := intersect(postCloudCandidates, matchedPurposeRanges)
 	portableHolderRanges := intersect(postCloudCandidates, matchedPortableRanges)
 	delegatedHolderRanges := intersect(postCloudCandidates, matchedDelegatedRanges)
+	legalEntityHolderRanges := intersect(postCloudCandidates, matchedLegalEntityRanges)
 	preRouteExcluded := merge(append(append([]span{}, cloudRanges...), apnicRanges...))
 	routeRecords, routeObjects, e := apnicroute.Parse(filepath.Join(*sources, "apnic_route.gz"), orgNames)
 	if e != nil {
@@ -790,10 +800,14 @@ func main() {
 	risRanges = merge(risRanges)
 	excludedRanges := merge(append(append([]span{}, preRISExcluded...), risRanges...))
 	assertNoOverlap(cnRanges, excludedRanges, "cn.txt overlaps an explicit cloud, APNIC, independent route-origin, or strong RIS MOAS exclusion")
+	expectedCN := subtract(preCloudCandidates, excludedRanges)
+	assertEqual(cnRanges, expectedCN, "cn.txt address set does not equal the recomputed final output")
 	var generatedOperators []span
 	for _, operator := range operators {
 		path := filepath.Join(*data, "operators", operator+".txt")
 		ranges := readCIDRs(path, true)
+		expected := subtract(intersect(allowedByOperator[operator], chinaRanges), excludedRanges)
+		assertEqual(ranges, expected, "operator address set does not recompute: "+operator)
 		assertContained(ranges, cnRanges)
 		assertContained(ranges, allowedByOperator[operator])
 		assertNoOverlap(ranges, merge(generatedOperators), "per-operator lists overlap")
@@ -852,6 +866,7 @@ func main() {
 		{"effective_apnic_prefix_exclusions", apnicPurposeRanges},
 		{"effective_apnic_portable_holder_exclusions", portableHolderRanges},
 		{"effective_apnic_delegated_holder_exclusions", delegatedHolderRanges},
+		{"effective_apnic_independent_legal_entity_exclusions", legalEntityHolderRanges},
 		{"effective_apnic_route_exclusions", routeRanges},
 		{"effective_apnic_independent_route_origin_exclusions", routeOriginCandidateRanges},
 		{"effective_ris_moas_exclusions", risRanges},
@@ -886,6 +901,9 @@ func main() {
 	}
 	if m.APNICDelegatedHolders.MatchedWinningSegmentCount != delegatedSegments || m.APNICDelegatedHolders.EffectiveCIDRCount != cidrCount(delegatedHolderRanges) || m.APNICDelegatedHolders.EffectiveAddressCount != addressCount(delegatedHolderRanges) {
 		panic("manifest APNIC delegated-holder metadata mismatch")
+	}
+	if m.APNICIndependentLegalEntities.MatchedWinningSegmentCount != legalEntityHolderSegments || m.APNICIndependentLegalEntities.EffectiveCIDRCount != cidrCount(legalEntityHolderRanges) || m.APNICIndependentLegalEntities.EffectiveAddressCount != addressCount(legalEntityHolderRanges) {
+		panic("manifest APNIC independent legal-entity metadata mismatch")
 	}
 	if m.APNICRoute.ObjectCount != routeObjects || m.APNICRoute.WinningSegmentCount != len(routeSegments) || m.APNICRoute.OriginValidatedMatchCount != routeMatches || m.APNICRoute.EffectiveCIDRCount != cidrCount(routeRanges) || m.APNICRoute.EffectiveAddressCount != addressCount(routeRanges) {
 		panic("manifest APNIC route metadata mismatch")
@@ -946,6 +964,15 @@ func main() {
 				panic("excluded APNIC delegated-holder evidence does not recompute: " + entry.CIDR)
 			}
 			assertContained([]span{row}, delegatedHolderRanges)
+		case "apnic_independent_legal_entity_holder":
+			if entry.Source != "apnic_autnum" || entry.Provider != "" || entry.MatchedBy != "APNIC legal entity plus exact aut-num org/netname link" || entry.Reason != "Most-specific APNIC registration names an independent legal entity and is exactly linked to an APNIC aut-num" {
+				panic("excluded APNIC independent legal-entity metadata mismatch: " + entry.CIDR)
+			}
+			segment := containingAPNICSegment(apnicSegments, row)
+			if segment == nil || segment.Match.Category != "apnic_independent_legal_entity_holder" || !classifier.IsIndependentLegalEntity(apnicinetnum.RegistrantText(segment.Record)) || entry.RegistryStatus != segment.Record.Status || !equalStrings(entry.RegistryNetnames, segment.Record.Netnames) || !equalStrings(entry.RegistryDescriptions, segment.Record.Descriptions) || !equalStrings(entry.RegistryOrganizations, segment.Record.Organizations) || !equalStrings(entry.RegistryOrganizationNames, segment.Record.OrganizationNames) || !equalStrings(entry.RegistryMaintainers, segment.Record.Maintainers) || entry.RegistryLastModified != segment.Record.LastModified || !reflect.DeepEqual(entry.LinkedASNs, independentAutnumLinks(segment.Record, registryAutnumIndex, classifier, asnDescriptions)) {
+				panic("excluded APNIC independent legal-entity evidence does not recompute: " + entry.CIDR)
+			}
+			assertContained([]span{row}, legalEntityHolderRanges)
 		case "apnic_route":
 			if entry.Source != "apnic_route" || entry.Provider != "" {
 				panic("excluded APNIC route metadata mismatch: " + entry.CIDR)
@@ -1013,7 +1040,7 @@ func main() {
 						continue
 					}
 					result := classifier.ClassifyAPNICInetnum(asnDescriptions[origin.ASN])
-					if result.Excluded && entry.MatchedBy == result.MatchedBy+"; RIPE RIS multi-observer MOAS" && entry.Reason == "Alternate origin AS"+origin.ASN+" is strongly identified as non-public: "+result.Reason {
+					if result.Excluded && entry.MatchedBy == result.MatchedBy+"; RIPE RIS multi-observer MOAS" && entry.Reason == "Alternate origin AS"+origin.ASN+" is strongly identified as outside ordinary Internet user access scope: "+result.Reason {
 						matched = true
 						break
 					}
