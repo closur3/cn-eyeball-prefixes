@@ -1016,7 +1016,7 @@ func main() {
 				result := classifier.ClassifyAPNICInetnum(description)
 				if result.Excluded && matchedBy == "" {
 					matchedBy = result.MatchedBy + "; RIPE RIS multi-observer MOAS"
-					reason = "Alternate origin AS" + origin.ASN + " is strongly identified as non-public: " + result.Reason
+					reason = "Alternate origin AS" + origin.ASN + " is strongly identified as non-terminal-access: " + result.Reason
 				}
 			}
 			if matchedBy == "" {
@@ -1127,7 +1127,7 @@ func main() {
 
 	m := manifest{
 		GeneratedAt: time.Now().UTC().Format(time.RFC3339Nano),
-		Scope:       "Best-effort ACL list; IPv4; mainland China; retains prefixes originated by ASNs whose current IPtoASN descriptions identify China Telecom, China Mobile, or China Unicom, only when also present in china-operator-ip's origin-only China list; explicitly subtracts cloud-provider CIDRs, strong non-public-purpose APNIC registrations, portable and non-portable registrations linked through APNIC aut-num to a currently active independent ASN, origin-validated APNIC route objects, strongly linked independent APNIC route origins, and conservative RIPE RIS multi-observer MOAS evidence; unclear mixed-use, historical and MOAS space remains included",
+		Scope:       "Best-effort ACL list; IPv4; mainland China; retains addresses used by China Telecom, China Mobile, or China Unicom to provide public Internet access to real end users, including household, mobile, enterprise, and institutional users, only when also present in china-operator-ip's origin-only China list; explicitly subtracts cloud-provider CIDRs, strong non-terminal-access APNIC registrations, portable and non-portable registrations linked through APNIC aut-num to a currently active independent ASN, origin-validated APNIC route objects, strongly linked independent APNIC route origins, and conservative RIPE RIS multi-observer MOAS evidence; unclear mixed-use, historical and MOAS space remains included",
 		Stages: []stageMeta{
 			stage("operator_origin_candidates", originCandidates),
 			stage("china_origin_intersection", preCloudCandidates),

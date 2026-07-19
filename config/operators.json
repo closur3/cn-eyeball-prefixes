@@ -134,8 +134,6 @@
     }
   ],
   "exclude_asns": {
-    "4809": "China Telecom CN2 dedicated premium backbone; not treated as public subscriber egress",
-    "9929": "China Unicom Industrial Internet dedicated premium backbone; not treated as public subscriber egress",
     "17442": "ChinaNetCenter/Wangsu CDN, not China Telecom",
     "133118": "China Unicom Cloud Data Company network; IPtoASN description is only UNICOM-CN",
     "133119": "China Unicom Cloud Data and third-party cloud/hosting network; IPtoASN description is only UNICOM-CN",
