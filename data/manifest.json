@@ -1,54 +1,54 @@
 {
-  "generated_at": "2026-07-18T20:25:20.4197349Z",
+  "generated_at": "2026-07-19T10:04:04.390465855Z",
   "scope": "Best-effort ACL list; IPv4; mainland China; retains prefixes originated by ASNs whose current IPtoASN descriptions identify China Telecom, China Mobile, or China Unicom, only when also present in china-operator-ip's origin-only China list; explicitly subtracts cloud-provider CIDRs, strong non-public-purpose APNIC registrations, portable and non-portable registrations linked through APNIC aut-num to a currently active independent ASN, origin-validated APNIC route objects, strongly linked independent APNIC route origins, and conservative RIPE RIS multi-observer MOAS evidence; unclear mixed-use, historical and MOAS space remains included",
   "sources": [
     {
       "name": "operator_config",
       "path": "config/operators.json",
-      "bytes": 7591,
-      "sha256": "6d9b82aac70edb3fb5af7a676d0def4481eaf3a92f8d048e7464bddd99f6bdd3"
+      "bytes": 7442,
+      "sha256": "fdda3ccdcac7034a3bed40593badcb8426cd67026b25c8b77a26e49e4d9bd7ca"
     },
     {
       "name": "china",
       "url": "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/china.txt",
-      "bytes": 65383,
-      "sha256": "c05f19cc04c00b458de84bd1e5cb9028a1902b3dd490c1ae588afc60ed9f06d7"
+      "bytes": 65385,
+      "sha256": "33af3a232e9e9164e165ea802fd7f10fe9c02b11b1bf5cd45d1f1122174b5f64"
     },
     {
       "name": "iptoasn_ipv4",
       "url": "https://iptoasn.com/data/ip2asn-v4.tsv.gz",
-      "bytes": 6884132,
-      "sha256": "9191ed0c5d1500d7c99dd6832c44cbb24d5d296fd825ca1d93e7b35ec8b22878"
+      "bytes": 6882965,
+      "sha256": "1b016cef70fe8cacb8fa178eb342090f89aaa87a2427a01dcfcfc93273334500"
     },
     {
       "name": "apnic_organisation",
       "url": "https://ftp.apnic.net/apnic/whois/apnic.db.organisation.gz",
-      "bytes": 546927,
-      "sha256": "5ea61d3b76fb29a227ab94d2948740a8f5fef89875ec4da31ca20fb6adf62728"
+      "bytes": 546965,
+      "sha256": "949530a37bd700b090bb0e11f7415c60bf926e7ba76f4c5f2d40c99745e7b70a"
     },
     {
       "name": "apnic_inetnum",
       "url": "https://ftp.apnic.net/apnic/whois/apnic.db.inetnum.gz",
-      "bytes": 53550577,
-      "sha256": "f1c5f13e21dbbd0158e59a6bdcf17629a6d7d5a0011dfffb6ee29f7b614046e3"
+      "bytes": 53551049,
+      "sha256": "291d468489b397d8ccb8a7742069170ac745393b78f959dd86c9d32628eada14"
     },
     {
       "name": "apnic_autnum",
       "url": "https://ftp.apnic.net/apnic/whois/apnic.db.aut-num.gz",
-      "bytes": 2090629,
-      "sha256": "b0866a048e551e7c8f48d3e8b70353beba2be6b6ad2b9464df4ab3b9ac492cb0"
+      "bytes": 2090703,
+      "sha256": "f0d570a36aa86bf021a5e41f68b6160f35ada96581735154c2b8cd1c0004db17"
     },
     {
       "name": "apnic_route",
       "url": "https://ftp.apnic.net/apnic/whois/apnic.db.route.gz",
-      "bytes": 7905240,
-      "sha256": "a516e94c90ab1ad669170104fcdb25d3f847f662212bf13cd09203277829dc72"
+      "bytes": 7905204,
+      "sha256": "d215cba1a954f33c78f1b8e1753557c2a3361095ea149217e777cc47c85d54a3"
     },
     {
       "name": "riswhois_ipv4",
       "url": "https://www.ris.ripe.net/dumps/riswhoisdump.IPv4.gz",
-      "bytes": 5355298,
-      "sha256": "4f41eed86b232ae6ce3cc7139ca71bd036b4f2a4a987b49103209bb929b96397"
+      "bytes": 5369834,
+      "sha256": "7461ec9380e7bc14e69627c32fa12bdc0070b1e6a7f442e55eb105a06605d57e"
     },
     {
       "name": "ip2region_ipv4_source",
@@ -107,8 +107,8 @@
     },
     {
       "name": "china_origin_intersection",
-      "cidr_count": 9778,
-      "address_count": 229276416
+      "cidr_count": 9779,
+      "address_count": 229276928
     },
     {
       "name": "effective_cloud_prefix_exclusions",
@@ -147,13 +147,13 @@
     },
     {
       "name": "final_output",
-      "cidr_count": 15734,
-      "address_count": 226236370
+      "cidr_count": 15735,
+      "address_count": 226236882
     },
     {
       "name": "province_attributed_output",
-      "cidr_count": 17086,
-      "address_count": 221376364
+      "cidr_count": 17087,
+      "address_count": 221376620
     }
   ],
   "cloud_sources": [
@@ -215,14 +215,14 @@
     }
   ],
   "apnic_inetnum": {
-    "record_count": 1256768,
+    "record_count": 1256774,
     "matched_winning_segment_count": 14370,
     "effective_cidr_count": 2007,
     "effective_address_count": 820547
   },
   "apnic_portable_holders": {
-    "autnum_record_count": 25886,
-    "matched_winning_segment_count": 127173,
+    "autnum_record_count": 25887,
+    "matched_winning_segment_count": 127170,
     "effective_cidr_count": 934,
     "effective_address_count": 1577746
   },
@@ -232,8 +232,8 @@
     "effective_address_count": 343001
   },
   "apnic_route": {
-    "object_count": 832529,
-    "winning_segment_count": 373982,
+    "object_count": 832539,
+    "winning_segment_count": 373984,
     "origin_validated_match_count": 3,
     "effective_cidr_count": 3,
     "effective_address_count": 2048
@@ -597,10 +597,10 @@
     ]
   },
   "ris_whois": {
-    "row_count": 1240763,
-    "prefix_count": 1218898,
-    "relevant_prefix_count": 46351,
-    "winning_segment_count": 56386,
+    "row_count": 1244948,
+    "prefix_count": 1223092,
+    "relevant_prefix_count": 46353,
+    "winning_segment_count": 56389,
     "candidate_moas_segment_count": 237,
     "strong_evidence_segment_count": 5,
     "retained_ambiguous_moas_segment_count": 232,
@@ -89772,7 +89772,7 @@
     {
       "operator": "unicom",
       "asn_count": 8,
-      "retained_address_count": 67859519,
+      "retained_address_count": 67860031,
       "asns": [
         {
           "asn": "4808",
@@ -90416,7 +90416,7 @@
       "description": "CHINA169-BJ China Unicom Beijing Province Network",
       "matched_by": "description_patterns: unicom",
       "origin_address_count": 7176704,
-      "retained_address_count": 6128690
+      "retained_address_count": 6129202
     },
     {
       "asn": "4837",
@@ -91005,7 +91005,7 @@
       "matched_by": "description_patterns: china ?telecom",
       "exclusion_source": "description_rule",
       "reason": "ASN description explicitly identifies a dedicated IDC network",
-      "origin_address_count": 63232
+      "origin_address_count": 62976
     },
     {
       "asn": "138982",
@@ -91257,7 +91257,7 @@
       "matched_by": "description_patterns: china ?telecom",
       "exclusion_source": "description_rule",
       "reason": "ASN description explicitly identifies a dedicated CDN network",
-      "origin_address_count": 4608
+      "origin_address_count": 4864
     },
     {
       "asn": "132510",
@@ -91437,7 +91437,7 @@
       "matched_by": "description_patterns: unicom",
       "exclusion_source": "description_rule",
       "reason": "ASN description explicitly identifies a dedicated IDC network",
-      "origin_address_count": 33280
+      "origin_address_count": 33536
     },
     {
       "asn": "140717",
@@ -91503,23 +91503,23 @@
     {
       "name": "unicom",
       "path": "operators/unicom.txt",
-      "cidr_count": 5950,
-      "address_count": 67859519,
-      "sha256": "d36cf3a317552462eef51cbee0f003adb2ae2ec84f261c4c2436cb014e1df6c7"
+      "cidr_count": 5951,
+      "address_count": 67860031,
+      "sha256": "63c2ab100321e6aa66e869303df1efefbbae2ec5a50632589c51b08bd500e031"
     },
     {
       "name": "CN",
       "path": "cn.txt",
-      "cidr_count": 15734,
-      "address_count": 226236370,
-      "sha256": "c0cef532625dd1e92665c753e1f21235c97c3f9b916a7908e805a5d1fed700f2"
+      "cidr_count": 15735,
+      "address_count": 226236882,
+      "sha256": "7bac06881bfdf1c0b1e2714ee2af166685227e9764b8ea320e24daee49938ebf"
     },
     {
       "name": "北京市",
       "path": "provinces/beijing.txt",
-      "cidr_count": 4389,
-      "address_count": 13799768,
-      "sha256": "fed612cd837eb86a7bcb1ad0d5e772c56df953f472bd24ac5fe76e962078aa49"
+      "cidr_count": 4390,
+      "address_count": 13800024,
+      "sha256": "783150632a49f0df894a9fce20691d65b572bc62fb0d8774a63f2809bc4e9a2f"
     },
     {
       "name": "天津市",
