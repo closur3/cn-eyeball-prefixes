@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-19T13:16:07.64647491Z",
+  "generated_at": "2026-07-19T16:28:58.950920556Z",
   "scope": "Best-effort ACL list; IPv4; mainland China; candidates for IPv4 addresses presented on the public Internet by ordinary Internet access users of China Telecom, China Mobile, or China Unicom, only when also present in china-operator-ip's origin-only China list; does not classify or protect addresses by household, individual, enterprise, or institutional customer type; explicitly subtracts dedicated premium backbone ASNs, cloud-provider CIDRs, strong APNIC registrations outside ordinary user access scope, portable and non-portable registrations linked through APNIC aut-num to a currently active independent ASN, registrations supported by both an independent legal-entity name and an exact APNIC aut-num link, origin-validated APNIC route objects, strongly linked independent APNIC route origins, and conservative RIPE RIS multi-observer MOAS evidence; unclear mixed-use, historical and MOAS space remains included",
   "sources": [
     {
@@ -17,32 +17,32 @@
     {
       "name": "iptoasn_ipv4",
       "url": "https://iptoasn.com/data/ip2asn-v4.tsv.gz",
-      "bytes": 6883432,
-      "sha256": "1dce6026ea1922b063fc28bc5503d1ffc3d2a607b3a5dfe7c314ef2cd6eff6f4"
+      "bytes": 6885253,
+      "sha256": "1b439ff04a81aa12080ba1aa434fc289cbf9f1bd33b5dfadbe70de9fba9c7c74"
     },
     {
       "name": "apnic_organisation",
       "url": "https://ftp.apnic.net/apnic/whois/apnic.db.organisation.gz",
-      "bytes": 546965,
-      "sha256": "949530a37bd700b090bb0e11f7415c60bf926e7ba76f4c5f2d40c99745e7b70a"
+      "bytes": 547004,
+      "sha256": "0e3b2b451562fbd95aa081294fbb75fc18d618ecdef7d5b12c2d11fc8af5ecd2"
     },
     {
       "name": "apnic_inetnum",
       "url": "https://ftp.apnic.net/apnic/whois/apnic.db.inetnum.gz",
-      "bytes": 53551049,
-      "sha256": "291d468489b397d8ccb8a7742069170ac745393b78f959dd86c9d32628eada14"
+      "bytes": 53551173,
+      "sha256": "ce4e061c24ed445e0172ea6833be392744915c00925f4368446f84246b348e9e"
     },
     {
       "name": "apnic_autnum",
       "url": "https://ftp.apnic.net/apnic/whois/apnic.db.aut-num.gz",
-      "bytes": 2090703,
-      "sha256": "f0d570a36aa86bf021a5e41f68b6160f35ada96581735154c2b8cd1c0004db17"
+      "bytes": 2090734,
+      "sha256": "31bb1f474185e6f175b644e9f75d65b44863b671e5e0635d427657023534e307"
     },
     {
       "name": "apnic_route",
       "url": "https://ftp.apnic.net/apnic/whois/apnic.db.route.gz",
-      "bytes": 7905204,
-      "sha256": "d215cba1a954f33c78f1b8e1753557c2a3361095ea149217e777cc47c85d54a3"
+      "bytes": 7905012,
+      "sha256": "c9a99c0ad6211c7e550e39ef0f64b755d2e784213855b661a3961cbca372b7ad"
     },
     {
       "name": "riswhois_ipv4",
@@ -220,7 +220,7 @@
     }
   ],
   "apnic_inetnum": {
-    "record_count": 1256774,
+    "record_count": 1256773,
     "relevant_record_count": 448025,
     "matched_winning_segment_count": 1648,
     "effective_cidr_count": 2007,
@@ -243,7 +243,7 @@
     "effective_address_count": 2659781
   },
   "apnic_route": {
-    "object_count": 832539,
+    "object_count": 832534,
     "relevant_object_count": 2826,
     "relevant_winning_segment_count": 2888,
     "origin_validated_match_count": 0,
