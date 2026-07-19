@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-19T16:28:58.950920556Z",
+  "generated_at": "2026-07-19T17:09:54.911597859Z",
   "scope": "Best-effort ACL list; IPv4; mainland China; candidates for IPv4 addresses presented on the public Internet by ordinary Internet access users of China Telecom, China Mobile, or China Unicom, only when also present in china-operator-ip's origin-only China list; does not classify or protect addresses by household, individual, enterprise, or institutional customer type; explicitly subtracts dedicated premium backbone ASNs, cloud-provider CIDRs, strong APNIC registrations outside ordinary user access scope, portable and non-portable registrations linked through APNIC aut-num to a currently active independent ASN, registrations supported by both an independent legal-entity name and an exact APNIC aut-num link, origin-validated APNIC route objects, strongly linked independent APNIC route origins, and conservative RIPE RIS multi-observer MOAS evidence; unclear mixed-use, historical and MOAS space remains included",
   "sources": [
     {
@@ -17,8 +17,8 @@
     {
       "name": "iptoasn_ipv4",
       "url": "https://iptoasn.com/data/ip2asn-v4.tsv.gz",
-      "bytes": 6885253,
-      "sha256": "1b439ff04a81aa12080ba1aa434fc289cbf9f1bd33b5dfadbe70de9fba9c7c74"
+      "bytes": 6884617,
+      "sha256": "d0f01fc260077cedbf995b73efce67cef5d4dfba47d6d16b9ed1e8544b7b524c"
     },
     {
       "name": "apnic_organisation",
@@ -106380,12 +106380,14 @@
     {
       "name": "zhejiang_apnic_registration",
       "path": "audits/zhejiang-apnic.json.gz",
+      "human_path": "audits/zhejiang-apnic.md",
       "cidr_count": 2303,
       "fact_count": 116817,
       "address_count": 16007190,
       "registry_covered_address_count": 16007190,
       "strong_non_public_signal_address_count": 8,
-      "sha256": "5b8164d35ff37fa3ed1b402086af6698ffa2a96569fbe0a0e5fe2d1c4248bffa"
+      "sha256": "5b8164d35ff37fa3ed1b402086af6698ffa2a96569fbe0a0e5fe2d1c4248bffa",
+      "human_sha256": "426bda2accffa0833754dc4a04c6d602ef39c8a329224d66555d4ebeb0ea604c"
     }
   ]
 }
