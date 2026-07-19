@@ -17,6 +17,7 @@ import (
 	"time"
 
 	"github.com/closur3/cn-operator-allowlist/internal/apnicautnum"
+	"github.com/closur3/cn-operator-allowlist/internal/apnicaudit"
 	"github.com/closur3/cn-operator-allowlist/internal/apnicinetnum"
 	"github.com/closur3/cn-operator-allowlist/internal/apnicorg"
 	"github.com/closur3/cn-operator-allowlist/internal/apnicroute"
@@ -86,6 +87,17 @@ type stageMeta struct {
 	Name         string `json:"name"`
 	CIDRCount    int    `json:"cidr_count"`
 	AddressCount uint64 `json:"address_count"`
+}
+
+type auditMeta struct {
+	Name                         string `json:"name"`
+	Path                         string `json:"path"`
+	CIDRCount                    int    `json:"cidr_count"`
+	FactCount                    int    `json:"fact_count"`
+	AddressCount                 uint64 `json:"address_count"`
+	RegistryCoveredAddressCount uint64 `json:"registry_covered_address_count"`
+	StrongNonPublicSignalAddressCount uint64 `json:"strong_non_public_signal_address_count"`
+	SHA256                       string `json:"sha256"`
 }
 
 type cloudSourceMeta struct {
@@ -235,6 +247,7 @@ type manifest struct {
 	IncludedASNs                  []includedASNMeta     `json:"included_asns"`
 	ExcludedASNs                  []excludedASNMeta     `json:"excluded_asns"`
 	Lists                         []listMeta            `json:"lists"`
+	Audits                        []auditMeta           `json:"audits"`
 }
 
 type province struct {
@@ -790,6 +803,30 @@ func writeManifest(path string, m manifest) {
 	}
 }
 
+func writeGzipJSON(path string, value any) (string, error) {
+	if e := os.MkdirAll(filepath.Dir(path), 0755); e != nil {
+		return "", e
+	}
+	f, e := os.Create(path)
+	if e != nil {
+		return "", e
+	}
+	z := gzip.NewWriter(f)
+	encodeErr := json.NewEncoder(z).Encode(value)
+	closeGzipErr := z.Close()
+	closeFileErr := f.Close()
+	if encodeErr != nil {
+		return "", encodeErr
+	}
+	if closeGzipErr != nil {
+		return "", closeGzipErr
+	}
+	if closeFileErr != nil {
+		return "", closeFileErr
+	}
+	return sha(path)
+}
+
 func provinceSet() map[string]bool {
 	out := map[string]bool{}
 	for _, p := range provinces {
@@ -1247,6 +1284,30 @@ func main() {
 		}
 		m.Lists = append(m.Lists, listMeta{Name: p.Name, Path: filepath.ToSlash(path), fileMeta: meta})
 	}
+
+	var zhejiangRows []span
+	zhejiangOperatorRanges := map[string][]apnicaudit.Range{}
+	for _, operator := range operators {
+		zhejiangRows = append(zhejiangRows, by[operator]["浙江省"]...)
+		for _, row := range by[operator]["浙江省"] {
+			zhejiangOperatorRanges[operator] = append(zhejiangOperatorRanges[operator], apnicaudit.Range{Lo: row.lo, Hi: row.hi})
+		}
+	}
+	zhejiangAudit, e := apnicaudit.Build("浙江省 retained IPv4 APNIC registration audit", spanCIDRs(zhejiangRows), zhejiangOperatorRanges, apnicAllSegments, classifier)
+	if e != nil {
+		panic(e)
+	}
+	auditPath := filepath.Join("audits", "zhejiang-apnic.json.gz")
+	auditSHA, e := writeGzipJSON(filepath.Join(*out, auditPath), zhejiangAudit)
+	if e != nil {
+		panic(e)
+	}
+	m.Audits = append(m.Audits, auditMeta{
+		Name: "zhejiang_apnic_registration", Path: filepath.ToSlash(auditPath),
+		CIDRCount: zhejiangAudit.Summary.CIDRCount, FactCount: zhejiangAudit.Summary.FactCount,
+		AddressCount: zhejiangAudit.Summary.AddressCount, RegistryCoveredAddressCount: zhejiangAudit.Summary.RegistryCoveredAddressCount,
+		StrongNonPublicSignalAddressCount: zhejiangAudit.Summary.StrongNonPublicSignalAddressCount, SHA256: auditSHA,
+	})
 
 	if hasOldManifest && sameManifestContent(oldManifest, m) {
 		m.GeneratedAt = oldManifest.GeneratedAt

@@ -18,6 +18,7 @@ import (
 	"time"
 
 	"github.com/closur3/cn-operator-allowlist/internal/apnicautnum"
+	"github.com/closur3/cn-operator-allowlist/internal/apnicaudit"
 	"github.com/closur3/cn-operator-allowlist/internal/apnicinetnum"
 	"github.com/closur3/cn-operator-allowlist/internal/apnicorg"
 	"github.com/closur3/cn-operator-allowlist/internal/apnicroute"
@@ -50,6 +51,17 @@ type stageMeta struct {
 	Name         string `json:"name"`
 	CIDRCount    int    `json:"cidr_count"`
 	AddressCount uint64 `json:"address_count"`
+}
+
+type auditMeta struct {
+	Name                         string `json:"name"`
+	Path                         string `json:"path"`
+	CIDRCount                    int    `json:"cidr_count"`
+	FactCount                    int    `json:"fact_count"`
+	AddressCount                 uint64 `json:"address_count"`
+	RegistryCoveredAddressCount uint64 `json:"registry_covered_address_count"`
+	StrongNonPublicSignalAddressCount uint64 `json:"strong_non_public_signal_address_count"`
+	SHA256                       string `json:"sha256"`
 }
 
 type cloudSourceMeta struct {
@@ -192,6 +204,7 @@ type manifest struct {
 	RISWhois                      risSourceMeta         `json:"ris_whois"`
 	ExcludedPrefixes              []prefixExclusionMeta `json:"excluded_prefixes"`
 	Lists                         []listMeta            `json:"lists"`
+	Audits                        []auditMeta           `json:"audits"`
 }
 
 type allowedASNRecord struct {
@@ -1088,6 +1101,43 @@ func main() {
 		manifestExcludedRanges = append(manifestExcludedRanges, row)
 	}
 	assertEqual(manifestExcludedRanges, intersect(preCloudCandidates, excludedRanges), "manifest excluded-prefix union mismatch")
+	if len(m.Audits) != 1 || m.Audits[0].Name != "zhejiang_apnic_registration" || m.Audits[0].Path != "audits/zhejiang-apnic.json.gz" {
+		panic("manifest Zhejiang APNIC audit metadata mismatch")
+	}
+	zhejiangPath := filepath.Join(*data, "provinces", "zhejiang.txt")
+	zhejiangCIDRs := strings.Fields(string(mustRead(zhejiangPath)))
+	zhejiangRanges := readCIDRs(zhejiangPath, true)
+	zhejiangOperatorRanges := map[string][]apnicaudit.Range{}
+	for _, operator := range operators {
+		operatorRows := intersect(readCIDRs(filepath.Join(*data, "operators", operator+".txt"), true), zhejiangRanges)
+		for _, row := range operatorRows {
+			zhejiangOperatorRanges[operator] = append(zhejiangOperatorRanges[operator], apnicaudit.Range{Lo: row.lo, Hi: row.hi})
+		}
+	}
+	expectedAudit, e := apnicaudit.Build("浙江省 retained IPv4 APNIC registration audit", zhejiangCIDRs, zhejiangOperatorRanges, apnicAllSegments, classifier)
+	if e != nil {
+		panic(e)
+	}
+	auditPath := filepath.Join(*data, filepath.FromSlash(m.Audits[0].Path))
+	auditFile, e := os.Open(auditPath)
+	if e != nil {
+		panic(e)
+	}
+	auditGzip, e := gzip.NewReader(auditFile)
+	if e != nil {
+		panic(e)
+	}
+	var actualAudit apnicaudit.Report
+	decodeErr := json.NewDecoder(auditGzip).Decode(&actualAudit)
+	closeGzipErr := auditGzip.Close()
+	closeFileErr := auditFile.Close()
+	if decodeErr != nil || closeGzipErr != nil || closeFileErr != nil || !reflect.DeepEqual(actualAudit, expectedAudit) {
+		panic("Zhejiang APNIC audit does not recompute")
+	}
+	auditMeta := m.Audits[0]
+	if auditMeta.CIDRCount != actualAudit.Summary.CIDRCount || auditMeta.FactCount != actualAudit.Summary.FactCount || auditMeta.AddressCount != actualAudit.Summary.AddressCount || auditMeta.RegistryCoveredAddressCount != actualAudit.Summary.RegistryCoveredAddressCount || auditMeta.StrongNonPublicSignalAddressCount != actualAudit.Summary.StrongNonPublicSignalAddressCount || auditMeta.SHA256 != fileSHA(auditPath) {
+		panic("manifest Zhejiang APNIC audit summary mismatch")
+	}
 	if len(m.Lists) != len(files) {
 		panic("manifest list count does not match generated files")
 	}

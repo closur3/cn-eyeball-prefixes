@@ -88,6 +88,10 @@ flowchart TD
 - 仅处理 IPv4 和中国大陆 31 个省级行政区；非中国大陆地址及无法归入省级行政区的网段不进入省级文件。
 - 相邻或重叠网段会合并为最大 CIDR 集合。三个运营商文件互不重叠且其并集严格等于 `cn.txt`；31 个省级文件互不重叠且均为 `cn.txt` 的子集。由于 ip2region 可能没有覆盖全国表中的全部地址，省级并集不强制等于全国表，实际归属覆盖量会作为 `province_attributed_output` 阶段写入 manifest。生成后校验器会检查这些关系、上游包含关系、排除证据和 manifest 文件摘要。
 
+## APNIC 登记事实反查试点
+
+`data/audits/zhejiang-apnic.json.gz` 将浙江省最大聚合 ACL 中的每个地址重新切分到构建快照内最具体的 APNIC `inetnum` 登记边界，并记录所属运营商、登记范围、netname、description、organisation、maintainer、status 和最后修改时间。报告覆盖全部浙江 CIDR 和地址，将登记分为三网自身、独立法定主体、其他登记、无登记覆盖及强非公众信号五类。独立主体登记只作为人工审计线索，不单独视为误收或自动排除证据。完整事实采用确定性的紧凑 gzip JSON，校验器会使用同一份上游快照独立重算整份报告。
+
 ## 自动更新
 
 [GitHub Actions](.github/workflows/update.yml) 每天 UTC 08:08 执行，也可从 Actions 页面手动运行。

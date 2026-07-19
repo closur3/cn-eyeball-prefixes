@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-19T12:21:54.837991185Z",
+  "generated_at": "2026-07-19T13:16:07.64647491Z",
   "scope": "Best-effort ACL list; IPv4; mainland China; candidates for IPv4 addresses presented on the public Internet by ordinary Internet access users of China Telecom, China Mobile, or China Unicom, only when also present in china-operator-ip's origin-only China list; does not classify or protect addresses by household, individual, enterprise, or institutional customer type; explicitly subtracts dedicated premium backbone ASNs, cloud-provider CIDRs, strong APNIC registrations outside ordinary user access scope, portable and non-portable registrations linked through APNIC aut-num to a currently active independent ASN, registrations supported by both an independent legal-entity name and an exact APNIC aut-num link, origin-validated APNIC route objects, strongly linked independent APNIC route origins, and conservative RIPE RIS multi-observer MOAS evidence; unclear mixed-use, historical and MOAS space remains included",
   "sources": [
     {
@@ -17,8 +17,8 @@
     {
       "name": "iptoasn_ipv4",
       "url": "https://iptoasn.com/data/ip2asn-v4.tsv.gz",
-      "bytes": 6883472,
-      "sha256": "bc5f685099a9b9eaa9a26bb16528198c0481d27059af367fca2457e1ab3622cb"
+      "bytes": 6883432,
+      "sha256": "1dce6026ea1922b063fc28bc5503d1ffc3d2a607b3a5dfe7c314ef2cd6eff6f4"
     },
     {
       "name": "apnic_organisation",
@@ -106374,6 +106374,18 @@
       "cidr_count": 237,
       "address_count": 3750734,
       "sha256": "4b7ccef2e4cdd1f702b3c498cbc6bdc32eb86b6af990db04fe8b25f9f21f103e"
+    }
+  ],
+  "audits": [
+    {
+      "name": "zhejiang_apnic_registration",
+      "path": "audits/zhejiang-apnic.json.gz",
+      "cidr_count": 2303,
+      "fact_count": 116817,
+      "address_count": 16007190,
+      "registry_covered_address_count": 16007190,
+      "strong_non_public_signal_address_count": 8,
+      "sha256": "5b8164d35ff37fa3ed1b402086af6698ffa2a96569fbe0a0e5fe2d1c4248bffa"
     }
   ]
 }
