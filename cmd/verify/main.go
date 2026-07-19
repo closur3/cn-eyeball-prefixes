@@ -15,6 +15,7 @@ import (
 	"reflect"
 	"sort"
 	"strings"
+	"time"
 
 	"github.com/closur3/cn-operator-allowlist/internal/apnicautnum"
 	"github.com/closur3/cn-operator-allowlist/internal/apnicinetnum"
@@ -61,6 +62,7 @@ type cloudSourceMeta struct {
 
 type apnicSourceMeta struct {
 	RecordCount                int    `json:"record_count"`
+	RelevantRecordCount        int    `json:"relevant_record_count"`
 	MatchedWinningSegmentCount int    `json:"matched_winning_segment_count"`
 	EffectiveCIDRCount         int    `json:"effective_cidr_count"`
 	EffectiveAddressCount      uint64 `json:"effective_address_count"`
@@ -78,11 +80,12 @@ type delegatedHolderMeta struct {
 	EffectiveAddressCount      uint64 `json:"effective_address_count"`
 }
 type routeSourceMeta struct {
-	ObjectCount               int    `json:"object_count"`
-	WinningSegmentCount       int    `json:"winning_segment_count"`
-	OriginValidatedMatchCount int    `json:"origin_validated_match_count"`
-	EffectiveCIDRCount        int    `json:"effective_cidr_count"`
-	EffectiveAddressCount     uint64 `json:"effective_address_count"`
+	ObjectCount                 int    `json:"object_count"`
+	RelevantObjectCount         int    `json:"relevant_object_count"`
+	RelevantWinningSegmentCount int    `json:"relevant_winning_segment_count"`
+	OriginValidatedMatchCount   int    `json:"origin_validated_match_count"`
+	EffectiveCIDRCount          int    `json:"effective_cidr_count"`
+	EffectiveAddressCount       uint64 `json:"effective_address_count"`
 }
 
 type routeOriginAuditMeta struct {
@@ -259,6 +262,23 @@ func intersect(a, b []span) []span {
 			i++
 		} else {
 			j++
+		}
+	}
+	return out
+}
+
+// overlapsSorted reports whether a normalized, address-sorted span set
+// intersects [lo, hi] without repeatedly sorting it for point queries.
+func overlapsSorted(rows []span, lo, hi uint32) bool {
+	i := sort.Search(len(rows), func(i int) bool { return rows[i].hi >= lo })
+	return i < len(rows) && rows[i].lo <= hi
+}
+
+func relevantAPNICRecords(records []apnicinetnum.Record, candidates []span) []apnicinetnum.Record {
+	out := make([]apnicinetnum.Record, 0, len(records)/8)
+	for _, record := range records {
+		if overlapsSorted(candidates, record.Lo, record.Hi) {
+			out = append(out, record)
 		}
 	}
 	return out
@@ -618,6 +638,12 @@ func main() {
 	if *sources == "" {
 		panic("--sources is required")
 	}
+	pipelineStarted, phaseStarted := time.Now(), time.Now()
+	logPhase := func(name string) {
+		now := time.Now()
+		fmt.Printf("timing: %-28s %s\n", name, now.Sub(phaseStarted).Round(time.Millisecond))
+		phaseStarted = now
+	}
 
 	provinceFiles, e := filepath.Glob(filepath.Join(*data, "provinces", "*.txt"))
 	if e != nil {
@@ -660,6 +686,7 @@ func main() {
 	assertContained(cnRanges, merge(allowedOperators))
 	preCloudCandidates := intersect(allowedOperators, chinaRanges)
 	postCloudCandidates := subtract(preCloudCandidates, cloudRanges)
+	logPhase("outputs, origin, and cloud")
 	orgNames, e := apnicorg.Parse(filepath.Join(*sources, "apnic_organisation.gz"))
 	if e != nil {
 		panic(e)
@@ -668,6 +695,8 @@ func main() {
 	if e != nil {
 		panic(e)
 	}
+	apnicRecordCount := len(apnicRecords)
+	apnicRecords = relevantAPNICRecords(apnicRecords, postCloudCandidates)
 	apnicinetnum.AttachOrganizationNames(apnicRecords, orgNames)
 	autnumRecords, e := apnicautnum.Parse(filepath.Join(*sources, "apnic_autnum.gz"))
 	if e != nil {
@@ -721,7 +750,8 @@ func main() {
 	delegatedHolderRanges := intersect(postCloudCandidates, matchedDelegatedRanges)
 	legalEntityHolderRanges := intersect(postCloudCandidates, matchedLegalEntityRanges)
 	preRouteExcluded := merge(append(append([]span{}, cloudRanges...), apnicRanges...))
-	routeRecords, routeObjects, e := apnicroute.Parse(filepath.Join(*sources, "apnic_route.gz"), orgNames)
+	logPhase("APNIC inetnum and aut-num")
+	routeRecords, routeObjects, relevantRouteObjects, e := apnicroute.Parse(filepath.Join(*sources, "apnic_route.gz"), orgNames, func(lo, hi uint32) bool { return overlapsSorted(postCloudCandidates, lo, hi) })
 	if e != nil {
 		panic(e)
 	}
@@ -749,7 +779,8 @@ func main() {
 	preRISExcluded := merge(append(append([]span{}, preRouteExcluded...), routeRanges...))
 	routeOriginCandidates, routeOriginCandidateRanges := auditIndependentRouteOrigins(apnicAllSegments, routeSegments, subtract(preCloudCandidates, preRISExcluded), allowedByASN, autnumIndex, classifier, asnDescriptions)
 	preRISExcluded = merge(append(preRISExcluded, routeOriginCandidateRanges...))
-	risRecords, risStats, e := riswhois.Parse(filepath.Join(*sources, "riswhois_ipv4.gz"), func(lo, hi uint32) bool { return len(intersect(postCloudCandidates, []span{{lo, hi}})) != 0 })
+	logPhase("APNIC route")
+	risRecords, risStats, e := riswhois.Parse(filepath.Join(*sources, "riswhois_ipv4.gz"), func(lo, hi uint32) bool { return overlapsSorted(postCloudCandidates, lo, hi) })
 	if e != nil {
 		panic(e)
 	}
@@ -799,6 +830,7 @@ func main() {
 	}
 	risRanges = merge(risRanges)
 	excludedRanges := merge(append(append([]span{}, preRISExcluded...), risRanges...))
+	logPhase("RIPE RISWhois")
 	assertNoOverlap(cnRanges, excludedRanges, "cn.txt overlaps an explicit cloud, APNIC, independent route-origin, or strong RIS MOAS exclusion")
 	expectedCN := subtract(preCloudCandidates, excludedRanges)
 	assertEqual(cnRanges, expectedCN, "cn.txt address set does not equal the recomputed final output")
@@ -893,7 +925,7 @@ func main() {
 			panic("manifest cloud source metadata mismatch for " + name)
 		}
 	}
-	if m.APNICInetnum.RecordCount != len(apnicRecords) || m.APNICInetnum.MatchedWinningSegmentCount != purposeSegments || m.APNICInetnum.EffectiveCIDRCount != cidrCount(apnicPurposeRanges) || m.APNICInetnum.EffectiveAddressCount != addressCount(apnicPurposeRanges) {
+	if m.APNICInetnum.RecordCount != apnicRecordCount || m.APNICInetnum.RelevantRecordCount != len(apnicRecords) || m.APNICInetnum.MatchedWinningSegmentCount != purposeSegments || m.APNICInetnum.EffectiveCIDRCount != cidrCount(apnicPurposeRanges) || m.APNICInetnum.EffectiveAddressCount != addressCount(apnicPurposeRanges) {
 		panic("manifest APNIC inetnum metadata mismatch")
 	}
 	if m.APNICPortableHolders.AutnumRecordCount != len(autnumRecords) || m.APNICPortableHolders.MatchedWinningSegmentCount != portableSegments || m.APNICPortableHolders.EffectiveCIDRCount != cidrCount(portableHolderRanges) || m.APNICPortableHolders.EffectiveAddressCount != addressCount(portableHolderRanges) {
@@ -905,7 +937,7 @@ func main() {
 	if m.APNICIndependentLegalEntities.MatchedWinningSegmentCount != legalEntityHolderSegments || m.APNICIndependentLegalEntities.EffectiveCIDRCount != cidrCount(legalEntityHolderRanges) || m.APNICIndependentLegalEntities.EffectiveAddressCount != addressCount(legalEntityHolderRanges) {
 		panic("manifest APNIC independent legal-entity metadata mismatch")
 	}
-	if m.APNICRoute.ObjectCount != routeObjects || m.APNICRoute.WinningSegmentCount != len(routeSegments) || m.APNICRoute.OriginValidatedMatchCount != routeMatches || m.APNICRoute.EffectiveCIDRCount != cidrCount(routeRanges) || m.APNICRoute.EffectiveAddressCount != addressCount(routeRanges) {
+	if m.APNICRoute.ObjectCount != routeObjects || m.APNICRoute.RelevantObjectCount != relevantRouteObjects || m.APNICRoute.RelevantWinningSegmentCount != len(routeSegments) || m.APNICRoute.OriginValidatedMatchCount != routeMatches || m.APNICRoute.EffectiveCIDRCount != cidrCount(routeRanges) || m.APNICRoute.EffectiveAddressCount != addressCount(routeRanges) {
 		panic("manifest APNIC route metadata mismatch")
 	}
 	if !m.APNICRouteOriginAudit.Enforced || m.APNICRouteOriginAudit.CandidateEvidenceCount != len(routeOriginCandidates) || m.APNICRouteOriginAudit.CandidateCIDRCount != cidrCount(routeOriginCandidateRanges) || m.APNICRouteOriginAudit.CandidateAddressCount != addressCount(routeOriginCandidateRanges) || !reflect.DeepEqual(m.APNICRouteOriginAudit.Candidates, routeOriginCandidates) {
@@ -1074,6 +1106,8 @@ func main() {
 			panic("generated file is missing from manifest: " + path)
 		}
 	}
+	logPhase("output and manifest checks")
+	fmt.Printf("timing: %-28s %s\n", "total", time.Since(pipelineStarted).Round(time.Millisecond))
 	fmt.Println("OK: all lists and manifest metadata are valid; operator/province relations, China boundary, ASN policy, cloud CIDRs, APNIC inetnum, portable/delegated-holder aut-num, origin-validated and strongly linked independent route-origin exclusions, and conservative RIPE RIS MOAS exclusions hold.")
 }
 

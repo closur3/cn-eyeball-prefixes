@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-19T11:06:29.428688118Z",
+  "generated_at": "2026-07-19T12:21:54.837991185Z",
   "scope": "Best-effort ACL list; IPv4; mainland China; candidates for IPv4 addresses presented on the public Internet by ordinary Internet access users of China Telecom, China Mobile, or China Unicom, only when also present in china-operator-ip's origin-only China list; does not classify or protect addresses by household, individual, enterprise, or institutional customer type; explicitly subtracts dedicated premium backbone ASNs, cloud-provider CIDRs, strong APNIC registrations outside ordinary user access scope, portable and non-portable registrations linked through APNIC aut-num to a currently active independent ASN, registrations supported by both an independent legal-entity name and an exact APNIC aut-num link, origin-validated APNIC route objects, strongly linked independent APNIC route origins, and conservative RIPE RIS multi-observer MOAS evidence; unclear mixed-use, historical and MOAS space remains included",
   "sources": [
     {
@@ -17,8 +17,8 @@
     {
       "name": "iptoasn_ipv4",
       "url": "https://iptoasn.com/data/ip2asn-v4.tsv.gz",
-      "bytes": 6882957,
-      "sha256": "4fc7b0cd168f19389b367a50238664b6e6a8260437ac89a3a0992ce9d53307e2"
+      "bytes": 6883472,
+      "sha256": "bc5f685099a9b9eaa9a26bb16528198c0481d27059af367fca2457e1ab3622cb"
     },
     {
       "name": "apnic_organisation",
@@ -221,29 +221,31 @@
   ],
   "apnic_inetnum": {
     "record_count": 1256774,
-    "matched_winning_segment_count": 14370,
+    "relevant_record_count": 448025,
+    "matched_winning_segment_count": 1648,
     "effective_cidr_count": 2007,
     "effective_address_count": 820547
   },
   "apnic_portable_holders": {
     "autnum_record_count": 25887,
-    "matched_winning_segment_count": 127172,
+    "matched_winning_segment_count": 597,
     "effective_cidr_count": 934,
     "effective_address_count": 1577746
   },
   "apnic_delegated_holders": {
-    "matched_winning_segment_count": 6061,
+    "matched_winning_segment_count": 51,
     "effective_cidr_count": 53,
     "effective_address_count": 343001
   },
   "apnic_independent_legal_entities": {
-    "matched_winning_segment_count": 6843,
+    "matched_winning_segment_count": 293,
     "effective_cidr_count": 359,
     "effective_address_count": 2659781
   },
   "apnic_route": {
     "object_count": 832539,
-    "winning_segment_count": 373984,
+    "relevant_object_count": 2826,
+    "relevant_winning_segment_count": 2888,
     "origin_validated_match_count": 0,
     "effective_cidr_count": 0,
     "effective_address_count": 0

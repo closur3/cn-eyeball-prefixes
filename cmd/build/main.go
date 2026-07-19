@@ -99,6 +99,7 @@ type cloudSourceMeta struct {
 
 type apnicSourceMeta struct {
 	RecordCount                int    `json:"record_count"`
+	RelevantRecordCount        int    `json:"relevant_record_count"`
 	MatchedWinningSegmentCount int    `json:"matched_winning_segment_count"`
 	EffectiveCIDRCount         int    `json:"effective_cidr_count"`
 	EffectiveAddressCount      uint64 `json:"effective_address_count"`
@@ -117,11 +118,12 @@ type delegatedHolderMeta struct {
 }
 
 type routeSourceMeta struct {
-	ObjectCount               int    `json:"object_count"`
-	WinningSegmentCount       int    `json:"winning_segment_count"`
-	OriginValidatedMatchCount int    `json:"origin_validated_match_count"`
-	EffectiveCIDRCount        int    `json:"effective_cidr_count"`
-	EffectiveAddressCount     uint64 `json:"effective_address_count"`
+	ObjectCount                 int    `json:"object_count"`
+	RelevantObjectCount         int    `json:"relevant_object_count"`
+	RelevantWinningSegmentCount int    `json:"relevant_winning_segment_count"`
+	OriginValidatedMatchCount   int    `json:"origin_validated_match_count"`
+	EffectiveCIDRCount          int    `json:"effective_cidr_count"`
+	EffectiveAddressCount       uint64 `json:"effective_address_count"`
 }
 
 type routeOriginAuditMeta struct {
@@ -373,6 +375,23 @@ func intersect(a, b []span) []span {
 			i++
 		} else {
 			j++
+		}
+	}
+	return out
+}
+
+// overlapsSorted reports whether a normalized, address-sorted span set
+// intersects [lo, hi] without repeatedly sorting it for point queries.
+func overlapsSorted(rows []span, lo, hi uint32) bool {
+	i := sort.Search(len(rows), func(i int) bool { return rows[i].hi >= lo })
+	return i < len(rows) && rows[i].lo <= hi
+}
+
+func relevantAPNICRecords(records []apnicinetnum.Record, candidates []span) []apnicinetnum.Record {
+	out := make([]apnicinetnum.Record, 0, len(records)/8)
+	for _, record := range records {
+		if overlapsSorted(candidates, record.Lo, record.Hi) {
+			out = append(out, record)
 		}
 	}
 	return out
@@ -787,6 +806,12 @@ func main() {
 	if *src == "" {
 		panic("--sources is required")
 	}
+	pipelineStarted, phaseStarted := time.Now(), time.Now()
+	logPhase := func(name string) {
+		now := time.Now()
+		fmt.Printf("timing: %-28s %s\n", name, now.Sub(phaseStarted).Round(time.Millisecond))
+		phaseStarted = now
+	}
 
 	oldManifest, hasOldManifest := readManifest(filepath.Join(*out, "manifest.json"))
 
@@ -850,6 +875,7 @@ func main() {
 	}
 	cloudRanges = merge(cloudRanges)
 	postCloudCandidates := subtract(preCloudCandidates, cloudRanges)
+	logPhase("origin and cloud inputs")
 
 	orgNames, e := apnicorg.Parse(filepath.Join(*src, "apnic_organisation.gz"))
 	if e != nil {
@@ -862,6 +888,8 @@ func main() {
 	if len(apnicRecords) < 10000 {
 		panic(fmt.Sprintf("APNIC inetnum source contains only %d records", len(apnicRecords)))
 	}
+	apnicRecordCount := len(apnicRecords)
+	apnicRecords = relevantAPNICRecords(apnicRecords, postCloudCandidates)
 	apnicinetnum.AttachOrganizationNames(apnicRecords, orgNames)
 	autnumRecords, e := apnicautnum.Parse(filepath.Join(*src, "apnic_autnum.gz"))
 	if e != nil {
@@ -954,8 +982,9 @@ func main() {
 	delegatedHolderRanges = merge(delegatedHolderRanges)
 	legalEntityHolderRanges = merge(legalEntityHolderRanges)
 	preRouteExcluded := merge(append(append([]span{}, cloudRanges...), apnicRanges...))
+	logPhase("APNIC inetnum and aut-num")
 
-	routeRecords, routeObjectCount, e := apnicroute.Parse(filepath.Join(*src, "apnic_route.gz"), orgNames)
+	routeRecords, routeObjectCount, relevantRouteObjectCount, e := apnicroute.Parse(filepath.Join(*src, "apnic_route.gz"), orgNames, func(lo, hi uint32) bool { return overlapsSorted(postCloudCandidates, lo, hi) })
 	if e != nil {
 		panic(e)
 	}
@@ -991,8 +1020,9 @@ func main() {
 		excludedPrefixes = append(excludedPrefixes, routeOriginExclusionMeta(candidate))
 	}
 	preRISExcluded = merge(append(preRISExcluded, routeOriginCandidateRanges...))
+	logPhase("APNIC route")
 
-	risRecords, risStats, e := riswhois.Parse(filepath.Join(*src, "riswhois_ipv4.gz"), func(lo, hi uint32) bool { return len(intersect(postCloudCandidates, []span{{lo, hi}})) != 0 })
+	risRecords, risStats, e := riswhois.Parse(filepath.Join(*src, "riswhois_ipv4.gz"), func(lo, hi uint32) bool { return overlapsSorted(postCloudCandidates, lo, hi) })
 	if e != nil {
 		panic(e)
 	}
@@ -1051,6 +1081,7 @@ func main() {
 	}
 	risRanges = merge(risRanges)
 	excludedRanges := merge(append(append([]span{}, preRISExcluded...), risRanges...))
+	logPhase("RIPE RISWhois")
 
 	sourceRank := map[string]int{}
 	for i, source := range cloudSources {
@@ -1090,6 +1121,7 @@ func main() {
 	for _, o := range operators {
 		by[o] = map[string][]span{}
 	}
+	provinceSourceRanges := map[string][]span{}
 	provinceNames := provinceSet()
 
 	b, e := os.ReadFile(filepath.Join(*src, "ip2region_ipv4_source.txt"))
@@ -1110,20 +1142,12 @@ func main() {
 		}
 		a, _ := netip.ParseAddr(x[0])
 		z, _ := netip.ParseAddr(x[1])
-		lo, hi := n(a), n(z)
+		provinceSourceRanges[p] = append(provinceSourceRanges[p], span{n(a), n(z)})
+	}
+	for _, p := range provinces {
+		provinceRanges := merge(provinceSourceRanges[p.Name])
 		for _, o := range operators {
-			for _, r := range ranges[o] {
-				l, h := lo, hi
-				if r.lo > l {
-					l = r.lo
-				}
-				if r.hi < h {
-					h = r.hi
-				}
-				if l <= h {
-					by[o][p] = append(by[o][p], span{l, h})
-				}
-			}
+			by[o][p.Name] = intersect(ranges[o], provinceRanges)
 		}
 	}
 	var provinceAttributed []span
@@ -1136,6 +1160,7 @@ func main() {
 	if addressCount(provinceAttributed)*100 < addressCount(finalRanges)*90 {
 		panic("ip2region attributes fewer than 90% of final output addresses to provinces")
 	}
+	logPhase("final and province ranges")
 
 	if e := os.RemoveAll(*out); e != nil {
 		panic(e)
@@ -1163,13 +1188,13 @@ func main() {
 		},
 		CloudSources: cloudSourceSummaries,
 		APNICInetnum: apnicSourceMeta{
-			RecordCount: len(apnicRecords), MatchedWinningSegmentCount: purposeSegments,
+			RecordCount: apnicRecordCount, RelevantRecordCount: len(apnicRecords), MatchedWinningSegmentCount: purposeSegments,
 			EffectiveCIDRCount: len(spanCIDRs(apnicPurposeRanges)), EffectiveAddressCount: addressCount(apnicPurposeRanges),
 		},
 		APNICPortableHolders:          portableHolderMeta{AutnumRecordCount: len(autnumRecords), MatchedWinningSegmentCount: portableSegments, EffectiveCIDRCount: len(spanCIDRs(portableHolderRanges)), EffectiveAddressCount: addressCount(portableHolderRanges)},
 		APNICDelegatedHolders:         delegatedHolderMeta{MatchedWinningSegmentCount: delegatedSegments, EffectiveCIDRCount: len(spanCIDRs(delegatedHolderRanges)), EffectiveAddressCount: addressCount(delegatedHolderRanges)},
 		APNICIndependentLegalEntities: delegatedHolderMeta{MatchedWinningSegmentCount: legalEntityHolderSegments, EffectiveCIDRCount: len(spanCIDRs(legalEntityHolderRanges)), EffectiveAddressCount: addressCount(legalEntityHolderRanges)},
-		APNICRoute:                    routeSourceMeta{ObjectCount: routeObjectCount, WinningSegmentCount: len(routeSegments), OriginValidatedMatchCount: routeValidatedMatches, EffectiveCIDRCount: len(spanCIDRs(routeRanges)), EffectiveAddressCount: addressCount(routeRanges)},
+		APNICRoute:                    routeSourceMeta{ObjectCount: routeObjectCount, RelevantObjectCount: relevantRouteObjectCount, RelevantWinningSegmentCount: len(routeSegments), OriginValidatedMatchCount: routeValidatedMatches, EffectiveCIDRCount: len(spanCIDRs(routeRanges)), EffectiveAddressCount: addressCount(routeRanges)},
 		APNICRouteOriginAudit:         routeOriginAuditMeta{Enforced: true, CandidateEvidenceCount: len(routeOriginCandidates), CandidateCIDRCount: len(spanCIDRs(routeOriginCandidateRanges)), CandidateAddressCount: addressCount(routeOriginCandidateRanges), Candidates: routeOriginCandidates},
 		RISWhois:                      risSourceMeta{RowCount: risStats.Rows, PrefixCount: risStats.Prefixes, RelevantPrefixCount: risStats.RelevantPrefixes, WinningSegmentCount: len(risSegments), CandidateMOASSegmentCount: candidateMOAS, StrongEvidenceSegmentCount: strongMOAS, RetainedAmbiguousMOASSegmentCount: candidateMOAS - strongMOAS, EffectiveCIDRCount: len(spanCIDRs(risRanges)), EffectiveAddressCount: addressCount(risRanges)},
 		ExcludedPrefixes:              excludedPrefixes,
@@ -1227,4 +1252,6 @@ func main() {
 		m.GeneratedAt = oldManifest.GeneratedAt
 	}
 	writeManifest(filepath.Join(*out, "manifest.json"), m)
+	logPhase("write outputs and manifest")
+	fmt.Printf("timing: %-28s %s\n", "total", time.Since(pipelineStarted).Round(time.Millisecond))
 }

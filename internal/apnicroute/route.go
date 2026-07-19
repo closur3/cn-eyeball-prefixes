@@ -27,20 +27,21 @@ type Segment struct {
 	Record Record
 }
 
-func Parse(path string, orgNames map[string]string) ([]Record, int, error) {
+func Parse(path string, orgNames map[string]string, relevant func(uint32, uint32) bool) ([]Record, int, int, error) {
 	f, err := os.Open(path)
 	if err != nil {
-		return nil, 0, err
+		return nil, 0, 0, err
 	}
 	defer f.Close()
 	z, err := gzip.NewReader(f)
 	if err != nil {
-		return nil, 0, err
+		return nil, 0, 0, err
 	}
 	defer z.Close()
 	fields := map[string][]string{}
 	last := ""
 	objects := 0
+	relevantObjects := 0
 	var raw []Record
 	finish := func() error {
 		defer func() { fields, last = map[string][]string{}, "" }()
@@ -56,6 +57,12 @@ func Parse(path string, orgNames map[string]string) ([]Record, int, error) {
 		if _, e = strconv.ParseUint(origin, 10, 32); e != nil {
 			return fmt.Errorf("invalid route origin %q", first(fields["origin"]))
 		}
+		objects++
+		lo, hi := number(p.Addr()), end(p)
+		if relevant != nil && !relevant(lo, hi) {
+			return nil
+		}
+		relevantObjects++
 		orgs := clean(fields["org"])
 		var names []string
 		for _, h := range orgs {
@@ -64,8 +71,7 @@ func Parse(path string, orgNames map[string]string) ([]Record, int, error) {
 			}
 		}
 		maintainers := append(clean(fields["mnt-by"]), clean(fields["mnt-routes"])...)
-		raw = append(raw, Record{number(p.Addr()), end(p), p.String(), []Variant{{origin, clean(fields["descr"]), orgs, names, clean(maintainers), first(fields["last-modified"])}}})
-		objects++
+		raw = append(raw, Record{lo, hi, p.String(), []Variant{{origin, clean(fields["descr"]), orgs, names, clean(maintainers), first(fields["last-modified"])}}})
 		return nil
 	}
 	s := bufio.NewScanner(z)
@@ -74,7 +80,7 @@ func Parse(path string, orgNames map[string]string) ([]Record, int, error) {
 		line := strings.TrimRight(s.Text(), "\r")
 		if strings.TrimSpace(line) == "" {
 			if e := finish(); e != nil {
-				return nil, objects, e
+				return nil, objects, relevantObjects, e
 			}
 			continue
 		}
@@ -89,19 +95,19 @@ func Parse(path string, orgNames map[string]string) ([]Record, int, error) {
 		}
 		c := strings.IndexByte(line, ':')
 		if c <= 0 {
-			return nil, objects, fmt.Errorf("%s: malformed RPSL", path)
+			return nil, objects, relevantObjects, fmt.Errorf("%s: malformed RPSL", path)
 		}
 		last = strings.ToLower(strings.TrimSpace(line[:c]))
 		fields[last] = append(fields[last], strings.TrimSpace(line[c+1:]))
 	}
 	if e := s.Err(); e != nil {
-		return nil, objects, e
+		return nil, objects, relevantObjects, e
 	}
 	if e := finish(); e != nil {
-		return nil, objects, e
+		return nil, objects, relevantObjects, e
 	}
 	if objects == 0 {
-		return nil, 0, fmt.Errorf("%s contains no route records", path)
+		return nil, 0, 0, fmt.Errorf("%s contains no route records", path)
 	}
 	sort.Slice(raw, func(i, j int) bool {
 		if raw[i].Lo != raw[j].Lo {
@@ -117,10 +123,13 @@ func Parse(path string, orgNames map[string]string) ([]Record, int, error) {
 		}
 		out[len(out)-1].Variants = append(out[len(out)-1].Variants, r.Variants...)
 	}
-	return out, objects, nil
+	return out, objects, relevantObjects, nil
 }
 
 func Resolve(records []Record) []Segment {
+	if len(records) == 0 {
+		return nil
+	}
 	type event struct {
 		pos uint64
 		idx int
