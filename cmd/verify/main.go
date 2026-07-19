@@ -56,12 +56,14 @@ type stageMeta struct {
 type auditMeta struct {
 	Name                         string `json:"name"`
 	Path                         string `json:"path"`
+	HumanPath                    string `json:"human_path"`
 	CIDRCount                    int    `json:"cidr_count"`
 	FactCount                    int    `json:"fact_count"`
 	AddressCount                 uint64 `json:"address_count"`
 	RegistryCoveredAddressCount uint64 `json:"registry_covered_address_count"`
 	StrongNonPublicSignalAddressCount uint64 `json:"strong_non_public_signal_address_count"`
 	SHA256                       string `json:"sha256"`
+	HumanSHA256                  string `json:"human_sha256"`
 }
 
 type cloudSourceMeta struct {
@@ -1101,7 +1103,7 @@ func main() {
 		manifestExcludedRanges = append(manifestExcludedRanges, row)
 	}
 	assertEqual(manifestExcludedRanges, intersect(preCloudCandidates, excludedRanges), "manifest excluded-prefix union mismatch")
-	if len(m.Audits) != 1 || m.Audits[0].Name != "zhejiang_apnic_registration" || m.Audits[0].Path != "audits/zhejiang-apnic.json.gz" {
+	if len(m.Audits) != 1 || m.Audits[0].Name != "zhejiang_apnic_registration" || m.Audits[0].Path != "audits/zhejiang-apnic.json.gz" || m.Audits[0].HumanPath != "audits/zhejiang-apnic.md" {
 		panic("manifest Zhejiang APNIC audit metadata mismatch")
 	}
 	zhejiangPath := filepath.Join(*data, "provinces", "zhejiang.txt")
@@ -1137,6 +1139,11 @@ func main() {
 	auditMeta := m.Audits[0]
 	if auditMeta.CIDRCount != actualAudit.Summary.CIDRCount || auditMeta.FactCount != actualAudit.Summary.FactCount || auditMeta.AddressCount != actualAudit.Summary.AddressCount || auditMeta.RegistryCoveredAddressCount != actualAudit.Summary.RegistryCoveredAddressCount || auditMeta.StrongNonPublicSignalAddressCount != actualAudit.Summary.StrongNonPublicSignalAddressCount || auditMeta.SHA256 != fileSHA(auditPath) {
 		panic("manifest Zhejiang APNIC audit summary mismatch")
+	}
+	humanAuditPath := filepath.Join(*data, filepath.FromSlash(auditMeta.HumanPath))
+	expectedHumanAudit := apnicaudit.RenderMarkdown(expectedAudit, filepath.Base(auditPath))
+	if string(mustRead(humanAuditPath)) != expectedHumanAudit || auditMeta.HumanSHA256 != fileSHA(humanAuditPath) {
+		panic("Zhejiang human-readable APNIC audit does not recompute")
 	}
 	if len(m.Lists) != len(files) {
 		panic("manifest list count does not match generated files")

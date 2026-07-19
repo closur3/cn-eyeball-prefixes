@@ -90,7 +90,7 @@ flowchart TD
 
 ## APNIC 登记事实反查试点
 
-`data/audits/zhejiang-apnic.json.gz` 将浙江省最大聚合 ACL 中的每个地址重新切分到构建快照内最具体的 APNIC `inetnum` 登记边界，并记录所属运营商、登记范围、netname、description、organisation、maintainer、status 和最后修改时间。报告覆盖全部浙江 CIDR 和地址，将登记分为三网自身、独立法定主体、其他登记、无登记覆盖及强非公众信号五类。独立主体登记只作为人工审计线索，不单独视为误收或自动排除证据。完整事实采用确定性的紧凑 gzip JSON，校验器会使用同一份上游快照独立重算整份报告。
+[`data/audits/zhejiang-apnic.md`](data/audits/zhejiang-apnic.md) 是面向人工阅读的浙江审计报告，包含总体结论、登记分类占比、全部残留强信号，以及按地址量排序的独立主体和其他登记复核索引。[`data/audits/zhejiang-apnic.json.gz`](data/audits/zhejiang-apnic.json.gz) 则将浙江省最大聚合 ACL 中的每个地址重新切分到构建快照内最具体的 APNIC `inetnum` 登记边界，并记录所属运营商、登记范围、netname、description、organisation、maintainer、status 和最后修改时间。独立主体登记只作为人工审计线索，不单独视为误收或自动排除证据。两份报告都由校验器使用同一份上游快照独立重算。
 
 ## 自动更新
 

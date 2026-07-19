@@ -92,12 +92,14 @@ type stageMeta struct {
 type auditMeta struct {
 	Name                         string `json:"name"`
 	Path                         string `json:"path"`
+	HumanPath                    string `json:"human_path"`
 	CIDRCount                    int    `json:"cidr_count"`
 	FactCount                    int    `json:"fact_count"`
 	AddressCount                 uint64 `json:"address_count"`
 	RegistryCoveredAddressCount uint64 `json:"registry_covered_address_count"`
 	StrongNonPublicSignalAddressCount uint64 `json:"strong_non_public_signal_address_count"`
 	SHA256                       string `json:"sha256"`
+	HumanSHA256                  string `json:"human_sha256"`
 }
 
 type cloudSourceMeta struct {
@@ -1302,11 +1304,20 @@ func main() {
 	if e != nil {
 		panic(e)
 	}
+	humanAuditPath := filepath.Join("audits", "zhejiang-apnic.md")
+	humanAuditBytes := []byte(apnicaudit.RenderMarkdown(zhejiangAudit, filepath.Base(auditPath)))
+	if e := os.WriteFile(filepath.Join(*out, humanAuditPath), humanAuditBytes, 0644); e != nil {
+		panic(e)
+	}
+	humanAuditSHA, e := sha(filepath.Join(*out, humanAuditPath))
+	if e != nil {
+		panic(e)
+	}
 	m.Audits = append(m.Audits, auditMeta{
-		Name: "zhejiang_apnic_registration", Path: filepath.ToSlash(auditPath),
+		Name: "zhejiang_apnic_registration", Path: filepath.ToSlash(auditPath), HumanPath: filepath.ToSlash(humanAuditPath),
 		CIDRCount: zhejiangAudit.Summary.CIDRCount, FactCount: zhejiangAudit.Summary.FactCount,
 		AddressCount: zhejiangAudit.Summary.AddressCount, RegistryCoveredAddressCount: zhejiangAudit.Summary.RegistryCoveredAddressCount,
-		StrongNonPublicSignalAddressCount: zhejiangAudit.Summary.StrongNonPublicSignalAddressCount, SHA256: auditSHA,
+		StrongNonPublicSignalAddressCount: zhejiangAudit.Summary.StrongNonPublicSignalAddressCount, SHA256: auditSHA, HumanSHA256: humanAuditSHA,
 	})
 
 	if hasOldManifest && sameManifestContent(oldManifest, m) {

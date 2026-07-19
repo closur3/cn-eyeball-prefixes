@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/netip"
 	"sort"
+	"strings"
 
 	"github.com/closur3/cn-operator-allowlist/internal/apnicinetnum"
 	"github.com/closur3/cn-operator-allowlist/internal/operatorconfig"
@@ -219,6 +220,175 @@ func addr(value uint32) string {
 
 func percent(part, total uint64) float64 {
 	return float64(part) * 100 / float64(total)
+}
+
+// RenderMarkdown turns the complete machine-readable evidence into a compact
+// review report. It deliberately presents independent registrations as leads,
+// not exclusions: registration ownership alone does not establish address use.
+func RenderMarkdown(report Report, evidencePath string) string {
+	var b strings.Builder
+	b.WriteString("# 浙江 IPv4 APNIC 登记事实审计\n\n")
+	b.WriteString("本报告用于人工判断浙江 ACL 与 APNIC 登记事实的吻合程度。它不是准确率证明，也不把独立主体登记直接判定为误收。完整逐地址事实保存在 [`")
+	b.WriteString(markdownText(evidencePath))
+	b.WriteString("`](./")
+	b.WriteString(markdownText(evidencePath))
+	b.WriteString(")。\n\n")
+
+	b.WriteString("## 总览\n\n")
+	b.WriteString("| 指标 | 数值 |\n|---|---:|\n")
+	fmt.Fprintf(&b, "| 最大聚合 ACL CIDR | %s |\n", formatUint(uint64(report.Summary.CIDRCount)))
+	fmt.Fprintf(&b, "| IPv4 地址 | %s |\n", formatUint(report.Summary.AddressCount))
+	fmt.Fprintf(&b, "| 最具体 APNIC 事实片段 | %s |\n", formatUint(uint64(report.Summary.FactCount)))
+	fmt.Fprintf(&b, "| APNIC 登记覆盖 | %s（%.4f%%） |\n", formatUint(report.Summary.RegistryCoveredAddressCount), report.Summary.RegistryCoveragePercent)
+	fmt.Fprintf(&b, "| 构建规则仍识别出的强非公众信号 | %s |\n\n", formatUint(report.Summary.StrongNonPublicSignalAddressCount))
+
+	b.WriteString("## 登记分类\n\n")
+	b.WriteString("| 分类 | 事实片段 | 地址 | 占全部地址 | 含义 |\n|---|---:|---:|---:|---|\n")
+	meaning := map[string]string{
+		"operator_registration":    "登记文本可归属于三网运营商",
+		"independent_legal_entity":  "登记文本出现完整独立法定主体；仅作为复核线索",
+		"other_registration":       "未归入前三类的 APNIC 登记",
+		"unregistered":             "构建快照内没有覆盖该范围的 inetnum",
+		"strong_non_public_signal": "命中当前明确非公众用途规则；应优先复核",
+	}
+	for _, category := range report.Summary.Categories {
+		fmt.Fprintf(&b, "| `%s` | %s | %s | %.4f%% | %s |\n", category.Classification, formatUint(uint64(category.FactCount)), formatUint(category.AddressCount), category.AddressPercent, meaning[category.Classification])
+	}
+
+	b.WriteString("\n## 怎样阅读\n\n")
+	b.WriteString("- ACL 文件采用最大 CIDR 聚合；表中的“保留范围”才是与 APNIC 登记边界对齐后的精确地址范围。\n")
+	b.WriteString("- `independent_legal_entity` 可能是普通企业互联网接入、历史登记或代维护关系，不能仅据此删除。\n")
+	b.WriteString("- 排名按覆盖地址量排列，用来优先投入人工审查，不代表风险评分。\n")
+	b.WriteString("- 下方索引只负责让主要事实可读；完整证据、全部小片段和全部字段仍以 gzip JSON 为准。\n\n")
+
+	renderStrongSignals(&b, report)
+	renderReviewGroups(&b, report, "independent_legal_entity", "独立法定主体登记：地址量前 100 项", 100)
+	renderReviewGroups(&b, report, "other_registration", "其他登记：地址量前 100 项", 100)
+	return b.String()
+}
+
+type reviewGroup struct {
+	Label        string
+	AddressCount uint64
+	FactCount    int
+	Samples      []string
+}
+
+func renderStrongSignals(b *strings.Builder, report Report) {
+	b.WriteString("## 当前规则仍识别出的强非公众信号\n\n")
+	b.WriteString("这些条目已处于最终 ACL 的登记事实中，应优先检查生成边界为何仍保留它们。\n\n")
+	b.WriteString("| 保留范围 | 所属 ACL CIDR | 运营商 | APNIC 登记主体 | APNIC 登记范围 | 命中原因 |\n|---|---|---|---|---|---|\n")
+	count := 0
+	for _, cidr := range report.CIDRs {
+		for _, fact := range cidr.Facts {
+			if fact.Classification != "strong_non_public_signal" {
+				continue
+			}
+			count++
+			registryRange := "—"
+			if fact.Registry != nil {
+				registryRange = fact.Registry.Range
+			}
+			fmt.Fprintf(b, "| `%s` | `%s` | `%s` | %s | `%s` | %s |\n", factRange(fact), cidr.CIDR, fact.Operator, markdownText(registrantLabel(fact.Registry)), markdownText(registryRange), markdownText(fact.Reason))
+		}
+	}
+	if count == 0 {
+		b.WriteString("| — | — | — | 当前没有残留强信号 | — | — |\n")
+	}
+	b.WriteString("\n")
+}
+
+func renderReviewGroups(b *strings.Builder, report Report, classification, title string, limit int) {
+	groups := map[string]*reviewGroup{}
+	for _, cidr := range report.CIDRs {
+		for _, fact := range cidr.Facts {
+			if fact.Classification != classification {
+				continue
+			}
+			label := registrantLabel(fact.Registry)
+			group := groups[label]
+			if group == nil {
+				group = &reviewGroup{Label: label}
+				groups[label] = group
+			}
+			group.AddressCount += fact.AddressCount
+			group.FactCount++
+			if len(group.Samples) < 3 {
+				sample := "`" + factRange(fact) + "` in `" + cidr.CIDR + "`"
+				if len(group.Samples) == 0 || group.Samples[len(group.Samples)-1] != sample {
+					group.Samples = append(group.Samples, sample)
+				}
+			}
+		}
+	}
+	rows := make([]reviewGroup, 0, len(groups))
+	for _, group := range groups {
+		rows = append(rows, *group)
+	}
+	sort.Slice(rows, func(i, j int) bool {
+		if rows[i].AddressCount != rows[j].AddressCount {
+			return rows[i].AddressCount > rows[j].AddressCount
+		}
+		return rows[i].Label < rows[j].Label
+	})
+
+	fmt.Fprintf(b, "## %s\n\n", title)
+	fmt.Fprintf(b, "共 %s 个登记主体标签；下表展示前 %d 项。标签优先取 APNIC organisation name，其次取 description、netname 或 organisation handle。\n\n", formatUint(uint64(len(rows))), minInt(limit, len(rows)))
+	b.WriteString("| # | APNIC 登记主体 | 地址 | 占全部地址 | 事实片段 | 保留范围样本 / 所属 ACL CIDR |\n|---:|---|---:|---:|---:|---|\n")
+	if len(rows) == 0 {
+		b.WriteString("| — | 无 | 0 | 0% | 0 | — |\n\n")
+		return
+	}
+	for i, group := range rows[:minInt(limit, len(rows))] {
+		fmt.Fprintf(b, "| %d | %s | %s | %.4f%% | %s | %s |\n", i+1, markdownText(group.Label), formatUint(group.AddressCount), percent(group.AddressCount, report.Summary.AddressCount), formatUint(uint64(group.FactCount)), strings.Join(group.Samples, "<br>"))
+	}
+	if len(rows) > limit {
+		fmt.Fprintf(b, "\n其余 %s 个较小登记主体标签未在 Markdown 展开，可在完整 gzip JSON 中查询。\n", formatUint(uint64(len(rows)-limit)))
+	}
+	b.WriteString("\n")
+}
+
+func registrantLabel(registry *Registry) string {
+	if registry == nil {
+		return "（无 APNIC 登记）"
+	}
+	for _, values := range [][]string{registry.OrganizationNames, registry.Descriptions, registry.Netnames, registry.Organizations} {
+		for _, value := range values {
+			if value = strings.TrimSpace(value); value != "" {
+				return value
+			}
+		}
+	}
+	return "（登记主体字段为空）"
+}
+
+func factRange(fact Fact) string {
+	if fact.Start == fact.End {
+		return fact.Start
+	}
+	return fact.Start + "–" + fact.End
+}
+
+func markdownText(value string) string {
+	value = strings.ReplaceAll(value, "|", "\\|")
+	value = strings.ReplaceAll(value, "\r", " ")
+	value = strings.ReplaceAll(value, "\n", " ")
+	return strings.TrimSpace(value)
+}
+
+func formatUint(value uint64) string {
+	s := fmt.Sprintf("%d", value)
+	for i := len(s) - 3; i > 0; i -= 3 {
+		s = s[:i] + "," + s[i:]
+	}
+	return s
+}
+
+func minInt(a, b int) int {
+	if a < b {
+		return a
+	}
+	return b
 }
 
 func min(a, b uint32) uint32 {

@@ -1,6 +1,7 @@
 package apnicaudit
 
 import (
+	"strings"
 	"testing"
 
 	"github.com/closur3/cn-operator-allowlist/internal/apnicinetnum"
@@ -32,6 +33,32 @@ func TestBuildCoversCIDRAndClassifiesMostSpecificRecords(t *testing.T) {
 	for i, classification := range want {
 		if report.CIDRs[0].Facts[i].Classification != classification {
 			t.Fatalf("fact %d classification=%q want %q", i, report.CIDRs[0].Facts[i].Classification, classification)
+		}
+	}
+}
+
+func TestRenderMarkdownIncludesSummaryAndReviewEvidence(t *testing.T) {
+	report := Report{
+		Summary: Summary{
+			CIDRCount: 1, FactCount: 2, AddressCount: 256, RegistryCoveredAddressCount: 256,
+			RegistryCoveragePercent: 100, StrongNonPublicSignalAddressCount: 16,
+			Categories: []CategorySummary{
+				{Classification: "independent_legal_entity", FactCount: 1, AddressCount: 240, AddressPercent: 93.75},
+				{Classification: "strong_non_public_signal", FactCount: 1, AddressCount: 16, AddressPercent: 6.25},
+			},
+		},
+		CIDRs: []CIDRRecord{{
+			CIDR: "10.0.0.0/24", AddressCount: 256,
+			Facts: []Fact{
+				{Start: "10.0.0.0", End: "10.0.0.239", AddressCount: 240, Operator: "chinanet", Classification: "independent_legal_entity", Registry: &Registry{Descriptions: []string{"Example Technology Co., Ltd."}, Range: "10.0.0.0 - 10.0.0.239"}},
+				{Start: "10.0.0.240", End: "10.0.0.255", AddressCount: 16, Operator: "chinanet", Classification: "strong_non_public_signal", Reason: "explicit hosting range", Registry: &Registry{Netnames: []string{"EXAMPLE-IDC"}, Range: "10.0.0.240 - 10.0.0.255"}},
+			},
+		}},
+	}
+	markdown := RenderMarkdown(report, "zhejiang-apnic.json.gz")
+	for _, want := range []string{"# 浙江 IPv4 APNIC 登记事实审计", "| `strong_non_public_signal` | 1 | 16 | 6.2500% |", "10.0.0.240–10.0.0.255", "Example Technology Co., Ltd.", "zhejiang-apnic.json.gz"} {
+		if !strings.Contains(markdown, want) {
+			t.Fatalf("Markdown report does not contain %q:\n%s", want, markdown)
 		}
 	}
 }
