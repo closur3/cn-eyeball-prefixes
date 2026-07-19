@@ -199,6 +199,15 @@ func SearchText(record Record) string {
 	return strings.Join(parts, " | ")
 }
 
+// RegistrantText excludes netname because it is an identifier, not evidence of
+// a complete legal entity name.
+func RegistrantText(record Record) string {
+	parts := make([]string, 0, len(record.Descriptions)+len(record.OrganizationNames))
+	parts = append(parts, record.Descriptions...)
+	parts = append(parts, record.OrganizationNames...)
+	return strings.Join(parts, " | ")
+}
+
 type recordHeap struct {
 	records []Record
 	items   []int

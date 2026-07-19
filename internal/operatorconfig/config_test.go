@@ -69,3 +69,19 @@ func TestRepositoryOperatorBoundary(t *testing.T) {
 		})
 	}
 }
+
+func TestIndependentLegalEntityPattern(t *testing.T) {
+	c, err := Load("../../config/operators.json", []string{"chinanet", "cmcc", "unicom"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !c.IsIndependentLegalEntity("Beijing BG Digital Technology Co.. Ltd") {
+		t.Fatal("complete BG-Digital legal entity name was not recognized")
+	}
+	if c.IsIndependentLegalEntity("BG-Digital") {
+		t.Fatal("netname alone must not be legal-entity evidence")
+	}
+	if c.IsIndependentLegalEntity("Ltd") {
+		t.Fatal("legal suffix alone must not be legal-entity evidence")
+	}
+}

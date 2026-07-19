@@ -19,10 +19,11 @@ type descriptionRule struct {
 }
 
 type configFile struct {
-	Operators                map[string]operator `json:"operators"`
-	ExcludeDescriptionRules  []descriptionRule   `json:"exclude_description_rules"`
-	ExcludeAPNICInetnumRules []descriptionRule   `json:"exclude_apnic_inetnum_rules"`
-	ExcludeASNs              map[string]string   `json:"exclude_asns"`
+	Operators                      map[string]operator `json:"operators"`
+	ExcludeDescriptionRules        []descriptionRule   `json:"exclude_description_rules"`
+	ExcludeAPNICInetnumRules       []descriptionRule   `json:"exclude_apnic_inetnum_rules"`
+	ExcludeASNs                    map[string]string   `json:"exclude_asns"`
+	IndependentLegalEntityPatterns []string            `json:"independent_legal_entity_patterns"`
 }
 
 type rule struct {
@@ -61,11 +62,12 @@ type inclusion struct {
 }
 
 type Classifier struct {
-	rules             []rule
-	included          map[string]inclusion
-	excluded          map[string]string
-	exclusionPatterns []exclusionRule
-	apnicPatterns     []exclusionRule
+	rules               []rule
+	included            map[string]inclusion
+	excluded            map[string]string
+	exclusionPatterns   []exclusionRule
+	apnicPatterns       []exclusionRule
+	legalEntityPatterns []*regexp.Regexp
 }
 
 func Load(path string, order []string) (*Classifier, error) {
@@ -117,6 +119,16 @@ func Parse(b []byte, order []string) (*Classifier, error) {
 		}
 		c.apnicPatterns = append(c.apnicPatterns, exclusionRule{pattern: re, source: rule.Pattern, reason: rule.Reason})
 	}
+	if len(cfg.IndependentLegalEntityPatterns) == 0 {
+		return nil, fmt.Errorf("operator config has no independent legal-entity patterns")
+	}
+	for _, pattern := range cfg.IndependentLegalEntityPatterns {
+		re, err := regexp.Compile("(?i)(?:" + pattern + ")")
+		if err != nil {
+			return nil, fmt.Errorf("independent legal-entity pattern %q: %w", pattern, err)
+		}
+		c.legalEntityPatterns = append(c.legalEntityPatterns, re)
+	}
 	for _, name := range order {
 		op, ok := cfg.Operators[name]
 		if !ok {
@@ -151,6 +163,15 @@ func Parse(b []byte, order []string) (*Classifier, error) {
 		c.rules = append(c.rules, r)
 	}
 	return c, nil
+}
+
+func (c *Classifier) IsIndependentLegalEntity(text string) bool {
+	for _, pattern := range c.legalEntityPatterns {
+		if pattern.MatchString(text) {
+			return true
+		}
+	}
+	return false
 }
 
 func validASN(asn string) error {

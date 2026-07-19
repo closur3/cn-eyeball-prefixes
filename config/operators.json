@@ -133,6 +133,9 @@
       "reason": "APNIC inetnum registration explicitly identifies a CCTV media or institutional network"
     }
   ],
+  "independent_legal_entity_patterns": [
+    "\\b(?:[a-z][a-z0-9&()'.,-]*[ .,-]+)+(?:co(?:mpany)?[ .,-]+)?(?:ltd|limited)\\b"
+  ],
   "exclude_asns": {
     "4809": "China Telecom CN2 dedicated premium backbone; outside ordinary Internet user access scope",
     "9929": "China Unicom CUII dedicated premium backbone; outside ordinary Internet user access scope",
