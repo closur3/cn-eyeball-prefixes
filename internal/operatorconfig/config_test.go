@@ -86,7 +86,7 @@ func TestIndependentLegalEntityPattern(t *testing.T) {
 	}
 }
 
-func TestNetEaseAPNICRuleDoesNotMatchWangyin(t *testing.T) {
+func TestNetEaseAndWangyinAPNICRules(t *testing.T) {
 	c, err := Load("../../config/operators.json", []string{"chinanet", "cmcc", "unicom"})
 	if err != nil {
 		t.Fatal(err)
@@ -104,10 +104,14 @@ func TestNetEaseAPNICRuleDoesNotMatchWangyin(t *testing.T) {
 	for _, text := range []string{
 		"WANGYINHULIAN,HANGZHOU,ZHEJIANG",
 		"WANGYINHULIANZHEJIANGHENGHUA,HANGZHOU,ZHEJIANG",
-		"ordinary residential broadband IP pool",
+		"SHIJIYITENGWANGYINHULIAN,HANGZHOU,ZHEJIANG",
+		"HangZhou Netbank Interlink Technolgies CO.,LTD",
 	} {
-		if result := c.ClassifyAPNICInetnum(text); result.Excluded {
-			t.Fatalf("non-NetEase registration %q was excluded: %+v", text, result)
+		if result := c.ClassifyAPNICInetnum(text); !result.Excluded {
+			t.Fatalf("Wangyin Hulian registration %q was not excluded", text)
 		}
+	}
+	if result := c.ClassifyAPNICInetnum("ordinary residential broadband IP pool"); result.Excluded {
+		t.Fatalf("ordinary access pool was excluded: %+v", result)
 	}
 }

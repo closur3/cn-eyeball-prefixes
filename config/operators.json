@@ -135,6 +135,10 @@
     {
       "pattern": "(?:^|[^a-z0-9])(?:guangzhouwangyihz|shanghaiwangyihz|guangzhou-wangyi-ltd)(?:[^a-z0-9]|$)|\\bguangzhou (?:wangyi|netease) computer systems? co(?:mpany)?[., ]+(?:ltd|limited)\\b",
       "reason": "APNIC inetnum registration explicitly identifies a NetEase corporate or service network"
+    },
+    {
+      "pattern": "(?:^|[^a-z0-9])[a-z0-9]*wangyinhulian[a-z0-9]*(?:[^a-z0-9]|$)|\\bhangzhou netbank interlink technolog(?:y|ies) co(?:mpany)?[., ]+(?:ltd|limited)\\b",
+      "reason": "APNIC inetnum registration explicitly identifies a Wangyin Hulian or Netbank Interlink corporate network"
     }
   ],
   "independent_legal_entity_patterns": [
