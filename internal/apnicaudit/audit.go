@@ -222,9 +222,6 @@ func classify(segment apnicinetnum.Segment, operator string, classifier *operato
 	if prefix := classifier.ClassifyAPNICInetnum(text); prefix.Excluded {
 		return "strong_non_public_signal", prefix.Reason, prefix.MatchedBy
 	}
-	if isLocalOperatorRegistration(operator, segment.Record) {
-		return "operator_registration", "APNIC registration and exact local maintainer identify a China Telecom Zhejiang branch", "local operator name plus exact provincial maintainer"
-	}
 	registrant := classifier.Classify("0", text)
 	if registrant.Operator != "" {
 		return "operator_registration", "APNIC registrant text matches " + registrant.Operator, registrant.MatchedBy
@@ -233,19 +230,6 @@ func classify(segment apnicinetnum.Segment, operator string, classifier *operato
 		return "independent_legal_entity", "APNIC registrant text names an independent legal entity; retained because registration alone is not sufficient exclusion evidence", "independent_legal_entity_patterns"
 	}
 	return "other_registration", "APNIC registration does not match an operator or a complete independent legal-entity pattern", ""
-}
-
-func isLocalOperatorRegistration(operator string, record apnicinetnum.Record) bool {
-	if operator != "chinanet" {
-		return false
-	}
-	text := strings.ToLower(apnicinetnum.SearchText(record))
-	maintainers := map[string]bool{}
-	for _, maintainer := range record.Maintainers {
-		maintainers[strings.ToUpper(strings.TrimSpace(maintainer))] = true
-	}
-	return (strings.Contains(text, "ningbo telecom") && maintainers["MAINT-CN-CHINANET-ZJ-NB"]) ||
-		(strings.Contains(text, "wenzhou telecom") && maintainers["MAINT-CN-CHINANET-ZJ-WZ"])
 }
 
 func registry(record apnicinetnum.Record) *Registry {
