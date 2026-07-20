@@ -85,3 +85,29 @@ func TestIndependentLegalEntityPattern(t *testing.T) {
 		t.Fatal("legal suffix alone must not be legal-entity evidence")
 	}
 }
+
+func TestNetEaseAPNICRuleDoesNotMatchWangyin(t *testing.T) {
+	c, err := Load("../../config/operators.json", []string{"chinanet", "cmcc", "unicom"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, text := range []string{
+		"GUANGZHOUWANGYIHZ | GUANGZHOUWANGYI,HANGZHOU,ZHEJIANG",
+		"SHANGHAIWANGYIHZ | SHANGHAIWANGYI,HANGZHOU,ZHEJIANG",
+		"GUANGZHOU-WANGYI-LTD | Guangzhou Wangyi Computer Systems Co.,Ltd.",
+		"Guangzhou NetEase Computer System Co., Ltd.",
+	} {
+		if result := c.ClassifyAPNICInetnum(text); !result.Excluded {
+			t.Fatalf("NetEase registration %q was not excluded", text)
+		}
+	}
+	for _, text := range []string{
+		"WANGYINHULIAN,HANGZHOU,ZHEJIANG",
+		"WANGYINHULIANZHEJIANGHENGHUA,HANGZHOU,ZHEJIANG",
+		"ordinary residential broadband IP pool",
+	} {
+		if result := c.ClassifyAPNICInetnum(text); result.Excluded {
+			t.Fatalf("non-NetEase registration %q was excluded: %+v", text, result)
+		}
+	}
+}

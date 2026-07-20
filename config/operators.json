@@ -131,6 +131,10 @@
     {
       "pattern": "(?:^|[^a-z0-9])cctv(?:[^a-z0-9]|$)|\\bchina central television\\b",
       "reason": "APNIC inetnum registration explicitly identifies a CCTV media or institutional network"
+    },
+    {
+      "pattern": "(?:^|[^a-z0-9])(?:guangzhouwangyihz|shanghaiwangyihz|guangzhou-wangyi-ltd)(?:[^a-z0-9]|$)|\\bguangzhou (?:wangyi|netease) computer systems? co(?:mpany)?[., ]+(?:ltd|limited)\\b",
+      "reason": "APNIC inetnum registration explicitly identifies a NetEase corporate or service network"
     }
   ],
   "independent_legal_entity_patterns": [
