@@ -9,8 +9,9 @@ import (
 )
 
 type operator struct {
-	DescriptionPatterns []string          `json:"description_patterns"`
-	IncludeASNs         map[string]string `json:"include_asns"`
+	DescriptionPatterns     []string          `json:"description_patterns"`
+	APNICRegistrantPatterns []string          `json:"apnic_registrant_patterns"`
+	IncludeASNs             map[string]string `json:"include_asns"`
 }
 
 type descriptionRule struct {
@@ -63,6 +64,7 @@ type inclusion struct {
 
 type Classifier struct {
 	rules               []rule
+	apnicRegistrantRules []rule
 	included            map[string]inclusion
 	excluded            map[string]string
 	exclusionPatterns   []exclusionRule
@@ -145,6 +147,14 @@ func Parse(b []byte, order []string) (*Classifier, error) {
 			}
 			r.patterns = append(r.patterns, matchPattern{pattern: re, source: pattern})
 		}
+		apnicRule := rule{name: name}
+		for _, pattern := range op.APNICRegistrantPatterns {
+			re, err := regexp.Compile("(?i)(?:" + pattern + ")")
+			if err != nil {
+				return nil, fmt.Errorf("operator %q APNIC registrant pattern %q: %w", name, pattern, err)
+			}
+			apnicRule.patterns = append(apnicRule.patterns, matchPattern{pattern: re, source: pattern})
+		}
 		for asn, reason := range op.IncludeASNs {
 			if err := validASN(asn); err != nil {
 				return nil, fmt.Errorf("operator %q included ASN %q: %w", name, asn, err)
@@ -161,8 +171,29 @@ func Parse(b []byte, order []string) (*Classifier, error) {
 			c.included[asn] = inclusion{operator: name, reason: reason}
 		}
 		c.rules = append(c.rules, r)
+		c.apnicRegistrantRules = append(c.apnicRegistrantRules, apnicRule)
 	}
 	return c, nil
+}
+
+// ClassifyAPNICRegistrant positively attributes an APNIC inetnum registrant to
+// an operator. ASN-only exceptions and ASN exclusion policy deliberately do
+// not participate: this is evidence about the most-specific registration, not
+// the BGP origin.
+func (c *Classifier) ClassifyAPNICRegistrant(text string) Result {
+	for i, r := range c.rules {
+		for _, pattern := range r.patterns {
+			if pattern.pattern.MatchString(text) {
+				return Result{Operator: r.name, MatchedBy: "description_patterns: " + pattern.source}
+			}
+		}
+		for _, pattern := range c.apnicRegistrantRules[i].patterns {
+			if pattern.pattern.MatchString(text) {
+				return Result{Operator: r.name, MatchedBy: "apnic_registrant_patterns: " + pattern.source}
+			}
+		}
+	}
+	return Result{}
 }
 
 func (c *Classifier) IsIndependentLegalEntity(text string) bool {

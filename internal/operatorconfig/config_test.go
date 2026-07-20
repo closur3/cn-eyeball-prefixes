@@ -97,6 +97,40 @@ func TestIndependentLegalEntityPattern(t *testing.T) {
 	}
 }
 
+func TestZhejiangAPNICRegistrantAdmission(t *testing.T) {
+	c, err := Load("../../config/operators.json", []string{"chinanet", "cmcc", "unicom"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	tests := []struct {
+		text     string
+		operator string
+	}{
+		{"Ningbo Telecom Co.ltd", "chinanet"},
+		{"Zhejiang Provice Telecom Limited Company Hangzhou Branch", "chinanet"},
+		{"ZHENGHAI TELECOM. CO.,LTD", "chinanet"},
+		{"Zhejiang Telecommunication Shaoxing Ltd", "chinanet"},
+		{"QuZhou Mobile Communications Co.,Ltd.(QZMCC)", "cmcc"},
+		{"ShaoXing mobile communication, Ltd.", "cmcc"},
+		{"China Unicom Zhejiang Province Network", "unicom"},
+	}
+	for _, tt := range tests {
+		if result := c.ClassifyAPNICRegistrant(tt.text); result.Operator != tt.operator {
+			t.Fatalf("ClassifyAPNICRegistrant(%q) = %+v, want %s", tt.text, result, tt.operator)
+		}
+	}
+	for _, text := range []string{
+		"HANGZHOU DIFO TELECOMMUNICATION CO.LTD",
+		"Shanghai Great Wall Broadband Network Service Co., Ltd.",
+		"Jiaxingshi Xinda Dianzi Keji Co.,Ltd",
+		"Hangzhou Network Technology Co., Ltd. Bank of Internet",
+	} {
+		if result := c.ClassifyAPNICRegistrant(text); result.Operator != "" {
+			t.Fatalf("independent registrant %q was admitted as %+v", text, result)
+		}
+	}
+}
+
 func TestNetEaseAndWangyinAPNICRules(t *testing.T) {
 	c, err := Load("../../config/operators.json", []string{"chinanet", "cmcc", "unicom"})
 	if err != nil {

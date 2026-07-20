@@ -71,7 +71,7 @@ flowchart TD
 | `data/cn.txt` | 中国电信、中国移动和中国联通的 IPv4 CIDR 去重合表 |
 | `data/provinces/<pinyin>.txt` | 相应省级行政区内上述运营商的 IPv4 CIDR 去重合表 |
 | `data/manifest.json` | 本次生成时间、上游文件大小与摘要、各筛选阶段统计、云 CIDR、APNIC inetnum/aut-num/route 和 RIPE RIS MOAS 的实际命中、三网 ASN 汇总、最终纳入和排除的 ASN/前缀、匹配依据，以及每个列表文件的统计信息 |
-| `config/operators.json` | 运营商 ASN 名称规则、强制收录 ASN 和排除 ASN；每个 ASN 可附维护原因 |
+| `config/operators.json` | 运营商 ASN 名称规则、APNIC 登记正向归属规则、强制收录 ASN 和排除 ASN；每个 ASN 可附维护原因 |
 
 省级文件以拼音命名，例如 `beijing.txt`、`guangdong.txt`、`shaanxi.txt`、`xinjiang.txt`。每个文本文件一行一个 CIDR，按地址排序，且文件内部不存在重叠网段。
 
@@ -88,9 +88,11 @@ flowchart TD
 - 仅处理 IPv4 和中国大陆 31 个省级行政区；非中国大陆地址及无法归入省级行政区的网段不进入省级文件。
 - 相邻或重叠网段会合并为最大 CIDR 集合。三个运营商文件互不重叠且其并集严格等于 `cn.txt`；31 个省级文件互不重叠且均为 `cn.txt` 的子集。由于 ip2region 可能没有覆盖全国表中的全部地址，省级并集不强制等于全国表，实际归属覆盖量会作为 `province_attributed_output` 阶段写入 manifest。生成后校验器会检查这些关系、上游包含关系、排除证据和 manifest 文件摘要。
 
-## APNIC 登记事实反查试点
+## 浙江 APNIC 正向准入试点
 
-[`data/audits/zhejiang-apnic.md`](data/audits/zhejiang-apnic.md) 是面向人工阅读的浙江审计报告，包含总体结论、登记分类占比、全部残留强信号，以及按地址量排序的独立主体和其他登记复核索引。[`data/audits/zhejiang-apnic.json.gz`](data/audits/zhejiang-apnic.json.gz) 则将浙江省最大聚合 ACL 中的每个地址重新切分到构建快照内最具体的 APNIC `inetnum` 登记边界，并记录所属运营商、登记范围、netname、description、organisation、maintainer、status 和最后修改时间。独立主体登记只作为人工审计线索，不单独视为误收或自动排除证据。两份报告都由校验器使用同一份上游快照独立重算。
+`zhejiang` 分支仅对 [`data/provinces/zhejiang.txt`](data/provinces/zhejiang.txt) 试验正向准入：地址必须先通过全国表既有规则，并同时满足“当前 BGP Origin 属于某一家三网运营商”与“最具体 APNIC `inetnum` 登记文本可明确归属于同一家运营商”。登记给独立主体、归属不明、无登记或登记运营商冲突的地址均不进入浙江文件；`cn.txt` 和三个运营商总表暂不受该试验影响。
+
+[`data/audits/zhejiang-apnic.md`](data/audits/zhejiang-apnic.md) 面向人工阅读，给出准入前候选、既有前缀排除、正向准入拒绝、最终保留量及排除证据样本。[`data/audits/zhejiang-apnic.json.gz`](data/audits/zhejiang-apnic.json.gz) 保存完整机读事实与登记字段。构建器和校验器分别使用同一上游快照重算浙江准入集合，并强制最终浙江文件只能包含 `operator_registration` 分类；二者不一致时构建失败。
 
 ## 自动更新
 

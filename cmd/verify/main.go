@@ -458,6 +458,56 @@ func provinceExclusionEvidence(entries []prefixExclusionMeta, candidatesByOperat
 	return out
 }
 
+func apnicOperatorAdmissionRanges(segments []apnicinetnum.Segment, classifier *operatorconfig.Classifier) map[string][]span {
+	out := map[string][]span{}
+	for _, segment := range segments {
+		result := classifier.ClassifyAPNICRegistrant(apnicinetnum.SearchText(segment.Record))
+		if result.Operator != "" {
+			out[result.Operator] = append(out[result.Operator], span{segment.Lo, segment.Hi})
+		}
+	}
+	for _, operator := range operators {
+		out[operator] = merge(out[operator])
+	}
+	return out
+}
+
+func auditRegistrant(registry *apnicaudit.Registry) string {
+	if registry == nil {
+		return "(no APNIC registration)"
+	}
+	for _, values := range [][]string{registry.OrganizationNames, registry.Descriptions, registry.Netnames, registry.Organizations} {
+		for _, value := range values {
+			if value = strings.TrimSpace(value); value != "" {
+				return value
+			}
+		}
+	}
+	return "(unnamed APNIC registration)"
+}
+
+func admissionExclusionEvidence(report apnicaudit.Report) []apnicaudit.Exclusion {
+	var out []apnicaudit.Exclusion
+	for _, record := range report.CIDRs {
+		for _, fact := range record.Facts {
+			if fact.Classification == "operator_registration" {
+				continue
+			}
+			lo := n(netip.MustParseAddr(fact.Start))
+			hi := n(netip.MustParseAddr(fact.End))
+			for _, cidr := range spanCIDRs([]span{{lo, hi}}) {
+				prefix := netip.MustParsePrefix(cidr)
+				out = append(out, apnicaudit.Exclusion{
+					CIDR: cidr, AddressCount: uint64(1) << uint(32-prefix.Bits()), Source: "apnic_inetnum",
+					Category: "apnic_operator_admission_" + fact.Classification, Operator: fact.Operator,
+					Registrant: auditRegistrant(fact.Registry), Reason: fact.Reason,
+				})
+			}
+		}
+	}
+	return out
+}
+
 func cidrCount(rows []span) int {
 	count := 0
 	for _, row := range merge(rows) {
@@ -919,9 +969,11 @@ func main() {
 	expectedCN := subtract(preCloudCandidates, excludedRanges)
 	assertEqual(cnRanges, expectedCN, "cn.txt address set does not equal the recomputed final output")
 	var generatedOperators []span
+	generatedByOperator := map[string][]span{}
 	for _, operator := range operators {
 		path := filepath.Join(*data, "operators", operator+".txt")
 		ranges := readCIDRs(path, true)
+		generatedByOperator[operator] = ranges
 		expected := subtract(intersect(allowedByOperator[operator], chinaRanges), excludedRanges)
 		assertEqual(ranges, expected, "operator address set does not recompute: "+operator)
 		assertContained(ranges, cnRanges)
@@ -930,6 +982,25 @@ func main() {
 		generatedOperators = append(generatedOperators, ranges...)
 	}
 	assertEqual(generatedOperators, cnRanges, "the union of per-operator lists does not equal cn.txt")
+	zhejiangProvince := zhejiangProvinceRanges(filepath.Join(*sources, "ip2region_ipv4_source.txt"))
+	zhejiangAdmissionRanges := apnicOperatorAdmissionRanges(apnicAllSegments, classifier)
+	zhejiangPreAdmissionByOperator := map[string][]span{}
+	zhejiangPreAdmissionOperatorRanges := map[string][]apnicaudit.Range{}
+	var zhejiangPreAdmissionRows, expectedZhejiangRows []span
+	for _, operator := range operators {
+		zhejiangPreAdmissionByOperator[operator] = intersect(generatedByOperator[operator], zhejiangProvince)
+		for _, row := range zhejiangPreAdmissionByOperator[operator] {
+			zhejiangPreAdmissionOperatorRanges[operator] = append(zhejiangPreAdmissionOperatorRanges[operator], apnicaudit.Range{Lo: row.lo, Hi: row.hi})
+		}
+		zhejiangPreAdmissionRows = append(zhejiangPreAdmissionRows, zhejiangPreAdmissionByOperator[operator]...)
+		expectedZhejiangRows = append(expectedZhejiangRows, intersect(zhejiangPreAdmissionByOperator[operator], zhejiangAdmissionRanges[operator])...)
+	}
+	zhejiangPreAdmissionRows = merge(zhejiangPreAdmissionRows)
+	expectedZhejiangRows = merge(expectedZhejiangRows)
+	zhejiangAdmissionDenied := subtract(zhejiangPreAdmissionRows, expectedZhejiangRows)
+	zhejiangPath := filepath.Join(*data, "provinces", "zhejiang.txt")
+	zhejiangRanges := readCIDRs(zhejiangPath, true)
+	assertEqual(zhejiangRanges, expectedZhejiangRows, "Zhejiang list does not equal the same-operator APNIC registrant admission set")
 	var provincialRanges []span
 	for _, f := range provinceFiles {
 		ranges := readCIDRs(f, true)
@@ -987,6 +1058,9 @@ func main() {
 		{"effective_apnic_independent_route_origin_exclusions", routeOriginCandidateRanges},
 		{"effective_ris_moas_exclusions", risRanges},
 		{"final_output", cnRanges},
+		{"zhejiang_pre_operator_registration_admission", zhejiangPreAdmissionRows},
+		{"zhejiang_operator_registration_denials", zhejiangAdmissionDenied},
+		{"zhejiang_operator_registration_admissions", expectedZhejiangRows},
 		{"province_attributed_output", provincialRanges},
 	}
 	if len(m.Stages) != len(expectedStages) {
@@ -1175,9 +1249,7 @@ func main() {
 	if len(m.Audits) != 1 || m.Audits[0].Name != "zhejiang_apnic_registration" || m.Audits[0].Path != "audits/zhejiang-apnic.json.gz" || m.Audits[0].HumanPath != "audits/zhejiang-apnic.md" {
 		panic("manifest Zhejiang APNIC audit metadata mismatch")
 	}
-	zhejiangPath := filepath.Join(*data, "provinces", "zhejiang.txt")
 	zhejiangCIDRs := strings.Fields(string(mustRead(zhejiangPath)))
-	zhejiangRanges := readCIDRs(zhejiangPath, true)
 	zhejiangOperatorRanges := map[string][]apnicaudit.Range{}
 	for _, operator := range operators {
 		operatorRows := intersect(readCIDRs(filepath.Join(*data, "operators", operator+".txt"), true), zhejiangRanges)
@@ -1189,7 +1261,6 @@ func main() {
 	if e != nil {
 		panic(e)
 	}
-	zhejiangProvince := zhejiangProvinceRanges(filepath.Join(*sources, "ip2region_ipv4_source.txt"))
 	zhejiangCandidatesByOperator := map[string][]span{}
 	var zhejiangCandidates []span
 	for _, operator := range operators {
@@ -1197,7 +1268,13 @@ func main() {
 		zhejiangCandidates = append(zhejiangCandidates, zhejiangCandidatesByOperator[operator]...)
 	}
 	zhejiangCandidates = merge(zhejiangCandidates)
-	apnicaudit.AttachComparison(&expectedAudit, addressCount(zhejiangCandidates), addressCount(intersect(zhejiangCandidates, excludedRanges)), provinceExclusionEvidence(m.ExcludedPrefixes, zhejiangCandidatesByOperator))
+	zhejiangPreAdmissionAudit, e := apnicaudit.Build("浙江省 pre-admission IPv4 APNIC registration audit", spanCIDRs(zhejiangPreAdmissionRows), zhejiangPreAdmissionOperatorRanges, apnicAllSegments, classifier)
+	if e != nil {
+		panic(e)
+	}
+	zhejiangEvidence := provinceExclusionEvidence(m.ExcludedPrefixes, zhejiangCandidatesByOperator)
+	zhejiangEvidence = append(zhejiangEvidence, admissionExclusionEvidence(zhejiangPreAdmissionAudit)...)
+	apnicaudit.AttachComparison(&expectedAudit, addressCount(zhejiangCandidates), addressCount(subtract(zhejiangCandidates, zhejiangRanges)), zhejiangEvidence)
 	auditPath := filepath.Join(*data, filepath.FromSlash(m.Audits[0].Path))
 	auditFile, e := os.Open(auditPath)
 	if e != nil {
@@ -1220,6 +1297,11 @@ func main() {
 	}
 	if actualAudit.Summary.StrongNonPublicSignalAddressCount != 0 {
 		panic(fmt.Sprintf("Zhejiang ACL retains %d addresses that still match an enforced non-public APNIC rule", actualAudit.Summary.StrongNonPublicSignalAddressCount))
+	}
+	for _, category := range actualAudit.Summary.Categories {
+		if category.Classification != "operator_registration" && category.AddressCount != 0 {
+			panic(fmt.Sprintf("Zhejiang admission output retains %d addresses classified as %s", category.AddressCount, category.Classification))
+		}
 	}
 	humanAuditPath := filepath.Join(*data, filepath.FromSlash(auditMeta.HumanPath))
 	expectedHumanAudit := apnicaudit.RenderMarkdown(expectedAudit, filepath.Base(auditPath))

@@ -852,6 +852,56 @@ func provinceExclusionEvidence(entries []prefixExclusionMeta, candidatesByOperat
 	return out
 }
 
+func apnicOperatorAdmissionRanges(segments []apnicinetnum.Segment, classifier *operatorconfig.Classifier) map[string][]span {
+	out := map[string][]span{}
+	for _, segment := range segments {
+		result := classifier.ClassifyAPNICRegistrant(apnicinetnum.SearchText(segment.Record))
+		if result.Operator != "" {
+			out[result.Operator] = append(out[result.Operator], span{segment.Lo, segment.Hi})
+		}
+	}
+	for _, operator := range operators {
+		out[operator] = merge(out[operator])
+	}
+	return out
+}
+
+func auditRegistrant(registry *apnicaudit.Registry) string {
+	if registry == nil {
+		return "(no APNIC registration)"
+	}
+	for _, values := range [][]string{registry.OrganizationNames, registry.Descriptions, registry.Netnames, registry.Organizations} {
+		for _, value := range values {
+			if value = strings.TrimSpace(value); value != "" {
+				return value
+			}
+		}
+	}
+	return "(unnamed APNIC registration)"
+}
+
+func admissionExclusionEvidence(report apnicaudit.Report) []apnicaudit.Exclusion {
+	var out []apnicaudit.Exclusion
+	for _, record := range report.CIDRs {
+		for _, fact := range record.Facts {
+			if fact.Classification == "operator_registration" {
+				continue
+			}
+			lo := n(netip.MustParseAddr(fact.Start))
+			hi := n(netip.MustParseAddr(fact.End))
+			for _, cidr := range spanCIDRs([]span{{lo, hi}}) {
+				prefix := netip.MustParsePrefix(cidr)
+				out = append(out, apnicaudit.Exclusion{
+					CIDR: cidr, AddressCount: uint64(1) << uint(32-prefix.Bits()), Source: "apnic_inetnum",
+					Category: "apnic_operator_admission_" + fact.Classification, Operator: fact.Operator,
+					Registrant: auditRegistrant(fact.Registry), Reason: fact.Reason,
+				})
+			}
+		}
+	}
+	return out
+}
+
 func writeGzipJSON(path string, value any) (string, error) {
 	if e := os.MkdirAll(filepath.Dir(path), 0755); e != nil {
 		return "", e
@@ -1236,6 +1286,27 @@ func main() {
 			by[o][p.Name] = intersect(ranges[o], provinceRanges)
 		}
 	}
+	zhejiangProvinceRanges := merge(provinceSourceRanges["浙江省"])
+	zhejiangAdmissionRanges := apnicOperatorAdmissionRanges(apnicAllSegments, classifier)
+	zhejiangPreAdmissionByOperator := map[string][]span{}
+	zhejiangPreAdmissionOperatorRanges := map[string][]apnicaudit.Range{}
+	var zhejiangPreAdmissionRows, zhejiangRows, zhejiangAdmissionDenied []span
+	for _, operator := range operators {
+		zhejiangPreAdmissionByOperator[operator] = by[operator]["浙江省"]
+		for _, row := range zhejiangPreAdmissionByOperator[operator] {
+			zhejiangPreAdmissionOperatorRanges[operator] = append(zhejiangPreAdmissionOperatorRanges[operator], apnicaudit.Range{Lo: row.lo, Hi: row.hi})
+		}
+		zhejiangPreAdmissionRows = append(zhejiangPreAdmissionRows, zhejiangPreAdmissionByOperator[operator]...)
+		by[operator]["浙江省"] = intersect(zhejiangPreAdmissionByOperator[operator], zhejiangAdmissionRanges[operator])
+		zhejiangRows = append(zhejiangRows, by[operator]["浙江省"]...)
+	}
+	zhejiangPreAdmissionRows = merge(zhejiangPreAdmissionRows)
+	zhejiangRows = merge(zhejiangRows)
+	zhejiangAdmissionDenied = subtract(zhejiangPreAdmissionRows, zhejiangRows)
+	zhejiangPreAdmissionAudit, e := apnicaudit.Build("浙江省 pre-admission IPv4 APNIC registration audit", spanCIDRs(zhejiangPreAdmissionRows), zhejiangPreAdmissionOperatorRanges, apnicAllSegments, classifier)
+	if e != nil {
+		panic(e)
+	}
 	var provinceAttributed []span
 	for _, p := range provinces {
 		for _, operator := range operators {
@@ -1257,7 +1328,7 @@ func main() {
 
 	m := manifest{
 		GeneratedAt: time.Now().UTC().Format(time.RFC3339Nano),
-		Scope:       "Best-effort ACL list; IPv4; mainland China; candidates for IPv4 addresses presented on the public Internet by ordinary Internet access users of China Telecom, China Mobile, or China Unicom, only when also present in china-operator-ip's origin-only China list; does not classify or protect addresses by household, individual, enterprise, or institutional customer type; explicitly subtracts dedicated premium backbone ASNs, cloud-provider CIDRs, strong APNIC registrations outside ordinary user access scope, portable and non-portable registrations linked through APNIC aut-num to a currently active independent ASN, registrations supported by both an independent legal-entity name and an exact APNIC aut-num link, origin-validated APNIC route objects, strongly linked independent APNIC route origins, and conservative RIPE RIS multi-observer MOAS evidence; unclear mixed-use, historical and MOAS space remains included",
+		Scope:       "Best-effort ACL list; IPv4; mainland China; candidates for IPv4 addresses presented on the public Internet by ordinary Internet access users of China Telecom, China Mobile, or China Unicom, only when also present in china-operator-ip's origin-only China list; does not classify or protect addresses by household, individual, enterprise, or institutional customer type; explicitly subtracts dedicated premium backbone ASNs, cloud-provider CIDRs, strong APNIC registrations outside ordinary user access scope, portable and non-portable registrations linked through APNIC aut-num to a currently active independent ASN, registrations supported by both an independent legal-entity name and an exact APNIC aut-num link, origin-validated APNIC route objects, strongly linked independent APNIC route origins, and conservative RIPE RIS multi-observer MOAS evidence; unclear mixed-use, historical and MOAS space remains included; Zhejiang province additionally experiments with positive admission requiring the most-specific APNIC registrant to match the current BGP origin operator",
 		Stages: []stageMeta{
 			stage("operator_origin_candidates", originCandidates),
 			stage("china_origin_intersection", preCloudCandidates),
@@ -1270,6 +1341,9 @@ func main() {
 			stage("effective_apnic_independent_route_origin_exclusions", routeOriginCandidateRanges),
 			stage("effective_ris_moas_exclusions", risRanges),
 			stage("final_output", finalRanges),
+			stage("zhejiang_pre_operator_registration_admission", zhejiangPreAdmissionRows),
+			stage("zhejiang_operator_registration_denials", zhejiangAdmissionDenied),
+			stage("zhejiang_operator_registration_admissions", zhejiangRows),
 			stage("province_attributed_output", provinceAttributed),
 		},
 		CloudSources: cloudSourceSummaries,
@@ -1334,13 +1408,10 @@ func main() {
 		m.Lists = append(m.Lists, listMeta{Name: p.Name, Path: filepath.ToSlash(path), fileMeta: meta})
 	}
 
-	var zhejiangRows []span
 	zhejiangOperatorRanges := map[string][]apnicaudit.Range{}
 	zhejiangCandidatesByOperator := map[string][]span{}
-	zhejiangProvinceRanges := merge(provinceSourceRanges["浙江省"])
 	var zhejiangCandidates []span
 	for _, operator := range operators {
-		zhejiangRows = append(zhejiangRows, by[operator]["浙江省"]...)
 		zhejiangCandidatesByOperator[operator] = intersect(preCloudByOperator[operator], zhejiangProvinceRanges)
 		zhejiangCandidates = append(zhejiangCandidates, zhejiangCandidatesByOperator[operator]...)
 		for _, row := range by[operator]["浙江省"] {
@@ -1354,9 +1425,16 @@ func main() {
 	if zhejiangAudit.Summary.StrongNonPublicSignalAddressCount != 0 {
 		panic(fmt.Sprintf("Zhejiang ACL retains %d addresses that still match an enforced non-public APNIC rule", zhejiangAudit.Summary.StrongNonPublicSignalAddressCount))
 	}
+	for _, category := range zhejiangAudit.Summary.Categories {
+		if category.Classification != "operator_registration" && category.AddressCount != 0 {
+			panic(fmt.Sprintf("Zhejiang admission output retains %d addresses classified as %s", category.AddressCount, category.Classification))
+		}
+	}
 	zhejiangCandidates = merge(zhejiangCandidates)
-	zhejiangExcluded := intersect(zhejiangCandidates, excludedRanges)
-	apnicaudit.AttachComparison(&zhejiangAudit, addressCount(zhejiangCandidates), addressCount(zhejiangExcluded), provinceExclusionEvidence(excludedPrefixes, zhejiangCandidatesByOperator))
+	zhejiangExcluded := subtract(zhejiangCandidates, zhejiangRows)
+	zhejiangEvidence := provinceExclusionEvidence(excludedPrefixes, zhejiangCandidatesByOperator)
+	zhejiangEvidence = append(zhejiangEvidence, admissionExclusionEvidence(zhejiangPreAdmissionAudit)...)
+	apnicaudit.AttachComparison(&zhejiangAudit, addressCount(zhejiangCandidates), addressCount(zhejiangExcluded), zhejiangEvidence)
 	auditPath := filepath.Join("audits", "zhejiang-apnic.json.gz")
 	auditSHA, e := writeGzipJSON(filepath.Join(*out, auditPath), zhejiangAudit)
 	if e != nil {

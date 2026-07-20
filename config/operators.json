@@ -5,6 +5,10 @@
         "china ?telecom",
         "chinanet"
       ],
+      "apnic_registrant_patterns": [
+        "\\bzhejiang[ -]?(?:(?:province|provice)[ -]?)?(?:telecom|telecommunication)\\b",
+        "\\b(?:hangzhou|ningbo|wenzhou|jiaxing|shaoxing|jinhua|huzhou|quzhou|zhoushan|taizhou|lishui|fuyang|linan|xiaoshan|zhenhai|zhenghai|haining)[ -]?(?:telecom|dianxin)\\b"
+      ],
       "include_asns": {
         "4847": "China Telecom Beijing provincial network; public description is China Networks Inter-Exchange"
       }
@@ -15,12 +19,18 @@
         "cmnet",
         "tietong"
       ],
+      "apnic_registrant_patterns": [
+        "\\b(?:zhejiang|hangzhou|ningbo|wenzhou|jiaxing|shaoxing|jinhua|huzhou|quzhou|zhoushan|taizhou|lishui)[ -]?mobile communications?\\b"
+      ],
       "include_asns": {}
     },
     "unicom": {
       "description_patterns": [
         "unicom",
         "(?:^|[^a-z0-9])cnc(?:group)?(?:[^a-z0-9]|$)"
+      ],
+      "apnic_registrant_patterns": [
+        "\\b(?:zhejiang|hangzhou|ningbo|wenzhou|jiaxing|shaoxing|jinhua|huzhou|quzhou|zhoushan|taizhou|lishui)[ -]?(?:china[ -]?)?unicom\\b"
       ],
       "include_asns": {}
     }
