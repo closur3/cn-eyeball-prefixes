@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-20T21:18:26.285699675Z",
+  "generated_at": "2026-07-20T21:27:32.834792181Z",
   "scope": "IPv4; mainland China; nationwide admission requires both a China Telecom, China Mobile, or China Unicom current BGP origin and a covering APNIC inetnum registration attributable to the same operator; most-specific registrations are used for strong exclusions and operator-conflict denials, not as a mandatory leaf-level admission boundary; dedicated premium backbone ASNs, cloud-provider CIDRs, strong APNIC registrations outside ordinary user access scope, independent holders and route origins, and strong RIPE RIS MOAS evidence are excluded",
   "sources": [
     {
@@ -201,6 +201,16 @@
       "address_count": 220987153
     },
     {
+      "name": "trial_bgp_prefix_covering_parent_relaxed_added_vs_current",
+      "cidr_count": 146,
+      "address_count": 7519
+    },
+    {
+      "name": "trial_bgp_prefix_covering_parent_relaxed_removed_vs_current",
+      "cidr_count": 5,
+      "address_count": 29952
+    },
+    {
       "name": "trial_bgp_prefix_relaxed_admission",
       "cidr_count": 15808,
       "address_count": 223519706
@@ -264,6 +274,16 @@
       "name": "trial_zhejiang_bgp_prefix_covering_parent_relaxed_conflicts",
       "cidr_count": 2456,
       "address_count": 15952367
+    },
+    {
+      "name": "trial_zhejiang_bgp_prefix_covering_parent_relaxed_added_vs_current",
+      "cidr_count": 19,
+      "address_count": 216
+    },
+    {
+      "name": "trial_zhejiang_bgp_prefix_covering_parent_relaxed_removed_vs_current",
+      "cidr_count": 0,
+      "address_count": 0
     },
     {
       "name": "trial_zhejiang_bgp_prefix_relaxed_admission",
@@ -109472,6 +109492,34 @@
       "cidr_count": 0,
       "address_count": 0,
       "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+    },
+    {
+      "name": "BGP covering-relaxed delta (nationwide, added versus current dev)",
+      "path": "experiments/bgp-prefix-admission/nationwide-covering_relaxed-added.txt",
+      "cidr_count": 146,
+      "address_count": 7519,
+      "sha256": "2f7e3311877606bd217e5ca517f8265db972ca2edadb1e529597b5593f762c78"
+    },
+    {
+      "name": "BGP covering-relaxed delta (nationwide, removed versus current dev)",
+      "path": "experiments/bgp-prefix-admission/nationwide-covering_relaxed-removed.txt",
+      "cidr_count": 5,
+      "address_count": 29952,
+      "sha256": "3f663c9a29992a88abdf3ed829f29a5b6ec5f2ebfca3ca7fedbc376a3d8088d3"
+    },
+    {
+      "name": "BGP covering-relaxed delta (Zhejiang, added versus current dev)",
+      "path": "experiments/bgp-prefix-admission/zhejiang-covering_relaxed-added.txt",
+      "cidr_count": 19,
+      "address_count": 216,
+      "sha256": "a5bdcda7a0f2491c29fbf958142e652b45f8b490d326a0260b2ae4383d68de80"
+    },
+    {
+      "name": "BGP covering-relaxed delta (Zhejiang, removed versus current dev)",
+      "path": "experiments/bgp-prefix-admission/zhejiang-covering_relaxed-removed.txt",
+      "cidr_count": 0,
+      "address_count": 0,
+      "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
     }
   ],
   "audits": [
@@ -109497,7 +109545,7 @@
       "registry_covered_address_count": 2510120,
       "strong_non_public_signal_address_count": 0,
       "sha256": "2cbd2a73264e62ec715282d2f9761d31337d97969b243fae0616c982c3a2bd32",
-      "human_sha256": "7e7842d8a39c3d9f940e73f5ee2cca9fcf0bbe5dde4369aef924c62e5fe628dc"
+      "human_sha256": "f908a33628618d0f828e08d2b5eba32e4688d227af8a18d25e08a16ed7702e04"
     }
   ]
 }
