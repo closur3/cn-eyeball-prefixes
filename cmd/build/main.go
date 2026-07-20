@@ -89,6 +89,15 @@ type stageMeta struct {
 	AddressCount uint64 `json:"address_count"`
 }
 
+type operatorAdmissionMeta struct {
+	Mode                      string  `json:"mode"`
+	PreCIDRCount              int     `json:"pre_cidr_count"`
+	DeniedCIDRCount           int     `json:"denied_cidr_count"`
+	FinalCIDRCount            int     `json:"final_cidr_count"`
+	CIDRExpansionRatio        float64 `json:"cidr_expansion_ratio"`
+	MaximumCIDRExpansionRatio float64 `json:"maximum_cidr_expansion_ratio"`
+}
+
 type auditMeta struct {
 	Name                              string `json:"name"`
 	Path                              string `json:"path"`
@@ -236,6 +245,7 @@ type manifest struct {
 	Scope                         string                `json:"scope"`
 	Sources                       []sourceMeta          `json:"sources"`
 	Stages                        []stageMeta           `json:"stages"`
+	OperatorAdmission             operatorAdmissionMeta `json:"operator_registration_admission"`
 	CloudSources                  []cloudSourceMeta     `json:"cloud_sources"`
 	APNICInetnum                  apnicSourceMeta       `json:"apnic_inetnum"`
 	APNICPortableHolders          portableHolderMeta    `json:"apnic_portable_holders"`
@@ -258,6 +268,8 @@ type province struct {
 }
 
 var operators = []string{"chinanet", "cmcc", "unicom"}
+
+const maxAdmissionCIDRExpansionRatio = 2.0
 var cloudSources = []string{
 	"ipdata_aliyun", "ipdata_tencent", "ipdata_huawei", "ipdata_ucloud", "ipdata_ksyun", "ipdata_baidu", "ipdata_jdcloud",
 }
@@ -853,12 +865,31 @@ func provinceExclusionEvidence(entries []prefixExclusionMeta, candidatesByOperat
 	return out
 }
 
-func apnicOperatorAdmissionRanges(segments []apnicinetnum.Segment, classifier *operatorconfig.Classifier) map[string][]span {
+func apnicOperatorAdmissionRanges(records []apnicinetnum.Record, classifier *operatorconfig.Classifier) map[string][]span {
+	out := map[string][]span{}
+	for _, record := range records {
+		result := classifier.ClassifyAPNICRegistrant(apnicinetnum.SearchText(record))
+		if result.Operator != "" {
+			out[result.Operator] = append(out[result.Operator], span{record.Lo, record.Hi})
+		}
+	}
+	for _, operator := range operators {
+		out[operator] = merge(out[operator])
+	}
+	return out
+}
+
+func apnicOperatorConflictRanges(segments []apnicinetnum.Segment, classifier *operatorconfig.Classifier) map[string][]span {
 	out := map[string][]span{}
 	for _, segment := range segments {
 		result := classifier.ClassifyAPNICRegistrant(apnicinetnum.SearchText(segment.Record))
-		if result.Operator != "" {
-			out[result.Operator] = append(out[result.Operator], span{segment.Lo, segment.Hi})
+		if result.Operator == "" {
+			continue
+		}
+		for _, operator := range operators {
+			if operator != result.Operator {
+				out[operator] = append(out[operator], span{segment.Lo, segment.Hi})
+			}
 		}
 	}
 	for _, operator := range operators {
@@ -881,16 +912,14 @@ func auditRegistrant(registry *apnicaudit.Registry) string {
 	return "(unnamed APNIC registration)"
 }
 
-func admissionExclusionEvidence(report apnicaudit.Report) []apnicaudit.Exclusion {
+func admissionExclusionEvidence(report apnicaudit.Report, deniedByOperator map[string][]span) []apnicaudit.Exclusion {
 	var out []apnicaudit.Exclusion
 	for _, record := range report.CIDRs {
 		for _, fact := range record.Facts {
-			if fact.Classification == "operator_registration" {
-				continue
-			}
 			lo := n(netip.MustParseAddr(fact.Start))
 			hi := n(netip.MustParseAddr(fact.End))
-			for _, cidr := range spanCIDRs([]span{{lo, hi}}) {
+			denied := intersect([]span{{lo, hi}}, deniedByOperator[fact.Operator])
+			for _, cidr := range spanCIDRs(denied) {
 				prefix := netip.MustParsePrefix(cidr)
 				out = append(out, apnicaudit.Exclusion{
 					CIDR: cidr, AddressCount: uint64(1) << uint(32-prefix.Bits()), Source: "apnic_inetnum",
@@ -1242,14 +1271,18 @@ func main() {
 		}
 		return a.MatchedBy < b.MatchedBy
 	})
-	operatorAdmissionRanges := apnicOperatorAdmissionRanges(apnicAllSegments, classifier)
+	operatorAdmissionRanges := apnicOperatorAdmissionRanges(apnicRecords, classifier)
+	operatorConflictRanges := apnicOperatorConflictRanges(apnicAllSegments, classifier)
 	preAdmissionByOperator := map[string][]span{}
+	admissionDeniedByOperator := map[string][]span{}
 	var preAdmissionRanges, admissionDeniedRanges []span
 	for _, o := range operators {
 		preAdmissionByOperator[o] = subtract(preCloudByOperator[o], excludedRanges)
-		ranges[o] = intersect(preAdmissionByOperator[o], operatorAdmissionRanges[o])
+		parentAdmitted := intersect(preAdmissionByOperator[o], operatorAdmissionRanges[o])
+		ranges[o] = subtract(parentAdmitted, operatorConflictRanges[o])
+		admissionDeniedByOperator[o] = subtract(preAdmissionByOperator[o], ranges[o])
 		preAdmissionRanges = append(preAdmissionRanges, preAdmissionByOperator[o]...)
-		admissionDeniedRanges = append(admissionDeniedRanges, subtract(preAdmissionByOperator[o], ranges[o])...)
+		admissionDeniedRanges = append(admissionDeniedRanges, admissionDeniedByOperator[o]...)
 	}
 	preAdmissionRanges = merge(preAdmissionRanges)
 	admissionDeniedRanges = merge(admissionDeniedRanges)
@@ -1259,6 +1292,12 @@ func main() {
 		finalRanges = append(finalRanges, ranges[operator]...)
 	}
 	finalRanges = merge(finalRanges)
+	preAdmissionCIDRCount := len(spanCIDRs(preAdmissionRanges))
+	finalCIDRCount := len(spanCIDRs(finalRanges))
+	if finalCIDRCount > preAdmissionCIDRCount*2 {
+		panic(fmt.Sprintf("operator parent-registration admission expands ACL from %d to %d CIDRs, exceeding the 2.0x limit", preAdmissionCIDRCount, finalCIDRCount))
+	}
+	admissionExpansionRatio := float64(finalCIDRCount) / float64(preAdmissionCIDRCount)
 	if addressCount(finalRanges) < 100000000 {
 		panic("final output contains fewer than 100,000,000 IPv4 addresses")
 	}
@@ -1334,7 +1373,8 @@ func main() {
 
 	m := manifest{
 		GeneratedAt: time.Now().UTC().Format(time.RFC3339Nano),
-		Scope:       "Strict experimental ACL list; IPv4; mainland China; nationwide positive admission requires both a China Telecom, China Mobile, or China Unicom current BGP origin and a most-specific APNIC inetnum registrant attributable to the same operator; dedicated premium backbone ASNs, cloud-provider CIDRs, strong APNIC registrations outside ordinary user access scope, independent holders and route origins, and strong RIPE RIS MOAS evidence are also excluded; independent, ambiguous, unregistered, and operator-conflicting APNIC registrations are not admitted",
+		Scope:       "IPv4; mainland China; nationwide admission requires both a China Telecom, China Mobile, or China Unicom current BGP origin and a covering APNIC inetnum registration attributable to the same operator; most-specific registrations are used for strong exclusions and operator-conflict denials, not as a mandatory leaf-level admission boundary; dedicated premium backbone ASNs, cloud-provider CIDRs, strong APNIC registrations outside ordinary user access scope, independent holders and route origins, and strong RIPE RIS MOAS evidence are excluded",
+		OperatorAdmission: operatorAdmissionMeta{Mode: "covering_operator_registration_with_strong_leaf_exclusions", PreCIDRCount: preAdmissionCIDRCount, DeniedCIDRCount: len(spanCIDRs(admissionDeniedRanges)), FinalCIDRCount: finalCIDRCount, CIDRExpansionRatio: admissionExpansionRatio, MaximumCIDRExpansionRatio: maxAdmissionCIDRExpansionRatio},
 		Stages: []stageMeta{
 			stage("operator_origin_candidates", originCandidates),
 			stage("china_origin_intersection", preCloudCandidates),
@@ -1346,9 +1386,9 @@ func main() {
 			stage("effective_apnic_route_exclusions", routeRanges),
 			stage("effective_apnic_independent_route_origin_exclusions", routeOriginCandidateRanges),
 			stage("effective_ris_moas_exclusions", risRanges),
-			stage("pre_operator_registration_admission", preAdmissionRanges),
-			stage("operator_registration_denials", admissionDeniedRanges),
-			stage("operator_registration_admissions", finalRanges),
+			stage("pre_operator_parent_registration_admission", preAdmissionRanges),
+			stage("operator_parent_registration_denials", admissionDeniedRanges),
+			stage("operator_parent_registration_admissions", finalRanges),
 			stage("final_output", finalRanges),
 			stage("province_attributed_output", provinceAttributed),
 		},
@@ -1431,15 +1471,10 @@ func main() {
 	if zhejiangAudit.Summary.StrongNonPublicSignalAddressCount != 0 {
 		panic(fmt.Sprintf("Zhejiang ACL retains %d addresses that still match an enforced non-public APNIC rule", zhejiangAudit.Summary.StrongNonPublicSignalAddressCount))
 	}
-	for _, category := range zhejiangAudit.Summary.Categories {
-		if category.Classification != "operator_registration" && category.AddressCount != 0 {
-			panic(fmt.Sprintf("Zhejiang admission output retains %d addresses classified as %s", category.AddressCount, category.Classification))
-		}
-	}
 	zhejiangCandidates = merge(zhejiangCandidates)
 	zhejiangExcluded := subtract(zhejiangCandidates, zhejiangRows)
 	zhejiangEvidence := provinceExclusionEvidence(excludedPrefixes, zhejiangCandidatesByOperator)
-	zhejiangEvidence = append(zhejiangEvidence, admissionExclusionEvidence(zhejiangPreAdmissionAudit)...)
+	zhejiangEvidence = append(zhejiangEvidence, admissionExclusionEvidence(zhejiangPreAdmissionAudit, admissionDeniedByOperator)...)
 	apnicaudit.AttachComparison(&zhejiangAudit, addressCount(zhejiangCandidates), addressCount(zhejiangExcluded), zhejiangEvidence)
 	auditPath := filepath.Join("audits", "zhejiang-apnic.json.gz")
 	auditSHA, e := writeGzipJSON(filepath.Join(*out, auditPath), zhejiangAudit)

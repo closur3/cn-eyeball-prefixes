@@ -57,7 +57,7 @@ func TestRenderMarkdownIncludesSummaryAndReviewEvidence(t *testing.T) {
 		}},
 	}
 	markdown := RenderMarkdown(report, "zhejiang-apnic.json.gz")
-	for _, want := range []string{"# 浙江 IPv4 APNIC 登记事实审计", "全国正向准入规则", "| `strong_non_public_signal` | 1 | 16 | 6.2500% |", "10.0.0.240–10.0.0.255", "Example Technology Co., Ltd.", "zhejiang-apnic.json.gz"} {
+	for _, want := range []string{"# 浙江 IPv4 APNIC 登记事实审计", "全国分层准入规则", "| `strong_non_public_signal` | 1 | 16 | 6.2500% |", "10.0.0.240–10.0.0.255", "Example Technology Co., Ltd.", "zhejiang-apnic.json.gz"} {
 		if !strings.Contains(markdown, want) {
 			t.Fatalf("Markdown report does not contain %q:\n%s", want, markdown)
 		}

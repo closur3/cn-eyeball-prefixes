@@ -33,6 +33,8 @@ var cloudSources = []string{
 }
 var operators = []string{"chinanet", "cmcc", "unicom"}
 
+const maxAdmissionCIDRExpansionRatio = 2.0
+
 type listMeta struct {
 	Path         string `json:"path"`
 	CIDRCount    int    `json:"cidr_count"`
@@ -51,6 +53,15 @@ type stageMeta struct {
 	Name         string `json:"name"`
 	CIDRCount    int    `json:"cidr_count"`
 	AddressCount uint64 `json:"address_count"`
+}
+
+type operatorAdmissionMeta struct {
+	Mode                      string  `json:"mode"`
+	PreCIDRCount              int     `json:"pre_cidr_count"`
+	DeniedCIDRCount           int     `json:"denied_cidr_count"`
+	FinalCIDRCount            int     `json:"final_cidr_count"`
+	CIDRExpansionRatio        float64 `json:"cidr_expansion_ratio"`
+	MaximumCIDRExpansionRatio float64 `json:"maximum_cidr_expansion_ratio"`
 }
 
 type auditMeta struct {
@@ -196,6 +207,7 @@ type prefixExclusionMeta struct {
 type manifest struct {
 	Sources                       []sourceMeta          `json:"sources"`
 	Stages                        []stageMeta           `json:"stages"`
+	OperatorAdmission             operatorAdmissionMeta `json:"operator_registration_admission"`
 	CloudSources                  []cloudSourceMeta     `json:"cloud_sources"`
 	APNICInetnum                  apnicSourceMeta       `json:"apnic_inetnum"`
 	APNICPortableHolders          portableHolderMeta    `json:"apnic_portable_holders"`
@@ -458,12 +470,31 @@ func provinceExclusionEvidence(entries []prefixExclusionMeta, candidatesByOperat
 	return out
 }
 
-func apnicOperatorAdmissionRanges(segments []apnicinetnum.Segment, classifier *operatorconfig.Classifier) map[string][]span {
+func apnicOperatorAdmissionRanges(records []apnicinetnum.Record, classifier *operatorconfig.Classifier) map[string][]span {
+	out := map[string][]span{}
+	for _, record := range records {
+		result := classifier.ClassifyAPNICRegistrant(apnicinetnum.SearchText(record))
+		if result.Operator != "" {
+			out[result.Operator] = append(out[result.Operator], span{record.Lo, record.Hi})
+		}
+	}
+	for _, operator := range operators {
+		out[operator] = merge(out[operator])
+	}
+	return out
+}
+
+func apnicOperatorConflictRanges(segments []apnicinetnum.Segment, classifier *operatorconfig.Classifier) map[string][]span {
 	out := map[string][]span{}
 	for _, segment := range segments {
 		result := classifier.ClassifyAPNICRegistrant(apnicinetnum.SearchText(segment.Record))
-		if result.Operator != "" {
-			out[result.Operator] = append(out[result.Operator], span{segment.Lo, segment.Hi})
+		if result.Operator == "" {
+			continue
+		}
+		for _, operator := range operators {
+			if operator != result.Operator {
+				out[operator] = append(out[operator], span{segment.Lo, segment.Hi})
+			}
 		}
 	}
 	for _, operator := range operators {
@@ -486,16 +517,14 @@ func auditRegistrant(registry *apnicaudit.Registry) string {
 	return "(unnamed APNIC registration)"
 }
 
-func admissionExclusionEvidence(report apnicaudit.Report) []apnicaudit.Exclusion {
+func admissionExclusionEvidence(report apnicaudit.Report, deniedByOperator map[string][]span) []apnicaudit.Exclusion {
 	var out []apnicaudit.Exclusion
 	for _, record := range report.CIDRs {
 		for _, fact := range record.Facts {
-			if fact.Classification == "operator_registration" {
-				continue
-			}
 			lo := n(netip.MustParseAddr(fact.Start))
 			hi := n(netip.MustParseAddr(fact.End))
-			for _, cidr := range spanCIDRs([]span{{lo, hi}}) {
+			denied := intersect([]span{{lo, hi}}, deniedByOperator[fact.Operator])
+			for _, cidr := range spanCIDRs(denied) {
 				prefix := netip.MustParsePrefix(cidr)
 				out = append(out, apnicaudit.Exclusion{
 					CIDR: cidr, AddressCount: uint64(1) << uint(32-prefix.Bits()), Source: "apnic_inetnum",
@@ -966,20 +995,33 @@ func main() {
 	excludedRanges := merge(append(append([]span{}, preRISExcluded...), risRanges...))
 	logPhase("RIPE RISWhois")
 	assertNoOverlap(cnRanges, excludedRanges, "cn.txt overlaps an explicit cloud, APNIC, independent route-origin, or strong RIS MOAS exclusion")
-	operatorAdmissionRanges := apnicOperatorAdmissionRanges(apnicAllSegments, classifier)
+	operatorAdmissionRanges := apnicOperatorAdmissionRanges(apnicRecords, classifier)
+	operatorConflictRanges := apnicOperatorConflictRanges(apnicAllSegments, classifier)
 	preAdmissionByOperator := map[string][]span{}
+	admissionDeniedByOperator := map[string][]span{}
 	expectedByOperator := map[string][]span{}
 	var preAdmissionRanges, admissionDeniedRanges, expectedCN []span
 	for _, operator := range operators {
 		preAdmissionByOperator[operator] = subtract(intersect(allowedByOperator[operator], chinaRanges), excludedRanges)
-		expectedByOperator[operator] = intersect(preAdmissionByOperator[operator], operatorAdmissionRanges[operator])
+		parentAdmitted := intersect(preAdmissionByOperator[operator], operatorAdmissionRanges[operator])
+		expectedByOperator[operator] = subtract(parentAdmitted, operatorConflictRanges[operator])
+		admissionDeniedByOperator[operator] = subtract(preAdmissionByOperator[operator], expectedByOperator[operator])
 		preAdmissionRanges = append(preAdmissionRanges, preAdmissionByOperator[operator]...)
-		admissionDeniedRanges = append(admissionDeniedRanges, subtract(preAdmissionByOperator[operator], expectedByOperator[operator])...)
+		admissionDeniedRanges = append(admissionDeniedRanges, admissionDeniedByOperator[operator]...)
 		expectedCN = append(expectedCN, expectedByOperator[operator]...)
 	}
 	preAdmissionRanges = merge(preAdmissionRanges)
 	admissionDeniedRanges = merge(admissionDeniedRanges)
 	expectedCN = merge(expectedCN)
+	preAdmissionCIDRCount := cidrCount(preAdmissionRanges)
+	finalCIDRCount := cidrCount(expectedCN)
+	if finalCIDRCount > preAdmissionCIDRCount*2 {
+		panic("operator parent-registration admission exceeds the 2.0x CIDR expansion limit")
+	}
+	admissionExpansionRatio := float64(finalCIDRCount) / float64(preAdmissionCIDRCount)
+	if m.OperatorAdmission.Mode != "covering_operator_registration_with_strong_leaf_exclusions" || m.OperatorAdmission.PreCIDRCount != preAdmissionCIDRCount || m.OperatorAdmission.DeniedCIDRCount != cidrCount(admissionDeniedRanges) || m.OperatorAdmission.FinalCIDRCount != finalCIDRCount || m.OperatorAdmission.CIDRExpansionRatio != admissionExpansionRatio || m.OperatorAdmission.MaximumCIDRExpansionRatio != maxAdmissionCIDRExpansionRatio {
+		panic("manifest operator parent-registration admission metadata mismatch")
+	}
 	assertEqual(cnRanges, expectedCN, "cn.txt address set does not equal the recomputed final output")
 	var generatedOperators []span
 	generatedByOperator := map[string][]span{}
@@ -1068,9 +1110,9 @@ func main() {
 		{"effective_apnic_route_exclusions", routeRanges},
 		{"effective_apnic_independent_route_origin_exclusions", routeOriginCandidateRanges},
 		{"effective_ris_moas_exclusions", risRanges},
-		{"pre_operator_registration_admission", preAdmissionRanges},
-		{"operator_registration_denials", admissionDeniedRanges},
-		{"operator_registration_admissions", cnRanges},
+		{"pre_operator_parent_registration_admission", preAdmissionRanges},
+		{"operator_parent_registration_denials", admissionDeniedRanges},
+		{"operator_parent_registration_admissions", cnRanges},
 		{"final_output", cnRanges},
 		{"province_attributed_output", provincialRanges},
 	}
@@ -1284,7 +1326,7 @@ func main() {
 		panic(e)
 	}
 	zhejiangEvidence := provinceExclusionEvidence(m.ExcludedPrefixes, zhejiangCandidatesByOperator)
-	zhejiangEvidence = append(zhejiangEvidence, admissionExclusionEvidence(zhejiangPreAdmissionAudit)...)
+	zhejiangEvidence = append(zhejiangEvidence, admissionExclusionEvidence(zhejiangPreAdmissionAudit, admissionDeniedByOperator)...)
 	apnicaudit.AttachComparison(&expectedAudit, addressCount(zhejiangCandidates), addressCount(subtract(zhejiangCandidates, zhejiangRanges)), zhejiangEvidence)
 	auditPath := filepath.Join(*data, filepath.FromSlash(m.Audits[0].Path))
 	auditFile, e := os.Open(auditPath)

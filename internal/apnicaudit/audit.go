@@ -122,7 +122,8 @@ func Build(scope string, cidrs []string, operatorRanges map[string][]Range, segm
 		Scope: scope,
 		Notes: []string{
 			"Every retained address is mapped to the most-specific APNIC inetnum object available in the build snapshot.",
-			"The nationwide admission experiment retains only addresses whose most-specific APNIC registrant is positively attributed to the same operator as the current BGP origin.",
+			"Nationwide admission requires a covering APNIC inetnum object attributable to the same operator as the current BGP origin.",
+			"A more-specific customer or legacy registration is retained unless it supplies an enforced strong exclusion or identifies a conflicting operator.",
 			"The emitted ACL CIDR may be a maximal aggregate and need not itself be visible as a BGP announcement.",
 		},
 	}
@@ -230,9 +231,9 @@ func classify(segment apnicinetnum.Segment, operator string, classifier *operato
 		return "operator_registration_conflict", "APNIC registrant text matches " + registrant.Operator + " but BGP origin candidate is " + operator, registrant.MatchedBy
 	}
 	if classifier.IsIndependentLegalEntity(apnicinetnum.RegistrantText(segment.Record)) {
-		return "independent_legal_entity", "APNIC registrant text names an independent legal entity and is not admitted by the nationwide operator-registration policy", "independent_legal_entity_patterns"
+		return "independent_legal_entity", "Most-specific APNIC registrant text names an independent legal entity; this fact is retained for audit and is excluded only when an enforced second signal links it to an independent network", "independent_legal_entity_patterns"
 	}
-	return "other_registration", "APNIC registration is not positively attributable to the BGP origin operator", ""
+	return "other_registration", "Most-specific APNIC registration is not attributable to the BGP origin operator; this leaf fact alone is not an exclusion", ""
 }
 
 func registry(record apnicinetnum.Record) *Registry {
@@ -245,7 +246,7 @@ func registry(record apnicinetnum.Record) *Registry {
 }
 
 func uncoveredFact(lo, hi uint32, operator string) Fact {
-	return Fact{Start: addr(lo), End: addr(hi), AddressCount: uint64(hi) - uint64(lo) + 1, Operator: operator, Classification: "unregistered", Reason: "No APNIC inetnum object covers this address range; it is not admitted by the nationwide operator-registration policy"}
+	return Fact{Start: addr(lo), End: addr(hi), AddressCount: uint64(hi) - uint64(lo) + 1, Operator: operator, Classification: "unregistered", Reason: "No APNIC inetnum object covers this address range"}
 }
 
 func overlapping(rows []Range, lo, hi uint32) []Range {
@@ -281,7 +282,7 @@ func percent(part, total uint64) float64 {
 func RenderMarkdown(report Report, evidencePath string) string {
 	var b strings.Builder
 	b.WriteString("# 浙江 IPv4 APNIC 登记事实审计\n\n")
-	b.WriteString("本报告以浙江输出为样本，复核全国正向准入规则：只有当前 BGP Origin 属于三网、且 APNIC 最具体登记可明确归属同一家运营商的地址才会保留。完整逐地址事实保存在 [`")
+	b.WriteString("本报告以浙江输出为样本，复核全国分层准入规则：当前 BGP Origin 必须属于三网，并由同一家运营商的 APNIC 上层登记覆盖；最具体登记用于审计及强证据排除，不再单独决定准入。完整逐地址事实保存在 [`")
 	b.WriteString(markdownText(evidencePath))
 	b.WriteString("`](./")
 	b.WriteString(markdownText(evidencePath))
@@ -300,10 +301,10 @@ func RenderMarkdown(report Report, evidencePath string) string {
 	b.WriteString("| 分类 | 事实片段 | 地址 | 占全部地址 | 含义 |\n|---|---:|---:|---:|---|\n")
 	meaning := map[string]string{
 		"operator_registration":    "登记文本可归属于三网运营商",
-		"operator_registration_conflict": "登记运营商与 BGP Origin 运营商不一致，不准入",
-		"independent_legal_entity": "登记给独立法定主体，不准入",
-		"other_registration":       "无法明确归属对应三网运营商，不准入",
-		"unregistered":             "构建快照内没有覆盖该范围的 inetnum，不准入",
+		"operator_registration_conflict": "最具体登记运营商与 BGP Origin 运营商不一致，拒绝",
+		"independent_legal_entity": "最具体登记为独立法定主体；仅在第二项强证据成立时排除",
+		"other_registration":       "最具体登记无法归属对应三网；在上层准入成立时保留审计",
+		"unregistered":             "构建快照内没有覆盖该范围的 inetnum",
 		"strong_non_public_signal": "命中当前明确非公众用途规则；应优先复核",
 	}
 	for _, category := range report.Summary.Categories {
@@ -312,7 +313,7 @@ func RenderMarkdown(report Report, evidencePath string) string {
 
 	b.WriteString("\n## 怎样阅读\n\n")
 	b.WriteString("- ACL 文件采用最大 CIDR 聚合；表中的“保留范围”才是与 APNIC 登记边界对齐后的精确地址范围。\n")
-	b.WriteString("- 全国输出统一采用正向准入；独立主体、归属不明、无登记及运营商冲突范围均不进入任何全国、运营商或省级列表。\n")
+	b.WriteString("- 全国输出统一采用上层运营商登记准入；最具体登记中的运营商冲突会被拒绝，其他独立主体或归属不明记录只有命中既有强证据规则才会删除。\n")
 	b.WriteString("- 排名按覆盖地址量排列，用来优先投入人工审查，不代表风险评分。\n")
 	b.WriteString("- 下方索引只负责让主要事实可读；完整证据、全部小片段和全部字段仍以 gzip JSON 为准。\n\n")
 
@@ -328,7 +329,7 @@ func renderComparison(b *strings.Builder, report Report) {
 	}
 	c := report.Comparison
 	b.WriteString("## 前缀清洗前后对照\n\n")
-	b.WriteString("这里的“准入前候选”指已满足三网 Origin 与中国边界、但尚未执行云 CIDR、APNIC、route、MOAS 排除及全国同运营商 APNIC 登记准入的浙江地址。分类地址数按证据行累加，多个上游命中同一地址时可能重复；总未准入地址数按地址并集计算。\n\n")
+	b.WriteString("这里的“准入前候选”指已满足三网 Origin 与中国边界、但尚未执行云 CIDR、APNIC、route、MOAS 排除及全国同运营商上层 APNIC 登记准入的浙江地址。分类地址数按证据行累加，多个上游命中同一地址时可能重复；总未准入地址数按地址并集计算。\n\n")
 	b.WriteString("| 阶段 | 地址 |\n|---|---:|\n")
 	fmt.Fprintf(b, "| 准入前候选 | %s |\n", formatUint(c.CandidateAddressCount))
 	fmt.Fprintf(b, "| 未准入（并集） | %s |\n", formatUint(c.ExcludedAddressCount))

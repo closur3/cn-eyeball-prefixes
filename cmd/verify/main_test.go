@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/closur3/cn-operator-allowlist/internal/apnicinetnum"
+	"github.com/closur3/cn-operator-allowlist/internal/operatorconfig"
 )
 
 func TestOverlapsSorted(t *testing.T) {
@@ -21,6 +22,26 @@ func TestOverlapsSorted(t *testing.T) {
 	}
 	if overlapsSorted(nil, 0, 100) {
 		t.Fatal("empty span set overlaps")
+	}
+}
+
+func TestParentOperatorRegistrationAdmitsMoreSpecificCustomerRecord(t *testing.T) {
+	classifier, err := operatorconfig.Load("../../config/operators.json", operators)
+	if err != nil {
+		t.Fatal(err)
+	}
+	records := []apnicinetnum.Record{
+		{Lo: 0, Hi: 255, Descriptions: []string{"CHINANET Zhejiang province network"}},
+		{Lo: 64, Hi: 127, Descriptions: []string{"Example customer assignment"}},
+	}
+	admitted := apnicOperatorAdmissionRanges(records, classifier)["chinanet"]
+	if len(admitted) != 1 || admitted[0] != (span{0, 255}) {
+		t.Fatalf("unexpected parent admission ranges: %#v", admitted)
+	}
+	segments := apnicinetnum.ResolveAll(records, func(apnicinetnum.Record) apnicinetnum.Match { return apnicinetnum.Match{} })
+	conflicts := apnicOperatorConflictRanges(segments, classifier)
+	if len(conflicts["chinanet"]) != 0 {
+		t.Fatalf("independent customer label unexpectedly became an operator conflict: %#v", conflicts["chinanet"])
 	}
 }
 
