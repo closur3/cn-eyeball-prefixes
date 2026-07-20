@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-20T21:11:40.657543474Z",
+  "generated_at": "2026-07-20T21:18:26.285699675Z",
   "scope": "IPv4; mainland China; nationwide admission requires both a China Telecom, China Mobile, or China Unicom current BGP origin and a covering APNIC inetnum registration attributable to the same operator; most-specific registrations are used for strong exclusions and operator-conflict denials, not as a mandatory leaf-level admission boundary; dedicated premium backbone ASNs, cloud-provider CIDRs, strong APNIC registrations outside ordinary user access scope, independent holders and route origins, and strong RIPE RIS MOAS evidence are excluded",
   "sources": [
     {
@@ -17,8 +17,8 @@
     {
       "name": "iptoasn_ipv4",
       "url": "https://iptoasn.com/data/ip2asn-v4.tsv.gz",
-      "bytes": 6884089,
-      "sha256": "34f51a28d20f451042ca4e11aa959e588eb753b5d27a13bdc94a1d39285b070e"
+      "bytes": 6884150,
+      "sha256": "3031b610b8ee1ab9db2919434b55b61f4b72221f7befe2b9dfa1ddee65d2e963"
     },
     {
       "name": "apnic_organisation",
@@ -102,13 +102,13 @@
   "stages": [
     {
       "name": "operator_origin_candidates",
-      "cidr_count": 9780,
-      "address_count": 229268480
+      "cidr_count": 9790,
+      "address_count": 229276928
     },
     {
       "name": "china_origin_intersection",
-      "cidr_count": 9778,
-      "address_count": 229267968
+      "cidr_count": 9788,
+      "address_count": 229276416
     },
     {
       "name": "effective_cloud_prefix_exclusions",
@@ -122,8 +122,8 @@
     },
     {
       "name": "effective_apnic_portable_holder_exclusions",
-      "cidr_count": 927,
-      "address_count": 1568786
+      "cidr_count": 932,
+      "address_count": 1576978
     },
     {
       "name": "effective_apnic_delegated_holder_exclusions",
@@ -152,8 +152,8 @@
     },
     {
       "name": "pre_operator_parent_registration_admission",
-      "cidr_count": 15785,
-      "address_count": 223546758
+      "cidr_count": 15786,
+      "address_count": 223547014
     },
     {
       "name": "operator_parent_registration_denials",
@@ -162,13 +162,13 @@
     },
     {
       "name": "operator_parent_registration_admissions",
-      "cidr_count": 14941,
-      "address_count": 221009330
+      "cidr_count": 14942,
+      "address_count": 221009586
     },
     {
       "name": "trial_bgp_prefix_observed_operator_origin",
-      "cidr_count": 16053,
-      "address_count": 222894211
+      "cidr_count": 16054,
+      "address_count": 222894467
     },
     {
       "name": "trial_bgp_prefix_no_operator_origin",
@@ -187,23 +187,23 @@
     },
     {
       "name": "trial_bgp_prefix_covering_parent_admission",
-      "cidr_count": 12364,
-      "address_count": 214803436
+      "cidr_count": 12365,
+      "address_count": 214803692
     },
     {
       "name": "trial_bgp_prefix_covering_parent_with_exact_conflict_carving",
-      "cidr_count": 15188,
-      "address_count": 220354139
+      "cidr_count": 15189,
+      "address_count": 220354395
     },
     {
       "name": "trial_bgp_prefix_covering_parent_relaxed_conflicts",
-      "cidr_count": 14058,
-      "address_count": 220986897
+      "cidr_count": 14059,
+      "address_count": 220987153
     },
     {
       "name": "trial_bgp_prefix_relaxed_admission",
-      "cidr_count": 15807,
-      "address_count": 223519450
+      "cidr_count": 15808,
+      "address_count": 223519706
     },
     {
       "name": "trial_bgp_prefix_relaxed_added_vs_current",
@@ -217,18 +217,18 @@
     },
     {
       "name": "trial_bgp_prefix_any_leaf_admission",
-      "cidr_count": 12819,
-      "address_count": 212881884
+      "cidr_count": 12820,
+      "address_count": 212882140
     },
     {
       "name": "trial_bgp_prefix_majority_leaf_admission",
-      "cidr_count": 11807,
-      "address_count": 208102898
+      "cidr_count": 11808,
+      "address_count": 208103154
     },
     {
       "name": "trial_bgp_prefix_full_leaf_admission",
-      "cidr_count": 7338,
-      "address_count": 164286486
+      "cidr_count": 7339,
+      "address_count": 164286742
     },
     {
       "name": "trial_zhejiang_bgp_prefix_observed_operator_origin",
@@ -297,21 +297,21 @@
     },
     {
       "name": "final_output",
-      "cidr_count": 14941,
-      "address_count": 221009330
+      "cidr_count": 14942,
+      "address_count": 221009586
     },
     {
       "name": "province_attributed_output",
-      "cidr_count": 16346,
-      "address_count": 216182604
+      "cidr_count": 16347,
+      "address_count": 216182860
     }
   ],
   "operator_registration_admission": {
     "mode": "covering_operator_registration_with_strong_leaf_exclusions",
-    "pre_cidr_count": 15785,
+    "pre_cidr_count": 15786,
     "denied_cidr_count": 1923,
-    "final_cidr_count": 14941,
-    "cidr_expansion_ratio": 0.9465315172632246,
+    "final_cidr_count": 14942,
+    "cidr_expansion_ratio": 0.9465349043456227,
     "maximum_cidr_expansion_ratio": 2
   },
   "cloud_sources": [
@@ -374,16 +374,16 @@
   ],
   "apnic_inetnum": {
     "record_count": 1256753,
-    "relevant_record_count": 448026,
+    "relevant_record_count": 448027,
     "matched_winning_segment_count": 1740,
     "effective_cidr_count": 2117,
     "effective_address_count": 856522
   },
   "apnic_portable_holders": {
     "autnum_record_count": 25883,
-    "matched_winning_segment_count": 595,
-    "effective_cidr_count": 927,
-    "effective_address_count": 1568786
+    "matched_winning_segment_count": 596,
+    "effective_cidr_count": 932,
+    "effective_address_count": 1576978
   },
   "apnic_delegated_holders": {
     "matched_winning_segment_count": 51,
@@ -397,8 +397,8 @@
   },
   "apnic_route": {
     "object_count": 832527,
-    "relevant_object_count": 2826,
-    "relevant_winning_segment_count": 2888,
+    "relevant_object_count": 2827,
+    "relevant_winning_segment_count": 2889,
     "origin_validated_match_count": 0,
     "effective_cidr_count": 0,
     "effective_address_count": 0
@@ -764,8 +764,8 @@
   "ris_whois": {
     "row_count": 1244134,
     "prefix_count": 1222201,
-    "relevant_prefix_count": 46380,
-    "winning_segment_count": 56401,
+    "relevant_prefix_count": 46385,
+    "winning_segment_count": 56411,
     "candidate_moas_segment_count": 201,
     "strong_evidence_segment_count": 0,
     "retained_ambiguous_moas_segment_count": 201,
@@ -58157,6 +58157,42 @@
     {
       "source": "apnic_autnum",
       "category": "apnic_independent_legal_entity_holder",
+      "cidr": "45.124.124.0/22",
+      "address_count": 1024,
+      "asn": "4811",
+      "operator": "chinanet",
+      "asn_description": "CHINANET-SHANGHAI-MAN China Telecom Group",
+      "registry_netnames": [
+        "ZHAOONE-NET"
+      ],
+      "registry_descriptions": [
+        "shanghai wexchange network technology Co. Ltd."
+      ],
+      "registry_maintainers": [
+        "MAINT-CNNIC-AP"
+      ],
+      "registry_status": "ALLOCATED PORTABLE",
+      "registry_last_modified": "2023-11-28T00:58:09Z",
+      "matched_by": "APNIC legal entity plus exact aut-num org/netname link",
+      "reason": "Most-specific APNIC registration names an independent legal entity and is exactly linked to an APNIC aut-num",
+      "linked_asns": [
+        {
+          "asn": "63537",
+          "description": "",
+          "as_name": "ZHAOONE-NET",
+          "via": "netname_as_name"
+        },
+        {
+          "asn": "63553",
+          "description": "",
+          "as_name": "ZHAOONE-NET",
+          "via": "netname_as_name"
+        }
+      ]
+    },
+    {
+      "source": "apnic_autnum",
+      "category": "apnic_independent_legal_entity_holder",
       "cidr": "59.153.92.0/22",
       "address_count": 1024,
       "asn": "4811",
@@ -58476,6 +58512,42 @@
     {
       "source": "apnic_autnum",
       "category": "apnic_independent_legal_entity_holder",
+      "cidr": "103.192.252.0/22",
+      "address_count": 1024,
+      "asn": "4811",
+      "operator": "chinanet",
+      "asn_description": "CHINANET-SHANGHAI-MAN China Telecom Group",
+      "registry_netnames": [
+        "ZHAOONE-NET"
+      ],
+      "registry_descriptions": [
+        "shanghai wexchange network technology Co. Ltd."
+      ],
+      "registry_maintainers": [
+        "MAINT-CNNIC-AP"
+      ],
+      "registry_status": "ALLOCATED PORTABLE",
+      "registry_last_modified": "2023-11-28T00:56:01Z",
+      "matched_by": "APNIC legal entity plus exact aut-num org/netname link",
+      "reason": "Most-specific APNIC registration names an independent legal entity and is exactly linked to an APNIC aut-num",
+      "linked_asns": [
+        {
+          "asn": "63537",
+          "description": "",
+          "as_name": "ZHAOONE-NET",
+          "via": "netname_as_name"
+        },
+        {
+          "asn": "63553",
+          "description": "",
+          "as_name": "ZHAOONE-NET",
+          "via": "netname_as_name"
+        }
+      ]
+    },
+    {
+      "source": "apnic_autnum",
+      "category": "apnic_independent_legal_entity_holder",
       "cidr": "103.198.124.0/22",
       "address_count": 1024,
       "asn": "4811",
@@ -58612,44 +58684,8 @@
     {
       "source": "apnic_autnum",
       "category": "apnic_independent_legal_entity_holder",
-      "cidr": "121.46.228.0/22",
-      "address_count": 1024,
-      "asn": "4811",
-      "operator": "chinanet",
-      "asn_description": "CHINANET-SHANGHAI-MAN China Telecom Group",
-      "registry_netnames": [
-        "ZHAOONE-NET"
-      ],
-      "registry_descriptions": [
-        "shanghai wexchange network technology Co. Ltd."
-      ],
-      "registry_maintainers": [
-        "MAINT-CNNIC-AP"
-      ],
-      "registry_status": "ALLOCATED PORTABLE",
-      "registry_last_modified": "2023-11-28T00:57:01Z",
-      "matched_by": "APNIC legal entity plus exact aut-num org/netname link",
-      "reason": "Most-specific APNIC registration names an independent legal entity and is exactly linked to an APNIC aut-num",
-      "linked_asns": [
-        {
-          "asn": "63537",
-          "description": "",
-          "as_name": "ZHAOONE-NET",
-          "via": "netname_as_name"
-        },
-        {
-          "asn": "63553",
-          "description": "",
-          "as_name": "ZHAOONE-NET",
-          "via": "netname_as_name"
-        }
-      ]
-    },
-    {
-      "source": "apnic_autnum",
-      "category": "apnic_independent_legal_entity_holder",
-      "cidr": "121.46.232.0/21",
-      "address_count": 2048,
+      "cidr": "121.46.224.0/20",
+      "address_count": 4096,
       "asn": "4811",
       "operator": "chinanet",
       "asn_description": "CHINANET-SHANGHAI-MAN China Telecom Group",
@@ -59526,42 +59562,6 @@
     },
     {
       "source": "apnic_autnum",
-      "category": "apnic_independent_legal_entity_holder",
-      "cidr": "45.124.124.0/22",
-      "address_count": 1024,
-      "asn": "4812",
-      "operator": "chinanet",
-      "asn_description": "CHINANET-SH-AP China Telecom Group",
-      "registry_netnames": [
-        "ZHAOONE-NET"
-      ],
-      "registry_descriptions": [
-        "shanghai wexchange network technology Co. Ltd."
-      ],
-      "registry_maintainers": [
-        "MAINT-CNNIC-AP"
-      ],
-      "registry_status": "ALLOCATED PORTABLE",
-      "registry_last_modified": "2023-11-28T00:58:09Z",
-      "matched_by": "APNIC legal entity plus exact aut-num org/netname link",
-      "reason": "Most-specific APNIC registration names an independent legal entity and is exactly linked to an APNIC aut-num",
-      "linked_asns": [
-        {
-          "asn": "63537",
-          "description": "",
-          "as_name": "ZHAOONE-NET",
-          "via": "netname_as_name"
-        },
-        {
-          "asn": "63553",
-          "description": "",
-          "as_name": "ZHAOONE-NET",
-          "via": "netname_as_name"
-        }
-      ]
-    },
-    {
-      "source": "apnic_autnum",
       "category": "apnic_delegated_holder",
       "cidr": "61.129.104.176/28",
       "address_count": 16,
@@ -59944,42 +59944,6 @@
           "asn": "146845",
           "description": "",
           "as_name": "LJNET",
-          "via": "netname_as_name"
-        }
-      ]
-    },
-    {
-      "source": "apnic_autnum",
-      "category": "apnic_independent_legal_entity_holder",
-      "cidr": "103.192.252.0/22",
-      "address_count": 1024,
-      "asn": "4812",
-      "operator": "chinanet",
-      "asn_description": "CHINANET-SH-AP China Telecom Group",
-      "registry_netnames": [
-        "ZHAOONE-NET"
-      ],
-      "registry_descriptions": [
-        "shanghai wexchange network technology Co. Ltd."
-      ],
-      "registry_maintainers": [
-        "MAINT-CNNIC-AP"
-      ],
-      "registry_status": "ALLOCATED PORTABLE",
-      "registry_last_modified": "2023-11-28T00:56:01Z",
-      "matched_by": "APNIC legal entity plus exact aut-num org/netname link",
-      "reason": "Most-specific APNIC registration names an independent legal entity and is exactly linked to an APNIC aut-num",
-      "linked_asns": [
-        {
-          "asn": "63537",
-          "description": "",
-          "as_name": "ZHAOONE-NET",
-          "via": "netname_as_name"
-        },
-        {
-          "asn": "63553",
-          "description": "",
-          "as_name": "ZHAOONE-NET",
           "via": "netname_as_name"
         }
       ]
@@ -60745,42 +60709,6 @@
           "asn": "24141",
           "description": "DMTNET Shanghai DMT Information Network cor.,LTD.",
           "as_name": "DMTNET",
-          "via": "netname_as_name"
-        }
-      ]
-    },
-    {
-      "source": "apnic_autnum",
-      "category": "apnic_independent_legal_entity_holder",
-      "cidr": "121.46.224.0/22",
-      "address_count": 1024,
-      "asn": "4812",
-      "operator": "chinanet",
-      "asn_description": "CHINANET-SH-AP China Telecom Group",
-      "registry_netnames": [
-        "ZHAOONE-NET"
-      ],
-      "registry_descriptions": [
-        "shanghai wexchange network technology Co. Ltd."
-      ],
-      "registry_maintainers": [
-        "MAINT-CNNIC-AP"
-      ],
-      "registry_status": "ALLOCATED PORTABLE",
-      "registry_last_modified": "2023-11-28T00:57:01Z",
-      "matched_by": "APNIC legal entity plus exact aut-num org/netname link",
-      "reason": "Most-specific APNIC registration names an independent legal entity and is exactly linked to an APNIC aut-num",
-      "linked_asns": [
-        {
-          "asn": "63537",
-          "description": "",
-          "as_name": "ZHAOONE-NET",
-          "via": "netname_as_name"
-        },
-        {
-          "asn": "63553",
-          "description": "",
-          "as_name": "ZHAOONE-NET",
           "via": "netname_as_name"
         }
       ]
@@ -63647,8 +63575,40 @@
     {
       "source": "apnic_autnum",
       "category": "apnic_portable_holder",
-      "cidr": "59.108.44.0/22",
-      "address_count": 1024,
+      "cidr": "59.108.44.0/24",
+      "address_count": 256,
+      "asn": "4847",
+      "operator": "chinanet",
+      "asn_description": "CNIX-AP China Networks Inter-Exchange",
+      "registry_netnames": [
+        "FOUNDERBN"
+      ],
+      "registry_descriptions": [
+        "Beijing Founder Broadband Network Technology Co.,Ltd",
+        "Floor 5th,ZhongGuanCun FangZheng Building,No.298,Chengfu",
+        "Road,HaidianDistrict,Beijing"
+      ],
+      "registry_maintainers": [
+        "MAINT-CNNIC-AP"
+      ],
+      "registry_status": "ALLOCATED PORTABLE",
+      "registry_last_modified": "2023-03-22T03:09:11Z",
+      "matched_by": "APNIC portable holder linked through aut-num",
+      "reason": "Most-specific APNIC portable registration is linked to a currently active independent ASN",
+      "linked_asns": [
+        {
+          "asn": "18245",
+          "description": "FOUNDERBN CNNIC",
+          "as_name": "Founderbn",
+          "via": "netname_as_name"
+        }
+      ]
+    },
+    {
+      "source": "apnic_autnum",
+      "category": "apnic_portable_holder",
+      "cidr": "59.108.46.0/23",
+      "address_count": 512,
       "asn": "4847",
       "operator": "chinanet",
       "asn_description": "CNIX-AP China Networks Inter-Exchange",
@@ -71504,6 +71464,130 @@
           "asn": "139128",
           "description": "DRPBD Dr.Peng BigData co.LTD",
           "as_name": "DRPBD",
+          "via": "netname_as_name"
+        }
+      ]
+    },
+    {
+      "source": "apnic_autnum",
+      "category": "apnic_portable_holder",
+      "cidr": "219.72.104.0/21",
+      "address_count": 2048,
+      "asn": "4847",
+      "operator": "chinanet",
+      "asn_description": "CNIX-AP China Networks Inter-Exchange",
+      "registry_netnames": [
+        "CITICNET-CN"
+      ],
+      "registry_descriptions": [
+        "CITIC Networks Management Co.,Ltd.",
+        "6 XINYUANNANLU BEIJING"
+      ],
+      "registry_maintainers": [
+        "MAINT-CNNIC-AP"
+      ],
+      "registry_status": "ALLOCATED PORTABLE",
+      "registry_last_modified": "2023-11-28T00:57:29Z",
+      "matched_by": "APNIC portable holder linked through aut-num",
+      "reason": "Most-specific APNIC portable registration is linked to a currently active independent ASN",
+      "linked_asns": [
+        {
+          "asn": "18118",
+          "description": "CITICNET-CN CITIC Networks Management Co.,Ltd.",
+          "as_name": "CITICNET-CN",
+          "via": "netname_as_name"
+        }
+      ]
+    },
+    {
+      "source": "apnic_autnum",
+      "category": "apnic_portable_holder",
+      "cidr": "219.72.144.0/21",
+      "address_count": 2048,
+      "asn": "4847",
+      "operator": "chinanet",
+      "asn_description": "CNIX-AP China Networks Inter-Exchange",
+      "registry_netnames": [
+        "CITICNET-CN"
+      ],
+      "registry_descriptions": [
+        "CITIC Networks Management Co.,Ltd.",
+        "6 XINYUANNANLU BEIJING"
+      ],
+      "registry_maintainers": [
+        "MAINT-CNNIC-AP"
+      ],
+      "registry_status": "ALLOCATED PORTABLE",
+      "registry_last_modified": "2023-11-28T00:57:29Z",
+      "matched_by": "APNIC portable holder linked through aut-num",
+      "reason": "Most-specific APNIC portable registration is linked to a currently active independent ASN",
+      "linked_asns": [
+        {
+          "asn": "18118",
+          "description": "CITICNET-CN CITIC Networks Management Co.,Ltd.",
+          "as_name": "CITICNET-CN",
+          "via": "netname_as_name"
+        }
+      ]
+    },
+    {
+      "source": "apnic_autnum",
+      "category": "apnic_portable_holder",
+      "cidr": "219.72.224.0/20",
+      "address_count": 4096,
+      "asn": "4847",
+      "operator": "chinanet",
+      "asn_description": "CNIX-AP China Networks Inter-Exchange",
+      "registry_netnames": [
+        "CITICNET-CN"
+      ],
+      "registry_descriptions": [
+        "CITIC Networks Management Co.,Ltd.",
+        "6 XINYUANNANLU BEIJING"
+      ],
+      "registry_maintainers": [
+        "MAINT-CNNIC-AP"
+      ],
+      "registry_status": "ALLOCATED PORTABLE",
+      "registry_last_modified": "2023-11-28T00:57:29Z",
+      "matched_by": "APNIC portable holder linked through aut-num",
+      "reason": "Most-specific APNIC portable registration is linked to a currently active independent ASN",
+      "linked_asns": [
+        {
+          "asn": "18118",
+          "description": "CITICNET-CN CITIC Networks Management Co.,Ltd.",
+          "as_name": "CITICNET-CN",
+          "via": "netname_as_name"
+        }
+      ]
+    },
+    {
+      "source": "apnic_autnum",
+      "category": "apnic_portable_holder",
+      "cidr": "219.72.254.0/24",
+      "address_count": 256,
+      "asn": "4847",
+      "operator": "chinanet",
+      "asn_description": "CNIX-AP China Networks Inter-Exchange",
+      "registry_netnames": [
+        "CITICNET-CN"
+      ],
+      "registry_descriptions": [
+        "CITIC Networks Management Co.,Ltd.",
+        "6 XINYUANNANLU BEIJING"
+      ],
+      "registry_maintainers": [
+        "MAINT-CNNIC-AP"
+      ],
+      "registry_status": "ALLOCATED PORTABLE",
+      "registry_last_modified": "2023-11-28T00:57:29Z",
+      "matched_by": "APNIC portable holder linked through aut-num",
+      "reason": "Most-specific APNIC portable registration is linked to a currently active independent ASN",
+      "linked_asns": [
+        {
+          "asn": "18118",
+          "description": "CITICNET-CN CITIC Networks Management Co.,Ltd.",
+          "as_name": "CITICNET-CN",
           "via": "netname_as_name"
         }
       ]
@@ -106946,7 +107030,7 @@
     {
       "operator": "chinanet",
       "asn_count": 54,
-      "retained_address_count": 115758207,
+      "retained_address_count": 115758463,
       "asns": [
         {
           "asn": "4134",
@@ -107299,15 +107383,15 @@
       "operator": "chinanet",
       "description": "CHINANET-BACKBONE No.31,Jin-rong Street",
       "matched_by": "description_patterns: chinanet",
-      "origin_address_count": 100026880,
-      "retained_address_count": 99873835
+      "origin_address_count": 99916288,
+      "retained_address_count": 99763243
     },
     {
       "asn": "4811",
       "operator": "chinanet",
       "description": "CHINANET-SHANGHAI-MAN China Telecom Group",
       "matched_by": "description_patterns: china ?telecom",
-      "origin_address_count": 862464,
+      "origin_address_count": 866560,
       "retained_address_count": 602779
     },
     {
@@ -107315,7 +107399,7 @@
       "operator": "chinanet",
       "description": "CHINANET-SH-AP China Telecom Group",
       "matched_by": "description_patterns: china ?telecom",
-      "origin_address_count": 7879680,
+      "origin_address_count": 7875584,
       "retained_address_count": 7694212
     },
     {
@@ -107331,7 +107415,7 @@
       "operator": "chinanet",
       "description": "CNIX-AP China Networks Inter-Exchange",
       "matched_by": "include_asns: China Telecom Beijing provincial network; public description is China Networks Inter-Exchange",
-      "origin_address_count": 3541248,
+      "origin_address_count": 3549440,
       "retained_address_count": 704640
     },
     {
@@ -107579,8 +107663,8 @@
       "operator": "chinanet",
       "description": "CHINATELECOM-GUANGDONG-ZHONGSHAN-5G-NETWORK CHINATELECOM Guangdong province Zhongshan 5G network",
       "matched_by": "description_patterns: china ?telecom",
-      "origin_address_count": 184320,
-      "retained_address_count": 184320
+      "origin_address_count": 233984,
+      "retained_address_count": 233984
     },
     {
       "asn": "140311",
@@ -107595,8 +107679,8 @@
       "operator": "chinanet",
       "description": "CHINATELECOM-GUANGDONG-HEYUAN-5G-NETWORK CHINATELECOM Guangdong province Heyuan 5G network",
       "matched_by": "description_patterns: china ?telecom",
-      "origin_address_count": 258560,
-      "retained_address_count": 258556
+      "origin_address_count": 319744,
+      "retained_address_count": 319740
     },
     {
       "asn": "140319",
@@ -107959,7 +108043,7 @@
       "matched_by": "description_patterns: china ?telecom",
       "exclusion_source": "explicit_policy",
       "reason": "China Telecom CN2 dedicated premium backbone; outside ordinary Internet user access scope",
-      "origin_address_count": 542976
+      "origin_address_count": 542720
     },
     {
       "asn": "4816",
@@ -108965,9 +109049,9 @@
     {
       "name": "chinanet",
       "path": "operators/chinanet.txt",
-      "cidr_count": 9412,
-      "address_count": 115758207,
-      "sha256": "f45e1a680a5395d901b7ada50376d6c28a441373f76a84920c99799c3d0059a9"
+      "cidr_count": 9413,
+      "address_count": 115758463,
+      "sha256": "58013bfb0cc3f9c0f2cdf80518fcc6e74c27b08d1676267b2cb3795454716235"
     },
     {
       "name": "cmcc",
@@ -108986,9 +109070,9 @@
     {
       "name": "CN",
       "path": "cn.txt",
-      "cidr_count": 14941,
-      "address_count": 221009330,
-      "sha256": "c4edd881d6323b8198d59b32e820622b81c9e688f1d6fabea7e23f2f3a01f6c7"
+      "cidr_count": 14942,
+      "address_count": 221009586,
+      "sha256": "936236727277a7d8ea1df36937c106c362f6fce908031335a11915890c237ead"
     },
     {
       "name": "北京市",
@@ -109119,9 +109203,9 @@
     {
       "name": "广东省",
       "path": "provinces/guangdong.txt",
-      "cidr_count": 3286,
-      "address_count": 25207610,
-      "sha256": "f3b46125a6f38e3c8dc5ab757f841477fdfce42cb06ce11bb03198893d453ea5"
+      "cidr_count": 3287,
+      "address_count": 25207866,
+      "sha256": "a9e09e7bc71ae7d3c16b64633a506e9c74fea6820939625d0a106fc53f55fc40"
     },
     {
       "name": "广西壮族自治区",
@@ -109210,9 +109294,9 @@
     {
       "name": "BGP prefix admission trial (nationwide, observed)",
       "path": "experiments/bgp-prefix-admission/nationwide-observed.txt",
-      "cidr_count": 16053,
-      "address_count": 222894211,
-      "sha256": "85094679a04d93c43da4fc37915df7ea7b580a9121625281c7b7a70822612d81"
+      "cidr_count": 16054,
+      "address_count": 222894467,
+      "sha256": "3d193b4d66dd3d4f66c4eb7d15cd3812747fce5c4f55403974a00708a38702c0"
     },
     {
       "name": "BGP prefix admission trial (Zhejiang, observed)",
@@ -109266,9 +109350,9 @@
     {
       "name": "BGP prefix admission trial (nationwide, covering)",
       "path": "experiments/bgp-prefix-admission/nationwide-covering.txt",
-      "cidr_count": 12364,
-      "address_count": 214803436,
-      "sha256": "de06335ef178e54198ca0fa189df4a37dbf846d7da92e3b32e259500c6a09a3a"
+      "cidr_count": 12365,
+      "address_count": 214803692,
+      "sha256": "c3a81cd74d031096dd1904d2c18b815d1a6809d0ea33fa69414c07b3e46a49fa"
     },
     {
       "name": "BGP prefix admission trial (Zhejiang, covering)",
@@ -109280,9 +109364,9 @@
     {
       "name": "BGP prefix admission trial (nationwide, covering_carved)",
       "path": "experiments/bgp-prefix-admission/nationwide-covering_carved.txt",
-      "cidr_count": 15188,
-      "address_count": 220354139,
-      "sha256": "8a1b941f39b56a4e64e9e3a96861110f6948459fbfa58d290efddaa70f1de35a"
+      "cidr_count": 15189,
+      "address_count": 220354395,
+      "sha256": "299defa13e36b632d593e15ba19d2535a10456d5c3f48cf8754d88967f93bf39"
     },
     {
       "name": "BGP prefix admission trial (Zhejiang, covering_carved)",
@@ -109294,9 +109378,9 @@
     {
       "name": "BGP prefix admission trial (nationwide, covering_relaxed)",
       "path": "experiments/bgp-prefix-admission/nationwide-covering_relaxed.txt",
-      "cidr_count": 14058,
-      "address_count": 220986897,
-      "sha256": "15a88adf7f9863ea146b1b6ce6dc54ba45fe42f65ceea195e7ebaf8187cb9434"
+      "cidr_count": 14059,
+      "address_count": 220987153,
+      "sha256": "d9bb71b7b33bc95f016e22c583baaa30415ae7d185bd0c5a7fbd503b226a721f"
     },
     {
       "name": "BGP prefix admission trial (Zhejiang, covering_relaxed)",
@@ -109308,9 +109392,9 @@
     {
       "name": "BGP prefix admission trial (nationwide, relaxed)",
       "path": "experiments/bgp-prefix-admission/nationwide-relaxed.txt",
-      "cidr_count": 15807,
-      "address_count": 223519450,
-      "sha256": "1779a6a20aebaf7cb6db19d8f129dadfac3a466aa280542e2587136032958787"
+      "cidr_count": 15808,
+      "address_count": 223519706,
+      "sha256": "cda7992b84bbcdd28fe9d7c93b15a4c66bb17b47b67ae2b81e7269a83935e6ec"
     },
     {
       "name": "BGP prefix admission trial (Zhejiang, relaxed)",
@@ -109322,9 +109406,9 @@
     {
       "name": "BGP prefix admission trial (nationwide, any)",
       "path": "experiments/bgp-prefix-admission/nationwide-any.txt",
-      "cidr_count": 12819,
-      "address_count": 212881884,
-      "sha256": "93b106f8f4a272d18a6b9c569bccdd6f058bb3c03fc72f71a52151ca732ca6ab"
+      "cidr_count": 12820,
+      "address_count": 212882140,
+      "sha256": "3f7596575d24791f52ad295136c530be03e49dc20b700eaff476ebafb653d2f2"
     },
     {
       "name": "BGP prefix admission trial (Zhejiang, any)",
@@ -109336,9 +109420,9 @@
     {
       "name": "BGP prefix admission trial (nationwide, majority)",
       "path": "experiments/bgp-prefix-admission/nationwide-majority.txt",
-      "cidr_count": 11807,
-      "address_count": 208102898,
-      "sha256": "739c029241d99d57737d801e8aaa2d8f124558af3f0ad56c72b7a3238a811796"
+      "cidr_count": 11808,
+      "address_count": 208103154,
+      "sha256": "f2000ca6d6386b57828ece166b4cfab3476a1bfa1f7f6bd0a1f2033fddb4ed65"
     },
     {
       "name": "BGP prefix admission trial (Zhejiang, majority)",
@@ -109350,9 +109434,9 @@
     {
       "name": "BGP prefix admission trial (nationwide, full)",
       "path": "experiments/bgp-prefix-admission/nationwide-full.txt",
-      "cidr_count": 7338,
-      "address_count": 164286486,
-      "sha256": "9a8f805d8443216c729ab96c0d9b67c0509e3f9c7e12fd7f9bd5ecba2ca3fce7"
+      "cidr_count": 7339,
+      "address_count": 164286742,
+      "sha256": "05c3ea02e5dc5ce8d8877ae00c0ba31235cafaed96b5ecbab60adbe9d237e7f6"
     },
     {
       "name": "BGP prefix admission trial (Zhejiang, full)",
@@ -109402,6 +109486,18 @@
       "strong_non_public_signal_address_count": 0,
       "sha256": "f8f43f23520077deab2b69655848d93ce7c280f7b5adaaea3c4226a3c903879a",
       "human_sha256": "8cae0d194dc48174ca6330c24be74b6cf6dba383d56716289f01f17689c1855b"
+    },
+    {
+      "name": "bgp_relaxed_added_apnic_registration",
+      "path": "audits/bgp-relaxed-added-apnic.json.gz",
+      "human_path": "audits/bgp-relaxed-added-apnic.md",
+      "cidr_count": 1908,
+      "fact_count": 6115,
+      "address_count": 2510120,
+      "registry_covered_address_count": 2510120,
+      "strong_non_public_signal_address_count": 0,
+      "sha256": "2cbd2a73264e62ec715282d2f9761d31337d97969b243fae0616c982c3a2bd32",
+      "human_sha256": "7e7842d8a39c3d9f940e73f5ee2cca9fcf0bbe5dde4369aef924c62e5fe628dc"
     }
   ]
 }
