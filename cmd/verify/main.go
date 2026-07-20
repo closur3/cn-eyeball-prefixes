@@ -517,10 +517,26 @@ func apnicOperatorLeafAdmissionRanges(segments []apnicinetnum.Segment, classifie
 	return out
 }
 
+func intersectSortedSpan(rows []span, lo, hi uint32) []span {
+	i := sort.Search(len(rows), func(i int) bool { return rows[i].hi >= lo })
+	var out []span
+	for ; i < len(rows) && rows[i].lo <= hi; i++ {
+		out = append(out, span{max32(lo, rows[i].lo), min32(hi, rows[i].hi)})
+	}
+	return out
+}
+
+func overlapAddressCountSorted(rows []span, lo, hi uint32) uint64 {
+	var count uint64
+	for _, hit := range intersectSortedSpan(rows, lo, hi) {
+		count += uint64(hit.hi) - uint64(hit.lo) + 1
+	}
+	return count
+}
+
 func bgpPrefixAdmissionTrials(segments []riswhois.Segment, asnOperators map[string]string, originByOperator, retainedByOperator, leafAdmission, operatorConflicts map[string][]span) map[string][]span {
 	out := map[string][]span{"any": {}, "majority": {}, "full": {}}
 	for _, segment := range segments {
-		unitRange := []span{{segment.Lo, segment.Hi}}
 		seenOperators := map[string]bool{}
 		for _, origin := range segment.Record.Origins {
 			operator := asnOperators[origin.ASN]
@@ -528,16 +544,30 @@ func bgpPrefixAdmissionTrials(segments []riswhois.Segment, asnOperators map[stri
 				continue
 			}
 			seenOperators[operator] = true
-			unit := intersect(unitRange, originByOperator[operator])
-			if len(unit) == 0 || len(intersect(unit, operatorConflicts[operator])) != 0 {
+			unit := intersectSortedSpan(originByOperator[operator], segment.Lo, segment.Hi)
+			if len(unit) == 0 {
 				continue
 			}
-			positive := addressCount(intersect(unit, leafAdmission[operator]))
-			total := addressCount(unit)
+			var positive, total uint64
+			conflict := false
+			for _, part := range unit {
+				if overlapsSorted(operatorConflicts[operator], part.lo, part.hi) {
+					conflict = true
+					break
+				}
+				positive += overlapAddressCountSorted(leafAdmission[operator], part.lo, part.hi)
+				total += uint64(part.hi) - uint64(part.lo) + 1
+			}
+			if conflict {
+				continue
+			}
 			if positive == 0 || total == 0 {
 				continue
 			}
-			retained := intersect(unit, retainedByOperator[operator])
+			var retained []span
+			for _, part := range unit {
+				retained = append(retained, intersectSortedSpan(retainedByOperator[operator], part.lo, part.hi)...)
+			}
 			if len(retained) == 0 {
 				continue
 			}
