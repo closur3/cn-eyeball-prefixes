@@ -932,8 +932,8 @@ func overlapAddressCountSorted(rows []span, lo, hi uint32) uint64 {
 // bgpPrefixAdmissionTrials treats the longest-prefix RIS routing decision as
 // the admission unit. APNIC evidence decides whether the whole unit is
 // admitted; existing strong exclusions may still punch holes afterwards.
-func bgpPrefixAdmissionTrials(segments []riswhois.Segment, asnOperators map[string]string, originByOperator, retainedByOperator, parentAdmission, leafAdmission, operatorConflicts map[string][]span) map[string][]span {
-	out := map[string][]span{"observed": {}, "no_ris": {}, "conflict": {}, "no_parent": {}, "covering": {}, "covering_carved": {}, "any": {}, "majority": {}, "full": {}}
+func bgpPrefixAdmissionTrials(segments []riswhois.Segment, asnOperators map[string]string, originByOperator, retainedByOperator, fallbackByOperator, parentAdmission, leafAdmission, operatorConflicts map[string][]span) map[string][]span {
+	out := map[string][]span{"observed": {}, "no_ris": {}, "conflict": {}, "no_parent": {}, "covering": {}, "covering_carved": {}, "covering_relaxed": {}, "relaxed": {}, "any": {}, "majority": {}, "full": {}}
 	observedByOperator := map[string][]span{}
 	for _, segment := range segments {
 		seenOperators := map[string]bool{}
@@ -955,6 +955,11 @@ func bgpPrefixAdmissionTrials(segments []riswhois.Segment, asnOperators map[stri
 				continue
 			}
 			out["observed"] = append(out["observed"], retained...)
+			// Current three-operator BGP origin is the positive admission
+			// evidence. APNIC no longer has to positively name the operator;
+			// strong APNIC and other non-target exclusions were already applied
+			// while constructing retainedByOperator.
+			out["relaxed"] = append(out["relaxed"], retained...)
 			observedByOperator[operator] = append(observedByOperator[operator], retained...)
 			conflict := false
 			for _, part := range unit {
@@ -976,6 +981,11 @@ func bgpPrefixAdmissionTrials(segments []riswhois.Segment, asnOperators map[stri
 				continue
 			}
 			if parentPositive == total {
+				// A current three-operator BGP route with a covering operator
+				// registration is admitted atomically. Cross-operator leaf
+				// registrations are attribution conflicts, not evidence that the
+				// address is outside the three-operator user-access scope.
+				out["covering_relaxed"] = append(out["covering_relaxed"], retained...)
 				for _, part := range retained {
 					localConflicts := intersectSortedSpan(operatorConflicts[operator], part.lo, part.hi)
 					out["covering_carved"] = append(out["covering_carved"], subtract([]span{part}, localConflicts)...)
@@ -1002,7 +1012,11 @@ func bgpPrefixAdmissionTrials(segments []riswhois.Segment, asnOperators map[stri
 		}
 	}
 	for _, operator := range operators {
-		out["no_ris"] = append(out["no_ris"], subtract(retainedByOperator[operator], merge(observedByOperator[operator]))...)
+		unobserved := subtract(retainedByOperator[operator], merge(observedByOperator[operator]))
+		out["no_ris"] = append(out["no_ris"], unobserved...)
+		fallback := intersect(unobserved, fallbackByOperator[operator])
+		out["covering_relaxed"] = append(out["covering_relaxed"], fallback...)
+		out["relaxed"] = append(out["relaxed"], fallback...)
 	}
 	for policy := range out {
 		out[policy] = merge(out[policy])
@@ -1403,7 +1417,7 @@ func main() {
 		asnOperators[asn] = record.meta.Operator
 	}
 	leafAdmissionRanges := apnicOperatorLeafAdmissionRanges(apnicAllSegments, classifier)
-	bgpAdmissionTrials := bgpPrefixAdmissionTrials(risSegments, asnOperators, preCloudByOperator, preAdmissionByOperator, operatorAdmissionRanges, leafAdmissionRanges, operatorConflictRanges)
+	bgpAdmissionTrials := bgpPrefixAdmissionTrials(risSegments, asnOperators, preCloudByOperator, preAdmissionByOperator, ranges, operatorAdmissionRanges, leafAdmissionRanges, operatorConflictRanges)
 	includedASNs := includedASNList(includedASNRecords, chinaRanges, excludedRanges, ranges)
 	var finalRanges []span
 	for _, operator := range operators {
@@ -1467,9 +1481,13 @@ func main() {
 	zhejiangPreAdmissionRows = merge(zhejiangPreAdmissionRows)
 	zhejiangRows = merge(zhejiangRows)
 	zhejiangBGPAdmissionTrials := map[string][]span{}
-	for _, policy := range []string{"observed", "no_ris", "conflict", "no_parent", "covering", "covering_carved", "any", "majority", "full"} {
+	for _, policy := range []string{"observed", "no_ris", "conflict", "no_parent", "covering", "covering_carved", "covering_relaxed", "relaxed", "any", "majority", "full"} {
 		zhejiangBGPAdmissionTrials[policy] = intersect(bgpAdmissionTrials[policy], zhejiangProvinceRanges)
 	}
+	bgpRelaxedAdded := subtract(bgpAdmissionTrials["relaxed"], finalRanges)
+	bgpRelaxedRemoved := subtract(finalRanges, bgpAdmissionTrials["relaxed"])
+	zhejiangBGPRelaxedAdded := subtract(zhejiangBGPAdmissionTrials["relaxed"], zhejiangRows)
+	zhejiangBGPRelaxedRemoved := subtract(zhejiangRows, zhejiangBGPAdmissionTrials["relaxed"])
 	zhejiangPreAdmissionAudit, e := apnicaudit.Build("浙江省 pre-admission IPv4 APNIC registration audit", spanCIDRs(zhejiangPreAdmissionRows), zhejiangPreAdmissionOperatorRanges, apnicAllSegments, classifier)
 	if e != nil {
 		panic(e)
@@ -1517,6 +1535,10 @@ func main() {
 			stage("trial_bgp_prefix_no_covering_parent_denial", bgpAdmissionTrials["no_parent"]),
 			stage("trial_bgp_prefix_covering_parent_admission", bgpAdmissionTrials["covering"]),
 			stage("trial_bgp_prefix_covering_parent_with_exact_conflict_carving", bgpAdmissionTrials["covering_carved"]),
+			stage("trial_bgp_prefix_covering_parent_relaxed_conflicts", bgpAdmissionTrials["covering_relaxed"]),
+			stage("trial_bgp_prefix_relaxed_admission", bgpAdmissionTrials["relaxed"]),
+			stage("trial_bgp_prefix_relaxed_added_vs_current", bgpRelaxedAdded),
+			stage("trial_bgp_prefix_relaxed_removed_vs_current", bgpRelaxedRemoved),
 			stage("trial_bgp_prefix_any_leaf_admission", bgpAdmissionTrials["any"]),
 			stage("trial_bgp_prefix_majority_leaf_admission", bgpAdmissionTrials["majority"]),
 			stage("trial_bgp_prefix_full_leaf_admission", bgpAdmissionTrials["full"]),
@@ -1526,6 +1548,10 @@ func main() {
 			stage("trial_zhejiang_bgp_prefix_no_covering_parent_denial", zhejiangBGPAdmissionTrials["no_parent"]),
 			stage("trial_zhejiang_bgp_prefix_covering_parent_admission", zhejiangBGPAdmissionTrials["covering"]),
 			stage("trial_zhejiang_bgp_prefix_covering_parent_with_exact_conflict_carving", zhejiangBGPAdmissionTrials["covering_carved"]),
+			stage("trial_zhejiang_bgp_prefix_covering_parent_relaxed_conflicts", zhejiangBGPAdmissionTrials["covering_relaxed"]),
+			stage("trial_zhejiang_bgp_prefix_relaxed_admission", zhejiangBGPAdmissionTrials["relaxed"]),
+			stage("trial_zhejiang_bgp_prefix_relaxed_added_vs_current", zhejiangBGPRelaxedAdded),
+			stage("trial_zhejiang_bgp_prefix_relaxed_removed_vs_current", zhejiangBGPRelaxedRemoved),
 			stage("trial_zhejiang_bgp_prefix_any_leaf_admission", zhejiangBGPAdmissionTrials["any"]),
 			stage("trial_zhejiang_bgp_prefix_majority_leaf_admission", zhejiangBGPAdmissionTrials["majority"]),
 			stage("trial_zhejiang_bgp_prefix_full_leaf_admission", zhejiangBGPAdmissionTrials["full"]),
@@ -1594,7 +1620,7 @@ func main() {
 		m.Lists = append(m.Lists, listMeta{Name: p.Name, Path: filepath.ToSlash(path), fileMeta: meta})
 	}
 
-	for _, policy := range []string{"observed", "no_ris", "conflict", "no_parent", "covering", "covering_carved", "any", "majority", "full"} {
+	for _, policy := range []string{"observed", "no_ris", "conflict", "no_parent", "covering", "covering_carved", "covering_relaxed", "relaxed", "any", "majority", "full"} {
 		for _, trial := range []struct {
 			name string
 			path string
@@ -1609,6 +1635,22 @@ func main() {
 			}
 			m.Lists = append(m.Lists, listMeta{Name: trial.name, Path: filepath.ToSlash(trial.path), fileMeta: meta})
 		}
+	}
+	for _, trial := range []struct {
+		name string
+		path string
+		rows []span
+	}{
+		{"BGP relaxed admission delta (nationwide, added versus current dev)", filepath.Join("experiments", "bgp-prefix-admission", "nationwide-relaxed-added.txt"), bgpRelaxedAdded},
+		{"BGP relaxed admission delta (nationwide, removed versus current dev)", filepath.Join("experiments", "bgp-prefix-admission", "nationwide-relaxed-removed.txt"), bgpRelaxedRemoved},
+		{"BGP relaxed admission delta (Zhejiang, added versus current dev)", filepath.Join("experiments", "bgp-prefix-admission", "zhejiang-relaxed-added.txt"), zhejiangBGPRelaxedAdded},
+		{"BGP relaxed admission delta (Zhejiang, removed versus current dev)", filepath.Join("experiments", "bgp-prefix-admission", "zhejiang-relaxed-removed.txt"), zhejiangBGPRelaxedRemoved},
+	} {
+		meta, e := write(filepath.Join(*out, trial.path), trial.rows)
+		if e != nil {
+			panic(e)
+		}
+		m.Lists = append(m.Lists, listMeta{Name: trial.name, Path: filepath.ToSlash(trial.path), fileMeta: meta})
 	}
 
 	zhejiangOperatorRanges := map[string][]apnicaudit.Range{}

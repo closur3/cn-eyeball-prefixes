@@ -64,6 +64,7 @@ func TestBGPPrefixAdmissionTrialsKeepTheRouteUnitAtomic(t *testing.T) {
 		map[string]string{"4134": "chinanet"},
 		map[string][]span{"chinanet": {{0, 255}}},
 		map[string][]span{"chinanet": {{0, 127}, {144, 255}}},
+		map[string][]span{"chinanet": {{0, 127}, {144, 255}}},
 		map[string][]span{"chinanet": {{0, 255}}},
 		map[string][]span{"chinanet": {{0, 63}}},
 		map[string][]span{"chinanet": nil},
@@ -76,5 +77,31 @@ func TestBGPPrefixAdmissionTrialsKeepTheRouteUnitAtomic(t *testing.T) {
 	}
 	if got := trials["covering"]; len(got) != 2 || got[0] != (span{0, 127}) || got[1] != (span{144, 255}) {
 		t.Fatalf("covering-parent policy did not retain the BGP unit after strong exclusions: %#v", got)
+	}
+	if got := trials["relaxed"]; len(got) != 2 || got[0] != (span{0, 127}) || got[1] != (span{144, 255}) {
+		t.Fatalf("relaxed policy did not retain the BGP unit after strong exclusions: %#v", got)
+	}
+}
+
+func TestRelaxedBGPPrefixAdmissionDoesNotRequireAPNICParent(t *testing.T) {
+	segments := []riswhois.Segment{{
+		Lo: 0, Hi: 255,
+		Record: riswhois.Record{Lo: 0, Hi: 255, Prefix: "0.0.0.0/24", Origins: []riswhois.Origin{{ASN: "4134", SeenPeers: 100}}},
+	}}
+	trials := bgpPrefixAdmissionTrials(
+		segments,
+		map[string]string{"4134": "chinanet"},
+		map[string][]span{"chinanet": {{0, 255}}},
+		map[string][]span{"chinanet": {{0, 255}}},
+		map[string][]span{"chinanet": nil},
+		map[string][]span{"chinanet": nil},
+		map[string][]span{"chinanet": nil},
+		map[string][]span{"chinanet": nil},
+	)
+	if got := trials["relaxed"]; len(got) != 1 || got[0] != (span{0, 255}) {
+		t.Fatalf("relaxed policy still depended on APNIC positive admission: %#v", got)
+	}
+	if len(trials["covering_relaxed"]) != 0 {
+		t.Fatalf("covering-relaxed control unexpectedly admitted a route without an APNIC operator parent: %#v", trials["covering_relaxed"])
 	}
 }
