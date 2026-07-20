@@ -6,6 +6,7 @@ import (
 	"os"
 	"regexp"
 	"strconv"
+	"strings"
 )
 
 type operator struct {
@@ -225,6 +226,10 @@ func (c *Classifier) Classify(asn, description string) Result {
 }
 
 func (c *Classifier) ClassifyAPNICInetnum(text string) PrefixResult {
+	// APNIC RPSL descriptions contain inconsistent runs of spaces and tabs.
+	// Normalize whitespace before matching so strong-purpose phrases such as
+	// "Data  Center" cannot bypass otherwise exact exclusion rules.
+	text = strings.Join(strings.Fields(text), " ")
 	for _, rule := range c.apnicPatterns {
 		if rule.pattern.MatchString(text) {
 			return PrefixResult{Excluded: true, Reason: rule.reason, MatchedBy: "exclude_apnic_inetnum_rules: " + rule.source}

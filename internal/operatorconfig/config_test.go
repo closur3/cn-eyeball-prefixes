@@ -85,3 +85,20 @@ func TestIndependentLegalEntityPattern(t *testing.T) {
 		t.Fatal("legal suffix alone must not be legal-entity evidence")
 	}
 }
+
+func TestAPNICInetnumRulesNormalizeWhitespace(t *testing.T) {
+	c, err := Load("../../config/operators.json", []string{"chinanet", "cmcc", "unicom"})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	for _, text := range []string{
+		"Shaoxing Telecom Bureau Data  Center",
+		"Shaoxing Telecom Bureau Data\tCenter",
+	} {
+		result := c.ClassifyAPNICInetnum(text)
+		if !result.Excluded {
+			t.Fatalf("APNIC inetnum registration %q was not excluded after whitespace normalization", text)
+		}
+	}
+}
