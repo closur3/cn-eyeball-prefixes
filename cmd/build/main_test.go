@@ -5,6 +5,7 @@ import (
 
 	"github.com/closur3/cn-operator-allowlist/internal/apnicinetnum"
 	"github.com/closur3/cn-operator-allowlist/internal/operatorconfig"
+	"github.com/closur3/cn-operator-allowlist/internal/riswhois"
 )
 
 func TestOverlapsSorted(t *testing.T) {
@@ -50,5 +51,26 @@ func TestRelevantAPNICRecords(t *testing.T) {
 	got := relevantAPNICRecords(records, []span{{12, 15}, {25, 25}})
 	if len(got) != 2 || got[0].Lo != 10 || got[1].Lo != 20 {
 		t.Fatalf("unexpected relevant records: %#v", got)
+	}
+}
+
+func TestBGPPrefixAdmissionTrialsKeepTheRouteUnitAtomic(t *testing.T) {
+	segments := []riswhois.Segment{{
+		Lo: 0, Hi: 255,
+		Record: riswhois.Record{Lo: 0, Hi: 255, Prefix: "0.0.0.0/24", Origins: []riswhois.Origin{{ASN: "4134", SeenPeers: 100}}},
+	}}
+	trials := bgpPrefixAdmissionTrials(
+		segments,
+		map[string]string{"4134": "chinanet"},
+		map[string][]span{"chinanet": {{0, 255}}},
+		map[string][]span{"chinanet": {{0, 127}, {144, 255}}},
+		map[string][]span{"chinanet": {{0, 63}}},
+		map[string][]span{"chinanet": nil},
+	)
+	if got := trials["any"]; len(got) != 2 || got[0] != (span{0, 127}) || got[1] != (span{144, 255}) {
+		t.Fatalf("any-evidence trial split on APNIC evidence instead of retaining the route unit after strong exclusions: %#v", got)
+	}
+	if len(trials["majority"]) != 0 || len(trials["full"]) != 0 {
+		t.Fatalf("stricter policies unexpectedly admitted a unit with only 25%% positive coverage: %#v", trials)
 	}
 }

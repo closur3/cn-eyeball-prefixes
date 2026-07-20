@@ -503,6 +503,59 @@ func apnicOperatorConflictRanges(segments []apnicinetnum.Segment, classifier *op
 	return out
 }
 
+func apnicOperatorLeafAdmissionRanges(segments []apnicinetnum.Segment, classifier *operatorconfig.Classifier) map[string][]span {
+	out := map[string][]span{}
+	for _, segment := range segments {
+		result := classifier.ClassifyAPNICRegistrant(apnicinetnum.SearchText(segment.Record))
+		if result.Operator != "" {
+			out[result.Operator] = append(out[result.Operator], span{segment.Lo, segment.Hi})
+		}
+	}
+	for _, operator := range operators {
+		out[operator] = merge(out[operator])
+	}
+	return out
+}
+
+func bgpPrefixAdmissionTrials(segments []riswhois.Segment, asnOperators map[string]string, originByOperator, retainedByOperator, leafAdmission, operatorConflicts map[string][]span) map[string][]span {
+	out := map[string][]span{"any": {}, "majority": {}, "full": {}}
+	for _, segment := range segments {
+		unitRange := []span{{segment.Lo, segment.Hi}}
+		seenOperators := map[string]bool{}
+		for _, origin := range segment.Record.Origins {
+			operator := asnOperators[origin.ASN]
+			if operator == "" || seenOperators[operator] {
+				continue
+			}
+			seenOperators[operator] = true
+			unit := intersect(unitRange, originByOperator[operator])
+			if len(unit) == 0 || len(intersect(unit, operatorConflicts[operator])) != 0 {
+				continue
+			}
+			positive := addressCount(intersect(unit, leafAdmission[operator]))
+			total := addressCount(unit)
+			if positive == 0 || total == 0 {
+				continue
+			}
+			retained := intersect(unit, retainedByOperator[operator])
+			if len(retained) == 0 {
+				continue
+			}
+			out["any"] = append(out["any"], retained...)
+			if positive*2 >= total {
+				out["majority"] = append(out["majority"], retained...)
+			}
+			if positive == total {
+				out["full"] = append(out["full"], retained...)
+			}
+		}
+	}
+	for policy := range out {
+		out[policy] = merge(out[policy])
+	}
+	return out
+}
+
 func auditRegistrant(registry *apnicaudit.Registry) string {
 	if registry == nil {
 		return "(no APNIC registration)"
@@ -1013,6 +1066,12 @@ func main() {
 	preAdmissionRanges = merge(preAdmissionRanges)
 	admissionDeniedRanges = merge(admissionDeniedRanges)
 	expectedCN = merge(expectedCN)
+	asnOperators := map[string]string{}
+	for asn, record := range allowedByASN {
+		asnOperators[asn] = record.operator
+	}
+	leafAdmissionRanges := apnicOperatorLeafAdmissionRanges(apnicAllSegments, classifier)
+	bgpAdmissionTrials := bgpPrefixAdmissionTrials(risSegments, asnOperators, preCloudByOperator, preAdmissionByOperator, leafAdmissionRanges, operatorConflictRanges)
 	preAdmissionCIDRCount := cidrCount(preAdmissionRanges)
 	finalCIDRCount := cidrCount(expectedCN)
 	if finalCIDRCount > preAdmissionCIDRCount*2 {
@@ -1048,6 +1107,10 @@ func main() {
 	}
 	zhejiangPreAdmissionRows = merge(zhejiangPreAdmissionRows)
 	expectedZhejiangRows = merge(expectedZhejiangRows)
+	zhejiangBGPAdmissionTrials := map[string][]span{}
+	for _, policy := range []string{"any", "majority", "full"} {
+		zhejiangBGPAdmissionTrials[policy] = intersect(bgpAdmissionTrials[policy], zhejiangProvince)
+	}
 	zhejiangPath := filepath.Join(*data, "provinces", "zhejiang.txt")
 	zhejiangRanges := readCIDRs(zhejiangPath, true)
 	assertEqual(zhejiangRanges, expectedZhejiangRows, "Zhejiang list does not equal the nationwide-admitted output intersected with Zhejiang")
@@ -1113,6 +1176,12 @@ func main() {
 		{"pre_operator_parent_registration_admission", preAdmissionRanges},
 		{"operator_parent_registration_denials", admissionDeniedRanges},
 		{"operator_parent_registration_admissions", cnRanges},
+		{"trial_bgp_prefix_any_leaf_admission", bgpAdmissionTrials["any"]},
+		{"trial_bgp_prefix_majority_leaf_admission", bgpAdmissionTrials["majority"]},
+		{"trial_bgp_prefix_full_leaf_admission", bgpAdmissionTrials["full"]},
+		{"trial_zhejiang_bgp_prefix_any_leaf_admission", zhejiangBGPAdmissionTrials["any"]},
+		{"trial_zhejiang_bgp_prefix_majority_leaf_admission", zhejiangBGPAdmissionTrials["majority"]},
+		{"trial_zhejiang_bgp_prefix_full_leaf_admission", zhejiangBGPAdmissionTrials["full"]},
 		{"final_output", cnRanges},
 		{"province_attributed_output", provincialRanges},
 	}
