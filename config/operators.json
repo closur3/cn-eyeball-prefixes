@@ -145,7 +145,7 @@
       "reason": "APNIC inetnum registration explicitly identifies an electronic-government or government data network"
     },
     {
-      "pattern": "(?:^|[^a-z0-9])(?:idcbeiyongjh|liantongidcyouxifuwuqihz|idcdi2pigongxiangjierufuwuqidi|xiaoshanidcchuangyehuliankejih?|wangluoyingpanhezuoidcziyuanhz|yuyaoidcyewudizhiduanvlan511|cabinet-retail)(?:[^a-z0-9]|$)",
+      "pattern": "(?:^|[^a-z0-9])(?:idcbeiyongjh|liantongidcyouxifuwuqihz|idcdi2pigongxiangjierufuwuqidi|xiaoshanidcchuangyehuliankejih?|wangluoyingpanhezuoidcziyuanhz|yuyaoidcyewudizhiduanvlan511(?:chinaunicomningbochina)?|cabinet-retail)(?:[^a-z0-9]|$)",
       "reason": "APNIC inetnum registration explicitly identifies a dedicated IDC resource or service range"
     },
     {

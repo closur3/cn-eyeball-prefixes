@@ -17,8 +17,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/closur3/cn-operator-allowlist/internal/apnicautnum"
 	"github.com/closur3/cn-operator-allowlist/internal/apnicaudit"
+	"github.com/closur3/cn-operator-allowlist/internal/apnicautnum"
 	"github.com/closur3/cn-operator-allowlist/internal/apnicinetnum"
 	"github.com/closur3/cn-operator-allowlist/internal/apnicorg"
 	"github.com/closur3/cn-operator-allowlist/internal/apnicroute"
@@ -54,16 +54,16 @@ type stageMeta struct {
 }
 
 type auditMeta struct {
-	Name                         string `json:"name"`
-	Path                         string `json:"path"`
-	HumanPath                    string `json:"human_path"`
-	CIDRCount                    int    `json:"cidr_count"`
-	FactCount                    int    `json:"fact_count"`
-	AddressCount                 uint64 `json:"address_count"`
-	RegistryCoveredAddressCount uint64 `json:"registry_covered_address_count"`
+	Name                              string `json:"name"`
+	Path                              string `json:"path"`
+	HumanPath                         string `json:"human_path"`
+	CIDRCount                         int    `json:"cidr_count"`
+	FactCount                         int    `json:"fact_count"`
+	AddressCount                      uint64 `json:"address_count"`
+	RegistryCoveredAddressCount       uint64 `json:"registry_covered_address_count"`
 	StrongNonPublicSignalAddressCount uint64 `json:"strong_non_public_signal_address_count"`
-	SHA256                       string `json:"sha256"`
-	HumanSHA256                  string `json:"human_sha256"`
+	SHA256                            string `json:"sha256"`
+	HumanSHA256                       string `json:"human_sha256"`
 }
 
 type cloudSourceMeta struct {

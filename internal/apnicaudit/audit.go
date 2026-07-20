@@ -52,13 +52,13 @@ type CategorySummary struct {
 }
 
 type Summary struct {
-	CIDRCount                     int               `json:"cidr_count"`
-	FactCount                     int               `json:"fact_count"`
-	AddressCount                  uint64            `json:"address_count"`
-	RegistryCoveredAddressCount   uint64            `json:"registry_covered_address_count"`
-	RegistryCoveragePercent       float64           `json:"registry_coverage_percent"`
-	StrongNonPublicSignalAddressCount uint64        `json:"strong_non_public_signal_address_count"`
-	Categories                    []CategorySummary `json:"categories"`
+	CIDRCount                         int               `json:"cidr_count"`
+	FactCount                         int               `json:"fact_count"`
+	AddressCount                      uint64            `json:"address_count"`
+	RegistryCoveredAddressCount       uint64            `json:"registry_covered_address_count"`
+	RegistryCoveragePercent           float64           `json:"registry_coverage_percent"`
+	StrongNonPublicSignalAddressCount uint64            `json:"strong_non_public_signal_address_count"`
+	Categories                        []CategorySummary `json:"categories"`
 }
 
 type Report struct {
@@ -70,14 +70,14 @@ type Report struct {
 }
 
 type Exclusion struct {
-	CIDR       string `json:"cidr"`
+	CIDR         string `json:"cidr"`
 	AddressCount uint64 `json:"address_count"`
-	Source     string `json:"source"`
-	Category   string `json:"category"`
-	Operator   string `json:"operator"`
-	ASN        string `json:"asn"`
-	Registrant string `json:"registrant,omitempty"`
-	Reason     string `json:"reason"`
+	Source       string `json:"source"`
+	Category     string `json:"category"`
+	Operator     string `json:"operator"`
+	ASN          string `json:"asn"`
+	Registrant   string `json:"registrant,omitempty"`
+	Reason       string `json:"reason"`
 }
 
 type ExclusionCategory struct {
@@ -140,14 +140,16 @@ func Build(scope string, cidrs []string, operatorRanges map[string][]Range, segm
 			return Report{}, fmt.Errorf("invalid canonical IPv4 CIDR %q", cidr)
 		}
 		lo, hi := number(prefix.Addr()), prefixEnd(prefix)
-		entry := CIDRRecord{CIDR: cidr, AddressCount: uint64(hi)-uint64(lo)+1}
+		entry := CIDRRecord{CIDR: cidr, AddressCount: uint64(hi) - uint64(lo) + 1}
 		for _, operator := range operators {
 			for _, candidate := range overlapping(operatorRanges[operator], lo, hi) {
 				start, end := max(lo, candidate.Lo), min(hi, candidate.Hi)
 				entry.Facts = append(entry.Facts, registryFacts(start, end, operator, segments, classifier)...)
 			}
 		}
-		sort.Slice(entry.Facts, func(i, j int) bool { return number(netip.MustParseAddr(entry.Facts[i].Start)) < number(netip.MustParseAddr(entry.Facts[j].Start)) })
+		sort.Slice(entry.Facts, func(i, j int) bool {
+			return number(netip.MustParseAddr(entry.Facts[i].Start)) < number(netip.MustParseAddr(entry.Facts[j].Start))
+		})
 		var covered uint64
 		for _, fact := range entry.Facts {
 			covered += fact.AddressCount
@@ -199,7 +201,7 @@ func registryFacts(lo, hi uint32, operator string, segments []apnicinetnum.Segme
 		}
 		classification, reason, matchedBy := classify(segment, operator, classifier)
 		out = append(out, Fact{
-			Start: addr(start), End: addr(end), AddressCount: uint64(end)-uint64(start)+1,
+			Start: addr(start), End: addr(end), AddressCount: uint64(end) - uint64(start) + 1,
 			Operator: operator, Classification: classification, Reason: reason, MatchedBy: matchedBy,
 			Registry: registry(segment.Record),
 		})
@@ -225,7 +227,7 @@ func classify(segment apnicinetnum.Segment, operator string, classifier *operato
 	}
 	registrant := classifier.Classify("0", text)
 	if registrant.Operator != "" {
-		return "operator_registration", "APNIC registrant text matches "+registrant.Operator, registrant.MatchedBy
+		return "operator_registration", "APNIC registrant text matches " + registrant.Operator, registrant.MatchedBy
 	}
 	if classifier.IsIndependentLegalEntity(apnicinetnum.RegistrantText(segment.Record)) {
 		return "independent_legal_entity", "APNIC registrant text names an independent legal entity; retained because registration alone is not sufficient exclusion evidence", "independent_legal_entity_patterns"
@@ -256,7 +258,7 @@ func registry(record apnicinetnum.Record) *Registry {
 }
 
 func uncoveredFact(lo, hi uint32, operator string) Fact {
-	return Fact{Start: addr(lo), End: addr(hi), AddressCount: uint64(hi)-uint64(lo)+1, Operator: operator, Classification: "unregistered", Reason: "No APNIC inetnum object covers this address range in the build snapshot"}
+	return Fact{Start: addr(lo), End: addr(hi), AddressCount: uint64(hi) - uint64(lo) + 1, Operator: operator, Classification: "unregistered", Reason: "No APNIC inetnum object covers this address range in the build snapshot"}
 }
 
 func overlapping(rows []Range, lo, hi uint32) []Range {
@@ -312,7 +314,7 @@ func RenderMarkdown(report Report, evidencePath string) string {
 	b.WriteString("| 分类 | 事实片段 | 地址 | 占全部地址 | 含义 |\n|---|---:|---:|---:|---|\n")
 	meaning := map[string]string{
 		"operator_registration":    "登记文本可归属于三网运营商",
-		"independent_legal_entity":  "登记文本出现完整独立法定主体；仅作为复核线索",
+		"independent_legal_entity": "登记文本出现完整独立法定主体；仅作为复核线索",
 		"other_registration":       "未归入前三类的 APNIC 登记",
 		"unregistered":             "构建快照内没有覆盖该范围的 inetnum",
 		"strong_non_public_signal": "命中当前明确非公众用途规则；应优先复核",
