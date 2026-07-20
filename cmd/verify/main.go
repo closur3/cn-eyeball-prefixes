@@ -535,7 +535,7 @@ func overlapAddressCountSorted(rows []span, lo, hi uint32) uint64 {
 }
 
 func bgpPrefixAdmissionTrials(segments []riswhois.Segment, asnOperators map[string]string, originByOperator, retainedByOperator, parentAdmission, leafAdmission, operatorConflicts map[string][]span) map[string][]span {
-	out := map[string][]span{"observed": {}, "no_ris": {}, "conflict": {}, "no_parent": {}, "covering": {}, "any": {}, "majority": {}, "full": {}}
+	out := map[string][]span{"observed": {}, "no_ris": {}, "conflict": {}, "no_parent": {}, "covering": {}, "covering_carved": {}, "any": {}, "majority": {}, "full": {}}
 	observedByOperator := map[string][]span{}
 	for _, segment := range segments {
 		seenOperators := map[string]bool{}
@@ -567,7 +567,6 @@ func bgpPrefixAdmissionTrials(segments []riswhois.Segment, asnOperators map[stri
 			}
 			if conflict {
 				out["conflict"] = append(out["conflict"], retained...)
-				continue
 			}
 			var positive, parentPositive, total uint64
 			for _, part := range unit {
@@ -579,9 +578,15 @@ func bgpPrefixAdmissionTrials(segments []riswhois.Segment, asnOperators map[stri
 				continue
 			}
 			if parentPositive == total {
-				out["covering"] = append(out["covering"], retained...)
-			} else {
+				out["covering_carved"] = append(out["covering_carved"], subtract(retained, operatorConflicts[operator])...)
+				if !conflict {
+					out["covering"] = append(out["covering"], retained...)
+				}
+			} else if !conflict {
 				out["no_parent"] = append(out["no_parent"], retained...)
+			}
+			if conflict {
+				continue
 			}
 			if positive == 0 {
 				continue
@@ -927,8 +932,8 @@ func main() {
 	if e != nil {
 		panic(e)
 	}
-	if len(trialFiles) != 16 {
-		panic("expected exactly sixteen BGP-prefix admission trial and diagnostic lists")
+	if len(trialFiles) != 18 {
+		panic("expected exactly eighteen BGP-prefix admission trial and diagnostic lists")
 	}
 	files := append(append(append(append([]string{}, provinceFiles...), operatorFiles...), trialFiles...), filepath.Join(*data, "cn.txt"))
 
@@ -1167,7 +1172,7 @@ func main() {
 	zhejiangPreAdmissionRows = merge(zhejiangPreAdmissionRows)
 	expectedZhejiangRows = merge(expectedZhejiangRows)
 	zhejiangBGPAdmissionTrials := map[string][]span{}
-	for _, policy := range []string{"observed", "no_ris", "conflict", "no_parent", "covering", "any", "majority", "full"} {
+	for _, policy := range []string{"observed", "no_ris", "conflict", "no_parent", "covering", "covering_carved", "any", "majority", "full"} {
 		zhejiangBGPAdmissionTrials[policy] = intersect(bgpAdmissionTrials[policy], zhejiangProvince)
 		assertEqual(
 			readCIDRs(filepath.Join(*data, "experiments", "bgp-prefix-admission", "nationwide-"+policy+".txt"), true),
@@ -1250,6 +1255,7 @@ func main() {
 		{"trial_bgp_prefix_operator_conflict_denial", bgpAdmissionTrials["conflict"]},
 		{"trial_bgp_prefix_no_covering_parent_denial", bgpAdmissionTrials["no_parent"]},
 		{"trial_bgp_prefix_covering_parent_admission", bgpAdmissionTrials["covering"]},
+		{"trial_bgp_prefix_covering_parent_with_exact_conflict_carving", bgpAdmissionTrials["covering_carved"]},
 		{"trial_bgp_prefix_any_leaf_admission", bgpAdmissionTrials["any"]},
 		{"trial_bgp_prefix_majority_leaf_admission", bgpAdmissionTrials["majority"]},
 		{"trial_bgp_prefix_full_leaf_admission", bgpAdmissionTrials["full"]},
@@ -1258,6 +1264,7 @@ func main() {
 		{"trial_zhejiang_bgp_prefix_operator_conflict_denial", zhejiangBGPAdmissionTrials["conflict"]},
 		{"trial_zhejiang_bgp_prefix_no_covering_parent_denial", zhejiangBGPAdmissionTrials["no_parent"]},
 		{"trial_zhejiang_bgp_prefix_covering_parent_admission", zhejiangBGPAdmissionTrials["covering"]},
+		{"trial_zhejiang_bgp_prefix_covering_parent_with_exact_conflict_carving", zhejiangBGPAdmissionTrials["covering_carved"]},
 		{"trial_zhejiang_bgp_prefix_any_leaf_admission", zhejiangBGPAdmissionTrials["any"]},
 		{"trial_zhejiang_bgp_prefix_majority_leaf_admission", zhejiangBGPAdmissionTrials["majority"]},
 		{"trial_zhejiang_bgp_prefix_full_leaf_admission", zhejiangBGPAdmissionTrials["full"]},

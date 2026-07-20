@@ -933,7 +933,7 @@ func overlapAddressCountSorted(rows []span, lo, hi uint32) uint64 {
 // the admission unit. APNIC evidence decides whether the whole unit is
 // admitted; existing strong exclusions may still punch holes afterwards.
 func bgpPrefixAdmissionTrials(segments []riswhois.Segment, asnOperators map[string]string, originByOperator, retainedByOperator, parentAdmission, leafAdmission, operatorConflicts map[string][]span) map[string][]span {
-	out := map[string][]span{"observed": {}, "no_ris": {}, "conflict": {}, "no_parent": {}, "covering": {}, "any": {}, "majority": {}, "full": {}}
+	out := map[string][]span{"observed": {}, "no_ris": {}, "conflict": {}, "no_parent": {}, "covering": {}, "covering_carved": {}, "any": {}, "majority": {}, "full": {}}
 	observedByOperator := map[string][]span{}
 	for _, segment := range segments {
 		seenOperators := map[string]bool{}
@@ -965,7 +965,6 @@ func bgpPrefixAdmissionTrials(segments []riswhois.Segment, asnOperators map[stri
 			}
 			if conflict {
 				out["conflict"] = append(out["conflict"], retained...)
-				continue
 			}
 			var positive, parentPositive, total uint64
 			for _, part := range unit {
@@ -977,9 +976,15 @@ func bgpPrefixAdmissionTrials(segments []riswhois.Segment, asnOperators map[stri
 				continue
 			}
 			if parentPositive == total {
-				out["covering"] = append(out["covering"], retained...)
-			} else {
+				out["covering_carved"] = append(out["covering_carved"], subtract(retained, operatorConflicts[operator])...)
+				if !conflict {
+					out["covering"] = append(out["covering"], retained...)
+				}
+			} else if !conflict {
 				out["no_parent"] = append(out["no_parent"], retained...)
+			}
+			if conflict {
+				continue
 			}
 			if positive == 0 {
 				continue
@@ -1459,7 +1464,7 @@ func main() {
 	zhejiangPreAdmissionRows = merge(zhejiangPreAdmissionRows)
 	zhejiangRows = merge(zhejiangRows)
 	zhejiangBGPAdmissionTrials := map[string][]span{}
-	for _, policy := range []string{"observed", "no_ris", "conflict", "no_parent", "covering", "any", "majority", "full"} {
+	for _, policy := range []string{"observed", "no_ris", "conflict", "no_parent", "covering", "covering_carved", "any", "majority", "full"} {
 		zhejiangBGPAdmissionTrials[policy] = intersect(bgpAdmissionTrials[policy], zhejiangProvinceRanges)
 	}
 	zhejiangPreAdmissionAudit, e := apnicaudit.Build("浙江省 pre-admission IPv4 APNIC registration audit", spanCIDRs(zhejiangPreAdmissionRows), zhejiangPreAdmissionOperatorRanges, apnicAllSegments, classifier)
@@ -1508,6 +1513,7 @@ func main() {
 			stage("trial_bgp_prefix_operator_conflict_denial", bgpAdmissionTrials["conflict"]),
 			stage("trial_bgp_prefix_no_covering_parent_denial", bgpAdmissionTrials["no_parent"]),
 			stage("trial_bgp_prefix_covering_parent_admission", bgpAdmissionTrials["covering"]),
+			stage("trial_bgp_prefix_covering_parent_with_exact_conflict_carving", bgpAdmissionTrials["covering_carved"]),
 			stage("trial_bgp_prefix_any_leaf_admission", bgpAdmissionTrials["any"]),
 			stage("trial_bgp_prefix_majority_leaf_admission", bgpAdmissionTrials["majority"]),
 			stage("trial_bgp_prefix_full_leaf_admission", bgpAdmissionTrials["full"]),
@@ -1516,6 +1522,7 @@ func main() {
 			stage("trial_zhejiang_bgp_prefix_operator_conflict_denial", zhejiangBGPAdmissionTrials["conflict"]),
 			stage("trial_zhejiang_bgp_prefix_no_covering_parent_denial", zhejiangBGPAdmissionTrials["no_parent"]),
 			stage("trial_zhejiang_bgp_prefix_covering_parent_admission", zhejiangBGPAdmissionTrials["covering"]),
+			stage("trial_zhejiang_bgp_prefix_covering_parent_with_exact_conflict_carving", zhejiangBGPAdmissionTrials["covering_carved"]),
 			stage("trial_zhejiang_bgp_prefix_any_leaf_admission", zhejiangBGPAdmissionTrials["any"]),
 			stage("trial_zhejiang_bgp_prefix_majority_leaf_admission", zhejiangBGPAdmissionTrials["majority"]),
 			stage("trial_zhejiang_bgp_prefix_full_leaf_admission", zhejiangBGPAdmissionTrials["full"]),
@@ -1584,7 +1591,7 @@ func main() {
 		m.Lists = append(m.Lists, listMeta{Name: p.Name, Path: filepath.ToSlash(path), fileMeta: meta})
 	}
 
-	for _, policy := range []string{"observed", "no_ris", "conflict", "no_parent", "covering", "any", "majority", "full"} {
+	for _, policy := range []string{"observed", "no_ris", "conflict", "no_parent", "covering", "covering_carved", "any", "majority", "full"} {
 		for _, trial := range []struct {
 			name string
 			path string
