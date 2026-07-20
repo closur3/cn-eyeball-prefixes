@@ -100,7 +100,18 @@ jobs:
             exit 1
           fi
       - name: Verify generated lists
-        run: go run ./cmd/verify --sources "$SOURCE_DIR" --operator-config config/operators.json
+        shell: bash
+        run: |
+          set -o pipefail
+          verify_log="$RUNNER_TEMP/cn-operator-verify.log"
+          if ! go run ./cmd/verify --sources "$SOURCE_DIR" --operator-config config/operators.json 2>&1 | tee "$verify_log"; then
+            while IFS= read -r line; do
+              line="${line//'%'/'%25'}"
+              line="${line//$'\r'/'%0D'}"
+              echo "::error title=Verifier failed::$line"
+            done < <(tail -n 20 "$verify_log")
+            exit 1
+          fi
       - name: Commit generated lists
         shell: bash
         run: |
