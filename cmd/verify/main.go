@@ -954,8 +954,8 @@ func main() {
 	if e != nil {
 		panic(e)
 	}
-	if len(trialFiles) != 30 {
-		panic("expected exactly thirty BGP-prefix admission trial, delta, and diagnostic lists")
+	if len(trialFiles) != 36 {
+		panic("expected exactly thirty-six BGP-prefix admission trial, delta, and diagnostic lists")
 	}
 	files := append(append(append(append([]string{}, provinceFiles...), operatorFiles...), trialFiles...), filepath.Join(*data, "cn.txt"))
 
@@ -1158,6 +1158,7 @@ func main() {
 	}
 	leafAdmissionRanges := apnicOperatorLeafAdmissionRanges(apnicAllSegments, classifier)
 	bgpAdmissionTrials := bgpPrefixAdmissionTrials(risSegments, asnOperators, originByOperator, preAdmissionByOperator, expectedByOperator, operatorAdmissionRanges, leafAdmissionRanges, operatorConflictRanges)
+	bgpAdmissionTrials["hybrid"] = merge(append(append([]span{}, expectedCN...), bgpAdmissionTrials["covering_relaxed"]...))
 	preAdmissionCIDRCount := cidrCount(preAdmissionRanges)
 	finalCIDRCount := cidrCount(expectedCN)
 	if finalCIDRCount > preAdmissionCIDRCount*2 {
@@ -1194,7 +1195,7 @@ func main() {
 	zhejiangPreAdmissionRows = merge(zhejiangPreAdmissionRows)
 	expectedZhejiangRows = merge(expectedZhejiangRows)
 	zhejiangBGPAdmissionTrials := map[string][]span{}
-	for _, policy := range []string{"observed", "no_ris", "conflict", "no_parent", "covering", "covering_carved", "covering_relaxed", "relaxed", "any", "majority", "full"} {
+	for _, policy := range []string{"observed", "no_ris", "conflict", "no_parent", "covering", "covering_carved", "covering_relaxed", "hybrid", "relaxed", "any", "majority", "full"} {
 		zhejiangBGPAdmissionTrials[policy] = intersect(bgpAdmissionTrials[policy], zhejiangProvince)
 		assertEqual(
 			readCIDRs(filepath.Join(*data, "experiments", "bgp-prefix-admission", "nationwide-"+policy+".txt"), true),
@@ -1211,10 +1212,14 @@ func main() {
 	bgpRelaxedRemoved := subtract(cnRanges, bgpAdmissionTrials["relaxed"])
 	bgpCoveringRelaxedAdded := subtract(bgpAdmissionTrials["covering_relaxed"], cnRanges)
 	bgpCoveringRelaxedRemoved := subtract(cnRanges, bgpAdmissionTrials["covering_relaxed"])
+	bgpHybridAdded := subtract(bgpAdmissionTrials["hybrid"], cnRanges)
+	bgpHybridRemoved := subtract(cnRanges, bgpAdmissionTrials["hybrid"])
 	zhejiangBGPRelaxedAdded := subtract(zhejiangBGPAdmissionTrials["relaxed"], expectedZhejiangRows)
 	zhejiangBGPRelaxedRemoved := subtract(expectedZhejiangRows, zhejiangBGPAdmissionTrials["relaxed"])
 	zhejiangBGPCoveringRelaxedAdded := subtract(zhejiangBGPAdmissionTrials["covering_relaxed"], expectedZhejiangRows)
 	zhejiangBGPCoveringRelaxedRemoved := subtract(expectedZhejiangRows, zhejiangBGPAdmissionTrials["covering_relaxed"])
+	zhejiangBGPHybridAdded := subtract(zhejiangBGPAdmissionTrials["hybrid"], expectedZhejiangRows)
+	zhejiangBGPHybridRemoved := subtract(expectedZhejiangRows, zhejiangBGPAdmissionTrials["hybrid"])
 	for _, delta := range []struct {
 		path string
 		rows []span
@@ -1227,6 +1232,10 @@ func main() {
 		{filepath.Join("experiments", "bgp-prefix-admission", "nationwide-covering_relaxed-removed.txt"), bgpCoveringRelaxedRemoved},
 		{filepath.Join("experiments", "bgp-prefix-admission", "zhejiang-covering_relaxed-added.txt"), zhejiangBGPCoveringRelaxedAdded},
 		{filepath.Join("experiments", "bgp-prefix-admission", "zhejiang-covering_relaxed-removed.txt"), zhejiangBGPCoveringRelaxedRemoved},
+		{filepath.Join("experiments", "bgp-prefix-admission", "nationwide-hybrid-added.txt"), bgpHybridAdded},
+		{filepath.Join("experiments", "bgp-prefix-admission", "nationwide-hybrid-removed.txt"), bgpHybridRemoved},
+		{filepath.Join("experiments", "bgp-prefix-admission", "zhejiang-hybrid-added.txt"), zhejiangBGPHybridAdded},
+		{filepath.Join("experiments", "bgp-prefix-admission", "zhejiang-hybrid-removed.txt"), zhejiangBGPHybridRemoved},
 	} {
 		assertEqual(readCIDRs(filepath.Join(*data, delta.path), true), delta.rows, "BGP relaxed-admission delta does not recompute: "+delta.path)
 	}
@@ -1304,6 +1313,9 @@ func main() {
 		{"trial_bgp_prefix_covering_parent_relaxed_conflicts", bgpAdmissionTrials["covering_relaxed"]},
 		{"trial_bgp_prefix_covering_parent_relaxed_added_vs_current", bgpCoveringRelaxedAdded},
 		{"trial_bgp_prefix_covering_parent_relaxed_removed_vs_current", bgpCoveringRelaxedRemoved},
+		{"trial_bgp_prefix_hybrid_conflict_healing", bgpAdmissionTrials["hybrid"]},
+		{"trial_bgp_prefix_hybrid_added_vs_current", bgpHybridAdded},
+		{"trial_bgp_prefix_hybrid_removed_vs_current", bgpHybridRemoved},
 		{"trial_bgp_prefix_relaxed_admission", bgpAdmissionTrials["relaxed"]},
 		{"trial_bgp_prefix_relaxed_added_vs_current", bgpRelaxedAdded},
 		{"trial_bgp_prefix_relaxed_removed_vs_current", bgpRelaxedRemoved},
@@ -1319,6 +1331,9 @@ func main() {
 		{"trial_zhejiang_bgp_prefix_covering_parent_relaxed_conflicts", zhejiangBGPAdmissionTrials["covering_relaxed"]},
 		{"trial_zhejiang_bgp_prefix_covering_parent_relaxed_added_vs_current", zhejiangBGPCoveringRelaxedAdded},
 		{"trial_zhejiang_bgp_prefix_covering_parent_relaxed_removed_vs_current", zhejiangBGPCoveringRelaxedRemoved},
+		{"trial_zhejiang_bgp_prefix_hybrid_conflict_healing", zhejiangBGPAdmissionTrials["hybrid"]},
+		{"trial_zhejiang_bgp_prefix_hybrid_added_vs_current", zhejiangBGPHybridAdded},
+		{"trial_zhejiang_bgp_prefix_hybrid_removed_vs_current", zhejiangBGPHybridRemoved},
 		{"trial_zhejiang_bgp_prefix_relaxed_admission", zhejiangBGPAdmissionTrials["relaxed"]},
 		{"trial_zhejiang_bgp_prefix_relaxed_added_vs_current", zhejiangBGPRelaxedAdded},
 		{"trial_zhejiang_bgp_prefix_relaxed_removed_vs_current", zhejiangBGPRelaxedRemoved},

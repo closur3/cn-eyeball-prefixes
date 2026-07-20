@@ -1437,6 +1437,7 @@ func main() {
 		finalRanges = append(finalRanges, ranges[operator]...)
 	}
 	finalRanges = merge(finalRanges)
+	bgpAdmissionTrials["hybrid"] = merge(append(append([]span{}, finalRanges...), bgpAdmissionTrials["covering_relaxed"]...))
 	preAdmissionCIDRCount := len(spanCIDRs(preAdmissionRanges))
 	finalCIDRCount := len(spanCIDRs(finalRanges))
 	if finalCIDRCount > preAdmissionCIDRCount*2 {
@@ -1494,17 +1495,21 @@ func main() {
 	zhejiangPreAdmissionRows = merge(zhejiangPreAdmissionRows)
 	zhejiangRows = merge(zhejiangRows)
 	zhejiangBGPAdmissionTrials := map[string][]span{}
-	for _, policy := range []string{"observed", "no_ris", "conflict", "no_parent", "covering", "covering_carved", "covering_relaxed", "relaxed", "any", "majority", "full"} {
+	for _, policy := range []string{"observed", "no_ris", "conflict", "no_parent", "covering", "covering_carved", "covering_relaxed", "hybrid", "relaxed", "any", "majority", "full"} {
 		zhejiangBGPAdmissionTrials[policy] = intersect(bgpAdmissionTrials[policy], zhejiangProvinceRanges)
 	}
 	bgpRelaxedAdded := subtract(bgpAdmissionTrials["relaxed"], finalRanges)
 	bgpRelaxedRemoved := subtract(finalRanges, bgpAdmissionTrials["relaxed"])
 	bgpCoveringRelaxedAdded := subtract(bgpAdmissionTrials["covering_relaxed"], finalRanges)
 	bgpCoveringRelaxedRemoved := subtract(finalRanges, bgpAdmissionTrials["covering_relaxed"])
+	bgpHybridAdded := subtract(bgpAdmissionTrials["hybrid"], finalRanges)
+	bgpHybridRemoved := subtract(finalRanges, bgpAdmissionTrials["hybrid"])
 	zhejiangBGPRelaxedAdded := subtract(zhejiangBGPAdmissionTrials["relaxed"], zhejiangRows)
 	zhejiangBGPRelaxedRemoved := subtract(zhejiangRows, zhejiangBGPAdmissionTrials["relaxed"])
 	zhejiangBGPCoveringRelaxedAdded := subtract(zhejiangBGPAdmissionTrials["covering_relaxed"], zhejiangRows)
 	zhejiangBGPCoveringRelaxedRemoved := subtract(zhejiangRows, zhejiangBGPAdmissionTrials["covering_relaxed"])
+	zhejiangBGPHybridAdded := subtract(zhejiangBGPAdmissionTrials["hybrid"], zhejiangRows)
+	zhejiangBGPHybridRemoved := subtract(zhejiangRows, zhejiangBGPAdmissionTrials["hybrid"])
 	zhejiangPreAdmissionAudit, e := apnicaudit.Build("浙江省 pre-admission IPv4 APNIC registration audit", spanCIDRs(zhejiangPreAdmissionRows), zhejiangPreAdmissionOperatorRanges, apnicAllSegments, classifier)
 	if e != nil {
 		panic(e)
@@ -1555,6 +1560,9 @@ func main() {
 			stage("trial_bgp_prefix_covering_parent_relaxed_conflicts", bgpAdmissionTrials["covering_relaxed"]),
 			stage("trial_bgp_prefix_covering_parent_relaxed_added_vs_current", bgpCoveringRelaxedAdded),
 			stage("trial_bgp_prefix_covering_parent_relaxed_removed_vs_current", bgpCoveringRelaxedRemoved),
+			stage("trial_bgp_prefix_hybrid_conflict_healing", bgpAdmissionTrials["hybrid"]),
+			stage("trial_bgp_prefix_hybrid_added_vs_current", bgpHybridAdded),
+			stage("trial_bgp_prefix_hybrid_removed_vs_current", bgpHybridRemoved),
 			stage("trial_bgp_prefix_relaxed_admission", bgpAdmissionTrials["relaxed"]),
 			stage("trial_bgp_prefix_relaxed_added_vs_current", bgpRelaxedAdded),
 			stage("trial_bgp_prefix_relaxed_removed_vs_current", bgpRelaxedRemoved),
@@ -1570,6 +1578,9 @@ func main() {
 			stage("trial_zhejiang_bgp_prefix_covering_parent_relaxed_conflicts", zhejiangBGPAdmissionTrials["covering_relaxed"]),
 			stage("trial_zhejiang_bgp_prefix_covering_parent_relaxed_added_vs_current", zhejiangBGPCoveringRelaxedAdded),
 			stage("trial_zhejiang_bgp_prefix_covering_parent_relaxed_removed_vs_current", zhejiangBGPCoveringRelaxedRemoved),
+			stage("trial_zhejiang_bgp_prefix_hybrid_conflict_healing", zhejiangBGPAdmissionTrials["hybrid"]),
+			stage("trial_zhejiang_bgp_prefix_hybrid_added_vs_current", zhejiangBGPHybridAdded),
+			stage("trial_zhejiang_bgp_prefix_hybrid_removed_vs_current", zhejiangBGPHybridRemoved),
 			stage("trial_zhejiang_bgp_prefix_relaxed_admission", zhejiangBGPAdmissionTrials["relaxed"]),
 			stage("trial_zhejiang_bgp_prefix_relaxed_added_vs_current", zhejiangBGPRelaxedAdded),
 			stage("trial_zhejiang_bgp_prefix_relaxed_removed_vs_current", zhejiangBGPRelaxedRemoved),
@@ -1641,7 +1652,7 @@ func main() {
 		m.Lists = append(m.Lists, listMeta{Name: p.Name, Path: filepath.ToSlash(path), fileMeta: meta})
 	}
 
-	for _, policy := range []string{"observed", "no_ris", "conflict", "no_parent", "covering", "covering_carved", "covering_relaxed", "relaxed", "any", "majority", "full"} {
+	for _, policy := range []string{"observed", "no_ris", "conflict", "no_parent", "covering", "covering_carved", "covering_relaxed", "hybrid", "relaxed", "any", "majority", "full"} {
 		for _, trial := range []struct {
 			name string
 			path string
@@ -1670,6 +1681,10 @@ func main() {
 		{"BGP covering-relaxed delta (nationwide, removed versus current dev)", filepath.Join("experiments", "bgp-prefix-admission", "nationwide-covering_relaxed-removed.txt"), bgpCoveringRelaxedRemoved},
 		{"BGP covering-relaxed delta (Zhejiang, added versus current dev)", filepath.Join("experiments", "bgp-prefix-admission", "zhejiang-covering_relaxed-added.txt"), zhejiangBGPCoveringRelaxedAdded},
 		{"BGP covering-relaxed delta (Zhejiang, removed versus current dev)", filepath.Join("experiments", "bgp-prefix-admission", "zhejiang-covering_relaxed-removed.txt"), zhejiangBGPCoveringRelaxedRemoved},
+		{"BGP hybrid conflict-healing delta (nationwide, added versus current dev)", filepath.Join("experiments", "bgp-prefix-admission", "nationwide-hybrid-added.txt"), bgpHybridAdded},
+		{"BGP hybrid conflict-healing delta (nationwide, removed versus current dev)", filepath.Join("experiments", "bgp-prefix-admission", "nationwide-hybrid-removed.txt"), bgpHybridRemoved},
+		{"BGP hybrid conflict-healing delta (Zhejiang, added versus current dev)", filepath.Join("experiments", "bgp-prefix-admission", "zhejiang-hybrid-added.txt"), zhejiangBGPHybridAdded},
+		{"BGP hybrid conflict-healing delta (Zhejiang, removed versus current dev)", filepath.Join("experiments", "bgp-prefix-admission", "zhejiang-hybrid-removed.txt"), zhejiangBGPHybridRemoved},
 	} {
 		meta, e := write(filepath.Join(*out, trial.path), trial.rows)
 		if e != nil {
