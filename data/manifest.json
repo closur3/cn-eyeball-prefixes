@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-20T20:04:18.735511893Z",
+  "generated_at": "2026-07-20T20:13:08.729210989Z",
   "scope": "IPv4; mainland China; nationwide admission requires both a China Telecom, China Mobile, or China Unicom current BGP origin and a covering APNIC inetnum registration attributable to the same operator; most-specific registrations are used for strong exclusions and operator-conflict denials, not as a mandatory leaf-level admission boundary; dedicated premium backbone ASNs, cloud-provider CIDRs, strong APNIC registrations outside ordinary user access scope, independent holders and route origins, and strong RIPE RIS MOAS evidence are excluded",
   "sources": [
     {
@@ -17,8 +17,8 @@
     {
       "name": "iptoasn_ipv4",
       "url": "https://iptoasn.com/data/ip2asn-v4.tsv.gz",
-      "bytes": 6884150,
-      "sha256": "3031b610b8ee1ab9db2919434b55b61f4b72221f7befe2b9dfa1ddee65d2e963"
+      "bytes": 6886194,
+      "sha256": "8be733039d50a94f19ae7ea5fab7b738e4af63b6f291a9ab5082be2aeb1bfc1e"
     },
     {
       "name": "apnic_organisation",
@@ -166,6 +166,11 @@
       "address_count": 221009586
     },
     {
+      "name": "trial_bgp_prefix_covering_parent_admission",
+      "cidr_count": 12365,
+      "address_count": 214803692
+    },
+    {
       "name": "trial_bgp_prefix_any_leaf_admission",
       "cidr_count": 12820,
       "address_count": 212882140
@@ -179,6 +184,11 @@
       "name": "trial_bgp_prefix_full_leaf_admission",
       "cidr_count": 7339,
       "address_count": 164286742
+    },
+    {
+      "name": "trial_zhejiang_bgp_prefix_covering_parent_admission",
+      "cidr_count": 1331,
+      "address_count": 13930759
     },
     {
       "name": "trial_zhejiang_bgp_prefix_any_leaf_admission",
@@ -109190,6 +109200,20 @@
       "cidr_count": 237,
       "address_count": 3750734,
       "sha256": "4b7ccef2e4cdd1f702b3c498cbc6bdc32eb86b6af990db04fe8b25f9f21f103e"
+    },
+    {
+      "name": "BGP prefix admission trial (nationwide, covering)",
+      "path": "experiments/bgp-prefix-admission/nationwide-covering.txt",
+      "cidr_count": 12365,
+      "address_count": 214803692,
+      "sha256": "c3a81cd74d031096dd1904d2c18b815d1a6809d0ea33fa69414c07b3e46a49fa"
+    },
+    {
+      "name": "BGP prefix admission trial (Zhejiang, covering)",
+      "path": "experiments/bgp-prefix-admission/zhejiang-covering.txt",
+      "cidr_count": 1331,
+      "address_count": 13930759,
+      "sha256": "0273f81b877c703dd5e85a92421a6b0bd037a9942c8a3aaa6c34a33a0f62f9b5"
     },
     {
       "name": "BGP prefix admission trial (nationwide, any)",
