@@ -88,7 +88,18 @@ jobs:
       - name: Run Go vet
         run: go vet ./...
       - name: Generate lists
-        run: go run ./cmd/build --sources "$SOURCE_DIR" --operator-config config/operators.json
+        shell: bash
+        run: |
+          set -o pipefail
+          build_log="$RUNNER_TEMP/cn-operator-build.log"
+          if ! go run ./cmd/build --sources "$SOURCE_DIR" --operator-config config/operators.json 2>&1 | tee "$build_log"; then
+            while IFS= read -r line; do
+              line="${line//'%'/'%25'}"
+              line="${line//$'\r'/'%0D'}"
+              echo "::error title=Generator failed::$line"
+            done < <(tail -n 20 "$build_log")
+            exit 1
+          fi
       - name: Verify generated lists
         run: go run ./cmd/verify --sources "$SOURCE_DIR" --operator-config config/operators.json
       - name: Commit generated lists
