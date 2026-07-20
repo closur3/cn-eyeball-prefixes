@@ -1058,6 +1058,19 @@ func admissionExclusionEvidence(report apnicaudit.Report, deniedByOperator map[s
 	return out
 }
 
+func buildRelaxedAddedAudit(cidrs []string, operatorRanges map[string][]apnicaudit.Range, segments []apnicinetnum.Segment, classifier *operatorconfig.Classifier) (apnicaudit.Report, error) {
+	report, err := apnicaudit.Build("Nationwide relaxed-BGP additions versus current dev", cidrs, operatorRanges, segments, classifier)
+	if err != nil {
+		return apnicaudit.Report{}, err
+	}
+	report.Notes = []string{
+		"Every added address has a current China Telecom, China Mobile, or China Unicom RIS origin and has already passed all enforced cloud, APNIC-purpose, independent-holder, route-origin, and strong MOAS exclusions.",
+		"These addresses are absent from the current dev output because APNIC does not provide the same positive parent-admission result, or because the most-specific registration names another operator.",
+		"The report maps every added address to the most-specific APNIC inetnum object so the cost of removing APNIC positive admission can be reviewed as data rather than inferred from CIDR counts.",
+	}
+	return report, nil
+}
+
 func writeGzipJSON(path string, value any) (string, error) {
 	if e := os.MkdirAll(filepath.Dir(path), 0755); e != nil {
 		return "", e
@@ -1694,6 +1707,39 @@ func main() {
 		CIDRCount: zhejiangAudit.Summary.CIDRCount, FactCount: zhejiangAudit.Summary.FactCount,
 		AddressCount: zhejiangAudit.Summary.AddressCount, RegistryCoveredAddressCount: zhejiangAudit.Summary.RegistryCoveredAddressCount,
 		StrongNonPublicSignalAddressCount: zhejiangAudit.Summary.StrongNonPublicSignalAddressCount, SHA256: auditSHA, HumanSHA256: humanAuditSHA,
+	})
+
+	relaxedAddedOperatorRanges := map[string][]apnicaudit.Range{}
+	for _, operator := range operators {
+		for _, row := range intersect(bgpRelaxedAdded, preAdmissionByOperator[operator]) {
+			relaxedAddedOperatorRanges[operator] = append(relaxedAddedOperatorRanges[operator], apnicaudit.Range{Lo: row.lo, Hi: row.hi})
+		}
+	}
+	relaxedAddedAudit, e := buildRelaxedAddedAudit(spanCIDRs(bgpRelaxedAdded), relaxedAddedOperatorRanges, apnicAllSegments, classifier)
+	if e != nil {
+		panic(e)
+	}
+	if relaxedAddedAudit.Summary.StrongNonPublicSignalAddressCount != 0 {
+		panic(fmt.Sprintf("relaxed BGP additions retain %d addresses that still match an enforced non-public APNIC rule", relaxedAddedAudit.Summary.StrongNonPublicSignalAddressCount))
+	}
+	relaxedAuditPath := filepath.Join("audits", "bgp-relaxed-added-apnic.json.gz")
+	relaxedAuditSHA, e := writeGzipJSON(filepath.Join(*out, relaxedAuditPath), relaxedAddedAudit)
+	if e != nil {
+		panic(e)
+	}
+	relaxedHumanAuditPath := filepath.Join("audits", "bgp-relaxed-added-apnic.md")
+	if e := os.WriteFile(filepath.Join(*out, relaxedHumanAuditPath), []byte(apnicaudit.RenderMarkdown(relaxedAddedAudit, filepath.Base(relaxedAuditPath))), 0644); e != nil {
+		panic(e)
+	}
+	relaxedHumanAuditSHA, e := sha(filepath.Join(*out, relaxedHumanAuditPath))
+	if e != nil {
+		panic(e)
+	}
+	m.Audits = append(m.Audits, auditMeta{
+		Name: "bgp_relaxed_added_apnic_registration", Path: filepath.ToSlash(relaxedAuditPath), HumanPath: filepath.ToSlash(relaxedHumanAuditPath),
+		CIDRCount: relaxedAddedAudit.Summary.CIDRCount, FactCount: relaxedAddedAudit.Summary.FactCount,
+		AddressCount: relaxedAddedAudit.Summary.AddressCount, RegistryCoveredAddressCount: relaxedAddedAudit.Summary.RegistryCoveredAddressCount,
+		StrongNonPublicSignalAddressCount: relaxedAddedAudit.Summary.StrongNonPublicSignalAddressCount, SHA256: relaxedAuditSHA, HumanSHA256: relaxedHumanAuditSHA,
 	})
 
 	if hasOldManifest && sameManifestContent(oldManifest, m) {
