@@ -64,6 +64,7 @@ func TestBGPPrefixAdmissionTrialsKeepTheRouteUnitAtomic(t *testing.T) {
 		map[string]string{"4134": "chinanet"},
 		map[string][]span{"chinanet": {{0, 255}}},
 		map[string][]span{"chinanet": {{0, 127}, {144, 255}}},
+		map[string][]span{"chinanet": {{0, 255}}},
 		map[string][]span{"chinanet": {{0, 63}}},
 		map[string][]span{"chinanet": nil},
 	)
@@ -72,5 +73,8 @@ func TestBGPPrefixAdmissionTrialsKeepTheRouteUnitAtomic(t *testing.T) {
 	}
 	if len(trials["majority"]) != 0 || len(trials["full"]) != 0 {
 		t.Fatalf("stricter policies unexpectedly admitted a unit with only 25%% positive coverage: %#v", trials)
+	}
+	if got := trials["covering"]; len(got) != 2 || got[0] != (span{0, 127}) || got[1] != (span{144, 255}) {
+		t.Fatalf("covering-parent policy did not retain the BGP unit after strong exclusions: %#v", got)
 	}
 }
