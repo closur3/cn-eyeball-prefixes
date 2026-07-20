@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-07-20T18:22:34.575516724Z",
-  "scope": "Strict experimental ACL list; IPv4; mainland China; nationwide positive admission requires both a China Telecom, China Mobile, or China Unicom current BGP origin and a most-specific APNIC inetnum registrant attributable to the same operator; dedicated premium backbone ASNs, cloud-provider CIDRs, strong APNIC registrations outside ordinary user access scope, independent holders and route origins, and strong RIPE RIS MOAS evidence are also excluded; independent, ambiguous, unregistered, and operator-conflicting APNIC registrations are not admitted",
+  "generated_at": "2026-07-20T19:07:44.146717718Z",
+  "scope": "IPv4; mainland China; nationwide admission requires both a China Telecom, China Mobile, or China Unicom current BGP origin and a covering APNIC inetnum registration attributable to the same operator; most-specific registrations are used for strong exclusions and operator-conflict denials, not as a mandatory leaf-level admission boundary; dedicated premium backbone ASNs, cloud-provider CIDRs, strong APNIC registrations outside ordinary user access scope, independent holders and route origins, and strong RIPE RIS MOAS evidence are excluded",
   "sources": [
     {
       "name": "operator_config",
@@ -151,31 +151,39 @@
       "address_count": 0
     },
     {
-      "name": "pre_operator_registration_admission",
+      "name": "pre_operator_parent_registration_admission",
       "cidr_count": 15759,
       "address_count": 223547462
     },
     {
-      "name": "operator_registration_denials",
-      "cidr_count": 154246,
-      "address_count": 12186400
+      "name": "operator_parent_registration_denials",
+      "cidr_count": 1923,
+      "address_count": 2537428
     },
     {
-      "name": "operator_registration_admissions",
-      "cidr_count": 151369,
-      "address_count": 211361062
+      "name": "operator_parent_registration_admissions",
+      "cidr_count": 14915,
+      "address_count": 221010034
     },
     {
       "name": "final_output",
-      "cidr_count": 151369,
-      "address_count": 211361062
+      "cidr_count": 14915,
+      "address_count": 221010034
     },
     {
       "name": "province_attributed_output",
-      "cidr_count": 152747,
-      "address_count": 206534344
+      "cidr_count": 16320,
+      "address_count": 216183308
     }
   ],
+  "operator_registration_admission": {
+    "mode": "covering_operator_registration_with_strong_leaf_exclusions",
+    "pre_cidr_count": 15759,
+    "denied_cidr_count": 1923,
+    "final_cidr_count": 14915,
+    "cidr_expansion_ratio": 0.9464433022399898,
+    "maximum_cidr_expansion_ratio": 2
+  },
   "cloud_sources": [
     {
       "source": "ipdata_aliyun",
@@ -106781,7 +106789,7 @@
     {
       "operator": "chinanet",
       "asn_count": 54,
-      "retained_address_count": 111024782,
+      "retained_address_count": 115758911,
       "asns": [
         {
           "asn": "4134",
@@ -107004,7 +107012,7 @@
     {
       "operator": "cmcc",
       "asn_count": 20,
-      "retained_address_count": 38961455,
+      "retained_address_count": 39070260,
       "asns": [
         {
           "asn": "9394",
@@ -107091,7 +107099,7 @@
     {
       "operator": "unicom",
       "asn_count": 8,
-      "retained_address_count": 61374825,
+      "retained_address_count": 66180863,
       "asns": [
         {
           "asn": "4808",
@@ -107135,7 +107143,7 @@
       "description": "CHINANET-BACKBONE No.31,Jin-rong Street",
       "matched_by": "description_patterns: chinanet",
       "origin_address_count": 99916288,
-      "retained_address_count": 95578582
+      "retained_address_count": 99763691
     },
     {
       "asn": "4811",
@@ -107143,7 +107151,7 @@
       "description": "CHINANET-SHANGHAI-MAN China Telecom Group",
       "matched_by": "description_patterns: china ?telecom",
       "origin_address_count": 866560,
-      "retained_address_count": 590935
+      "retained_address_count": 602779
     },
     {
       "asn": "4812",
@@ -107151,7 +107159,7 @@
       "description": "CHINANET-SH-AP China Telecom Group",
       "matched_by": "description_patterns: china ?telecom",
       "origin_address_count": 7875584,
-      "retained_address_count": 7433396
+      "retained_address_count": 7694212
     },
     {
       "asn": "4813",
@@ -107167,7 +107175,7 @@
       "description": "CNIX-AP China Networks Inter-Exchange",
       "matched_by": "include_asns: China Telecom Beijing provincial network; public description is China Networks Inter-Exchange",
       "origin_address_count": 3549440,
-      "retained_address_count": 612254
+      "retained_address_count": 704640
     },
     {
       "asn": "17633",
@@ -107175,7 +107183,7 @@
       "description": "CHINATELECOM-SD-AS-AP ASN for Shandong Provincial Net of CT",
       "matched_by": "description_patterns: china ?telecom",
       "origin_address_count": 8704,
-      "retained_address_count": 8672
+      "retained_address_count": 8704
     },
     {
       "asn": "17638",
@@ -107183,7 +107191,7 @@
       "description": "CHINATELECOM-TJ-AS-AP ASN for TIANJIN Provincial Net of CT",
       "matched_by": "description_patterns: china ?telecom",
       "origin_address_count": 603392,
-      "retained_address_count": 526510
+      "retained_address_count": 597760
     },
     {
       "asn": "17799",
@@ -107199,7 +107207,7 @@
       "description": "CHINATELECOM-HLJ-AS-AP asn for Heilongjiang Provincial Net of CT",
       "matched_by": "description_patterns: china ?telecom",
       "origin_address_count": 151296,
-      "retained_address_count": 151024
+      "retained_address_count": 151296
     },
     {
       "asn": "58517",
@@ -107223,7 +107231,7 @@
       "description": "CHINATELECOM-TIANJIN Tianjij,300000",
       "matched_by": "description_patterns: china ?telecom",
       "origin_address_count": 108544,
-      "retained_address_count": 86016
+      "retained_address_count": 105728
     },
     {
       "asn": "58571",
@@ -107255,7 +107263,7 @@
       "description": "CHINATELECOM-QINGHAI-5G-NETWORK China Telecom",
       "matched_by": "description_patterns: china ?telecom",
       "origin_address_count": 20992,
-      "retained_address_count": 20608
+      "retained_address_count": 20992
     },
     {
       "asn": "132536",
@@ -107263,7 +107271,7 @@
       "description": "CHINANET-TIANJIN-MAN-NEW China Telecom",
       "matched_by": "description_patterns: china ?telecom",
       "origin_address_count": 5888,
-      "retained_address_count": 5120
+      "retained_address_count": 5376
     },
     {
       "asn": "134419",
@@ -107271,7 +107279,7 @@
       "description": "CHINATELECOM-GUANGXI-BEIHAI-MAN Beihai",
       "matched_by": "description_patterns: china ?telecom",
       "origin_address_count": 112384,
-      "retained_address_count": 112217
+      "retained_address_count": 112376
     },
     {
       "asn": "134762",
@@ -107279,7 +107287,7 @@
       "description": "CHINANET-LIAONING-DALIAN-MAN CHINANET Liaoning province Dalian MAN network",
       "matched_by": "description_patterns: chinanet",
       "origin_address_count": 195072,
-      "retained_address_count": 157315
+      "retained_address_count": 167901
     },
     {
       "asn": "134767",
@@ -107295,7 +107303,7 @@
       "description": "CHINANET-GUANGDONG-GUANGZHOU-MAN CHINANET Guangdong province Guangzhou MAN network",
       "matched_by": "description_patterns: chinanet",
       "origin_address_count": 143360,
-      "retained_address_count": 913
+      "retained_address_count": 1536
     },
     {
       "asn": "134774",
@@ -107303,7 +107311,7 @@
       "description": "CHINANET-GUANGDONG-SHENZHEN-MAN CHINANET Guangdong province Shenzhen MAN network",
       "matched_by": "description_patterns: chinanet",
       "origin_address_count": 213248,
-      "retained_address_count": 153788
+      "retained_address_count": 153856
     },
     {
       "asn": "136197",
@@ -107327,7 +107335,7 @@
       "description": "CHINANET-GUANGDONG-YUEDONG-MAN CHINANET Guangdong province Yuedong MAN network",
       "matched_by": "description_patterns: chinanet",
       "origin_address_count": 475904,
-      "retained_address_count": 471243
+      "retained_address_count": 475900
     },
     {
       "asn": "137266",
@@ -107343,7 +107351,7 @@
       "description": "CHINATELECOM-LIAONING-BENXI-MAN CHINATELECOM Liaoning Benxi MAN",
       "matched_by": "description_patterns: china ?telecom",
       "origin_address_count": 66048,
-      "retained_address_count": 57427
+      "retained_address_count": 66048
     },
     {
       "asn": "137694",
@@ -107351,7 +107359,7 @@
       "description": "CHINATELECOM-XINJIANG-KEZHOU-MAN CHINATELECOM Xinjiang Kezhou MAN network",
       "matched_by": "description_patterns: china ?telecom",
       "origin_address_count": 95744,
-      "retained_address_count": 95488
+      "retained_address_count": 95744
     },
     {
       "asn": "137695",
@@ -107359,7 +107367,7 @@
       "description": "CHINATELECOM-XINJIANG-WULUMUQI-MAN CHINATELECOM Xinjiang Wulumuqi MAN network",
       "matched_by": "description_patterns: china ?telecom",
       "origin_address_count": 67072,
-      "retained_address_count": 66516
+      "retained_address_count": 67072
     },
     {
       "asn": "139721",
@@ -107375,7 +107383,7 @@
       "description": "CHINANET-QINGHAI-AS-AP Qinghai Telecom",
       "matched_by": "description_patterns: chinanet",
       "origin_address_count": 482048,
-      "retained_address_count": 448000
+      "retained_address_count": 478700
     },
     {
       "asn": "140083",
@@ -107407,7 +107415,7 @@
       "description": "CHINATELECOM-GUANGDONG-ZHUHAI-5G-NETWORK CHINATELECOM Guangdong province Zhuhai 5G network",
       "matched_by": "description_patterns: china ?telecom",
       "origin_address_count": 328192,
-      "retained_address_count": 321261
+      "retained_address_count": 328188
     },
     {
       "asn": "140309",
@@ -107415,7 +107423,7 @@
       "description": "CHINATELECOM-GUANGDONG-ZHONGSHAN-5G-NETWORK CHINATELECOM Guangdong province Zhongshan 5G network",
       "matched_by": "description_patterns: china ?telecom",
       "origin_address_count": 233984,
-      "retained_address_count": 231750
+      "retained_address_count": 233984
     },
     {
       "asn": "140311",
@@ -107423,7 +107431,7 @@
       "description": "CHINATELECOM-GUANGDONG-JIANGMEN-5G-NETWORK CHINATELECOM Guangdong province Jiangmen 5G network",
       "matched_by": "description_patterns: china ?telecom",
       "origin_address_count": 215808,
-      "retained_address_count": 209651
+      "retained_address_count": 215808
     },
     {
       "asn": "140318",
@@ -107431,7 +107439,7 @@
       "description": "CHINATELECOM-GUANGDONG-HEYUAN-5G-NETWORK CHINATELECOM Guangdong province Heyuan 5G network",
       "matched_by": "description_patterns: china ?telecom",
       "origin_address_count": 319744,
-      "retained_address_count": 308545
+      "retained_address_count": 319740
     },
     {
       "asn": "140319",
@@ -107439,7 +107447,7 @@
       "description": "CHINATELECOM-GUANGDONG-QINGYUAN-5G-NETWORK CHINATELECOM Guangdong province Qingyuan 5G network",
       "matched_by": "description_patterns: china ?telecom",
       "origin_address_count": 255232,
-      "retained_address_count": 247792
+      "retained_address_count": 255232
     },
     {
       "asn": "140320",
@@ -107447,7 +107455,7 @@
       "description": "CHINATELECOM-GUANGDONG-SHANWEI-5G-NETWORK CHINATELECOM Guangdong province Shanwei 5G network",
       "matched_by": "description_patterns: china ?telecom",
       "origin_address_count": 225536,
-      "retained_address_count": 224915
+      "retained_address_count": 225536
     },
     {
       "asn": "140329",
@@ -107463,7 +107471,7 @@
       "description": "CHINATELECOM-FUJIAN-XIAMEN-5G-NETWORK CHINATELECOM Fujian province Xiamen 5G network",
       "matched_by": "description_patterns: china ?telecom",
       "origin_address_count": 3328,
-      "retained_address_count": 2304
+      "retained_address_count": 3328
     },
     {
       "asn": "140345",
@@ -107527,7 +107535,7 @@
       "description": "CT-LIAONING-SHENYANG-MAN Shenyang MAN, Liaoning, China Telecom",
       "matched_by": "description_patterns: china ?telecom",
       "origin_address_count": 1280,
-      "retained_address_count": 1036
+      "retained_address_count": 1280
     },
     {
       "asn": "141739",
@@ -107567,7 +107575,7 @@
       "description": "CTTNET China TieTong Telecommunications Corporation",
       "matched_by": "description_patterns: tietong",
       "origin_address_count": 2663168,
-      "retained_address_count": 2508024
+      "retained_address_count": 2597248
     },
     {
       "asn": "9808",
@@ -107575,7 +107583,7 @@
       "description": "CHINAMOBILE-CN China Mobile Communications Group Co., Ltd.",
       "matched_by": "description_patterns: china mobile",
       "origin_address_count": 17488896,
-      "retained_address_count": 16904945
+      "retained_address_count": 16913888
     },
     {
       "asn": "24138",
@@ -107583,7 +107591,7 @@
       "description": "CTTNET China TieTong Telecommunications Corporation",
       "matched_by": "description_patterns: tietong",
       "origin_address_count": 558080,
-      "retained_address_count": 476768
+      "retained_address_count": 482304
     },
     {
       "asn": "24400",
@@ -107591,7 +107599,7 @@
       "description": "CMNET-V4SHANGHAI-AS-AP Shanghai Mobile Communications Co.,Ltd.",
       "matched_by": "description_patterns: cmnet",
       "origin_address_count": 762368,
-      "retained_address_count": 760580
+      "retained_address_count": 761328
     },
     {
       "asn": "24444",
@@ -107599,7 +107607,7 @@
       "description": "CMNET-V4SHANDONG-AS-AP Shandong Mobile Communication Company Limited",
       "matched_by": "description_patterns: cmnet",
       "origin_address_count": 1870848,
-      "retained_address_count": 1867168
+      "retained_address_count": 1867244
     },
     {
       "asn": "24445",
@@ -107607,7 +107615,7 @@
       "description": "CMNET-V4HENAN-AS-AP Henan Mobile Communications Co.,Ltd",
       "matched_by": "description_patterns: cmnet",
       "origin_address_count": 1939456,
-      "retained_address_count": 1934593
+      "retained_address_count": 1936896
     },
     {
       "asn": "24547",
@@ -107623,7 +107631,7 @@
       "description": "CMNET-V4TIANJIN-AS-AP tianjin Mobile Communication Company Limited",
       "matched_by": "description_patterns: cmnet",
       "origin_address_count": 284160,
-      "retained_address_count": 251639
+      "retained_address_count": 251904
     },
     {
       "asn": "45057",
@@ -107639,7 +107647,7 @@
       "description": "CMNET-GUANGDONG-AP China Mobile communications corporation",
       "matched_by": "description_patterns: china mobile",
       "origin_address_count": 844288,
-      "retained_address_count": 831984
+      "retained_address_count": 832248
     },
     {
       "asn": "56041",
@@ -107647,7 +107655,7 @@
       "description": "CMNET-ZHEJIANG-AP China Mobile communications corporation",
       "matched_by": "description_patterns: china mobile",
       "origin_address_count": 2963968,
-      "retained_address_count": 2948552
+      "retained_address_count": 2949376
     },
     {
       "asn": "56042",
@@ -107679,7 +107687,7 @@
       "description": "CMNET-JIANGSU-AP China Mobile communications corporation",
       "matched_by": "description_patterns: china mobile",
       "origin_address_count": 3715584,
-      "retained_address_count": 3655826
+      "retained_address_count": 3656448
     },
     {
       "asn": "56047",
@@ -107727,7 +107735,7 @@
       "description": "CHINA169-BJ China Unicom Beijing Province Network",
       "matched_by": "description_patterns: unicom",
       "origin_address_count": 7176704,
-      "retained_address_count": 4724984
+      "retained_address_count": 5197928
     },
     {
       "asn": "4837",
@@ -107735,7 +107743,7 @@
       "description": "CHINA169-BACKBONE CHINA UNICOM China169 Backbone",
       "matched_by": "description_patterns: unicom",
       "origin_address_count": 57247744,
-      "retained_address_count": 52557503
+      "retained_address_count": 56562455
     },
     {
       "asn": "17621",
@@ -107743,7 +107751,7 @@
       "description": "CNCGROUP-SH China Unicom Shanghai network",
       "matched_by": "description_patterns: unicom",
       "origin_address_count": 806144,
-      "retained_address_count": 623408
+      "retained_address_count": 773308
     },
     {
       "asn": "17622",
@@ -107751,7 +107759,7 @@
       "description": "CNCGROUP-GZ China Unicom Guangzhou network",
       "matched_by": "description_patterns: unicom",
       "origin_address_count": 676864,
-      "retained_address_count": 441007
+      "retained_address_count": 488704
     },
     {
       "asn": "17623",
@@ -107759,7 +107767,7 @@
       "description": "CNCGROUP-SZ China Unicom Shenzen network",
       "matched_by": "description_patterns: unicom",
       "origin_address_count": 455168,
-      "retained_address_count": 397317
+      "retained_address_count": 420204
     },
     {
       "asn": "17816",
@@ -107767,7 +107775,7 @@
       "description": "CHINA169-GZ China Unicom IP network China169 Guangdong province",
       "matched_by": "description_patterns: unicom",
       "origin_address_count": 2657536,
-      "retained_address_count": 2520861
+      "retained_address_count": 2593368
     },
     {
       "asn": "23851",
@@ -107783,7 +107791,7 @@
       "description": "UNICOM-HEFEI-MAN UNICOM AnHui province network",
       "matched_by": "description_patterns: unicom",
       "origin_address_count": 146944,
-      "retained_address_count": 109489
+      "retained_address_count": 144640
     }
   ],
   "excluded_asns": [
@@ -108800,247 +108808,247 @@
     {
       "name": "chinanet",
       "path": "operators/chinanet.txt",
-      "cidr_count": 90739,
-      "address_count": 111024782,
-      "sha256": "8a3cea7b9dc41c64f996d92da5a9f6eaf2997c6838c0d7621d60f02226d8e28d"
+      "cidr_count": 9386,
+      "address_count": 115758911,
+      "sha256": "7da35b9207f8bd4219b045618c6a5eab12f42f58920757d426e4313415d0ac33"
     },
     {
       "name": "cmcc",
       "path": "operators/cmcc.txt",
-      "cidr_count": 2887,
-      "address_count": 38961455,
-      "sha256": "53ec8c85897ee9dd3352ca4922ba78575d2adafa57cd94bd68784951178b26e1"
+      "cidr_count": 692,
+      "address_count": 39070260,
+      "sha256": "6c1bcc3c44c3e587897bcb426dd5bbaad9e5d06ff6889ee4cbab3cafca9a9ff7"
     },
     {
       "name": "unicom",
       "path": "operators/unicom.txt",
-      "cidr_count": 57748,
-      "address_count": 61374825,
-      "sha256": "4ea0f384f3798128b872e480edb95f763a4b2eac7cd1109a5a6190c830a9061f"
+      "cidr_count": 4852,
+      "address_count": 66180863,
+      "sha256": "deb5e65b5c3075b1e2f178233b88dd9b39f2460998c18b6c4534fdd0938c7ce7"
     },
     {
       "name": "CN",
       "path": "cn.txt",
-      "cidr_count": 151369,
-      "address_count": 211361062,
-      "sha256": "64483d3779f2b7dfd41cb86239b13b75228ba21ce5e02429f3eecccb229510f0"
+      "cidr_count": 14915,
+      "address_count": 221010034,
+      "sha256": "9ea8818f027b22345f3550f310f004e657e43d43e0790cd3e9c46a8e8ddf1a1b"
     },
     {
       "name": "北京市",
       "path": "provinces/beijing.txt",
-      "cidr_count": 3615,
-      "address_count": 9763851,
-      "sha256": "c0983e12201d880103ebd7ad7f9a472d1478021792a059fefde3b89b94681bcd"
+      "cidr_count": 2800,
+      "address_count": 10343834,
+      "sha256": "96ae824bc7951a374ff028d85b71a96f3cd0bd18d8d09abead4c7b395ccd4875"
     },
     {
       "name": "天津市",
       "path": "provinces/tianjin.txt",
-      "cidr_count": 5537,
-      "address_count": 3191356,
-      "sha256": "cdc6a51f5bc81a2c7efa16755935402405ca36baca8531555910b7b12646de3a"
+      "cidr_count": 549,
+      "address_count": 3438228,
+      "sha256": "9c8514aa7026c2fd8cece90c0dbe332ed6b391da1ea70912eea001e51d626389"
     },
     {
       "name": "河北省",
       "path": "provinces/hebei.txt",
-      "cidr_count": 4312,
-      "address_count": 9182872,
-      "sha256": "b83479194ed8a4bfc1186d0705530c56b4839f7861d34d3f8ec80ef8ff4eb5ad"
+      "cidr_count": 473,
+      "address_count": 9297027,
+      "sha256": "4b688d8a868d47ca7480f9903a872501231a4db8ef31e05d7ff6fd5fd0f7f03f"
     },
     {
       "name": "山西省",
       "path": "provinces/shanxi.txt",
-      "cidr_count": 3811,
-      "address_count": 2721109,
-      "sha256": "15f3cdd304be6f6f84b3f24842d670e5e32088231507a021c6c54e0c9f5b3f2a"
+      "cidr_count": 382,
+      "address_count": 5319831,
+      "sha256": "a3d2a23556f47ca28aa0b3832cd994bba86525ee786839d71f614695e58d02db"
     },
     {
       "name": "内蒙古自治区",
       "path": "provinces/neimenggu.txt",
-      "cidr_count": 2912,
-      "address_count": 2689901,
-      "sha256": "f981b522e1d5e35a750a76bbc3dc7b8bc96b05ffac128ee2743c6dd3294b1f74"
+      "cidr_count": 429,
+      "address_count": 3215883,
+      "sha256": "68b7d65248364543580f218784b32a0b4422ab6c702747cdbefa2c7192d1fd82"
     },
     {
       "name": "辽宁省",
       "path": "provinces/liaoning.txt",
-      "cidr_count": 6930,
-      "address_count": 10437628,
-      "sha256": "c48819c73f6da5ed13397bf5f51ebb81711092099d8997317b033b35fe55e6af"
+      "cidr_count": 555,
+      "address_count": 10565080,
+      "sha256": "544714b49bb9b116650d87236887425def992c2d73197698f15cf1868018e9c5"
     },
     {
       "name": "吉林省",
       "path": "provinces/jilin.txt",
-      "cidr_count": 4006,
-      "address_count": 3991106,
-      "sha256": "36b0176a2abb323cc61d085179b8791b78322e2530b44c39c6aa7635a575d0b1"
+      "cidr_count": 239,
+      "address_count": 4116379,
+      "sha256": "14054ad7ccc478890bfc9cddab1fa9bb8b8951742f87053e5635f3ca1cb496cd"
     },
     {
       "name": "黑龙江省",
       "path": "provinces/heilongjiang.txt",
-      "cidr_count": 3037,
-      "address_count": 4464159,
-      "sha256": "23cfdb39b2778d94866553d5a3a7d0acd1b98173efc3ec71291db2b104d02b5c"
+      "cidr_count": 422,
+      "address_count": 4729411,
+      "sha256": "696cf731ddccba0c73c3ce023fa8a4841b44a8e14e81aec8f72a7f5044a21fb7"
     },
     {
       "name": "上海市",
       "path": "provinces/shanghai.txt",
-      "cidr_count": 21679,
-      "address_count": 9574370,
-      "sha256": "7dfee4d249ff39fa4c12d7ce2570af4d91f77895bf2ccdd110f8cde4f2c63d1f"
+      "cidr_count": 1763,
+      "address_count": 9998639,
+      "sha256": "2fd288f0f82327a73b9bfacd15bfb2c902d021b25a379060a46830a7a798b6ee"
     },
     {
       "name": "江苏省",
       "path": "provinces/jiangsu.txt",
-      "cidr_count": 18638,
-      "address_count": 15528016,
-      "sha256": "bfdd84939907b1e576b9789ed724a182ce1a5e50df16f2aa89a253019bd43089"
+      "cidr_count": 2752,
+      "address_count": 16494527,
+      "sha256": "4bbe5e80d270a387dbac3fca9cb62eee55543510069518c6ef925d060678cfdd"
     },
     {
       "name": "浙江省",
       "path": "provinces/zhejiang.txt",
-      "cidr_count": 13429,
-      "address_count": 15302562,
-      "sha256": "93a6c3eb107ab96dc7d0e5f494d128a01b0b4cb3f32222c891c4d9ed8d6e17e8"
+      "cidr_count": 2561,
+      "address_count": 15952407,
+      "sha256": "9488e0fa72259fcaf72e5ca7efcaade84a84d8cec25e5c6a35499088fd4335e6"
     },
     {
       "name": "安徽省",
       "path": "provinces/anhui.txt",
-      "cidr_count": 1178,
-      "address_count": 6274311,
-      "sha256": "25bba51afe99f70071bc9e02e4b77a5dacf4abf6979ab4b85b1c157dc9686d04"
+      "cidr_count": 412,
+      "address_count": 6406093,
+      "sha256": "754fb332bda44f862a7a220d080370b0f7e08b4ee89e33edb6b6aebf8e7b3ef3"
     },
     {
       "name": "福建省",
       "path": "provinces/fujian.txt",
-      "cidr_count": 5731,
-      "address_count": 5812868,
-      "sha256": "9dce668b71f81c45db6667517a7eefd077c5ddac94244ab311d518584039ad41"
+      "cidr_count": 879,
+      "address_count": 6254250,
+      "sha256": "d3117ba7b887f7883c6c7bd59bded5ea72fc0ebb1838781e5f7e1f7600523a19"
     },
     {
       "name": "江西省",
       "path": "provinces/jiangxi.txt",
-      "cidr_count": 865,
-      "address_count": 6745720,
-      "sha256": "903b13a4e4b7f5c1d9323f52b6da877852618b1bfd72901e246b2e3b1a3e5d87"
+      "cidr_count": 478,
+      "address_count": 6770917,
+      "sha256": "6dddc4f8b3a22db075a88c4214fdb32d4a360466b0aacff51c5b4f0964d3c974"
     },
     {
       "name": "山东省",
       "path": "provinces/shandong.txt",
-      "cidr_count": 13621,
-      "address_count": 15880958,
-      "sha256": "448b809e51628b7f00f9a3cbf74a4232ddb5133138f4d479129cd1a104e46ba5"
+      "cidr_count": 988,
+      "address_count": 16281311,
+      "sha256": "c499d9b77ec5ef1697971dca56b2960f22f14bfae514c055a3641c4b14178b5e"
     },
     {
       "name": "河南省",
       "path": "provinces/henan.txt",
-      "cidr_count": 10033,
-      "address_count": 10085172,
-      "sha256": "05a9ea599cd3704c44edcaf2a5e670844b43f671e4225d812291bb4766e4e7ad"
+      "cidr_count": 611,
+      "address_count": 10236531,
+      "sha256": "71bf9b67f79c159e130688fab1417fad0f5ef27edb8bab1da00c85a8ea5970fd"
     },
     {
       "name": "湖北省",
       "path": "provinces/hubei.txt",
-      "cidr_count": 1591,
-      "address_count": 6843080,
-      "sha256": "ba3d4bcabaf4d99f303680e184bd01a9fab516ac63522644f7d6cd59506da4bb"
+      "cidr_count": 883,
+      "address_count": 6937985,
+      "sha256": "4786388a51395dec66e9f8278ec34b4023de4ef4e099f639d25b658a762c7f10"
     },
     {
       "name": "湖南省",
       "path": "provinces/hunan.txt",
-      "cidr_count": 1074,
-      "address_count": 6618844,
-      "sha256": "33e6b98889b9147291c9c47c77598da7fd117edfa903f8089ad1aefff4a67f84"
+      "cidr_count": 413,
+      "address_count": 6656887,
+      "sha256": "e1b61d14ea4ad1ebb90898ca6090738741c7ca02d66996f6ae0d0cda4de8dd9d"
     },
     {
       "name": "广东省",
       "path": "provinces/guangdong.txt",
-      "cidr_count": 20164,
-      "address_count": 24657899,
-      "sha256": "85ca40bdeffa6a7b706c7eda2033c806c471c879598b5c29f59adafcb322b15d"
+      "cidr_count": 3264,
+      "address_count": 25208058,
+      "sha256": "bebbdf81be66fb6ad9ce52aeeb2ac6f24ad9420145eb80c335e4e90a35dbc19a"
     },
     {
       "name": "广西壮族自治区",
       "path": "provinces/guangxi.txt",
-      "cidr_count": 1389,
-      "address_count": 4026530,
-      "sha256": "44063b0991f98e284dbb419619fa4d9d16621c62d32bcf47af044534c8c2359d"
+      "cidr_count": 725,
+      "address_count": 4075569,
+      "sha256": "1a30b64af9b830ee3de015292f8f13e460aff3f1eb3ee4f8d1e507e24705bbe7"
     },
     {
       "name": "海南省",
       "path": "provinces/hainan.txt",
-      "cidr_count": 1681,
-      "address_count": 1169796,
-      "sha256": "e126f48482e8f14c3df7ad1f579ad7eec327444bea427b93ae6b2168b6a7136f"
+      "cidr_count": 203,
+      "address_count": 1610229,
+      "sha256": "68ab96b078ee2c6cdbee72b62200586e7cd0bf43acf5d9f698a9aaf1edf13b2e"
     },
     {
       "name": "重庆市",
       "path": "provinces/chongqing.txt",
-      "cidr_count": 7344,
-      "address_count": 5788540,
-      "sha256": "21f8eaf846a38f5b5698f76b408681a24fd458e5347c1979922bc9b39c9fd734"
+      "cidr_count": 570,
+      "address_count": 5921609,
+      "sha256": "e8852715957a01e33332722e88560cdb5f89b165b921df2aa4d6fb08154dd2e5"
     },
     {
       "name": "四川省",
       "path": "provinces/sichuan.txt",
-      "cidr_count": 3433,
-      "address_count": 8950101,
-      "sha256": "b67623138e0c3175046b53373570a5489cf10cbdd03698546eb98a197be02159"
+      "cidr_count": 1362,
+      "address_count": 9038431,
+      "sha256": "7b52fc90ddaf8165b0f6633a45736d62d3d20ffcb1364ce67308907f1dcab626"
     },
     {
       "name": "贵州省",
       "path": "provinces/guizhou.txt",
-      "cidr_count": 827,
-      "address_count": 2170778,
-      "sha256": "cf9a12903ad3701b85fdd7a11a541555502278bb988e2895e769e178be269536"
+      "cidr_count": 310,
+      "address_count": 2178924,
+      "sha256": "27c2d6e70454c0ebb114c72ef4f9cae07ae45ae8cad90c45a5e7d36e92e06fbe"
     },
     {
       "name": "云南省",
       "path": "provinces/yunnan.txt",
-      "cidr_count": 902,
-      "address_count": 3413802,
-      "sha256": "1aeef9f20b64c2eb5f21a717c16458f22685a229ef3f18e36b0bed28230a6140"
+      "cidr_count": 416,
+      "address_count": 3458470,
+      "sha256": "5dfbaf59154b3042ef0364c461aec8003532705c6b80d965222c4af9b0998339"
     },
     {
       "name": "西藏自治区",
       "path": "provinces/xizang.txt",
-      "cidr_count": 203,
-      "address_count": 472219,
-      "sha256": "ade28dfcceb5991296344c926cf4785b23362fbfe3b6d85a637d50ce1964e163"
+      "cidr_count": 119,
+      "address_count": 472943,
+      "sha256": "29ec99b0601feea616091d6bbf5a238ae89489b2ff84ad25ef2c89bd64064b26"
     },
     {
       "name": "陕西省",
       "path": "provinces/shaanxi.txt",
-      "cidr_count": 1825,
-      "address_count": 3511097,
-      "sha256": "1a806ddd938a0d68ce8588118212c36be3ee39154d97dd09d816a03ee7dd8872"
+      "cidr_count": 732,
+      "address_count": 3751180,
+      "sha256": "74f19630c9cc42ba7efa77b3bf98ef92cfb1107a25734b29686f6977e88e4294"
     },
     {
       "name": "甘肃省",
       "path": "provinces/gansu.txt",
-      "cidr_count": 672,
-      "address_count": 1714838,
-      "sha256": "bbbf07c5d08a52e903785fd82ede123fea5ba5879438980a1c301fcf8876203e"
+      "cidr_count": 362,
+      "address_count": 1774938,
+      "sha256": "a5068d4d68539e62d079766f4268bb0ffdcecc2996cedc84ec3d56f15a59ee6a"
     },
     {
       "name": "青海省",
       "path": "provinces/qinghai.txt",
-      "cidr_count": 521,
-      "address_count": 778510,
-      "sha256": "58d14ef89fb0d62d5104c375dad8d8e4d2d07eef73e05166b72001fd17a2f264"
+      "cidr_count": 228,
+      "address_count": 814562,
+      "sha256": "ea0c26f4ead70e47d43f01a84b896503017384c9783d77bd4c1346d1bec0ee47"
     },
     {
       "name": "宁夏回族自治区",
       "path": "provinces/ningxia.txt",
-      "cidr_count": 420,
-      "address_count": 1038033,
-      "sha256": "05fbd32d5ed561c22a0156ad8c2f0526764bbe95da6af8822237e1d7d66d5f98"
+      "cidr_count": 170,
+      "address_count": 1112441,
+      "sha256": "935778e29fc267104a675e89fe7708c22cf557813b239b7ec330db4bbcb78c83"
     },
     {
       "name": "新疆维吾尔自治区",
       "path": "provinces/xinjiang.txt",
-      "cidr_count": 905,
-      "address_count": 3734318,
-      "sha256": "2d7bca633f7bba8ec79f4972630406ae9b34d612bb680391f2466db7a03a9706"
+      "cidr_count": 237,
+      "address_count": 3750734,
+      "sha256": "4b7ccef2e4cdd1f702b3c498cbc6bdc32eb86b6af990db04fe8b25f9f21f103e"
     }
   ],
   "audits": [
@@ -109048,13 +109056,13 @@
       "name": "zhejiang_apnic_registration",
       "path": "audits/zhejiang-apnic.json.gz",
       "human_path": "audits/zhejiang-apnic.md",
-      "cidr_count": 13429,
-      "fact_count": 15538,
-      "address_count": 15302562,
-      "registry_covered_address_count": 15302562,
+      "cidr_count": 2561,
+      "fact_count": 116707,
+      "address_count": 15952407,
+      "registry_covered_address_count": 15952407,
       "strong_non_public_signal_address_count": 0,
-      "sha256": "7ec99bafdc65ca7d6793ab44565adc2571afb5eea365d72da845a2f450af4133",
-      "human_sha256": "0e55b9461638d7e09994ec1ce6621af19e07a02a9c3b358ded95bec1afa7684e"
+      "sha256": "94e7d830780276e4e1573a9fd66bdfbaccd621241d87322edb4103b9a7b04a3e",
+      "human_sha256": "71c88396b7c317ba615721d97f565bb8a620c7db6b0de877c7eca34e7287c3b6"
     }
   ]
 }
