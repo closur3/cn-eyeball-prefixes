@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-20T21:27:32.834792181Z",
+  "generated_at": "2026-07-20T21:35:27.519886668Z",
   "scope": "IPv4; mainland China; nationwide admission requires both a China Telecom, China Mobile, or China Unicom current BGP origin and a covering APNIC inetnum registration attributable to the same operator; most-specific registrations are used for strong exclusions and operator-conflict denials, not as a mandatory leaf-level admission boundary; dedicated premium backbone ASNs, cloud-provider CIDRs, strong APNIC registrations outside ordinary user access scope, independent holders and route origins, and strong RIPE RIS MOAS evidence are excluded",
   "sources": [
     {
@@ -211,6 +211,21 @@
       "address_count": 29952
     },
     {
+      "name": "trial_bgp_prefix_hybrid_conflict_healing",
+      "cidr_count": 14057,
+      "address_count": 221017105
+    },
+    {
+      "name": "trial_bgp_prefix_hybrid_added_vs_current",
+      "cidr_count": 146,
+      "address_count": 7519
+    },
+    {
+      "name": "trial_bgp_prefix_hybrid_removed_vs_current",
+      "cidr_count": 0,
+      "address_count": 0
+    },
+    {
       "name": "trial_bgp_prefix_relaxed_admission",
       "cidr_count": 15808,
       "address_count": 223519706
@@ -282,6 +297,21 @@
     },
     {
       "name": "trial_zhejiang_bgp_prefix_covering_parent_relaxed_removed_vs_current",
+      "cidr_count": 0,
+      "address_count": 0
+    },
+    {
+      "name": "trial_zhejiang_bgp_prefix_hybrid_conflict_healing",
+      "cidr_count": 2456,
+      "address_count": 15952367
+    },
+    {
+      "name": "trial_zhejiang_bgp_prefix_hybrid_added_vs_current",
+      "cidr_count": 19,
+      "address_count": 216
+    },
+    {
+      "name": "trial_zhejiang_bgp_prefix_hybrid_removed_vs_current",
       "cidr_count": 0,
       "address_count": 0
     },
@@ -109410,6 +109440,20 @@
       "sha256": "0be0090303f2af93c078d8689137f0eed0b60b415742f79209a87e038b9f64fe"
     },
     {
+      "name": "BGP prefix admission trial (nationwide, hybrid)",
+      "path": "experiments/bgp-prefix-admission/nationwide-hybrid.txt",
+      "cidr_count": 14057,
+      "address_count": 221017105,
+      "sha256": "cfcc77c8fea0dfa9ff3125470cee71e73ba87f7ae321810e70cce36193b5f2c7"
+    },
+    {
+      "name": "BGP prefix admission trial (Zhejiang, hybrid)",
+      "path": "experiments/bgp-prefix-admission/zhejiang-hybrid.txt",
+      "cidr_count": 2456,
+      "address_count": 15952367,
+      "sha256": "0be0090303f2af93c078d8689137f0eed0b60b415742f79209a87e038b9f64fe"
+    },
+    {
       "name": "BGP prefix admission trial (nationwide, relaxed)",
       "path": "experiments/bgp-prefix-admission/nationwide-relaxed.txt",
       "cidr_count": 15808,
@@ -109517,6 +109561,34 @@
     {
       "name": "BGP covering-relaxed delta (Zhejiang, removed versus current dev)",
       "path": "experiments/bgp-prefix-admission/zhejiang-covering_relaxed-removed.txt",
+      "cidr_count": 0,
+      "address_count": 0,
+      "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+    },
+    {
+      "name": "BGP hybrid conflict-healing delta (nationwide, added versus current dev)",
+      "path": "experiments/bgp-prefix-admission/nationwide-hybrid-added.txt",
+      "cidr_count": 146,
+      "address_count": 7519,
+      "sha256": "2f7e3311877606bd217e5ca517f8265db972ca2edadb1e529597b5593f762c78"
+    },
+    {
+      "name": "BGP hybrid conflict-healing delta (nationwide, removed versus current dev)",
+      "path": "experiments/bgp-prefix-admission/nationwide-hybrid-removed.txt",
+      "cidr_count": 0,
+      "address_count": 0,
+      "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+    },
+    {
+      "name": "BGP hybrid conflict-healing delta (Zhejiang, added versus current dev)",
+      "path": "experiments/bgp-prefix-admission/zhejiang-hybrid-added.txt",
+      "cidr_count": 19,
+      "address_count": 216,
+      "sha256": "a5bdcda7a0f2491c29fbf958142e652b45f8b490d326a0260b2ae4383d68de80"
+    },
+    {
+      "name": "BGP hybrid conflict-healing delta (Zhejiang, removed versus current dev)",
+      "path": "experiments/bgp-prefix-admission/zhejiang-hybrid-removed.txt",
       "cidr_count": 0,
       "address_count": 0,
       "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
