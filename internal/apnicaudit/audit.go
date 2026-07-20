@@ -62,10 +62,59 @@ type Summary struct {
 }
 
 type Report struct {
-	Scope string       `json:"scope"`
-	Notes []string     `json:"notes"`
-	Summary Summary    `json:"summary"`
-	CIDRs []CIDRRecord `json:"cidrs"`
+	Scope      string       `json:"scope"`
+	Notes      []string     `json:"notes"`
+	Summary    Summary      `json:"summary"`
+	Comparison *Comparison  `json:"comparison,omitempty"`
+	CIDRs      []CIDRRecord `json:"cidrs"`
+}
+
+type Exclusion struct {
+	CIDR       string `json:"cidr"`
+	AddressCount uint64 `json:"address_count"`
+	Source     string `json:"source"`
+	Category   string `json:"category"`
+	Operator   string `json:"operator"`
+	ASN        string `json:"asn"`
+	Registrant string `json:"registrant,omitempty"`
+	Reason     string `json:"reason"`
+}
+
+type ExclusionCategory struct {
+	Category     string `json:"category"`
+	EvidenceRows int    `json:"evidence_rows"`
+	AddressCount uint64 `json:"address_count"`
+}
+
+type Comparison struct {
+	CandidateAddressCount uint64              `json:"candidate_address_count"`
+	ExcludedAddressCount  uint64              `json:"excluded_address_count"`
+	RetainedAddressCount  uint64              `json:"retained_address_count"`
+	Categories            []ExclusionCategory `json:"categories"`
+	Exclusions            []Exclusion         `json:"exclusions"`
+}
+
+func AttachComparison(report *Report, candidateAddressCount, excludedAddressCount uint64, exclusions []Exclusion) {
+	categories := map[string]*ExclusionCategory{}
+	for _, exclusion := range exclusions {
+		category := categories[exclusion.Category]
+		if category == nil {
+			category = &ExclusionCategory{Category: exclusion.Category}
+			categories[exclusion.Category] = category
+		}
+		category.EvidenceRows++
+		category.AddressCount += exclusion.AddressCount
+	}
+	names := make([]string, 0, len(categories))
+	for name := range categories {
+		names = append(names, name)
+	}
+	sort.Strings(names)
+	comparison := &Comparison{CandidateAddressCount: candidateAddressCount, ExcludedAddressCount: excludedAddressCount, RetainedAddressCount: report.Summary.AddressCount, Exclusions: exclusions}
+	for _, name := range names {
+		comparison.Categories = append(comparison.Categories, *categories[name])
+	}
+	report.Comparison = comparison
 }
 
 func Build(scope string, cidrs []string, operatorRanges map[string][]Range, segments []apnicinetnum.Segment, classifier *operatorconfig.Classifier) (Report, error) {
@@ -148,7 +197,7 @@ func registryFacts(lo, hi uint32, operator string, segments []apnicinetnum.Segme
 		if cursor < uint64(start) {
 			out = append(out, uncoveredFact(uint32(cursor), start-1, operator))
 		}
-		classification, reason, matchedBy := classify(segment, classifier)
+		classification, reason, matchedBy := classify(segment, operator, classifier)
 		out = append(out, Fact{
 			Start: addr(start), End: addr(end), AddressCount: uint64(end)-uint64(start)+1,
 			Operator: operator, Classification: classification, Reason: reason, MatchedBy: matchedBy,
@@ -163,15 +212,18 @@ func registryFacts(lo, hi uint32, operator string, segments []apnicinetnum.Segme
 	return out
 }
 
-func classify(segment apnicinetnum.Segment, classifier *operatorconfig.Classifier) (string, string, string) {
+func classify(segment apnicinetnum.Segment, operator string, classifier *operatorconfig.Classifier) (string, string, string) {
 	if segment.Match.Reason != "" {
 		return "strong_non_public_signal", segment.Match.Reason, segment.Match.MatchedBy
 	}
 	text := apnicinetnum.SearchText(segment.Record)
-	registrant := classifier.Classify("0", text)
-	if registrant.Excluded {
-		return "strong_non_public_signal", registrant.Reason, registrant.MatchedBy
+	if prefix := classifier.ClassifyAPNICInetnum(text); prefix.Excluded {
+		return "strong_non_public_signal", prefix.Reason, prefix.MatchedBy
 	}
+	if isLocalOperatorRegistration(operator, segment.Record) {
+		return "operator_registration", "APNIC registration and exact local maintainer identify a China Telecom Zhejiang branch", "local operator name plus exact provincial maintainer"
+	}
+	registrant := classifier.Classify("0", text)
 	if registrant.Operator != "" {
 		return "operator_registration", "APNIC registrant text matches "+registrant.Operator, registrant.MatchedBy
 	}
@@ -179,6 +231,19 @@ func classify(segment apnicinetnum.Segment, classifier *operatorconfig.Classifie
 		return "independent_legal_entity", "APNIC registrant text names an independent legal entity; retained because registration alone is not sufficient exclusion evidence", "independent_legal_entity_patterns"
 	}
 	return "other_registration", "APNIC registration does not match an operator or a complete independent legal-entity pattern", ""
+}
+
+func isLocalOperatorRegistration(operator string, record apnicinetnum.Record) bool {
+	if operator != "chinanet" {
+		return false
+	}
+	text := strings.ToLower(apnicinetnum.SearchText(record))
+	maintainers := map[string]bool{}
+	for _, maintainer := range record.Maintainers {
+		maintainers[strings.ToUpper(strings.TrimSpace(maintainer))] = true
+	}
+	return (strings.Contains(text, "ningbo telecom") && maintainers["MAINT-CN-CHINANET-ZJ-NB"]) ||
+		(strings.Contains(text, "wenzhou telecom") && maintainers["MAINT-CN-CHINANET-ZJ-WZ"])
 }
 
 func registry(record apnicinetnum.Record) *Registry {
@@ -241,6 +306,7 @@ func RenderMarkdown(report Report, evidencePath string) string {
 	fmt.Fprintf(&b, "| 最具体 APNIC 事实片段 | %s |\n", formatUint(uint64(report.Summary.FactCount)))
 	fmt.Fprintf(&b, "| APNIC 登记覆盖 | %s（%.4f%%） |\n", formatUint(report.Summary.RegistryCoveredAddressCount), report.Summary.RegistryCoveragePercent)
 	fmt.Fprintf(&b, "| 构建规则仍识别出的强非公众信号 | %s |\n\n", formatUint(report.Summary.StrongNonPublicSignalAddressCount))
+	renderComparison(&b, report)
 
 	b.WriteString("## 登记分类\n\n")
 	b.WriteString("| 分类 | 事实片段 | 地址 | 占全部地址 | 含义 |\n|---|---:|---:|---:|---|\n")
@@ -265,6 +331,33 @@ func RenderMarkdown(report Report, evidencePath string) string {
 	renderReviewGroups(&b, report, "independent_legal_entity", "独立法定主体登记：地址量前 100 项", 100)
 	renderReviewGroups(&b, report, "other_registration", "其他登记：地址量前 100 项", 100)
 	return strings.TrimRight(b.String(), "\n") + "\n"
+}
+
+func renderComparison(b *strings.Builder, report Report) {
+	if report.Comparison == nil {
+		return
+	}
+	c := report.Comparison
+	b.WriteString("## 前缀清洗前后对照\n\n")
+	b.WriteString("这里的“清洗前”指已满足三网 Origin 与中国边界、但尚未执行云 CIDR、APNIC、route 和 MOAS 前缀排除的浙江候选地址。分类地址数按证据行累加，多个上游命中同一地址时可能重复；总排除地址数按地址并集计算。\n\n")
+	b.WriteString("| 阶段 | 地址 |\n|---|---:|\n")
+	fmt.Fprintf(b, "| 前缀清洗前候选 | %s |\n", formatUint(c.CandidateAddressCount))
+	fmt.Fprintf(b, "| 前缀级排除（并集） | %s |\n", formatUint(c.ExcludedAddressCount))
+	fmt.Fprintf(b, "| 最终保留 | %s |\n\n", formatUint(c.RetainedAddressCount))
+	b.WriteString("| 排除类别 | 证据范围 | 地址（可重复） |\n|---|---:|---:|\n")
+	for _, category := range c.Categories {
+		fmt.Fprintf(b, "| `%s` | %s | %s |\n", markdownText(category.Category), formatUint(uint64(category.EvidenceRows)), formatUint(category.AddressCount))
+	}
+	b.WriteString("\n### 排除证据样本\n\n")
+	b.WriteString("| CIDR | 地址 | 类别 | 运营商 / ASN | APNIC 登记主体 | 原因 |\n|---|---:|---|---|---|---|\n")
+	limit := minInt(200, len(c.Exclusions))
+	for _, exclusion := range c.Exclusions[:limit] {
+		fmt.Fprintf(b, "| `%s` | %s | `%s` | `%s / AS%s` | %s | %s |\n", exclusion.CIDR, formatUint(exclusion.AddressCount), markdownText(exclusion.Category), markdownText(exclusion.Operator), markdownText(exclusion.ASN), markdownText(exclusion.Registrant), markdownText(exclusion.Reason))
+	}
+	if len(c.Exclusions) > limit {
+		fmt.Fprintf(b, "\n其余 %s 条排除证据未在 Markdown 展开；完整内容保存在 gzip JSON 与 manifest。\n", formatUint(uint64(len(c.Exclusions)-limit)))
+	}
+	b.WriteString("\n")
 }
 
 type reviewGroup struct {

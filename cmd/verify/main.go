@@ -389,6 +389,75 @@ func addressCount(rows []span) uint64 {
 	return count
 }
 
+func zhejiangProvinceRanges(path string) []span {
+	b, err := os.ReadFile(path)
+	if err != nil {
+		panic(err)
+	}
+	var out []span
+	for _, line := range strings.Split(strings.TrimSpace(string(b)), "\n") {
+		fields := strings.Split(strings.TrimSpace(line), "|")
+		if len(fields) != 7 || fields[2] != "中国" || (fields[3] != "浙江" && fields[3] != "浙江省") {
+			continue
+		}
+		lo, loErr := netip.ParseAddr(fields[0])
+		hi, hiErr := netip.ParseAddr(fields[1])
+		if loErr != nil || hiErr != nil || !lo.Is4() || !hi.Is4() {
+			panic("invalid Zhejiang range in ip2region source")
+		}
+		out = append(out, span{n(lo), n(hi)})
+	}
+	return merge(out)
+}
+
+func exclusionRegistrant(entry prefixExclusionMeta) string {
+	for _, values := range [][]string{entry.RegistryOrganizationNames, entry.RegistryDescriptions, entry.RegistryNetnames, entry.RegistryOrganizations} {
+		for _, value := range values {
+			if value = strings.TrimSpace(value); value != "" {
+				return value
+			}
+		}
+	}
+	if entry.Provider != "" {
+		return entry.Provider
+	}
+	return entry.ASNDescription
+}
+
+func provinceExclusionEvidence(entries []prefixExclusionMeta, candidatesByOperator map[string][]span) []apnicaudit.Exclusion {
+	var out []apnicaudit.Exclusion
+	for _, entry := range entries {
+		prefix, err := netip.ParsePrefix(entry.CIDR)
+		if err != nil || !prefix.Addr().Is4() {
+			panic("invalid exclusion CIDR while verifying province audit: " + entry.CIDR)
+		}
+		lo := n(prefix.Addr())
+		hi := uint32(uint64(lo) + (uint64(1) << uint(32-prefix.Bits())) - 1)
+		for _, cidr := range spanCIDRs(intersect(candidatesByOperator[entry.Operator], []span{{lo, hi}})) {
+			p := netip.MustParsePrefix(cidr)
+			out = append(out, apnicaudit.Exclusion{
+				CIDR: cidr, AddressCount: uint64(1) << uint(32-p.Bits()), Source: entry.Source,
+				Category: entry.Category, Operator: entry.Operator, ASN: entry.ASN,
+				Registrant: exclusionRegistrant(entry), Reason: entry.Reason,
+			})
+		}
+	}
+	sort.Slice(out, func(i, j int) bool {
+		a, b := netip.MustParsePrefix(out[i].CIDR), netip.MustParsePrefix(out[j].CIDR)
+		if n(a.Addr()) != n(b.Addr()) {
+			return n(a.Addr()) < n(b.Addr())
+		}
+		if a.Bits() != b.Bits() {
+			return a.Bits() < b.Bits()
+		}
+		if out[i].Category != out[j].Category {
+			return out[i].Category < out[j].Category
+		}
+		return out[i].Reason < out[j].Reason
+	})
+	return out
+}
+
 func cidrCount(rows []span) int {
 	count := 0
 	for _, row := range merge(rows) {
@@ -1120,6 +1189,15 @@ func main() {
 	if e != nil {
 		panic(e)
 	}
+	zhejiangProvince := zhejiangProvinceRanges(filepath.Join(*sources, "ip2region_ipv4_source.txt"))
+	zhejiangCandidatesByOperator := map[string][]span{}
+	var zhejiangCandidates []span
+	for _, operator := range operators {
+		zhejiangCandidatesByOperator[operator] = intersect(intersect(allowedByOperator[operator], chinaRanges), zhejiangProvince)
+		zhejiangCandidates = append(zhejiangCandidates, zhejiangCandidatesByOperator[operator]...)
+	}
+	zhejiangCandidates = merge(zhejiangCandidates)
+	apnicaudit.AttachComparison(&expectedAudit, addressCount(zhejiangCandidates), addressCount(intersect(zhejiangCandidates, excludedRanges)), provinceExclusionEvidence(m.ExcludedPrefixes, zhejiangCandidatesByOperator))
 	auditPath := filepath.Join(*data, filepath.FromSlash(m.Audits[0].Path))
 	auditFile, e := os.Open(auditPath)
 	if e != nil {
@@ -1139,6 +1217,9 @@ func main() {
 	auditMeta := m.Audits[0]
 	if auditMeta.CIDRCount != actualAudit.Summary.CIDRCount || auditMeta.FactCount != actualAudit.Summary.FactCount || auditMeta.AddressCount != actualAudit.Summary.AddressCount || auditMeta.RegistryCoveredAddressCount != actualAudit.Summary.RegistryCoveredAddressCount || auditMeta.StrongNonPublicSignalAddressCount != actualAudit.Summary.StrongNonPublicSignalAddressCount || auditMeta.SHA256 != fileSHA(auditPath) {
 		panic("manifest Zhejiang APNIC audit summary mismatch")
+	}
+	if actualAudit.Summary.StrongNonPublicSignalAddressCount != 0 {
+		panic(fmt.Sprintf("Zhejiang ACL retains %d addresses that still match an enforced non-public APNIC rule", actualAudit.Summary.StrongNonPublicSignalAddressCount))
 	}
 	humanAuditPath := filepath.Join(*data, filepath.FromSlash(auditMeta.HumanPath))
 	expectedHumanAudit := apnicaudit.RenderMarkdown(expectedAudit, filepath.Base(auditPath))

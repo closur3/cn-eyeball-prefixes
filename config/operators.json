@@ -20,7 +20,7 @@
     "unicom": {
       "description_patterns": [
         "unicom",
-        "cnc"
+        "(?:^|[^a-z0-9])cnc(?:group)?(?:[^a-z0-9]|$)"
       ],
       "include_asns": {}
     }
@@ -139,6 +139,22 @@
     {
       "pattern": "(?:^|[^a-z0-9])[a-z0-9]*wangyinhulian[a-z0-9]*(?:[^a-z0-9]|$)|\\bhangzhou netbank interlink technol(?:og(?:y|ies)|gies) co(?:mpany)?[., ]+(?:ltd|limited)\\b",
       "reason": "APNIC inetnum registration explicitly identifies a Wangyin Hulian or Netbank Interlink corporate network"
+    },
+    {
+      "pattern": "(?:^|[^a-z0-9])(?:zhejiang-provincial-bureau-of-data|ningbo-people-gov|cangnan-dianzhizhenwu-co|yongkang-electronic-gov|fuyang-network-center-gov)(?:[^a-z0-9]|$)|\\belectronic government network\\b|\\bhangzhou city people(?:'|’)s government of the electronic government affairs office\\b",
+      "reason": "APNIC inetnum registration explicitly identifies an electronic-government or government data network"
+    },
+    {
+      "pattern": "(?:^|[^a-z0-9])(?:idcbeiyongjh|liantongidcyouxifuwuqihz|idcdi2pigongxiangjierufuwuqidi|xiaoshanidcchuangyehuliankejih?|wangluoyingpanhezuoidcziyuanhz|yuyaoidcyewudizhiduanvlan511|cabinet-retail)(?:[^a-z0-9]|$)",
+      "reason": "APNIC inetnum registration explicitly identifies a dedicated IDC resource or service range"
+    },
+    {
+      "pattern": "(?:^|[^a-z0-9])zhuanxiandizhibeiyongjh(?:[^a-z0-9]|$)",
+      "reason": "APNIC inetnum registration explicitly identifies a backup dedicated-line address range"
+    },
+    {
+      "pattern": "(?:^|[^a-z0-9])(?:chinatell?ecom-cloud-company|cloud-interface-address|zhejiangzhiyun|hangzhou-youpaiyun-ltd)(?:[^a-z0-9]|$)|\\bbeijing jinshan cloud network technology co(?:mpany)?[., ]+(?:ltd|limited)\\b|\\bzhejiang zhi cloud information technology co(?:mpany)?[., ]+(?:ltd|limited)\\b|\\bhangzhou beat cloud technology co(?:mpany)?[., ]+(?:ltd|limited)\\b",
+      "reason": "APNIC inetnum registration explicitly identifies a cloud-company or cloud-service address range"
     }
   ],
   "independent_legal_entity_patterns": [

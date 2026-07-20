@@ -805,6 +805,53 @@ func writeManifest(path string, m manifest) {
 	}
 }
 
+func exclusionRegistrant(entry prefixExclusionMeta) string {
+	for _, values := range [][]string{entry.RegistryOrganizationNames, entry.RegistryDescriptions, entry.RegistryNetnames, entry.RegistryOrganizations} {
+		for _, value := range values {
+			if value = strings.TrimSpace(value); value != "" {
+				return value
+			}
+		}
+	}
+	if entry.Provider != "" {
+		return entry.Provider
+	}
+	return entry.ASNDescription
+}
+
+func provinceExclusionEvidence(entries []prefixExclusionMeta, candidatesByOperator map[string][]span) []apnicaudit.Exclusion {
+	var out []apnicaudit.Exclusion
+	for _, entry := range entries {
+		prefix, err := netip.ParsePrefix(entry.CIDR)
+		if err != nil || !prefix.Addr().Is4() {
+			panic("invalid exclusion CIDR while building province audit: " + entry.CIDR)
+		}
+		hits := intersect(candidatesByOperator[entry.Operator], []span{{n(prefix.Addr()), end(prefix)}})
+		for _, cidr := range spanCIDRs(hits) {
+			p := netip.MustParsePrefix(cidr)
+			out = append(out, apnicaudit.Exclusion{
+				CIDR: cidr, AddressCount: uint64(1) << uint(32-p.Bits()), Source: entry.Source,
+				Category: entry.Category, Operator: entry.Operator, ASN: entry.ASN,
+				Registrant: exclusionRegistrant(entry), Reason: entry.Reason,
+			})
+		}
+	}
+	sort.Slice(out, func(i, j int) bool {
+		a, b := netip.MustParsePrefix(out[i].CIDR), netip.MustParsePrefix(out[j].CIDR)
+		if n(a.Addr()) != n(b.Addr()) {
+			return n(a.Addr()) < n(b.Addr())
+		}
+		if a.Bits() != b.Bits() {
+			return a.Bits() < b.Bits()
+		}
+		if out[i].Category != out[j].Category {
+			return out[i].Category < out[j].Category
+		}
+		return out[i].Reason < out[j].Reason
+	})
+	return out
+}
+
 func writeGzipJSON(path string, value any) (string, error) {
 	if e := os.MkdirAll(filepath.Dir(path), 0755); e != nil {
 		return "", e
@@ -1289,8 +1336,13 @@ func main() {
 
 	var zhejiangRows []span
 	zhejiangOperatorRanges := map[string][]apnicaudit.Range{}
+	zhejiangCandidatesByOperator := map[string][]span{}
+	zhejiangProvinceRanges := merge(provinceSourceRanges["浙江省"])
+	var zhejiangCandidates []span
 	for _, operator := range operators {
 		zhejiangRows = append(zhejiangRows, by[operator]["浙江省"]...)
+		zhejiangCandidatesByOperator[operator] = intersect(preCloudByOperator[operator], zhejiangProvinceRanges)
+		zhejiangCandidates = append(zhejiangCandidates, zhejiangCandidatesByOperator[operator]...)
 		for _, row := range by[operator]["浙江省"] {
 			zhejiangOperatorRanges[operator] = append(zhejiangOperatorRanges[operator], apnicaudit.Range{Lo: row.lo, Hi: row.hi})
 		}
@@ -1299,6 +1351,12 @@ func main() {
 	if e != nil {
 		panic(e)
 	}
+	if zhejiangAudit.Summary.StrongNonPublicSignalAddressCount != 0 {
+		panic(fmt.Sprintf("Zhejiang ACL retains %d addresses that still match an enforced non-public APNIC rule", zhejiangAudit.Summary.StrongNonPublicSignalAddressCount))
+	}
+	zhejiangCandidates = merge(zhejiangCandidates)
+	zhejiangExcluded := intersect(zhejiangCandidates, excludedRanges)
+	apnicaudit.AttachComparison(&zhejiangAudit, addressCount(zhejiangCandidates), addressCount(zhejiangExcluded), provinceExclusionEvidence(excludedPrefixes, zhejiangCandidatesByOperator))
 	auditPath := filepath.Join("audits", "zhejiang-apnic.json.gz")
 	auditSHA, e := writeGzipJSON(filepath.Join(*out, auditPath), zhejiangAudit)
 	if e != nil {

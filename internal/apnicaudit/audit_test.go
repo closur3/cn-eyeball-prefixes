@@ -62,3 +62,31 @@ func TestRenderMarkdownIncludesSummaryAndReviewEvidence(t *testing.T) {
 		}
 	}
 }
+
+func TestLocalTelecomRegistrationRequiresMatchingMaintainer(t *testing.T) {
+	classifier, err := operatorconfig.Load("../../config/operators.json", []string{"chinanet", "cmcc", "unicom"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	positive := apnicinetnum.Segment{Record: apnicinetnum.Record{
+		Descriptions: []string{"Ningbo Telecom customer access pool"},
+		Maintainers:  []string{"MAINT-CN-CHINANET-ZJ-NB"},
+	}}
+	classification, _, _ := classify(positive, "chinanet", classifier)
+	if classification != "operator_registration" {
+		t.Fatalf("matching Ningbo branch registration classified as %q", classification)
+	}
+	for _, negative := range []struct {
+		operator string
+		record   apnicinetnum.Record
+	}{
+		{"chinanet", apnicinetnum.Record{Descriptions: []string{"Ningbo Telecom customer access pool"}, Maintainers: []string{"MAINT-CN-CHINANET-ZJ-WZ"}}},
+		{"unicom", apnicinetnum.Record{Descriptions: []string{"Ningbo Telecom customer access pool"}, Maintainers: []string{"MAINT-CN-CHINANET-ZJ-NB"}}},
+		{"chinanet", apnicinetnum.Record{Descriptions: []string{"Example Global Telecom Co., Ltd."}, Maintainers: []string{"MAINT-CN-CHINANET-ZJ-NB"}}},
+	} {
+		classification, _, _ := classify(apnicinetnum.Segment{Record: negative.record}, negative.operator, classifier)
+		if classification == "operator_registration" {
+			t.Fatalf("unmatched local branch control was classified as operator: %+v", negative)
+		}
+	}
+}

@@ -45,6 +45,17 @@ func TestRepositoryOperatorBoundary(t *testing.T) {
 			operator:    "unicom",
 		},
 		{
+			name:        "CNCGROUP remains a bounded China Unicom identifier",
+			asn:         "4837",
+			description: "CNCGROUP-BACKBONE China Network Communications Group",
+			operator:    "unicom",
+		},
+		{
+			name:        "embedded cnc typo is not a China Unicom identifier",
+			asn:         "64512",
+			description: "TIANHE-TELECOM-BRACNCH",
+		},
+		{
 			name:        "Beijing Telecom provincial network exception",
 			asn:         "4847",
 			description: "China Networks Inter-Exchange",
@@ -113,5 +124,42 @@ func TestNetEaseAndWangyinAPNICRules(t *testing.T) {
 	}
 	if result := c.ClassifyAPNICInetnum("ordinary residential broadband IP pool"); result.Excluded {
 		t.Fatalf("ordinary access pool was excluded: %+v", result)
+	}
+}
+
+func TestConfirmedZhejiangAPNICRules(t *testing.T) {
+	c, err := Load("../../config/operators.json", []string{"chinanet", "cmcc", "unicom"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	positives := []string{
+		"Zhejiang-Provincial-Bureau-of-Data | Zhejiang Provincial Bureau of Data",
+		"NINGBO-GOVERNMENT-NETWORK | Ningbo Electronic Government Network",
+		"NINGBO-PEOPLE-GOV | Ningbo Municipal People's Government",
+		"IDCBEIYONGJH | IDCBEIYONG,JINHUA,ZHEJIANG",
+		"YuYaoIDCYeWuDiZhiDuanVLAN511ChinaunicomNingboChina",
+		"ZHUANXIANDIZHIBEIYONGJH | ZHUANXIANDIZHIBEIYONG,JINHUA,ZHEJIANG",
+		"CHINATELLECOM-CLOUD-COMPANY",
+		"CLOUD-INTERFACE-ADDRESS | Cloud interface address",
+		"Beijing Jinshan cloud Network Technology Co., Ltd.",
+		"ZHEJIANGZHIYUN | Zhejiang zhi cloud information technology co., LTD",
+		"HANGZHOU-YOUPAIYUN-LTD | Hangzhou beat cloud Technology Co. Ltd.",
+	}
+	for _, text := range positives {
+		if result := c.ClassifyAPNICInetnum(text); !result.Excluded {
+			t.Fatalf("confirmed Zhejiang non-public registration %q was not excluded", text)
+		}
+	}
+	negatives := []string{
+		"IDCCeShi,ZheJiang,Wenzhou",
+		"ZHEJIANG-IDCARD-CENTRE | Zhejiang TELECOM",
+		"ZHEJIANGZHIYUNXINXI",
+		"Hangzhou Office of Ningbo Municipal People's Government",
+		"ordinary residential broadband IP pool",
+	}
+	for _, text := range negatives {
+		if result := c.ClassifyAPNICInetnum(text); result.Excluded {
+			t.Fatalf("unconfirmed control registration %q was excluded: %+v", text, result)
+		}
 	}
 }
