@@ -1070,8 +1070,12 @@ func main() {
 	for asn, record := range allowedByASN {
 		asnOperators[asn] = record.operator
 	}
+	originByOperator := map[string][]span{}
+	for _, operator := range operators {
+		originByOperator[operator] = intersect(allowedByOperator[operator], chinaRanges)
+	}
 	leafAdmissionRanges := apnicOperatorLeafAdmissionRanges(apnicAllSegments, classifier)
-	bgpAdmissionTrials := bgpPrefixAdmissionTrials(risSegments, asnOperators, preCloudByOperator, preAdmissionByOperator, leafAdmissionRanges, operatorConflictRanges)
+	bgpAdmissionTrials := bgpPrefixAdmissionTrials(risSegments, asnOperators, originByOperator, preAdmissionByOperator, leafAdmissionRanges, operatorConflictRanges)
 	preAdmissionCIDRCount := cidrCount(preAdmissionRanges)
 	finalCIDRCount := cidrCount(expectedCN)
 	if finalCIDRCount > preAdmissionCIDRCount*2 {
