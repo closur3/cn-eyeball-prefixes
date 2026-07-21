@@ -36,6 +36,9 @@ jobs:
           curl "${curl_opts[@]}" 'https://iptoasn.com/data/ip2asn-v6.tsv.gz' -o "$SOURCE_DIR/ip2asn-v6.tsv.gz"
           curl "${curl_opts[@]}" 'https://ftp.apnic.net/stats/apnic/delegated-apnic-latest' -o "$SOURCE_DIR/delegated-apnic-latest"
           curl "${curl_opts[@]}" 'https://www.ris.ripe.net/dumps/riswhoisdump.IPv6.gz' -o "$SOURCE_DIR/riswhois-ipv6.gz"
+          curl "${curl_opts[@]}" 'https://ftp.apnic.net/apnic/whois/apnic.db.inet6num.gz' -o "$SOURCE_DIR/apnic-inet6num.gz"
+          curl "${curl_opts[@]}" 'https://ftp.apnic.net/apnic/whois/apnic.db.route6.gz' -o "$SOURCE_DIR/apnic-route6.gz"
+          curl "${curl_opts[@]}" 'https://ftp.apnic.net/apnic/whois/apnic.db.organisation.gz' -o "$SOURCE_DIR/apnic-organisation.gz"
           du -h "$SOURCE_DIR"/*
       - name: Validate downloaded sources
         shell: bash
@@ -45,6 +48,9 @@ jobs:
           test $(stat -c '%s' "$SOURCE_DIR/ip2asn-v6.tsv.gz") -gt 100000
           test $(stat -c '%s' "$SOURCE_DIR/delegated-apnic-latest") -gt 100000
           test $(stat -c '%s' "$SOURCE_DIR/riswhois-ipv6.gz") -gt 1000000
+          test $(stat -c '%s' "$SOURCE_DIR/apnic-inet6num.gz") -gt 1000000
+          test $(stat -c '%s' "$SOURCE_DIR/apnic-route6.gz") -gt 1000000
+          test $(stat -c '%s' "$SOURCE_DIR/apnic-organisation.gz") -gt 100000
       - name: Test IPv6 audit code
         run: go test ./...
       - name: Generate china6 validation report
@@ -55,6 +61,13 @@ jobs:
             --iptoasn "$SOURCE_DIR/ip2asn-v6.tsv.gz" \
             --delegated "$SOURCE_DIR/delegated-apnic-latest" \
             --ris "$SOURCE_DIR/riswhois-ipv6.gz" \
+            --operator-config config/operators.json
+          go run ./cmd/audit6registrations \
+            --china6 "$SOURCE_DIR/china6.txt" \
+            --iptoasn "$SOURCE_DIR/ip2asn-v6.tsv.gz" \
+            --inet6num "$SOURCE_DIR/apnic-inet6num.gz" \
+            --route6 "$SOURCE_DIR/apnic-route6.gz" \
+            --organisation "$SOURCE_DIR/apnic-organisation.gz" \
             --operator-config config/operators.json
       - uses: actions/upload-artifact@v4
         with:
