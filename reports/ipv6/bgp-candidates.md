@@ -1,10 +1,10 @@
 # 三网 IPv6 原始 BGP 前缀审计
 
-生成时间：`2026-07-21T20:47:58.116563067Z`
+生成时间：`2026-07-21T20:59:59.960120093Z`
 
 本报告直接以 RIPE RISWhois 的当前原始 IPv6 宣告前缀为单位；只准入完整位于电信 `240e::/18`、移动 `2409:8000::/20`、联通 `2408:8000::/20` 相应母段内的前缀。不使用 `china6`，不读取 APNIC `inet6num`，不进行地址切除或 CIDR 再聚合。
 
-BGP 只能证明前缀和 Origin，不能证明终端用户接入用途。因此电信输出是待继续验证的 BGP 候选，不是已经完成用途证明的正式白名单。
+BGP 只能证明前缀和 Origin，不能证明终端用户接入用途。RIPE Atlas 探针在本报告中仅作为正向接入证据；本轮只审计，不自动扩大正式白名单。
 
 RIS 行：**308993**；原始 IPv6 前缀：**296767**。
 
@@ -16,7 +16,33 @@ RIS 行：**308993**；原始 IPv6 前缀：**296767**。
 | cmcc | 17723 | 不输出，等待额外正证据 |
 | unicom | 4460 | 不输出，等待额外正证据 |
 
-## 电信候选 Origin ASN
+## RIPE Atlas 正向接入证据
+
+只有当前在线、公开、非 Anchor、带明确终端接入信号、无办公/机房反证，且 Atlas 前缀与当前 RIS BGP 前缀及 Origin 精确一致的样本，才标记为可提升准入。
+
+| 运营商 | API 探针 | 当前在线 | 可提升的精确 BGP 前缀 |
+| --- | ---: | ---: | ---: |
+| chinanet | 23 | 8 | 3 |
+| cmcc | 26 | 4 | 3 |
+| unicom | 20 | 7 | 3 |
+
+### 可提升样本
+
+| 运营商 | BGP 前缀 | Origin | 类型 | 证据 | 探针 |
+| --- | --- | ---: | --- | --- | ---: |
+| chinanet | `240e:368::/29` | AS4134 | fixed_access | tag:home, tag:pppoe | 1010334 |
+| chinanet | `240e:390::/29` | AS4134 | fixed_access | tag:home | 55328 |
+| chinanet | `240e:3a0::/28` | AS4134 | fixed_access | tag:home, tag:ftth, tag:pppoe, description:home, description:ftth | 1015794 |
+| cmcc | `2409:8a00::/32` | AS56048 | fixed_access | description:residential | 64826 |
+| cmcc | `2409:8a04:200::/40` | AS24547 | fixed_access | tag:pppoe | 1014053 |
+| cmcc | `2409:8a55:400::/40` | AS9808 | fixed_access | tag:home | 51162 |
+| unicom | `2408:8207:4000::/34` | AS4808 | fixed_access | tag:home, tag:ftth, tag:pppoe | 1012369 |
+| unicom | `2408:824e::/32` | AS4837 | fixed_access | tag:home, tag:pppoe | 1010487 |
+| unicom | `2408:8256:200::/39` | AS17622 | fixed_access | tag:home | 34903 |
+
+## 三网候选 Origin ASN
+
+### chinanet
 
 | ASN | 原始 BGP 前缀 | 描述 |
 | --- | ---: | --- |
@@ -207,6 +233,40 @@ RIS 行：**308993**；原始 IPv6 前缀：**296767**。
 | AS141006 | 1 | CT-NEIMENGGU-WULANCHABU-MAN China Telecom |
 | AS4813 | 1 | BACKBONE-GUANGDONG-AP China TelecomGroup |
 | AS58571 | 1 | CHINATELECOM-GUIZHOU CHINANET Guizhou province network |
+
+### cmcc
+
+| ASN | 原始 BGP 前缀 | 描述 |
+| --- | ---: | --- |
+| AS9808 | 7106 | CHINAMOBILE-CN China Mobile Communications Group Co., Ltd. |
+| AS56041 | 2253 | CMNET-ZHEJIANG-AP China Mobile communications corporation |
+| AS24547 | 2109 | CMNET-V4HEBEI-AS-AP Hebei Mobile Communication Company Limited |
+| AS56046 | 1581 | CMNET-JIANGSU-AP China Mobile communications corporation |
+| AS56044 | 1249 | CMNET-AS-LIAONING China Mobile communications corporation |
+| AS56047 | 730 | CMNET-HUNAN-AP China Mobile communications corporation |
+| AS24400 | 603 | CMNET-V4SHANGHAI-AS-AP Shanghai Mobile Communications Co.,Ltd. |
+| AS24445 | 580 | CMNET-V4HENAN-AS-AP Henan Mobile Communications Co.,Ltd |
+| AS24444 | 470 | CMNET-V4SHANDONG-AS-AP Shandong Mobile Communication Company Limited |
+| AS56045 | 310 | CMNET-JIANGXI-AP China Mobile communications corporation |
+| AS132525 | 189 | CMNET-HEILONGJIANG-CN HeiLongJiang Mobile Communication Company Limited |
+| AS56040 | 149 | CMNET-GUANGDONG-AP China Mobile communications corporation |
+| AS134810 | 120 | CMNET-JILIN-AS-AP China Mobile Group JiLin communications corporation |
+| AS56042 | 119 | CMNET-SHANXI-AP China Mobile communications corporation |
+| AS56048 | 76 | CMNET-BEIJING-AP China Mobile Communicaitons Corporation |
+| AS38019 | 75 | CMNET-V4TIANJIN-AS-AP tianjin Mobile Communication Company Limited |
+| AS141425 | 4 | CMNET-GUANGDONG-CN China Mobile Group Guangdong communications corporation |
+
+### unicom
+
+| ASN | 原始 BGP 前缀 | 描述 |
+| --- | ---: | --- |
+| AS17622 | 1961 | CNCGROUP-GZ China Unicom Guangzhou network |
+| AS4808 | 905 | CHINA169-BJ China Unicom Beijing Province Network |
+| AS4837 | 458 | CHINA169-BACKBONE CHINA UNICOM China169 Backbone |
+| AS17623 | 440 | CNCGROUP-SZ China Unicom Shenzen network |
+| AS17621 | 418 | CNCGROUP-SH China Unicom Shanghai network |
+| AS140726 | 229 | UNICOM-HEFEI-MAN UNICOM AnHui province network |
+| AS17816 | 49 | CHINA169-GZ China Unicom IP network China169 Guangdong province |
 
 ## 未进入三网候选的原因
 

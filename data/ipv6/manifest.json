@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-21T20:47:58.116563067Z",
+  "generated_at": "2026-07-21T20:59:59.960120093Z",
   "scope": "Current exact IPv6 BGP prefixes fully contained by each operator's official APNIC 240x allocation and whose complete observed Origin set is attributed to that operator",
   "output_kind": "exact_bgp_prefix_candidates",
   "sources": {
@@ -21,7 +21,7 @@
     "iptoasn_v6_asn_metadata_only": {
       "path": "/home/runner/work/cn-eyeball-prefixes/cn-eyeball-prefixes/.tmp/cn-eyeball-ipv6-sources/ip2asn-v6.tsv.gz",
       "bytes": 1975215,
-      "sha256": "d8e2681f61082246560fcd3574ab9375e09066b466e3bbf15a675109d556268c"
+      "sha256": "95aafeb0d0a8862a4f03b3bfdbfc29a825e548afc70d1ca98a479733fe804de9"
     },
     "operator_config": {
       "path": "config/operators.json",
@@ -32,6 +32,21 @@
       "path": "config/ipv6_allocations.json",
       "bytes": 1200,
       "sha256": "b6b72b32b5fd63d436672711126c9c869823bffac87d9c334ae5d0e32974c9a4"
+    },
+    "ripe_atlas_probes_chinanet": {
+      "path": "/home/runner/work/cn-eyeball-prefixes/cn-eyeball-prefixes/.tmp/cn-eyeball-ipv6-sources/atlas/chinanet.json",
+      "bytes": 23442,
+      "sha256": "0d5b8c89adb4525efdfa5cbd78d7ed1a0e928b94e54af4ca02b44b65731cac90"
+    },
+    "ripe_atlas_probes_cmcc": {
+      "path": "/home/runner/work/cn-eyeball-prefixes/cn-eyeball-prefixes/.tmp/cn-eyeball-ipv6-sources/atlas/cmcc.json",
+      "bytes": 24060,
+      "sha256": "e24fc916a085fa3d03fece8835b7b320d04c4184f8ab042c849ac23fcae59612"
+    },
+    "ripe_atlas_probes_unicom": {
+      "path": "/home/runner/work/cn-eyeball-prefixes/cn-eyeball-prefixes/.tmp/cn-eyeball-ipv6-sources/atlas/unicom.json",
+      "bytes": 20013,
+      "sha256": "7d8ea115e699eb36f501d238bc983df160b2f1f27a10a6c051f2b8f548cfa8a7"
     },
     "riswhois_ipv6": {
       "path": "/home/runner/work/cn-eyeball-prefixes/cn-eyeball-prefixes/.tmp/cn-eyeball-ipv6-sources/riswhois-ipv6.gz",
@@ -48,7 +63,8 @@
     "Every emitted CIDR is an exact prefix present in the RIPE RISWhois IPv6 dump",
     "No address subtraction, sibling merging, or synthetic CIDR aggregation",
     "Prefixes with unknown, excluded, or cross-operator Origins are not emitted",
-    "BGP candidates are not a terminal-user allowlist until independent positive access-purpose evidence is defined"
+    "BGP candidates are not a terminal-user allowlist until independent positive access-purpose evidence is defined",
+    "RIPE Atlas is report-only: only connected non-anchor probes with explicit access signals, no office/datacentre signal, and an exact current BGP-prefix match are marked admission-eligible"
   ],
   "ris": {
     "rows": 308993,
