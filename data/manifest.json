@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-21T12:54:27.03076165Z",
+  "generated_at": "2026-07-21T13:04:06.819344762Z",
   "scope": "IPv4; mainland China; current China Telecom, China Mobile, or China Unicom BGP origin plus a covering same-operator APNIC registration; current three-operator BGP units heal internal operator-registration conflict holes after all strong exclusions; small ambiguous customer-use fragments are accepted as best-effort error to keep the ACL deployably compact; dedicated premium backbone ASNs, cloud-provider CIDRs, strong APNIC registrations outside ordinary user access scope, independent holders and route origins, and strong RIPE RIS MOAS evidence are excluded",
   "sources": [
     {
@@ -17,8 +17,8 @@
     {
       "name": "iptoasn_ipv4",
       "url": "https://iptoasn.com/data/ip2asn-v4.tsv.gz",
-      "bytes": 6885301,
-      "sha256": "d481246230fc072d17bad7575d762c7166e4fbd6ad3da04d42789a23acbae5a9"
+      "bytes": 6885929,
+      "sha256": "4ab36c3041129584d67e53f8ace330a99a54fdbf5958ccd3617bf9846f53c22a"
     },
     {
       "name": "apnic_organisation",
@@ -107930,7 +107930,7 @@
       "matched_by": "description_patterns: china ?telecom",
       "exclusion_source": "explicit_policy",
       "reason": "China Telecom CN2 dedicated premium backbone; outside ordinary Internet user access scope",
-      "origin_address_count": 542464
+      "origin_address_count": 542720
     },
     {
       "asn": "4816",
