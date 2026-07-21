@@ -1,0 +1,71 @@
+name: Audit gaoyifan china6
+
+on:
+  push:
+    branches:
+      - ipv6
+    paths-ignore:
+      - 'reports/ipv6/**'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: audit-gaoyifan-china6-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    env:
+      SOURCE_DIR: ${{ runner.temp }}/cn-eyeball-ipv6-sources
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-go@v6
+        with:
+          go-version: '1.26'
+          cache: true
+      - name: Download IPv6 audit sources
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$SOURCE_DIR"
+          curl_opts=(--fail --silent --show-error --location --retry 3)
+          curl "${curl_opts[@]}" 'https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/china6.txt' -o "$SOURCE_DIR/china6.txt"
+          curl "${curl_opts[@]}" 'https://iptoasn.com/data/ip2asn-v6.tsv.gz' -o "$SOURCE_DIR/ip2asn-v6.tsv.gz"
+          curl "${curl_opts[@]}" 'https://ftp.apnic.net/stats/apnic/delegated-apnic-latest' -o "$SOURCE_DIR/delegated-apnic-latest"
+          curl "${curl_opts[@]}" 'https://www.ris.ripe.net/dumps/riswhoisdump.IPv6.gz' -o "$SOURCE_DIR/riswhois-ipv6.gz"
+          du -h "$SOURCE_DIR"/*
+      - name: Validate downloaded sources
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s "$SOURCE_DIR/china6.txt"
+          test $(stat -c '%s' "$SOURCE_DIR/ip2asn-v6.tsv.gz") -gt 100000
+          test $(stat -c '%s' "$SOURCE_DIR/delegated-apnic-latest") -gt 100000
+          test $(stat -c '%s' "$SOURCE_DIR/riswhois-ipv6.gz") -gt 1000000
+      - name: Test IPv6 audit code
+        run: go test ./...
+      - name: Generate china6 validation report
+        shell: bash
+        run: |
+          go run ./cmd/audit6 \
+            --china6 "$SOURCE_DIR/china6.txt" \
+            --iptoasn "$SOURCE_DIR/ip2asn-v6.tsv.gz" \
+            --delegated "$SOURCE_DIR/delegated-apnic-latest" \
+            --ris "$SOURCE_DIR/riswhois-ipv6.gz" \
+            --operator-config config/operators.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: china6-validation
+          path: reports/ipv6/
+      - name: Commit validation report
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A reports/ipv6
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m 'chore: update china6 validation report'
+          git push
