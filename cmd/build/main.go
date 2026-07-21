@@ -16,13 +16,13 @@ import (
 	"strings"
 	"time"
 
-	"github.com/closur3/cn-operator-allowlist/internal/apnicaudit"
-	"github.com/closur3/cn-operator-allowlist/internal/apnicautnum"
-	"github.com/closur3/cn-operator-allowlist/internal/apnicinetnum"
-	"github.com/closur3/cn-operator-allowlist/internal/apnicorg"
-	"github.com/closur3/cn-operator-allowlist/internal/apnicroute"
-	"github.com/closur3/cn-operator-allowlist/internal/operatorconfig"
-	"github.com/closur3/cn-operator-allowlist/internal/riswhois"
+	"github.com/closur3/cn-eyeball-prefixes/internal/apnicaudit"
+	"github.com/closur3/cn-eyeball-prefixes/internal/apnicautnum"
+	"github.com/closur3/cn-eyeball-prefixes/internal/apnicinetnum"
+	"github.com/closur3/cn-eyeball-prefixes/internal/apnicorg"
+	"github.com/closur3/cn-eyeball-prefixes/internal/apnicroute"
+	"github.com/closur3/cn-eyeball-prefixes/internal/operatorconfig"
+	"github.com/closur3/cn-eyeball-prefixes/internal/riswhois"
 )
 
 type span struct{ lo, hi uint32 }

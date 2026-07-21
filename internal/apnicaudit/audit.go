@@ -6,8 +6,8 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/closur3/cn-operator-allowlist/internal/apnicinetnum"
-	"github.com/closur3/cn-operator-allowlist/internal/operatorconfig"
+	"github.com/closur3/cn-eyeball-prefixes/internal/apnicinetnum"
+	"github.com/closur3/cn-eyeball-prefixes/internal/operatorconfig"
 )
 
 type Range struct {
