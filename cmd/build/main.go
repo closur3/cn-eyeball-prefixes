@@ -907,20 +907,6 @@ func apnicOperatorConflictRanges(segments []apnicinetnum.Segment, classifier *op
 	return out
 }
 
-func apnicOperatorLeafAdmissionRanges(segments []apnicinetnum.Segment, classifier *operatorconfig.Classifier) map[string][]span {
-	out := map[string][]span{}
-	for _, segment := range segments {
-		result := classifier.ClassifyAPNICRegistrant(apnicinetnum.SearchText(segment.Record))
-		if result.Operator != "" {
-			out[result.Operator] = append(out[result.Operator], span{segment.Lo, segment.Hi})
-		}
-	}
-	for _, operator := range operators {
-		out[operator] = merge(out[operator])
-	}
-	return out
-}
-
 func intersectSortedSpan(rows []span, lo, hi uint32) []span {
 	i := sort.Search(len(rows), func(i int) bool { return rows[i].hi >= lo })
 	var out []span
@@ -938,12 +924,11 @@ func overlapAddressCountSorted(rows []span, lo, hi uint32) uint64 {
 	return count
 }
 
-// bgpPrefixAdmissionTrials treats the longest-prefix RIS routing decision as
-// the admission unit. APNIC evidence decides whether the whole unit is
-// admitted; existing strong exclusions may still punch holes afterwards.
-func bgpPrefixAdmissionTrials(segments []riswhois.Segment, asnOperators map[string]string, originByOperator, retainedByOperator, fallbackByOperator, parentAdmission, leafAdmission, operatorConflicts map[string][]span) map[string][]span {
-	out := map[string][]span{"observed": {}, "no_ris": {}, "conflict": {}, "no_parent": {}, "covering": {}, "covering_carved": {}, "covering_relaxed": {}, "relaxed": {}, "any": {}, "majority": {}, "full": {}}
-	observedByOperator := map[string][]span{}
+// bgpConflictHealingRanges treats the longest-prefix RIS routing decision as
+// the formal healing unit. It returns all retained current three-operator BGP
+// addresses and the subset whose complete origin unit has a same-operator
+// APNIC parent. Existing strong exclusions may still punch holes afterwards.
+func bgpConflictHealingRanges(segments []riswhois.Segment, asnOperators map[string]string, originByOperator, retainedByOperator, parentAdmission map[string][]span) (observed, eligible []span) {
 	for _, segment := range segments {
 		seenOperators := map[string]bool{}
 		for _, origin := range segment.Record.Origins {
@@ -963,26 +948,9 @@ func bgpPrefixAdmissionTrials(segments []riswhois.Segment, asnOperators map[stri
 			if len(retained) == 0 {
 				continue
 			}
-			out["observed"] = append(out["observed"], retained...)
-			// Current three-operator BGP origin is the positive admission
-			// evidence. APNIC no longer has to positively name the operator;
-			// strong APNIC and other non-target exclusions were already applied
-			// while constructing retainedByOperator.
-			out["relaxed"] = append(out["relaxed"], retained...)
-			observedByOperator[operator] = append(observedByOperator[operator], retained...)
-			conflict := false
+			observed = append(observed, retained...)
+			var parentPositive, total uint64
 			for _, part := range unit {
-				if overlapsSorted(operatorConflicts[operator], part.lo, part.hi) {
-					conflict = true
-					break
-				}
-			}
-			if conflict {
-				out["conflict"] = append(out["conflict"], retained...)
-			}
-			var positive, parentPositive, total uint64
-			for _, part := range unit {
-				positive += overlapAddressCountSorted(leafAdmission[operator], part.lo, part.hi)
 				parentPositive += overlapAddressCountSorted(parentAdmission[operator], part.lo, part.hi)
 				total += uint64(part.hi) - uint64(part.lo) + 1
 			}
@@ -990,53 +958,17 @@ func bgpPrefixAdmissionTrials(segments []riswhois.Segment, asnOperators map[stri
 				continue
 			}
 			if parentPositive == total {
-				// A current three-operator BGP route with a covering operator
-				// registration is admitted atomically. Cross-operator leaf
-				// registrations are attribution conflicts, not evidence that the
-				// address is outside the three-operator user-access scope.
-				out["covering_relaxed"] = append(out["covering_relaxed"], retained...)
-				for _, part := range retained {
-					localConflicts := intersectSortedSpan(operatorConflicts[operator], part.lo, part.hi)
-					out["covering_carved"] = append(out["covering_carved"], subtract([]span{part}, localConflicts)...)
-				}
-				if !conflict {
-					out["covering"] = append(out["covering"], retained...)
-				}
-			} else if !conflict {
-				out["no_parent"] = append(out["no_parent"], retained...)
-			}
-			if conflict {
-				continue
-			}
-			if positive == 0 {
-				continue
-			}
-			out["any"] = append(out["any"], retained...)
-			if positive*2 >= total {
-				out["majority"] = append(out["majority"], retained...)
-			}
-			if positive == total {
-				out["full"] = append(out["full"], retained...)
+				eligible = append(eligible, retained...)
 			}
 		}
 	}
-	for _, operator := range operators {
-		unobserved := subtract(retainedByOperator[operator], merge(observedByOperator[operator]))
-		out["no_ris"] = append(out["no_ris"], unobserved...)
-		fallback := intersect(unobserved, fallbackByOperator[operator])
-		out["covering_relaxed"] = append(out["covering_relaxed"], fallback...)
-		out["relaxed"] = append(out["relaxed"], fallback...)
-	}
-	for policy := range out {
-		out[policy] = merge(out[policy])
-	}
-	return out
+	return merge(observed), merge(eligible)
 }
 
-func hybridAdmissionByOperator(hierarchicalByOperator map[string][]span, coveringRelaxed []span, eligibleByOperator map[string][]span) map[string][]span {
+func hybridAdmissionByOperator(hierarchicalByOperator map[string][]span, hybridEligible []span, eligibleByOperator map[string][]span) map[string][]span {
 	out := map[string][]span{}
 	for _, operator := range operators {
-		healed := intersect(coveringRelaxed, eligibleByOperator[operator])
+		healed := intersect(hybridEligible, eligibleByOperator[operator])
 		out[operator] = merge(append(append([]span{}, hierarchicalByOperator[operator]...), healed...))
 	}
 	return out
@@ -1074,19 +1006,6 @@ func admissionExclusionEvidence(report apnicaudit.Report, deniedByOperator map[s
 		}
 	}
 	return out
-}
-
-func buildRelaxedAddedAudit(cidrs []string, operatorRanges map[string][]apnicaudit.Range, segments []apnicinetnum.Segment, classifier *operatorconfig.Classifier) (apnicaudit.Report, error) {
-	report, err := apnicaudit.Build("Nationwide relaxed-BGP additions versus current dev", cidrs, operatorRanges, segments, classifier)
-	if err != nil {
-		return apnicaudit.Report{}, err
-	}
-	report.Notes = []string{
-		"Every added address has a current China Telecom, China Mobile, or China Unicom RIS origin and has already passed all enforced cloud, APNIC-purpose, independent-holder, route-origin, and strong MOAS exclusions.",
-		"These addresses are absent from the current hybrid dev output because APNIC does not provide a covering positive registration for the same operator; internal three-operator registration conflicts with such a parent are already healed by the formal hybrid policy.",
-		"The report maps every added address to the most-specific APNIC inetnum object so the cost of removing APNIC positive admission can be reviewed as data rather than inferred from CIDR counts.",
-	}
-	return report, nil
 }
 
 func writeGzipJSON(path string, value any) (string, error) {
@@ -1445,14 +1364,13 @@ func main() {
 	for asn, record := range includedASNRecords {
 		asnOperators[asn] = record.meta.Operator
 	}
-	leafAdmissionRanges := apnicOperatorLeafAdmissionRanges(apnicAllSegments, classifier)
-	bgpAdmissionTrials := bgpPrefixAdmissionTrials(risSegments, asnOperators, preCloudByOperator, preAdmissionByOperator, hierarchicalByOperator, operatorAdmissionRanges, leafAdmissionRanges, operatorConflictRanges)
+	observedBGPRanges, hybridEligibleRanges := bgpConflictHealingRanges(risSegments, asnOperators, preCloudByOperator, preAdmissionByOperator, operatorAdmissionRanges)
 	var hierarchicalRanges []span
 	for _, operator := range operators {
 		hierarchicalRanges = append(hierarchicalRanges, hierarchicalByOperator[operator]...)
 	}
 	hierarchicalRanges = merge(hierarchicalRanges)
-	ranges = hybridAdmissionByOperator(hierarchicalByOperator, bgpAdmissionTrials["covering_relaxed"], preAdmissionByOperator)
+	ranges = hybridAdmissionByOperator(hierarchicalByOperator, hybridEligibleRanges, preAdmissionByOperator)
 	var finalRanges, admissionDeniedRanges, assignedRanges []span
 	for _, operator := range operators {
 		if len(intersect(ranges[operator], merge(assignedRanges))) != 0 {
@@ -1465,7 +1383,6 @@ func main() {
 	}
 	finalRanges = merge(finalRanges)
 	admissionDeniedRanges = merge(admissionDeniedRanges)
-	bgpAdmissionTrials["hybrid"] = finalRanges
 	bgpHybridAdded := subtract(finalRanges, hierarchicalRanges)
 	bgpHybridRemoved := subtract(hierarchicalRanges, finalRanges)
 	if len(bgpHybridRemoved) != 0 {
@@ -1474,10 +1391,10 @@ func main() {
 	if len(subtract(bgpHybridAdded, preAdmissionRanges)) != 0 {
 		panic("hybrid admission adds addresses without a current three-operator origin or after a strong exclusion")
 	}
-	if len(subtract(bgpHybridAdded, bgpAdmissionTrials["observed"])) != 0 {
+	if len(subtract(bgpHybridAdded, observedBGPRanges)) != 0 {
 		panic("hybrid admission adds addresses without a current RIS-observed three-operator origin")
 	}
-	if len(subtract(bgpHybridAdded, bgpAdmissionTrials["covering_relaxed"])) != 0 {
+	if len(subtract(bgpHybridAdded, hybridEligibleRanges)) != 0 {
 		panic("hybrid admission adds addresses outside a same-operator APNIC parent")
 	}
 	var allOperatorConflicts []span
@@ -1545,35 +1462,17 @@ func main() {
 	zhejiangProvinceRanges := merge(provinceSourceRanges["浙江省"])
 	zhejiangPreAdmissionByOperator := map[string][]span{}
 	zhejiangPreAdmissionOperatorRanges := map[string][]apnicaudit.Range{}
-	var zhejiangPreAdmissionRows, zhejiangHierarchicalRows, zhejiangRows []span
+	var zhejiangPreAdmissionRows, zhejiangRows []span
 	for _, operator := range operators {
 		zhejiangPreAdmissionByOperator[operator] = intersect(preAdmissionByOperator[operator], zhejiangProvinceRanges)
 		for _, row := range zhejiangPreAdmissionByOperator[operator] {
 			zhejiangPreAdmissionOperatorRanges[operator] = append(zhejiangPreAdmissionOperatorRanges[operator], apnicaudit.Range{Lo: row.lo, Hi: row.hi})
 		}
 		zhejiangPreAdmissionRows = append(zhejiangPreAdmissionRows, zhejiangPreAdmissionByOperator[operator]...)
-		zhejiangHierarchicalRows = append(zhejiangHierarchicalRows, intersect(hierarchicalByOperator[operator], zhejiangProvinceRanges)...)
 		zhejiangRows = append(zhejiangRows, by[operator]["浙江省"]...)
 	}
 	zhejiangPreAdmissionRows = merge(zhejiangPreAdmissionRows)
-	zhejiangHierarchicalRows = merge(zhejiangHierarchicalRows)
 	zhejiangRows = merge(zhejiangRows)
-	zhejiangBGPAdmissionTrials := map[string][]span{}
-	for _, policy := range []string{"observed", "no_ris", "conflict", "no_parent", "covering", "covering_carved", "covering_relaxed", "hybrid", "relaxed", "any", "majority", "full"} {
-		zhejiangBGPAdmissionTrials[policy] = intersect(bgpAdmissionTrials[policy], zhejiangProvinceRanges)
-	}
-	bgpRelaxedAdded := subtract(bgpAdmissionTrials["relaxed"], finalRanges)
-	bgpRelaxedRemoved := subtract(finalRanges, bgpAdmissionTrials["relaxed"])
-	bgpCoveringRelaxedAdded := subtract(bgpAdmissionTrials["covering_relaxed"], finalRanges)
-	bgpCoveringRelaxedRemoved := subtract(finalRanges, bgpAdmissionTrials["covering_relaxed"])
-	// Hybrid deltas remain relative to the former hierarchical baseline so the
-	// exact best-effort trade-off stays visible after hybrid becomes formal.
-	zhejiangBGPRelaxedAdded := subtract(zhejiangBGPAdmissionTrials["relaxed"], zhejiangRows)
-	zhejiangBGPRelaxedRemoved := subtract(zhejiangRows, zhejiangBGPAdmissionTrials["relaxed"])
-	zhejiangBGPCoveringRelaxedAdded := subtract(zhejiangBGPAdmissionTrials["covering_relaxed"], zhejiangRows)
-	zhejiangBGPCoveringRelaxedRemoved := subtract(zhejiangRows, zhejiangBGPAdmissionTrials["covering_relaxed"])
-	zhejiangBGPHybridAdded := subtract(zhejiangBGPAdmissionTrials["hybrid"], zhejiangHierarchicalRows)
-	zhejiangBGPHybridRemoved := subtract(zhejiangHierarchicalRows, zhejiangBGPAdmissionTrials["hybrid"])
 	zhejiangPreAdmissionAudit, e := apnicaudit.Build("浙江省 pre-admission IPv4 APNIC registration audit", spanCIDRs(zhejiangPreAdmissionRows), zhejiangPreAdmissionOperatorRanges, apnicAllSegments, classifier)
 	if e != nil {
 		panic(e)
@@ -1617,42 +1516,6 @@ func main() {
 			stage("hybrid_bgp_conflict_healed_additions", bgpHybridAdded),
 			stage("hybrid_bgp_conflict_healing_admissions", finalRanges),
 			stage("hybrid_admission_denials", admissionDeniedRanges),
-			stage("trial_bgp_prefix_observed_operator_origin", bgpAdmissionTrials["observed"]),
-			stage("trial_bgp_prefix_no_operator_origin", bgpAdmissionTrials["no_ris"]),
-			stage("trial_bgp_prefix_operator_conflict_denial", bgpAdmissionTrials["conflict"]),
-			stage("trial_bgp_prefix_no_covering_parent_denial", bgpAdmissionTrials["no_parent"]),
-			stage("trial_bgp_prefix_covering_parent_admission", bgpAdmissionTrials["covering"]),
-			stage("trial_bgp_prefix_covering_parent_with_exact_conflict_carving", bgpAdmissionTrials["covering_carved"]),
-			stage("trial_bgp_prefix_covering_parent_relaxed_conflicts", bgpAdmissionTrials["covering_relaxed"]),
-			stage("trial_bgp_prefix_covering_parent_relaxed_added_vs_current", bgpCoveringRelaxedAdded),
-			stage("trial_bgp_prefix_covering_parent_relaxed_removed_vs_current", bgpCoveringRelaxedRemoved),
-			stage("trial_bgp_prefix_hybrid_conflict_healing", bgpAdmissionTrials["hybrid"]),
-			stage("trial_bgp_prefix_hybrid_added_vs_hierarchical", bgpHybridAdded),
-			stage("trial_bgp_prefix_hybrid_removed_vs_hierarchical", bgpHybridRemoved),
-			stage("trial_bgp_prefix_relaxed_admission", bgpAdmissionTrials["relaxed"]),
-			stage("trial_bgp_prefix_relaxed_added_vs_current", bgpRelaxedAdded),
-			stage("trial_bgp_prefix_relaxed_removed_vs_current", bgpRelaxedRemoved),
-			stage("trial_bgp_prefix_any_leaf_admission", bgpAdmissionTrials["any"]),
-			stage("trial_bgp_prefix_majority_leaf_admission", bgpAdmissionTrials["majority"]),
-			stage("trial_bgp_prefix_full_leaf_admission", bgpAdmissionTrials["full"]),
-			stage("trial_zhejiang_bgp_prefix_observed_operator_origin", zhejiangBGPAdmissionTrials["observed"]),
-			stage("trial_zhejiang_bgp_prefix_no_operator_origin", zhejiangBGPAdmissionTrials["no_ris"]),
-			stage("trial_zhejiang_bgp_prefix_operator_conflict_denial", zhejiangBGPAdmissionTrials["conflict"]),
-			stage("trial_zhejiang_bgp_prefix_no_covering_parent_denial", zhejiangBGPAdmissionTrials["no_parent"]),
-			stage("trial_zhejiang_bgp_prefix_covering_parent_admission", zhejiangBGPAdmissionTrials["covering"]),
-			stage("trial_zhejiang_bgp_prefix_covering_parent_with_exact_conflict_carving", zhejiangBGPAdmissionTrials["covering_carved"]),
-			stage("trial_zhejiang_bgp_prefix_covering_parent_relaxed_conflicts", zhejiangBGPAdmissionTrials["covering_relaxed"]),
-			stage("trial_zhejiang_bgp_prefix_covering_parent_relaxed_added_vs_current", zhejiangBGPCoveringRelaxedAdded),
-			stage("trial_zhejiang_bgp_prefix_covering_parent_relaxed_removed_vs_current", zhejiangBGPCoveringRelaxedRemoved),
-			stage("trial_zhejiang_bgp_prefix_hybrid_conflict_healing", zhejiangBGPAdmissionTrials["hybrid"]),
-			stage("trial_zhejiang_bgp_prefix_hybrid_added_vs_hierarchical", zhejiangBGPHybridAdded),
-			stage("trial_zhejiang_bgp_prefix_hybrid_removed_vs_hierarchical", zhejiangBGPHybridRemoved),
-			stage("trial_zhejiang_bgp_prefix_relaxed_admission", zhejiangBGPAdmissionTrials["relaxed"]),
-			stage("trial_zhejiang_bgp_prefix_relaxed_added_vs_current", zhejiangBGPRelaxedAdded),
-			stage("trial_zhejiang_bgp_prefix_relaxed_removed_vs_current", zhejiangBGPRelaxedRemoved),
-			stage("trial_zhejiang_bgp_prefix_any_leaf_admission", zhejiangBGPAdmissionTrials["any"]),
-			stage("trial_zhejiang_bgp_prefix_majority_leaf_admission", zhejiangBGPAdmissionTrials["majority"]),
-			stage("trial_zhejiang_bgp_prefix_full_leaf_admission", zhejiangBGPAdmissionTrials["full"]),
 			stage("final_output", finalRanges),
 			stage("province_attributed_output", provinceAttributed),
 		},
@@ -1718,47 +1581,6 @@ func main() {
 		m.Lists = append(m.Lists, listMeta{Name: p.Name, Path: filepath.ToSlash(path), fileMeta: meta})
 	}
 
-	for _, policy := range []string{"observed", "no_ris", "conflict", "no_parent", "covering", "covering_carved", "covering_relaxed", "hybrid", "relaxed", "any", "majority", "full"} {
-		for _, trial := range []struct {
-			name string
-			path string
-			rows []span
-		}{
-			{"BGP prefix admission trial (nationwide, " + policy + ")", filepath.Join("experiments", "bgp-prefix-admission", "nationwide-"+policy+".txt"), bgpAdmissionTrials[policy]},
-			{"BGP prefix admission trial (Zhejiang, " + policy + ")", filepath.Join("experiments", "bgp-prefix-admission", "zhejiang-"+policy+".txt"), zhejiangBGPAdmissionTrials[policy]},
-		} {
-			meta, e := write(filepath.Join(*out, trial.path), trial.rows)
-			if e != nil {
-				panic(e)
-			}
-			m.Lists = append(m.Lists, listMeta{Name: trial.name, Path: filepath.ToSlash(trial.path), fileMeta: meta})
-		}
-	}
-	for _, trial := range []struct {
-		name string
-		path string
-		rows []span
-	}{
-		{"BGP relaxed admission delta (nationwide, added versus current dev)", filepath.Join("experiments", "bgp-prefix-admission", "nationwide-relaxed-added.txt"), bgpRelaxedAdded},
-		{"BGP relaxed admission delta (nationwide, removed versus current dev)", filepath.Join("experiments", "bgp-prefix-admission", "nationwide-relaxed-removed.txt"), bgpRelaxedRemoved},
-		{"BGP relaxed admission delta (Zhejiang, added versus current dev)", filepath.Join("experiments", "bgp-prefix-admission", "zhejiang-relaxed-added.txt"), zhejiangBGPRelaxedAdded},
-		{"BGP relaxed admission delta (Zhejiang, removed versus current dev)", filepath.Join("experiments", "bgp-prefix-admission", "zhejiang-relaxed-removed.txt"), zhejiangBGPRelaxedRemoved},
-		{"BGP covering-relaxed delta (nationwide, added versus current dev)", filepath.Join("experiments", "bgp-prefix-admission", "nationwide-covering_relaxed-added.txt"), bgpCoveringRelaxedAdded},
-		{"BGP covering-relaxed delta (nationwide, removed versus current dev)", filepath.Join("experiments", "bgp-prefix-admission", "nationwide-covering_relaxed-removed.txt"), bgpCoveringRelaxedRemoved},
-		{"BGP covering-relaxed delta (Zhejiang, added versus current dev)", filepath.Join("experiments", "bgp-prefix-admission", "zhejiang-covering_relaxed-added.txt"), zhejiangBGPCoveringRelaxedAdded},
-		{"BGP covering-relaxed delta (Zhejiang, removed versus current dev)", filepath.Join("experiments", "bgp-prefix-admission", "zhejiang-covering_relaxed-removed.txt"), zhejiangBGPCoveringRelaxedRemoved},
-		{"BGP hybrid conflict-healing delta (nationwide, added versus hierarchical baseline)", filepath.Join("experiments", "bgp-prefix-admission", "nationwide-hybrid-added.txt"), bgpHybridAdded},
-		{"BGP hybrid conflict-healing delta (nationwide, removed versus hierarchical baseline)", filepath.Join("experiments", "bgp-prefix-admission", "nationwide-hybrid-removed.txt"), bgpHybridRemoved},
-		{"BGP hybrid conflict-healing delta (Zhejiang, added versus hierarchical baseline)", filepath.Join("experiments", "bgp-prefix-admission", "zhejiang-hybrid-added.txt"), zhejiangBGPHybridAdded},
-		{"BGP hybrid conflict-healing delta (Zhejiang, removed versus hierarchical baseline)", filepath.Join("experiments", "bgp-prefix-admission", "zhejiang-hybrid-removed.txt"), zhejiangBGPHybridRemoved},
-	} {
-		meta, e := write(filepath.Join(*out, trial.path), trial.rows)
-		if e != nil {
-			panic(e)
-		}
-		m.Lists = append(m.Lists, listMeta{Name: trial.name, Path: filepath.ToSlash(trial.path), fileMeta: meta})
-	}
-
 	zhejiangOperatorRanges := map[string][]apnicaudit.Range{}
 	zhejiangCandidatesByOperator := map[string][]span{}
 	var zhejiangCandidates []span
@@ -1800,39 +1622,6 @@ func main() {
 		CIDRCount: zhejiangAudit.Summary.CIDRCount, FactCount: zhejiangAudit.Summary.FactCount,
 		AddressCount: zhejiangAudit.Summary.AddressCount, RegistryCoveredAddressCount: zhejiangAudit.Summary.RegistryCoveredAddressCount,
 		StrongNonPublicSignalAddressCount: zhejiangAudit.Summary.StrongNonPublicSignalAddressCount, SHA256: auditSHA, HumanSHA256: humanAuditSHA,
-	})
-
-	relaxedAddedOperatorRanges := map[string][]apnicaudit.Range{}
-	for _, operator := range operators {
-		for _, row := range intersect(bgpRelaxedAdded, preAdmissionByOperator[operator]) {
-			relaxedAddedOperatorRanges[operator] = append(relaxedAddedOperatorRanges[operator], apnicaudit.Range{Lo: row.lo, Hi: row.hi})
-		}
-	}
-	relaxedAddedAudit, e := buildRelaxedAddedAudit(spanCIDRs(bgpRelaxedAdded), relaxedAddedOperatorRanges, apnicAllSegments, classifier)
-	if e != nil {
-		panic(e)
-	}
-	if relaxedAddedAudit.Summary.StrongNonPublicSignalAddressCount != 0 {
-		panic(fmt.Sprintf("relaxed BGP additions retain %d addresses that still match an enforced non-public APNIC rule", relaxedAddedAudit.Summary.StrongNonPublicSignalAddressCount))
-	}
-	relaxedAuditPath := filepath.Join("audits", "bgp-relaxed-added-apnic.json.gz")
-	relaxedAuditSHA, e := writeGzipJSON(filepath.Join(*out, relaxedAuditPath), relaxedAddedAudit)
-	if e != nil {
-		panic(e)
-	}
-	relaxedHumanAuditPath := filepath.Join("audits", "bgp-relaxed-added-apnic.md")
-	if e := os.WriteFile(filepath.Join(*out, relaxedHumanAuditPath), []byte(apnicaudit.RenderMarkdown(relaxedAddedAudit, filepath.Base(relaxedAuditPath))), 0644); e != nil {
-		panic(e)
-	}
-	relaxedHumanAuditSHA, e := sha(filepath.Join(*out, relaxedHumanAuditPath))
-	if e != nil {
-		panic(e)
-	}
-	m.Audits = append(m.Audits, auditMeta{
-		Name: "bgp_relaxed_added_apnic_registration", Path: filepath.ToSlash(relaxedAuditPath), HumanPath: filepath.ToSlash(relaxedHumanAuditPath),
-		CIDRCount: relaxedAddedAudit.Summary.CIDRCount, FactCount: relaxedAddedAudit.Summary.FactCount,
-		AddressCount: relaxedAddedAudit.Summary.AddressCount, RegistryCoveredAddressCount: relaxedAddedAudit.Summary.RegistryCoveredAddressCount,
-		StrongNonPublicSignalAddressCount: relaxedAddedAudit.Summary.StrongNonPublicSignalAddressCount, SHA256: relaxedAuditSHA, HumanSHA256: relaxedHumanAuditSHA,
 	})
 
 	if hasOldManifest && sameManifestContent(oldManifest, m) {

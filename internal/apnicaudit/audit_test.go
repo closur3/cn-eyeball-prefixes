@@ -57,25 +57,9 @@ func TestRenderMarkdownIncludesSummaryAndReviewEvidence(t *testing.T) {
 		}},
 	}
 	markdown := RenderMarkdown(report, "zhejiang-apnic.json.gz")
-	for _, want := range []string{"# 浙江 IPv4 APNIC 登记事实审计", "全国分层准入规则", "| `strong_non_public_signal` | 1 | 16 | 6.2500% |", "10.0.0.240–10.0.0.255", "Example Technology Co., Ltd.", "zhejiang-apnic.json.gz"} {
+	for _, want := range []string{"# 浙江 IPv4 APNIC 登记事实审计", "全国 hybrid 准入规则", "| `strong_non_public_signal` | 1 | 16 | 6.2500% |", "10.0.0.240–10.0.0.255", "Example Technology Co., Ltd.", "zhejiang-apnic.json.gz"} {
 		if !strings.Contains(markdown, want) {
 			t.Fatalf("Markdown report does not contain %q:\n%s", want, markdown)
 		}
-	}
-}
-
-func TestRenderMarkdownExplainsRelaxedBGPAdditions(t *testing.T) {
-	report := Report{
-		Scope: "Nationwide relaxed-BGP additions versus current dev",
-		Summary: Summary{AddressCount: 256, Categories: []CategorySummary{{Classification: "independent_legal_entity", FactCount: 1, AddressCount: 256, AddressPercent: 100}}},
-	}
-	markdown := RenderMarkdown(report, "bgp-relaxed-added-apnic.json.gz")
-	for _, want := range []string{"# 宽松 BGP 新增地址 APNIC 登记事实审计", "取消 APNIC 正向准入", "宽松 BGP 方案会纳入", "尚未进入正式 ACL"} {
-		if !strings.Contains(markdown, want) {
-			t.Fatalf("relaxed-BGP Markdown report does not contain %q:\n%s", want, markdown)
-		}
-	}
-	if strings.Contains(markdown, "# 浙江 IPv4") {
-		t.Fatalf("relaxed-BGP Markdown report retained the Zhejiang title:\n%s", markdown)
 	}
 }
