@@ -3,8 +3,8 @@ package main
 import (
 	"testing"
 
-	"github.com/closur3/cn-operator-allowlist/internal/apnicinetnum"
-	"github.com/closur3/cn-operator-allowlist/internal/operatorconfig"
+	"github.com/closur3/cn-eyeball-prefixes/internal/apnicinetnum"
+	"github.com/closur3/cn-eyeball-prefixes/internal/operatorconfig"
 )
 
 func TestOverlapsSorted(t *testing.T) {

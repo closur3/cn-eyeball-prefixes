@@ -1,112 +1,145 @@
-# 中国三网普通互联网接入用户侧公网 IPv4 候选列表
+# 中国三网终端用户接入网 IPv4 地址前缀候选列表
 
-本仓库自动维护上述候选列表，明确用于 ACL 白名单。正式版本采用全国混合准入：地址必须具有中国电信、中国移动或中国联通的当前 BGP Origin，并存在归属于同一家运营商的 APNIC 覆盖登记；在此边界内，以实际 BGP 宣告单元修复三网内部登记冲突造成的细碎孔洞。
+本仓库自动维护中国电信、中国移动和中国联通终端用户接入网的 IPv4 地址前缀候选列表，供 ACL 白名单使用。这里的终端用户接入网特指以住宅宽带和移动数据用户为主要流量来源的互联网接入网络；企业专线、机构统一出口、云、IDC、托管、内容网络和专用骨干不属于目标范围。
 
-APNIC 最具体登记不再作为逐地址切割边界：其中的客户、项目和历史子登记会保留审计，只有命中云厂商 CIDR、明确非普通用户侧用途、独立资源持有人、独立 route origin、强 MOAS 等强证据时才会删除。三网之间的登记冲突若同时位于同运营商 APNIC 父级和当前三网 BGP 宣告单元内，则作为 best-effort 误差整体保留；这可能带入极小范围的企业、网吧等非目标地址，但避免 ACL CIDR 爆炸式膨胀。规则不枚举省、市或县级分支名称，所有地区使用完全相同的全国规则。
+这是一个 **best-effort 候选列表**，不是地址实际用途的保证。生成器先识别当前 BGP Origin 属于三网的地址范围，以强证据排除可识别的非目标网络，再要求剩余地址具有同运营商 APNIC 父级登记；最后只在严格边界内，以当前 BGP 宣告单元修复三网内部登记冲突造成的细碎孔洞。
 
-仓库输出三网独立列表、全国合表及 31 个省级行政区合表，供 ACL 系统按 CIDR 加载为允许来源。使用方应根据自身安全边界决定是否叠加更严格的策略，不应把本列表解释为对任一地址实际业务用途的保证。
+## 范围
 
-## 项目流程
+| 范围 | 处理 |
+| --- | --- |
+| 三网终端用户接入网的 IPv4 地址前缀 | 目标范围，满足准入条件后保留 |
+| 云计算、IDC、托管、CDN、VPS 和服务器业务 | 有可靠 ASN、CIDR 或 APNIC 证据时排除 |
+| 企业办公出口、企业宽带或互联网专线、企业 NAT 和固定企业地址 | 非目标；有可靠证据时排除 |
+| 学校、酒店、商场、园区及其他机构的统一上网出口 | 非目标；有可靠证据时排除 |
+| 政务、行业专网、VPN/MPLS、IoT/M2M、OA、监控等专用网络 | 有明确用途登记时排除 |
+| CN2、CUII 等专用精品骨干 | 按 Origin ASN 显式排除；终端用户地址的路由路径经过这些骨干不受影响 |
+| 无法形成可靠证据的混合用途或代宣告地址 | 保留并承认 best-effort 误差 |
+
+本项目不通过维护全国省、市、县分支名称白名单来提高召回率，也不逐个追踪无法自动验证的客户地址。使用方应按自身安全边界决定是否叠加更严格的策略。
+
+## 工作流程
 
 ```mermaid
 flowchart TD
-    A["IPtoASN：当前 IPv4 起源 ASN 与描述"] --> B["三网 ASN 分类"]
-    C["config/operators.json"] --> B
-    C --> D["描述规则与最小 ASN 例外"]
-    D --> B
-    B --> E["电信、移动、联通起源候选"]
+    A["IPtoASN：当前 IPv4 Origin ASN"] --> B["按 config/operators.json 识别三网 ASN"]
+    C["gaoyifan/china-operator-ip：china.txt"] --> D["与中国起源地址取交集"]
+    B --> D
 
-    F["gaoyifan/china-operator-ip：china.txt"] --> G["与中国起源边界取交集"]
+    D --> E["三网 Origin 候选"]
+    F["云厂商 CIDR"] --> G["强证据排除"]
+    H["APNIC inetnum / organisation / aut-num / route"] --> G
+    I["RIPE RISWhois：当前多 Origin 与可见度"] --> G
     E --> G
 
-    H["IP-Data：七家云厂商 CIDR"] --> I["计算云 CIDR 实际命中"]
-    G --> I
-    Q["APNIC：inetnum + organisation"] --> R["解析组织实体，最具体记录优先"]
-    C --> R
-    I --> R
-    W["APNIC：aut-num + 当前/登记 ASN"] --> X["资源持有人与独立 ASN 双证据"]
-    R --> X
-    C --> X
-    S["APNIC：route 对象"] --> T["route origin 与当前 BGP origin 一致"]
-    X --> T
-    C --> T
-    S --> Y["独立 route origin + org/专用 maintainer 强关联排除"]
-    Q --> Y
-    W --> Y
-    U["RIPE RISWhois：多观测点 origin 集合"] --> V["保守 MOAS：三网 origin + 强非普通用户侧备用 origin"]
-    T --> Y
-    Y --> V
-    C --> V
-    V --> AA["全国基础准入：三网 Origin + 同运营商 APNIC 覆盖登记"]
-    Q --> AA
-    C --> AA
-    R --> AB["最具体登记：强证据排除与运营商冲突标记"]
-    AB --> AA
-    U --> AC["BGP 单元修复同父级内的三网冲突孔洞"]
-    AA --> AC
-    AC --> J["最终三网地址池"]
+    G --> J["排除后候选"]
+    H --> K["同运营商 APNIC 父级准入"]
+    J --> K
+    K --> L["基础分层准入：扣除最具体三网登记冲突"]
 
-    J --> K["data/operators：三网独立列表"]
-    J --> L["data/cn.txt：全国去重合表"]
+    I --> M["BGP 冲突孔洞修复"]
+    H --> M
+    J --> M
+    L --> M
+    M --> N["正式 hybrid 地址池"]
 
-    M["ip2region：省级归属数据"] --> N["省级归属切分"]
-    J --> N
-    N --> O["data/provinces：31 个省级列表"]
+    N --> O["data/operators：三网独立列表"]
+    N --> P["data/cn.txt：全国合表"]
+    Q["ip2region：省级归属"] --> R["data/provinces：31 个省级列表"]
+    N --> R
 
-    A -. "摘要与规模" .-> P["data/manifest.json"]
-    C -. "规则与匹配依据" .-> P
-    F -. "摘要与阶段统计" .-> P
-    H -. "原始规模与有效命中" .-> P
-    Q -. "注册依据与有效命中" .-> P
-    W -. "独立持有人关联与有效命中" .-> P
-    S -. "origin 校验与 route 证据" .-> P
-    Y -. "自动排除与完整决策证据" .-> P
-    U -. "MOAS origin、可见 peer 与审计统计" .-> P
-    J -. "纳入 ASN 与最终统计" .-> P
-    N -. "省级实际覆盖量" .-> P
+    A -. "来源摘要" .-> S["data/manifest.json"]
+    G -. "排除证据" .-> S
+    K -. "准入与拒绝统计" .-> S
+    M -. "冲突修复统计与安全阈值" .-> S
+    N -. "ASN、CIDR 与地址量" .-> S
 ```
 
-`ip2region` 只对最终地址池进行省级归属，不参与全国三网地址的纳入或排除判断；无法归属省份的地址仍保留在全国表和相应运营商表中。
+### 1. 三网 Origin 候选
+
+- [IPtoASN](https://iptoasn.com/) 提供当前 IPv4 BGP Origin ASN 和 ASN 描述。
+- `config/operators.json` 使用全国通用名称规则识别中国电信、中国移动和中国联通；每家运营商的 `include_asns` 只补充名称无法可靠识别的 ASN。
+- `exclude_description_rules` 自动排除用途明确且不属于目标接入网的 ASN；`exclude_asns` 只保留无法由通用描述规则安全表达的最小例外。
+- AS4809（中国电信 CN2）和 AS9929（中国联通 CUII）按专用精品骨干显式排除。构建器只判断 Origin ASN，不会因为终端用户地址的 AS Path 经过二者而删除该地址。
+- 候选地址必须同时位于 [gaoyifan/china-operator-ip](https://github.com/gaoyifan/china-operator-ip/tree/ip-lists) `ip-lists` 分支的 `china.txt` 内，用于限制中国起源边界。
+
+### 2. 强证据排除
+
+所有强排除都先于 hybrid 准入执行，后续冲突修复不得将其放回。
+
+- 云厂商 CIDR 使用 [axpwx/IP-Data](https://github.com/axpwx/IP-Data) 的阿里云、腾讯云、华为云、UCloud、金山云、百度智能云和京东云独立 IPv4 文件，不使用其宽泛的 `all-cidr`。只有与三网候选实际相交的部分影响结果。
+- APNIC 前缀证据来自 [`inetnum`](https://ftp.apnic.net/apnic/whois/apnic.db.inetnum.gz)、[`organisation`](https://ftp.apnic.net/apnic/whois/apnic.db.organisation.gz)、[`aut-num`](https://ftp.apnic.net/apnic/whois/apnic.db.aut-num.gz) 和 [`route`](https://ftp.apnic.net/apnic/whois/apnic.db.route.gz)。重叠 `inetnum` 按最具体记录解析，`org` handle 会关联到结构化组织名称。
+- 用途规则只匹配明确强特征，例如 IDC/data center、hosting/colocation、云计算服务、CDN、VPS/服务器托管、专线/专用电路、VPN/MPLS、IoT/M2M、电子政务、安全/DDoS、OA、监控，以及经审计的完整云、IDC 或独立主体名称。单独出现 Huawei、Baidu、Alibaba、`cloud`、`netbar`、`DIA`、设备或接入系统标签不会触发。
+- portable、delegated 和独立法定主体资源必须通过 APNIC 登记与活跃独立 ASN 的 `org`、精确 `netname == as-name` 或完整法定主体等强关联验证，不能仅凭普通企业名称删除。
+- 同 Origin 的 APNIC `route` 用于验证登记用途；当 APNIC route Origin 与当前三网 Origin 不同，只有 inetnum、route、aut-num 共享同一 `org` 或专属于该独立 ASN 的 maintainer 时才自动排除。公共 maintainer 会因关联多个活跃 ASN 而失效，完整证据写入 manifest 的 `apnic_route_origin_audit`。
+- [RIPE RISWhois](https://ris.ripe.net/docs/ris-whois/) 的强 MOAS 排除要求当前三网 Origin 和备用 Origin 均至少被 10 个 peer 观测，且各自达到该前缀最高可见度的 5%；备用 Origin 的当前 ASN 描述还必须命中强非目标规则。其余 MOAS 保留。
+
+### 3. APNIC 父级准入
+
+强排除后的每个地址必须具有由全国通用规则识别为同一家运营商的 APNIC 覆盖 `inetnum`。缺少同运营商父级登记的独立资源不会进入正式列表。
+
+在此父级内，基础分层准入仍会按 APNIC 最具体登记扣除三网之间的运营商冲突。最具体登记不是直接证明实际业务用途；它只形成保守基线及可审计的冲突范围。
+
+### 4. BGP 冲突孔洞修复
+
+正式模式为 `hybrid_bgp_conflict_healing_with_strong_exclusions`。只有同时满足以下条件的地址，才能从三网登记冲突范围恢复：
+
+1. 位于强排除后的三网 Origin 候选内；
+2. 当前被 RIS 观测为同一家运营商的 BGP Origin；
+3. 完整 BGP 宣告单元具有同运营商 APNIC 父级登记；
+4. 确实属于三网之间的最具体登记冲突；
+5. 不与云、APNIC 用途、独立资源/route Origin 或强 MOAS 排除重叠。
+
+生成器和独立校验器同时强制：hybrid 不得删除基础分层准入地址，修复地址不得超过基础分层地址量的 `0.1%`，最终 CIDR 数不得超过基础分层的 `1.10` 倍，且最终 CIDR 数不得超过父级准入前候选的 `2.0` 倍。仓库只生成正式 hybrid 结果，不保留其他准入策略的试验列表或对照报告。
+
+### 5. 聚合与省级切分
+
+- 最终地址按运营商分别聚合为最大 CIDR，三网列表互不重叠，其并集严格等于 `data/cn.txt`。
+- [lionsoul2014/ip2region](https://github.com/lionsoul2014/ip2region) 只用于把最终地址池切分为中国大陆 31 个省级列表，不参与全国地址的纳入或排除。
+- 无法被 ip2region 归属到省份的地址仍保留在全国表和运营商表，因此省级文件并集不强制等于全国表。
 
 ## 数据文件
 
 | 文件 | 内容 |
 | --- | --- |
-| `data/operators/chinanet.txt` | 中国电信 IPv4 CIDR |
-| `data/operators/cmcc.txt` | 中国移动 IPv4 CIDR |
-| `data/operators/unicom.txt` | 中国联通 IPv4 CIDR |
-| `data/cn.txt` | 中国电信、中国移动和中国联通的 IPv4 CIDR 去重合表 |
-| `data/provinces/<pinyin>.txt` | 相应省级行政区内上述运营商的 IPv4 CIDR 去重合表 |
-| `data/manifest.json` | 本次生成时间、上游文件大小与摘要、各筛选阶段统计、云 CIDR、APNIC inetnum/aut-num/route 和 RIPE RIS MOAS 的实际命中、三网 ASN 汇总、最终纳入和排除的 ASN/前缀、匹配依据，以及每个列表文件的统计信息 |
-| `config/operators.json` | 全国通用的运营商名称规则、强制收录 ASN 和排除 ASN；不得包含按省、市或县单独生效的准入规则 |
+| `data/operators/chinanet.txt` | 中国电信正式 IPv4 CIDR |
+| `data/operators/cmcc.txt` | 中国移动正式 IPv4 CIDR |
+| `data/operators/unicom.txt` | 中国联通正式 IPv4 CIDR |
+| `data/cn.txt` | 三网地址的去重合表 |
+| `data/provinces/<pinyin>.txt` | 相应省级行政区内的三网地址合表 |
+| `data/manifest.json` | 上游摘要、各阶段统计、hybrid 阈值、纳入/排除 ASN、前缀级排除证据及输出文件摘要 |
+| `data/audits/zhejiang-apnic.md` | 浙江正式结果的可读 APNIC 抽样审计 |
+| `data/audits/zhejiang-apnic.json.gz` | 上述审计的完整机器可读事实 |
+| `config/operators.json` | 全国通用的三网识别、ASN 例外和强排除规则 |
 
-省级文件以拼音命名，例如 `beijing.txt`、`guangdong.txt`、`shaanxi.txt`、`xinjiang.txt`。每个文本文件一行一个 CIDR，按地址排序，且文件内部不存在重叠网段。
+省级文件使用拼音命名，例如 `beijing.txt`、`guangdong.txt`、`shaanxi.txt` 和 `xinjiang.txt`。所有文本文件每行一个 CIDR，按地址排序且内部无重叠。
 
-## 生成规则
+## Manifest 与审计
 
-- 运营商候选采用 [IPtoASN](https://iptoasn.com/) 按小时更新的 IPv4 BGP 起源 ASN 数据，根据中国电信、中国移动和中国联通的 ASN 名称筛选，并显式排除名称碰撞但不属于三家运营商的 ASN；仅保留同时出现在 [gaoyifan/china-operator-ip](https://github.com/gaoyifan/china-operator-ip/tree/ip-lists) `ip-lists` 分支 `china.txt`（起源 ASN 为中国 ASN）的地址，以排除异常路由与非中国起源地址。
-- 全国混合准入在既有排除之后执行：每个运营商候选地址必须落在由 APNIC 全国通用名称规则识别为同一家运营商的覆盖 `inetnum` 内。当前三网 BGP 宣告单元可修复该父级内由三网最具体登记冲突造成的孔洞，但不能放回缺少三网父级的独立资源，也不能穿透云、IDC、独立主体、route origin、强 MOAS 等既有强排除。配置不得通过枚举地方分支名称提高单一地区召回率。
-- 运营商匹配规则统一维护在 `config/operators.json`。`include_asns` 补充名称无法识别的三网 ASN；`exclude_description_rules` 自动识别用途明确、超出普通互联网用户侧范围的 ASN；`exclude_asns` 只处理有明确证据、无法由通用描述规则可靠表达的例外。AS4809（中国电信 CN2）和 AS9929（中国联通 CUII）按专用精品骨干显式排除；普通用户地址的 AS Path 即使经过二者也不受影响，因为构建器只按 Origin ASN 判定。manifest 会区分 `description_rule` 和 `explicit_policy` 两类排除来源。
-- 云厂商前缀排除暂采用 [axpwx/IP-Data](https://github.com/axpwx/IP-Data) 的阿里云、腾讯云、华为云、UCloud、金山云、百度智能云和京东云独立 IPv4 CIDR 文件，不使用其宽泛 `all-cidr` 集合。云清单只有与三网候选地址实际相交的部分会影响结果；各来源的原始规模、有效命中规模和命中的 ASN/CIDR 都写入 manifest，便于持续审计上游质量。
-- 混合运营商 ASN 内部的前缀级排除采用 APNIC WHOIS 的 [`inetnum`](https://ftp.apnic.net/apnic/whois/apnic.db.inetnum.gz)、[`organisation`](https://ftp.apnic.net/apnic/whois/apnic.db.organisation.gz) 和 [`route`](https://ftp.apnic.net/apnic/whois/apnic.db.route.gz) 对象。构建器仍扫描并统计完整上游，但只有与云清洗后三网候选范围相交的 inetnum/route 对象会进入组织关联、最具体记录解析和规则判断；任何能够影响候选地址的登记对象都必然与候选范围相交，因此该预过滤不改变地址判断。manifest 同时记录全量及实际参与计算的对象数。`inetnum` 的 `org` handle 会解析为结构化 `org-name`；重叠范围按最具体记录优先。`route` 证据只有在其 `origin` 与 IPtoASN 当前 BGP 起源 ASN 一致时才生效，避免陈旧 IRR 对象直接造成误删。只匹配用途明确的强特征：IDC/data center、hosting/colocation、21Vianet/CNISP、cloud computing/service/data、CDN、VPS/服务器托管、私有专线/专用电路、MPLS/VPN、IoT/M2M、电子政务专网、安全/DDoS、OA 系统、监控专网及 CCTV 媒体/机构网络；明确云品牌组合、AWS 中国运营方 Sinnet/光环新网与 WestCloudData/NWCD，以及经审计的完整企业实体名称也会触发。单独出现 Huawei、Baidu、Alibaba、`cloud`、`netbar`、`DIA`、`dedicated internet access`，以及设备、宽带或接入系统标签不会触发。
-- 独立资源持有人以及登记给可关联独立 ASN 主体的三网 origin 前缀采用 APNIC [`aut-num`](https://ftp.apnic.net/apnic/whois/apnic.db.aut-num.gz) 自动交叉验证。最具体 inetnum 为 `ALLOCATED/ASSIGNED PORTABLE` 或 `ALLOCATED/ASSIGNED NON-PORTABLE`、登记主体自身不能识别为三网，并能通过相同 `org` handle 或长度不少于五字符的精确 `netname == as-name` 连接到 IPtoASN 当前仍活跃的非三网 ASN 时，按该登记前缀排除。若关联 ASN 当前不活跃，则还必须从 inetnum 的 `descr` 或 organisation 名称识别出完整法定主体名称，形成第二项独立证据；单独的企业词、netname、历史 ASN 或模糊名称不会触发。
-- APNIC route 独立 origin 强关联用于处理当前由三网 ASN 宣告、但 route 对象指向活跃非三网 ASN 的前缀：inetnum、route、aut-num 三者必须共享同一 `org` handle，或共享只归属于该 ASN 的专用 maintainer。公共 maintainer 会因关联多个活跃 ASN 自动失效。满足条件的前缀自动排除，同时将完整登记证据写入 manifest 的 `apnic_route_origin_audit`；该段以 `enforced: true` 明确表示审计结论已参与最终 CIDR 删除。
-- [RIPE RISWhois](https://ris.ripe.net/docs/ris-whois/) 提供多个 RIS 采集点汇总的当前前缀/origin 与可见 peer 数。这里只处理三网候选范围，并按最具体 BGP 前缀判断：当前三网 origin 和备用 origin 均须至少被 10 个 peer、且达到该前缀最高可见度的 5%；备用 origin 的当前 IPtoASN 描述还必须命中同一套强非普通用户侧规则，才会剔除。普通 MOAS、低可见度 origin、描述未知或证据含糊的情况只计入审计统计并继续保留。
-- hybrid 的安全边界由生成器和独立校验器直接强制：相对基础分层准入删除量必须为零，冲突修复地址必须同时位于当前三网 Origin、RIS 已观测范围、同运营商 APNIC 父级和三网内部登记冲突内，且不得与任何强排除重叠；修复地址不得超过分层基线的 0.1%，最终 CIDR 不得超过分层基线的 1.10 倍。仓库只发布正式结果，不生成或提交其他准入策略的试验列表和对照报告。
-- 省级归属采用 [lionsoul2014/ip2region](https://github.com/lionsoul2014/ip2region) IPv4 源数据；构建器先按省份合并其有序区间，再与三个运营商最终地址池求交。它只用于地域切分，不参与运营商判定。
-- 仅处理 IPv4 和中国大陆 31 个省级行政区；非中国大陆地址及无法归入省级行政区的网段不进入省级文件。
-- 相邻或重叠网段会合并为最大 CIDR 集合。三个运营商文件互不重叠且其并集严格等于 `cn.txt`；31 个省级文件互不重叠且均为 `cn.txt` 的子集。由于 ip2region 可能没有覆盖全国表中的全部地址，省级并集不强制等于全国表，实际归属覆盖量会作为 `province_attributed_output` 阶段写入 manifest。生成后校验器会检查这些关系、上游包含关系、排除证据和 manifest 文件摘要。
+`data/manifest.json` 是每次生成的事实清单，记录：
 
-## 全国混合准入与浙江抽样审计
+- 本次生成时间，以及所有上游的 URL、文件大小和 SHA-256；
+- 从 Origin 候选、中国边界、各类强排除、父级准入、hybrid 修复到最终输出的地址量和 CIDR 数；
+- 三网纳入 ASN 汇总及显式/描述规则排除的 ASN；
+- 每个实际生效的云、APNIC、独立 route Origin 和强 MOAS 前缀及其证据；
+- hybrid 修复地址量、CIDR 变化和全部安全阈值；
+- 全国、运营商、省级列表及审计文件的摘要。
 
-混合准入直接作用于全国地址池，省级文件只是全国最终结果与 `ip2region` 地域范围的交集，不存在浙江专用准入逻辑。manifest 分别记录基础分层准入、BGP 冲突孔洞修复、最终混合准入和剩余拒绝规模；`operator_registration_admission` 同时记录修复地址量、CIDR 变化、0.1% 新增地址上限、1.10 倍 hybrid CIDR 上限及总体 2.0 倍部署上限。
-
-[`data/audits/zhejiang-apnic.md`](data/audits/zhejiang-apnic.md) 继续作为可人工阅读的地区抽样审计，给出浙江准入前候选、全国规则造成的拒绝、最终保留量及最具体 APNIC 登记事实；它不包含任何浙江专用分类规则。校验器会独立重算全国 `cn.txt` 和三网列表，并保证最终样本不残留已经启用的强非公众用途信号。
+浙江审计只用于检查全国正式规则在一个小范围内的表现，不包含任何浙江专用准入或排除规则。校验器会独立重算全国表、三网表、各阶段统计和 manifest 证据，并要求正式结果不与已启用的强排除范围重叠。
 
 ## 自动更新
 
-[GitHub Actions](.github/workflows/update.yml) 每天 UTC 08:08 执行，也可从 Actions 页面手动运行。
+[GitHub Actions](.github/workflows/update.yml) 每天 UTC 08:08 运行，也支持手动触发。
 
-仓库固定使用 `dev` 作为唯一开发分支，所有代码、规则、文档和工作流修改均先进入 `dev`；`main` 仅用于正式版本。推送非 `data/` 变更到 `dev` 会自动运行完整构建，Action 回写的纯数据提交不会重复触发工作流。
+仓库固定使用 `dev` 作为唯一开发分支：代码、规则、文档和工作流修改先进入 `dev`，`main` 只接收经过验证的正式版本。推送非 `data/` 变更到 `dev` 会触发完整流程；Action 回写的纯数据提交因 `paths-ignore: data/**` 不会递归触发。
 
-工作流在 runner 工作区下的临时目录下载上游数据，拒绝空文件或异常小的 APNIC/RIS 数据，执行 Go 编译检查和静态检查，生成 `data/` 并逐条校验来源、阶段统计和排除依据；仅当列表内容、上游来源或统计信息变化时提交更新。上游源文件不会被提交到仓库，runner 结束后即被销毁。
+工作流依次执行：
+
+1. 下载全部上游到 runner 临时目录；
+2. 拒绝空文件以及异常小的 APNIC/RIS 数据；
+3. 运行 `go test ./...` 和 `go vet ./...`；
+4. 生成正式列表、manifest 和浙江审计；
+5. 使用独立校验器重算并核验所有关系、阈值和摘要；
+6. 仅在 `data/` 实际变化时由 GitHub Actions 提交结果。
+
+Go 模块缓存由 `actions/setup-go` 管理；上游原始文件不进入仓库，runner 结束后销毁。
