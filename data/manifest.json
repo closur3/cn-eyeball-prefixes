@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-21T12:15:30.368682278Z",
+  "generated_at": "2026-07-21T12:54:27.03076165Z",
   "scope": "IPv4; mainland China; current China Telecom, China Mobile, or China Unicom BGP origin plus a covering same-operator APNIC registration; current three-operator BGP units heal internal operator-registration conflict holes after all strong exclusions; small ambiguous customer-use fragments are accepted as best-effort error to keep the ACL deployably compact; dedicated premium backbone ASNs, cloud-provider CIDRs, strong APNIC registrations outside ordinary user access scope, independent holders and route origins, and strong RIPE RIS MOAS evidence are excluded",
   "sources": [
     {
@@ -161,17 +161,17 @@
       "address_count": 221009074
     },
     {
-      "name": "hybrid_bgp_conflict_healed_additions",
+      "name": "bgp_conflict_healed_additions",
       "cidr_count": 146,
       "address_count": 7519
     },
     {
-      "name": "hybrid_bgp_conflict_healing_admissions",
+      "name": "bgp_conflict_healing_admissions",
       "cidr_count": 14075,
       "address_count": 221016593
     },
     {
-      "name": "hybrid_admission_denials",
+      "name": "operator_registration_admission_denials",
       "cidr_count": 1777,
       "address_count": 2529909
     },
@@ -187,7 +187,7 @@
     }
   ],
   "operator_registration_admission": {
-    "mode": "hybrid_bgp_conflict_healing_with_strong_exclusions",
+    "mode": "bgp_registration_conflict_healing_with_strong_exclusions",
     "pre_cidr_count": 15804,
     "denied_cidr_count": 1777,
     "hierarchical_cidr_count": 14960,
@@ -196,10 +196,10 @@
     "final_cidr_count": 14075,
     "cidr_expansion_ratio": 0.8905973171349025,
     "maximum_cidr_expansion_ratio": 2,
-    "hybrid_cidr_ratio": 0.9408422459893048,
-    "maximum_hybrid_cidr_ratio": 1.1,
-    "hybrid_added_address_ratio": 0.000034021227562810384,
-    "maximum_hybrid_added_address_ratio": 0.001
+    "conflict_healing_cidr_ratio": 0.9408422459893048,
+    "maximum_conflict_healing_cidr_ratio": 1.1,
+    "conflict_healed_address_ratio": 0.000034021227562810384,
+    "maximum_conflict_healed_address_ratio": 0.001
   },
   "cloud_sources": [
     {
@@ -109177,20 +109177,6 @@
       "cidr_count": 237,
       "address_count": 3750734,
       "sha256": "4b7ccef2e4cdd1f702b3c498cbc6bdc32eb86b6af990db04fe8b25f9f21f103e"
-    }
-  ],
-  "audits": [
-    {
-      "name": "zhejiang_apnic_registration",
-      "path": "audits/zhejiang-apnic.json.gz",
-      "human_path": "audits/zhejiang-apnic.md",
-      "cidr_count": 2456,
-      "fact_count": 116726,
-      "address_count": 15952367,
-      "registry_covered_address_count": 15952367,
-      "strong_non_public_signal_address_count": 0,
-      "sha256": "f3cddb08bd14f69d3eb3c99e8420bf7ba7216957f8629780da1f0916f0fc4f71",
-      "human_sha256": "efa00a8dbb1b385ee7a532013bfd7ce43c5ee742c750ec0225c3925af3cfe4cb"
     }
   ]
 }
