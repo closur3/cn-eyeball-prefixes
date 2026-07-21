@@ -1,12 +1,27 @@
 {
-  "generated_at": "2026-07-21T20:19:30.059447868Z",
+  "generated_at": "2026-07-21T20:47:58.116563067Z",
   "scope": "Current exact IPv6 BGP prefixes fully contained by each operator's official APNIC 240x allocation and whose complete observed Origin set is attributed to that operator",
   "output_kind": "exact_bgp_prefix_candidates",
   "sources": {
+    "apnic_rdap_chinanet_1": {
+      "path": "/home/runner/work/cn-eyeball-prefixes/cn-eyeball-prefixes/.tmp/cn-eyeball-ipv6-sources/rdap/chinanet.json",
+      "bytes": 4225,
+      "sha256": "dc2ad5e8e53649b9aff368490d44e093aed918320acda1cc745ee29e3fc5f9d5"
+    },
+    "apnic_rdap_cmcc_1": {
+      "path": "/home/runner/work/cn-eyeball-prefixes/cn-eyeball-prefixes/.tmp/cn-eyeball-ipv6-sources/rdap/cmcc.json",
+      "bytes": 5025,
+      "sha256": "62363b564971ae374f30a90d54ef4b634bf4511edca6ab8ffaed448630198cdd"
+    },
+    "apnic_rdap_unicom_1": {
+      "path": "/home/runner/work/cn-eyeball-prefixes/cn-eyeball-prefixes/.tmp/cn-eyeball-ipv6-sources/rdap/unicom.json",
+      "bytes": 3373,
+      "sha256": "a3d60192df59b7e413b7fa47fd6ac482ec6b1617a0b1869ab15ba4ce6e2f1f8f"
+    },
     "iptoasn_v6_asn_metadata_only": {
       "path": "/home/runner/work/cn-eyeball-prefixes/cn-eyeball-prefixes/.tmp/cn-eyeball-ipv6-sources/ip2asn-v6.tsv.gz",
-      "bytes": 1974689,
-      "sha256": "816bd185c5a950b8dc8a5cf2d97606d28f7ed4c3e5f6e7fa698ca738d0af3269"
+      "bytes": 1975215,
+      "sha256": "d8e2681f61082246560fcd3574ab9375e09066b466e3bbf15a675109d556268c"
     },
     "operator_config": {
       "path": "config/operators.json",
@@ -15,8 +30,8 @@
     },
     "operator_ipv6_allocations": {
       "path": "config/ipv6_allocations.json",
-      "bytes": 1017,
-      "sha256": "827387ed52b25f2a5eeaae91425822998cde0552f3b1876f93531373a3a2bd93"
+      "bytes": 1200,
+      "sha256": "b6b72b32b5fd63d436672711126c9c869823bffac87d9c334ae5d0e32974c9a4"
     },
     "riswhois_ipv6": {
       "path": "/home/runner/work/cn-eyeball-prefixes/cn-eyeball-prefixes/.tmp/cn-eyeball-ipv6-sources/riswhois-ipv6.gz",
@@ -28,6 +43,7 @@
     "No gaoyifan china6 intersection",
     "No APNIC inet6num input",
     "Admission boundaries are the official allocations 240e::/18, 2409:8000::/20, and 2408:8000::/20 recorded in versioned configuration",
+    "Every build validates each admission boundary against a freshly downloaded APNIC RDAP response and fails closed on registration drift",
     "Legacy 2001:: and 2400:: operator prefixes are outside the admission boundary",
     "Every emitted CIDR is an exact prefix present in the RIPE RISWhois IPv6 dump",
     "No address subtraction, sibling merging, or synthetic CIDR aggregation",
@@ -988,7 +1004,11 @@
           "netname": "CT-IPv6-Networks",
           "organization": "China Telecom",
           "status": "ALLOCATED PORTABLE",
-          "source": "https://wq.apnic.net/apnic-bin/whois.pl?object_type=inet6num\u0026searchtext=240e%3A%3A%2F18"
+          "source": "https://rdap.apnic.net/ip/240e::/18",
+          "rdap_file": "chinanet.json",
+          "required_entity_handles": [
+            "ORG-CT1-AP"
+          ]
         }
       ]
     },
@@ -1003,7 +1023,11 @@
           "netname": "CMNET-V6-20110823",
           "organization": "China Mobile",
           "status": "ALLOCATED PORTABLE",
-          "source": "https://wq.apnic.net/apnic-bin/whois.pl?object_type=inet6num\u0026searchtext=2409%3A8000%3A%3A%2F20"
+          "source": "https://rdap.apnic.net/ip/2409:8000::/20",
+          "rdap_file": "cmcc.json",
+          "required_entity_handles": [
+            "ORG-CM1-AP"
+          ]
         }
       ]
     },
@@ -1018,7 +1042,12 @@
           "netname": "CU-CN",
           "organization": "China Unicom",
           "status": "ALLOCATED PORTABLE",
-          "source": "https://wq.apnic.net/apnic-bin/whois.pl?object_type=inet6num\u0026searchtext=2408%3A8000%3A%3A%2F20"
+          "source": "https://rdap.apnic.net/ip/2408:8000::/20",
+          "rdap_file": "unicom.json",
+          "required_entity_handles": [
+            "CH1302-AP",
+            "IRT-CU-CN"
+          ]
         }
       ]
     }

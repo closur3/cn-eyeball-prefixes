@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-21T20:19:30.059447868Z",
+  "generated_at": "2026-07-21T20:47:58.116563067Z",
   "scope": "Current exact IPv6 BGP prefixes fully contained by each operator's official APNIC 240x allocation and whose complete observed Origin set is attributed to that operator",
   "ris": {
     "rows": 308993,
@@ -13,8 +13,8 @@
   "rejected_prefixes_by_reason": {
     "cross_operator_moas": 6,
     "excluded_origin": 3588,
-    "missing_asn_metadata": 2457,
-    "non_cn_origin": 258083,
+    "missing_asn_metadata": 2442,
+    "non_cn_origin": 258098,
     "non_operator_origin": 6223,
     "outside_operator_240x_allocation": 229
   },
