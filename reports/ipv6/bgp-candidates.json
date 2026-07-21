@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-21T20:59:59.960120093Z",
+  "generated_at": "2026-07-21T21:03:46.092835502Z",
   "scope": "Current exact IPv6 BGP prefixes fully contained by each operator's official APNIC 240x allocation and whose complete observed Origin set is attributed to that operator",
   "ris": {
     "rows": 308993,
