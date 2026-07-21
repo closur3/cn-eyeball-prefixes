@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-20T11:10:47.322764573Z",
+  "generated_at": "2026-07-21T10:33:23.315789174Z",
   "scope": "Best-effort ACL list; IPv4; mainland China; candidates for IPv4 addresses presented on the public Internet by ordinary Internet access users of China Telecom, China Mobile, or China Unicom, only when also present in china-operator-ip's origin-only China list; does not classify or protect addresses by household, individual, enterprise, or institutional customer type; explicitly subtracts dedicated premium backbone ASNs, cloud-provider CIDRs, strong APNIC registrations outside ordinary user access scope, portable and non-portable registrations linked through APNIC aut-num to a currently active independent ASN, registrations supported by both an independent legal-entity name and an exact APNIC aut-num link, origin-validated APNIC route objects, strongly linked independent APNIC route origins, and conservative RIPE RIS multi-observer MOAS evidence; unclear mixed-use, historical and MOAS space remains included",
   "sources": [
     {
@@ -11,44 +11,44 @@
     {
       "name": "china",
       "url": "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/china.txt",
-      "bytes": 65385,
-      "sha256": "33af3a232e9e9164e165ea802fd7f10fe9c02b11b1bf5cd45d1f1122174b5f64"
+      "bytes": 65291,
+      "sha256": "c353efa07050b302afc836ca140087c1e0ba047ef0683fa58b63ea998107649b"
     },
     {
       "name": "iptoasn_ipv4",
       "url": "https://iptoasn.com/data/ip2asn-v4.tsv.gz",
-      "bytes": 6885303,
-      "sha256": "0899afc4515ae8e2218a92658578f9238c46a36829833c0223f576e8881d53e6"
+      "bytes": 6885879,
+      "sha256": "4819103eb004fc8eee9214e6e512e84712cc0763774ce8f459d79dc6672e617a"
     },
     {
       "name": "apnic_organisation",
       "url": "https://ftp.apnic.net/apnic/whois/apnic.db.organisation.gz",
-      "bytes": 547004,
-      "sha256": "0e3b2b451562fbd95aa081294fbb75fc18d618ecdef7d5b12c2d11fc8af5ecd2"
+      "bytes": 547119,
+      "sha256": "bf73977cc520234791c2d235cf6cc24a9e6efd96dcfe333fca154095accf8276"
     },
     {
       "name": "apnic_inetnum",
       "url": "https://ftp.apnic.net/apnic/whois/apnic.db.inetnum.gz",
-      "bytes": 53551173,
-      "sha256": "ce4e061c24ed445e0172ea6833be392744915c00925f4368446f84246b348e9e"
+      "bytes": 53549161,
+      "sha256": "09da31aea138771f44b195cdad8d4212b87b2079b2acbafbf064deab35e62839"
     },
     {
       "name": "apnic_autnum",
       "url": "https://ftp.apnic.net/apnic/whois/apnic.db.aut-num.gz",
-      "bytes": 2090734,
-      "sha256": "31bb1f474185e6f175b644e9f75d65b44863b671e5e0635d427657023534e307"
+      "bytes": 2091221,
+      "sha256": "38cdbfc08334dfe2cda4e87e40f224abf5e87ce1496f5d4b2f819e35e7aeea42"
     },
     {
       "name": "apnic_route",
       "url": "https://ftp.apnic.net/apnic/whois/apnic.db.route.gz",
-      "bytes": 7905012,
-      "sha256": "c9a99c0ad6211c7e550e39ef0f64b755d2e784213855b661a3961cbca372b7ad"
+      "bytes": 7904103,
+      "sha256": "927713a99efd6358277a841a9c822cbf5e6da81d93b3260b85945b609125bd4c"
     },
     {
       "name": "riswhois_ipv4",
       "url": "https://www.ris.ripe.net/dumps/riswhoisdump.IPv4.gz",
-      "bytes": 5373511,
-      "sha256": "8d6e87a86ae802e8c7ddc3ce4a7a15c795a9229daba20fad6cf23ff0e66832ba"
+      "bytes": 5373228,
+      "sha256": "400351e8a987e0f555f0b5a43061ac1906e84346ea720e43992a1e144dfb74b7"
     },
     {
       "name": "ip2region_ipv4_source",
@@ -102,13 +102,13 @@
   "stages": [
     {
       "name": "operator_origin_candidates",
-      "cidr_count": 9779,
-      "address_count": 229277440
+      "cidr_count": 9808,
+      "address_count": 229276416
     },
     {
       "name": "china_origin_intersection",
-      "cidr_count": 9777,
-      "address_count": 229276928
+      "cidr_count": 9806,
+      "address_count": 229275904
     },
     {
       "name": "effective_cloud_prefix_exclusions",
@@ -117,8 +117,8 @@
     },
     {
       "name": "effective_apnic_prefix_exclusions",
-      "cidr_count": 2009,
-      "address_count": 822083
+      "cidr_count": 2014,
+      "address_count": 822531
     },
     {
       "name": "effective_apnic_portable_holder_exclusions",
@@ -152,13 +152,13 @@
     },
     {
       "name": "final_output",
-      "cidr_count": 15565,
-      "address_count": 223581197
+      "cidr_count": 15617,
+      "address_count": 223579725
     },
     {
       "name": "province_attributed_output",
-      "cidr_count": 16939,
-      "address_count": 218736807
+      "cidr_count": 16991,
+      "address_count": 218735335
     }
   ],
   "cloud_sources": [
@@ -220,14 +220,14 @@
     }
   ],
   "apnic_inetnum": {
-    "record_count": 1256773,
+    "record_count": 1256753,
     "relevant_record_count": 448027,
-    "matched_winning_segment_count": 1650,
-    "effective_cidr_count": 2009,
-    "effective_address_count": 822083
+    "matched_winning_segment_count": 1655,
+    "effective_cidr_count": 2014,
+    "effective_address_count": 822531
   },
   "apnic_portable_holders": {
-    "autnum_record_count": 25887,
+    "autnum_record_count": 25883,
     "matched_winning_segment_count": 597,
     "effective_cidr_count": 934,
     "effective_address_count": 1577746
@@ -243,7 +243,7 @@
     "effective_address_count": 2659781
   },
   "apnic_route": {
-    "object_count": 832534,
+    "object_count": 832527,
     "relevant_object_count": 2826,
     "relevant_winning_segment_count": 2888,
     "origin_validated_match_count": 0,
@@ -609,13 +609,13 @@
     ]
   },
   "ris_whois": {
-    "row_count": 1245577,
-    "prefix_count": 1223694,
-    "relevant_prefix_count": 46384,
-    "winning_segment_count": 56408,
-    "candidate_moas_segment_count": 202,
+    "row_count": 1245753,
+    "prefix_count": 1223880,
+    "relevant_prefix_count": 46385,
+    "winning_segment_count": 56412,
+    "candidate_moas_segment_count": 201,
     "strong_evidence_segment_count": 0,
-    "retained_ambiguous_moas_segment_count": 202,
+    "retained_ambiguous_moas_segment_count": 201,
     "effective_cidr_count": 0,
     "effective_address_count": 0
   },
@@ -3818,6 +3818,28 @@
     {
       "source": "apnic_inetnum",
       "category": "apnic_inetnum",
+      "cidr": "61.144.250.192/27",
+      "address_count": 32,
+      "asn": "4134",
+      "operator": "chinanet",
+      "asn_description": "CHINANET-BACKBONE No.31,Jin-rong Street",
+      "registry_netnames": [
+        "SHENZHEN-HUWEI-TECH-CO"
+      ],
+      "registry_descriptions": [
+        "SHENZHEN HUAWEI TECHNOLOGY  CO."
+      ],
+      "registry_maintainers": [
+        "MAINT-CHINANET-GD"
+      ],
+      "registry_status": "ASSIGNED NON-PORTABLE",
+      "registry_last_modified": "2008-09-04T06:51:12Z",
+      "matched_by": "exclude_apnic_inetnum_rules: \\bhuawei[ -]?(?:(?:3com|symantec)[ -]?(?:tech|technology)|software[ -]?technology|(?:technologies|technology|technique)[ -]?(?:co(?:mpany)?|inc))(?:[., ]+(?:ltd|limited))?\\b|\\bbeijing[ -]?baidu[ -]?(?:network information technology|netcom science and technology)[ -]?co(?:mpany)?(?:[., ]+(?:ltd|limited))?\\b|\\bbaidu online network technology\\b|\\bbaidu[ -]?co(?:mpany)?[., ]+(?:ltd|limited)\\b|\\balibaba(?:\\.com|[ -]com)?[ -]?(?:\\(china\\)|china)[ -]?(?:(?:network|networking|net|web)[ -]?)?(?:technology[ -]?)?(?:co(?:mpany)?(?:[., ]+(?:ltd|limited))?|ltd[.]com)\\b",
+      "reason": "APNIC inetnum registration explicitly identifies a qualified Huawei, Baidu, or Alibaba corporate network"
+    },
+    {
+      "source": "apnic_inetnum",
+      "category": "apnic_inetnum",
       "cidr": "61.145.73.48/29",
       "address_count": 8,
       "asn": "4134",
@@ -5330,6 +5352,29 @@
       "registry_last_modified": "2021-06-24T07:29:12Z",
       "matched_by": "exclude_apnic_inetnum_rules: idc(?:[^a-z0-9]|$)|\\binternet data cent(?:er|re)\\b",
       "reason": "APNIC inetnum registration explicitly identifies an IDC network"
+    },
+    {
+      "source": "apnic_inetnum",
+      "category": "apnic_inetnum",
+      "cidr": "61.174.214.0/24",
+      "address_count": 256,
+      "asn": "4134",
+      "operator": "chinanet",
+      "asn_description": "CHINANET-BACKBONE No.31,Jin-rong Street",
+      "registry_netnames": [
+        "SHAOXING-TELECOM-BUREAU"
+      ],
+      "registry_descriptions": [
+        "Shaoxing Telecom Bureau Data  Center",
+        "NULL"
+      ],
+      "registry_maintainers": [
+        "MAINT-CN-CHINANET-ZJ-SX"
+      ],
+      "registry_status": "ASSIGNED NON-PORTABLE",
+      "registry_last_modified": "2008-09-04T06:55:07Z",
+      "matched_by": "exclude_apnic_inetnum_rules: \\bdata[ -]?cent(?:er|re)\\b",
+      "reason": "APNIC inetnum registration explicitly identifies a data-center network"
     },
     {
       "source": "apnic_inetnum",
@@ -9774,6 +9819,28 @@
     {
       "source": "apnic_inetnum",
       "category": "apnic_inetnum",
+      "cidr": "218.17.215.160/27",
+      "address_count": 32,
+      "asn": "4134",
+      "operator": "chinanet",
+      "asn_description": "CHINANET-BACKBONE No.31,Jin-rong Street",
+      "registry_netnames": [
+        "HUWEI-TECH"
+      ],
+      "registry_descriptions": [
+        "HUAWEI TECHNOLOGY  CO."
+      ],
+      "registry_maintainers": [
+        "MAINT-CHINANET-GD"
+      ],
+      "registry_status": "ASSIGNED NON-PORTABLE",
+      "registry_last_modified": "2008-09-04T06:52:43Z",
+      "matched_by": "exclude_apnic_inetnum_rules: \\bhuawei[ -]?(?:(?:3com|symantec)[ -]?(?:tech|technology)|software[ -]?technology|(?:technologies|technology|technique)[ -]?(?:co(?:mpany)?|inc))(?:[., ]+(?:ltd|limited))?\\b|\\bbeijing[ -]?baidu[ -]?(?:network information technology|netcom science and technology)[ -]?co(?:mpany)?(?:[., ]+(?:ltd|limited))?\\b|\\bbaidu online network technology\\b|\\bbaidu[ -]?co(?:mpany)?[., ]+(?:ltd|limited)\\b|\\balibaba(?:\\.com|[ -]com)?[ -]?(?:\\(china\\)|china)[ -]?(?:(?:network|networking|net|web)[ -]?)?(?:technology[ -]?)?(?:co(?:mpany)?(?:[., ]+(?:ltd|limited))?|ltd[.]com)\\b",
+      "reason": "APNIC inetnum registration explicitly identifies a qualified Huawei, Baidu, or Alibaba corporate network"
+    },
+    {
+      "source": "apnic_inetnum",
+      "category": "apnic_inetnum",
       "cidr": "218.17.247.0/24",
       "address_count": 256,
       "asn": "4134",
@@ -11235,6 +11302,50 @@
       "registry_last_modified": "2008-09-04T07:20:55Z",
       "matched_by": "exclude_apnic_inetnum_rules: idc(?:[^a-z0-9]|$)|\\binternet data cent(?:er|re)\\b",
       "reason": "APNIC inetnum registration explicitly identifies an IDC network"
+    },
+    {
+      "source": "apnic_inetnum",
+      "category": "apnic_inetnum",
+      "cidr": "219.133.0.0/26",
+      "address_count": 64,
+      "asn": "4134",
+      "operator": "chinanet",
+      "asn_description": "CHINANET-BACKBONE No.31,Jin-rong Street",
+      "registry_netnames": [
+        "SHENZHEN-HUAWEI-CO"
+      ],
+      "registry_descriptions": [
+        "SHENZHEN HUAWEI TECHNOLOGY  CO."
+      ],
+      "registry_maintainers": [
+        "MAINT-CHINANET-GD"
+      ],
+      "registry_status": "ASSIGNED NON-PORTABLE",
+      "registry_last_modified": "2008-09-04T06:54:15Z",
+      "matched_by": "exclude_apnic_inetnum_rules: \\bhuawei[ -]?(?:(?:3com|symantec)[ -]?(?:tech|technology)|software[ -]?technology|(?:technologies|technology|technique)[ -]?(?:co(?:mpany)?|inc))(?:[., ]+(?:ltd|limited))?\\b|\\bbeijing[ -]?baidu[ -]?(?:network information technology|netcom science and technology)[ -]?co(?:mpany)?(?:[., ]+(?:ltd|limited))?\\b|\\bbaidu online network technology\\b|\\bbaidu[ -]?co(?:mpany)?[., ]+(?:ltd|limited)\\b|\\balibaba(?:\\.com|[ -]com)?[ -]?(?:\\(china\\)|china)[ -]?(?:(?:network|networking|net|web)[ -]?)?(?:technology[ -]?)?(?:co(?:mpany)?(?:[., ]+(?:ltd|limited))?|ltd[.]com)\\b",
+      "reason": "APNIC inetnum registration explicitly identifies a qualified Huawei, Baidu, or Alibaba corporate network"
+    },
+    {
+      "source": "apnic_inetnum",
+      "category": "apnic_inetnum",
+      "cidr": "219.133.94.128/26",
+      "address_count": 64,
+      "asn": "4134",
+      "operator": "chinanet",
+      "asn_description": "CHINANET-BACKBONE No.31,Jin-rong Street",
+      "registry_netnames": [
+        "HUWEI-TECH"
+      ],
+      "registry_descriptions": [
+        "HUAWEI TECHNOLOGY  CO."
+      ],
+      "registry_maintainers": [
+        "MAINT-CHINANET-GD"
+      ],
+      "registry_status": "ASSIGNED NON-PORTABLE",
+      "registry_last_modified": "2008-09-04T06:53:11Z",
+      "matched_by": "exclude_apnic_inetnum_rules: \\bhuawei[ -]?(?:(?:3com|symantec)[ -]?(?:tech|technology)|software[ -]?technology|(?:technologies|technology|technique)[ -]?(?:co(?:mpany)?|inc))(?:[., ]+(?:ltd|limited))?\\b|\\bbeijing[ -]?baidu[ -]?(?:network information technology|netcom science and technology)[ -]?co(?:mpany)?(?:[., ]+(?:ltd|limited))?\\b|\\bbaidu online network technology\\b|\\bbaidu[ -]?co(?:mpany)?[., ]+(?:ltd|limited)\\b|\\balibaba(?:\\.com|[ -]com)?[ -]?(?:\\(china\\)|china)[ -]?(?:(?:network|networking|net|web)[ -]?)?(?:technology[ -]?)?(?:co(?:mpany)?(?:[., ]+(?:ltd|limited))?|ltd[.]com)\\b",
+      "reason": "APNIC inetnum registration explicitly identifies a qualified Huawei, Baidu, or Alibaba corporate network"
     },
     {
       "source": "apnic_inetnum",
@@ -104140,7 +104251,7 @@
     {
       "operator": "chinanet",
       "asn_count": 55,
-      "retained_address_count": 116802702,
+      "retained_address_count": 116801742,
       "asns": [
         {
           "asn": "4134",
@@ -104454,7 +104565,7 @@
     {
       "operator": "unicom",
       "asn_count": 8,
-      "retained_address_count": 67205939,
+      "retained_address_count": 67205427,
       "asns": [
         {
           "asn": "4808",
@@ -104497,8 +104608,8 @@
       "operator": "chinanet",
       "description": "CHINANET-BACKBONE No.31,Jin-rong Street",
       "matched_by": "description_patterns: chinanet",
-      "origin_address_count": 99916288,
-      "retained_address_count": 99822796
+      "origin_address_count": 99916032,
+      "retained_address_count": 99822092
     },
     {
       "asn": "4811",
@@ -104529,8 +104640,8 @@
       "operator": "chinanet",
       "description": "CNIX-AP China Networks Inter-Exchange",
       "matched_by": "include_asns: China Telecom Beijing provincial network; public description is China Networks Inter-Exchange",
-      "origin_address_count": 3549696,
-      "retained_address_count": 1447714
+      "origin_address_count": 3549440,
+      "retained_address_count": 1447458
     },
     {
       "asn": "17633",
@@ -105105,8 +105216,8 @@
       "operator": "unicom",
       "description": "CHINA169-BACKBONE CHINA UNICOM China169 Backbone",
       "matched_by": "description_patterns: unicom",
-      "origin_address_count": 57248000,
-      "retained_address_count": 57049377
+      "origin_address_count": 57247488,
+      "retained_address_count": 57048865
     },
     {
       "asn": "17621",
@@ -105210,7 +105321,7 @@
       "matched_by": "description_patterns: china ?telecom",
       "exclusion_source": "description_rule",
       "reason": "ASN description explicitly identifies a dedicated IDC network",
-      "origin_address_count": 1888000
+      "origin_address_count": 1886976
     },
     {
       "asn": "38283",
@@ -105300,7 +105411,7 @@
       "matched_by": "description_patterns: china ?telecom",
       "exclusion_source": "description_rule",
       "reason": "ASN description explicitly identifies a dedicated cybersecurity network",
-      "origin_address_count": 4864
+      "origin_address_count": 5120
     },
     {
       "asn": "59223",
@@ -105993,7 +106104,7 @@
       "matched_by": "description_patterns: unicom",
       "exclusion_source": "explicit_policy",
       "reason": "China Unicom CUII dedicated premium backbone; outside ordinary Internet user access scope",
-      "origin_address_count": 650496
+      "origin_address_count": 651008
     },
     {
       "asn": "10206",
@@ -106171,9 +106282,9 @@
     {
       "name": "chinanet",
       "path": "operators/chinanet.txt",
-      "cidr_count": 9050,
-      "address_count": 116802702,
-      "sha256": "d3efbb0f4d5e9d549ba96be8f39ab7429158a890b4c9cd1241507b1c84ca0bb1"
+      "cidr_count": 9089,
+      "address_count": 116801742,
+      "sha256": "37a0436775d96c65713f776ad5e3c65e591bb95ce04563532fda5c400a39e00f"
     },
     {
       "name": "cmcc",
@@ -106185,23 +106296,23 @@
     {
       "name": "unicom",
       "path": "operators/unicom.txt",
-      "cidr_count": 5848,
-      "address_count": 67205939,
-      "sha256": "a59fa3cdccd0408dc46d15e105aa445f4b57b711597f8d64d8813873f1d7f04a"
+      "cidr_count": 5861,
+      "address_count": 67205427,
+      "sha256": "c88cbc0ab3e1fb217efee31648c54ac5e3262e90559a467a1240eab821dc4d94"
     },
     {
       "name": "CN",
       "path": "cn.txt",
-      "cidr_count": 15565,
-      "address_count": 223581197,
-      "sha256": "4d71146d4bf00a38a62e55b2dd25e97207605c48d0e12c486fd8fc0722424b20"
+      "cidr_count": 15617,
+      "address_count": 223579725,
+      "sha256": "f3e5a14222d6c29592edb6c2495e48e581f79a172c5a51cb7173e2aba30ea035"
     },
     {
       "name": "北京市",
       "path": "provinces/beijing.txt",
-      "cidr_count": 4280,
-      "address_count": 11791831,
-      "sha256": "3d2d46fe98540546f61615fb782208147c9f336f9defbfd716de606b8de9d4ff"
+      "cidr_count": 4283,
+      "address_count": 11791575,
+      "sha256": "fcb59e6cb150d48071bedff0b0368bce87efaf02342703145aeb246f43bf4869"
     },
     {
       "name": "天津市",
@@ -106213,9 +106324,9 @@
     {
       "name": "河北省",
       "path": "provinces/hebei.txt",
-      "cidr_count": 466,
-      "address_count": 9343379,
-      "sha256": "fd3f7189d6eb0f25409fbf90c9ad8b7551f45b12675949ee35a3d00e0b82daa1"
+      "cidr_count": 470,
+      "address_count": 9343123,
+      "sha256": "bfd2f4f45e3729db60e9ccdcebf862f8a0335e30407d0d0cc10baa9f271d64ab"
     },
     {
       "name": "山西省",
@@ -106269,23 +106380,23 @@
     {
       "name": "浙江省",
       "path": "provinces/zhejiang.txt",
-      "cidr_count": 2303,
-      "address_count": 16007190,
-      "sha256": "0f07a330434e35ccc8781e215179564d58ac474305293051c50dbee496a2c136"
+      "cidr_count": 2307,
+      "address_count": 16006934,
+      "sha256": "dc84024a8029c1792e54fd4ee26fde398d46d0b27d908d9c72893b84b2e51e8c"
     },
     {
       "name": "安徽省",
       "path": "provinces/anhui.txt",
-      "cidr_count": 407,
-      "address_count": 6486482,
-      "sha256": "7edfd7b3c3aeab47badde10bf8be16d5a8604cbf735bda8570624cd2b4cc443e"
+      "cidr_count": 416,
+      "address_count": 6486226,
+      "sha256": "4406a9624747d96f86ff43327ca6421db82ddbf58f25e02a09029bfdec628e08"
     },
     {
       "name": "福建省",
       "path": "provinces/fujian.txt",
-      "cidr_count": 870,
-      "address_count": 6298554,
-      "sha256": "9f8f340a58886b2ca0f4149fbc16b1abebaa45ceaf49b5c89bd9eca9033e6b85"
+      "cidr_count": 879,
+      "address_count": 6298298,
+      "sha256": "bbd98d5047e92699eef83ee0890d4202b0b4ff4de81837bec1a5cb232ac5c978"
     },
     {
       "name": "江西省",
@@ -106325,9 +106436,9 @@
     {
       "name": "广东省",
       "path": "provinces/guangdong.txt",
-      "cidr_count": 3292,
-      "address_count": 25578173,
-      "sha256": "455ffccab3aa5b71575ae3fa265200d87502cd7b729ce67d9d1916866b85ae4a"
+      "cidr_count": 3315,
+      "address_count": 25577981,
+      "sha256": "2f15beb1d8d6c882e172f9dcb775ff97c926bff416f3179082cb2619d9610f2d"
     },
     {
       "name": "广西壮族自治区",
