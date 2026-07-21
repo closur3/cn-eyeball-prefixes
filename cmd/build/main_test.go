@@ -35,14 +35,14 @@ func TestParentOperatorRegistrationAdmitsMoreSpecificCustomerRecord(t *testing.T
 		{Lo: 0, Hi: 255, Descriptions: []string{"CHINANET Zhejiang province network"}},
 		{Lo: 64, Hi: 127, Descriptions: []string{"Example customer assignment"}},
 	}
-	admitted := apnicOperatorAdmissionRanges(records, classifier)["chinanet"]
+	admitted := apnicOperatorAdmissionRanges(records, classifier)["chinatelecom"]
 	if len(admitted) != 1 || admitted[0] != (span{0, 255}) {
 		t.Fatalf("unexpected parent admission ranges: %#v", admitted)
 	}
 	segments := apnicinetnum.ResolveAll(records, func(apnicinetnum.Record) apnicinetnum.Match { return apnicinetnum.Match{} })
 	conflicts := apnicOperatorConflictRanges(segments, classifier)
-	if len(conflicts["chinanet"]) != 0 {
-		t.Fatalf("independent customer label unexpectedly became an operator conflict: %#v", conflicts["chinanet"])
+	if len(conflicts["chinatelecom"]) != 0 {
+		t.Fatalf("independent customer label unexpectedly became an operator conflict: %#v", conflicts["chinatelecom"])
 	}
 }
 
@@ -61,10 +61,10 @@ func TestBGPConflictHealingKeepsTheRouteUnitAtomic(t *testing.T) {
 	}}
 	observed, eligible := bgpConflictHealingRanges(
 		segments,
-		map[string]string{"4134": "chinanet"},
-		map[string][]span{"chinanet": {{0, 255}}},
-		map[string][]span{"chinanet": {{0, 127}, {144, 255}}},
-		map[string][]span{"chinanet": {{0, 255}}},
+		map[string]string{"4134": "chinatelecom"},
+		map[string][]span{"chinatelecom": {{0, 255}}},
+		map[string][]span{"chinatelecom": {{0, 127}, {144, 255}}},
+		map[string][]span{"chinatelecom": {{0, 255}}},
 	)
 	if len(observed) != 2 || observed[0] != (span{0, 127}) || observed[1] != (span{144, 255}) {
 		t.Fatalf("unexpected RIS-observed retained ranges: %#v", observed)
@@ -81,10 +81,10 @@ func TestBGPConflictHealingRequiresAPNICParent(t *testing.T) {
 	}}
 	observed, eligible := bgpConflictHealingRanges(
 		segments,
-		map[string]string{"4134": "chinanet"},
-		map[string][]span{"chinanet": {{0, 255}}},
-		map[string][]span{"chinanet": {{0, 255}}},
-		map[string][]span{"chinanet": nil},
+		map[string]string{"4134": "chinatelecom"},
+		map[string][]span{"chinatelecom": {{0, 255}}},
+		map[string][]span{"chinatelecom": {{0, 255}}},
+		map[string][]span{"chinatelecom": nil},
 	)
 	if len(observed) != 1 || observed[0] != (span{0, 255}) {
 		t.Fatalf("RIS observation unexpectedly depended on APNIC parent evidence: %#v", observed)
@@ -96,23 +96,23 @@ func TestBGPConflictHealingRequiresAPNICParent(t *testing.T) {
 
 func TestConflictHealedAdmissionHealsOnlyEligibleOperatorRanges(t *testing.T) {
 	hierarchical := map[string][]span{
-		"chinanet": {{0, 63}},
-		"cmcc":     {{128, 191}},
-		"unicom":   nil,
+		"chinatelecom": {{0, 63}},
+		"chinamobile":     {{128, 191}},
+		"chinaunicom":   nil,
 	}
 	eligible := map[string][]span{
-		"chinanet": {{0, 127}},
-		"cmcc":     {{128, 255}},
-		"unicom":   nil,
+		"chinatelecom": {{0, 127}},
+		"chinamobile":     {{128, 255}},
+		"chinaunicom":   nil,
 	}
 	got := conflictHealedAdmissionByOperator(hierarchical, []span{{64, 223}}, eligible)
-	if len(got["chinanet"]) != 1 || got["chinanet"][0] != (span{0, 127}) {
-		t.Fatalf("chinanet conflict healing did not heal its eligible conflict hole: %#v", got["chinanet"])
+	if len(got["chinatelecom"]) != 1 || got["chinatelecom"][0] != (span{0, 127}) {
+		t.Fatalf("chinatelecom conflict healing did not heal its eligible conflict hole: %#v", got["chinatelecom"])
 	}
-	if len(got["cmcc"]) != 1 || got["cmcc"][0] != (span{128, 223}) {
-		t.Fatalf("cmcc conflict healing escaped its BGP-covered eligible range: %#v", got["cmcc"])
+	if len(got["chinamobile"]) != 1 || got["chinamobile"][0] != (span{128, 223}) {
+		t.Fatalf("chinamobile conflict healing escaped its BGP-covered eligible range: %#v", got["chinamobile"])
 	}
-	if len(got["unicom"]) != 0 {
-		t.Fatalf("conflict healing invented an ineligible operator range: %#v", got["unicom"])
+	if len(got["chinaunicom"]) != 0 {
+		t.Fatalf("conflict healing invented an ineligible operator range: %#v", got["chinaunicom"])
 	}
 }

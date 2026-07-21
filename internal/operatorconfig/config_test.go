@@ -3,7 +3,7 @@ package operatorconfig
 import "testing"
 
 func TestRepositoryOperatorBoundary(t *testing.T) {
-	classifier, err := Load("../../config/operators.json", []string{"chinanet", "cmcc", "unicom"})
+	classifier, err := Load("../../config/operators.json", []string{"chinatelecom", "chinamobile", "chinaunicom"})
 	if err != nil {
 		t.Fatalf("load repository operator config: %v", err)
 	}
@@ -20,7 +20,7 @@ func TestRepositoryOperatorBoundary(t *testing.T) {
 			name:            "China Telecom CN2 dedicated premium backbone",
 			asn:             "4809",
 			description:     "CHINATELECOM-CORE-WAN-CN2 China Telecom Next Generation Carrier Network",
-			operator:        "chinanet",
+			operator:        "chinatelecom",
 			excluded:        true,
 			exclusionSource: "explicit_policy",
 		},
@@ -28,7 +28,7 @@ func TestRepositoryOperatorBoundary(t *testing.T) {
 			name:            "China Unicom CUII dedicated premium backbone",
 			asn:             "9929",
 			description:     "CUII CHINA UNICOM Industrial Internet Backbone",
-			operator:        "unicom",
+			operator:        "chinaunicom",
 			excluded:        true,
 			exclusionSource: "explicit_policy",
 		},
@@ -36,19 +36,19 @@ func TestRepositoryOperatorBoundary(t *testing.T) {
 			name:        "China Telecom ordinary access origins remain eligible",
 			asn:         "4134",
 			description: "CHINANET-BACKBONE No.31 Jin-rong Street",
-			operator:    "chinanet",
+			operator:    "chinatelecom",
 		},
 		{
 			name:        "China Unicom ordinary access origins remain eligible",
 			asn:         "4837",
 			description: "CHINA169-BACKBONE CHINA UNICOM China169 Backbone",
-			operator:    "unicom",
+			operator:    "chinaunicom",
 		},
 		{
 			name:        "CNCGROUP remains a bounded China Unicom identifier",
 			asn:         "4837",
 			description: "CNCGROUP-BACKBONE China Network Communications Group",
-			operator:    "unicom",
+			operator:    "chinaunicom",
 		},
 		{
 			name:        "embedded cnc typo is not a China Unicom identifier",
@@ -59,13 +59,13 @@ func TestRepositoryOperatorBoundary(t *testing.T) {
 			name:        "Beijing Telecom provincial network exception",
 			asn:         "4847",
 			description: "China Networks Inter-Exchange",
-			operator:    "chinanet",
+			operator:    "chinatelecom",
 		},
 		{
 			name:            "dedicated IDC description remains excluded",
 			asn:             "23724",
 			description:     "IDC China Telecommunications Corporation",
-			operator:        "chinanet",
+			operator:        "chinatelecom",
 			excluded:        true,
 			exclusionSource: "description_rule",
 		},
@@ -82,7 +82,7 @@ func TestRepositoryOperatorBoundary(t *testing.T) {
 }
 
 func TestIndependentLegalEntityPattern(t *testing.T) {
-	c, err := Load("../../config/operators.json", []string{"chinanet", "cmcc", "unicom"})
+	c, err := Load("../../config/operators.json", []string{"chinatelecom", "chinamobile", "chinaunicom"})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -98,7 +98,7 @@ func TestIndependentLegalEntityPattern(t *testing.T) {
 }
 
 func TestNationwideAPNICRegistrantAdmission(t *testing.T) {
-	c, err := Load("../../config/operators.json", []string{"chinanet", "cmcc", "unicom"})
+	c, err := Load("../../config/operators.json", []string{"chinatelecom", "chinamobile", "chinaunicom"})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -106,11 +106,11 @@ func TestNationwideAPNICRegistrantAdmission(t *testing.T) {
 		text     string
 		operator string
 	}{
-		{"CHINANET Zhejiang Province Network", "chinanet"},
-		{"China Telecom Zhejiang Province Network", "chinanet"},
-		{"China Mobile Group Zhejiang Co., Ltd.", "cmcc"},
-		{"CMNET-ZHEJIANG", "cmcc"},
-		{"China Unicom Zhejiang Province Network", "unicom"},
+		{"CHINANET Zhejiang Province Network", "chinatelecom"},
+		{"China Telecom Zhejiang Province Network", "chinatelecom"},
+		{"China Mobile Group Zhejiang Co., Ltd.", "chinamobile"},
+		{"CMNET-ZHEJIANG", "chinamobile"},
+		{"China Unicom Zhejiang Province Network", "chinaunicom"},
 	}
 	for _, tt := range tests {
 		if result := c.ClassifyAPNICRegistrant(tt.text); result.Operator != tt.operator {
@@ -133,7 +133,7 @@ func TestNationwideAPNICRegistrantAdmission(t *testing.T) {
 }
 
 func TestNetEaseAndWangyinAPNICRules(t *testing.T) {
-	c, err := Load("../../config/operators.json", []string{"chinanet", "cmcc", "unicom"})
+	c, err := Load("../../config/operators.json", []string{"chinatelecom", "chinamobile", "chinaunicom"})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -163,7 +163,7 @@ func TestNetEaseAndWangyinAPNICRules(t *testing.T) {
 }
 
 func TestConfirmedZhejiangAPNICRules(t *testing.T) {
-	c, err := Load("../../config/operators.json", []string{"chinanet", "cmcc", "unicom"})
+	c, err := Load("../../config/operators.json", []string{"chinatelecom", "chinamobile", "chinaunicom"})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -200,7 +200,7 @@ func TestConfirmedZhejiangAPNICRules(t *testing.T) {
 }
 
 func TestAPNICInetnumRulesNormalizeWhitespace(t *testing.T) {
-	c, err := Load("../../config/operators.json", []string{"chinanet", "cmcc", "unicom"})
+	c, err := Load("../../config/operators.json", []string{"chinatelecom", "chinamobile", "chinaunicom"})
 	if err != nil {
 		t.Fatal(err)
 	}

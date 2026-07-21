@@ -102,9 +102,9 @@ flowchart TD
 
 | 文件 | 内容 |
 | --- | --- |
-| `data/operators/chinanet.txt` | 中国电信正式 IPv4 CIDR |
-| `data/operators/cmcc.txt` | 中国移动正式 IPv4 CIDR |
-| `data/operators/unicom.txt` | 中国联通正式 IPv4 CIDR |
+| `data/operators/chinatelecom.txt` | 中国电信正式 IPv4 CIDR |
+| `data/operators/chinamobile.txt` | 中国移动正式 IPv4 CIDR |
+| `data/operators/chinaunicom.txt` | 中国联通正式 IPv4 CIDR |
 | `data/cn.txt` | 三网地址的去重合表 |
 | `data/provinces/<pinyin>.txt` | 相应省级行政区内的三网地址合表 |
 | `data/manifest.json` | 上游摘要、各阶段统计、冲突修复阈值、纳入/排除 ASN、前缀级排除证据及输出文件摘要 |
