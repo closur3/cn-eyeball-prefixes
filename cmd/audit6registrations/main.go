@@ -283,12 +283,21 @@ func firstPassDecision(category string, record apnic6.InetRecord) (bool, string)
 	case "independent_legal_entity":
 		return true, "Exclude: most-specific APNIC registration names an independent legal entity"
 	case "other_or_unclassified":
-		if strings.Contains(strings.ToUpper(record.Status), "PORTABLE") {
+		if isPortableStatus(record.Status) {
 			return true, "Exclude: portable resource cannot be attributed to the current operator"
 		}
 		return false, "Retain: non-portable assignment under the current three-operator Origin"
 	default:
 		return false, "Retain: most-specific APNIC registration is attributed to the current operator"
+	}
+}
+
+func isPortableStatus(status string) bool {
+	switch strings.ToUpper(strings.TrimSpace(status)) {
+	case "ALLOCATED PORTABLE", "ASSIGNED PORTABLE":
+		return true
+	default:
+		return false
 	}
 }
 
