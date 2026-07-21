@@ -62,6 +62,7 @@ type registrationFact struct {
 	ExplicitUserPurpose bool   `json:"explicit_user_purpose,omitempty"`
 	Space             spaceStat `json:"space"`
 	count             *big.Int
+	ranges            []ipset6.Range
 }
 
 type operatorSummary struct {
@@ -196,6 +197,7 @@ func main() {
 				facts[key] = fact
 			}
 			fact.count.Add(fact.count, ipset6.AddressCount([]ipset6.Range{hit.Range}))
+			fact.ranges = append(fact.ranges, hit.Range)
 		}
 	}
 
@@ -251,7 +253,7 @@ func main() {
 	}
 	for _, fact := range facts {
 		total := ipset6.AddressCount(candidateByOperator[fact.Operator])
-		fact.Space = countStat(fact.count, total)
+		fact.Space = makeStat(fact.ranges, total)
 		result.RegistrationFacts = append(result.RegistrationFacts, *fact)
 	}
 	sort.Slice(result.RegistrationFacts, func(i, j int) bool {
