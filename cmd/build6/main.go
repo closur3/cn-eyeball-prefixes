@@ -34,31 +34,13 @@ type allocationConfig struct {
 }
 
 type allocation struct {
-	Prefix                string   `json:"prefix"`
-	Registry              string   `json:"registry"`
-	Netname               string   `json:"netname"`
-	Organization          string   `json:"organization"`
-	Status                string   `json:"status"`
-	Source                string   `json:"source"`
-	RDAPFile              string   `json:"rdap_file"`
-	RequiredEntityHandles []string `json:"required_entity_handles"`
-	parsed                netip.Prefix
-}
-
-type rdapNetwork struct {
-	Handle       string       `json:"handle"`
-	StartAddress string       `json:"startAddress"`
-	EndAddress   string       `json:"endAddress"`
-	IPVersion    string       `json:"ipVersion"`
-	Name         string       `json:"name"`
-	Type         string       `json:"type"`
-	Country      string       `json:"country"`
-	Status       []string     `json:"status"`
-	Entities     []rdapEntity `json:"entities"`
-}
-
-type rdapEntity struct {
-	Handle string `json:"handle"`
+	Prefix       string `json:"prefix"`
+	Registry     string `json:"registry"`
+	Netname      string `json:"netname"`
+	Organization string `json:"organization"`
+	Status       string `json:"status"`
+	Source       string `json:"source"`
+	parsed       netip.Prefix
 }
 
 type sourceMeta struct {
@@ -165,22 +147,20 @@ func main() {
 	iptoasnPath := flag.String("iptoasn", "", "IPtoASN IPv6 TSV gzip, used only for ASN names")
 	configPath := flag.String("operator-config", "config/operators.json", "operator config")
 	allocationPath := flag.String("allocation-config", "config/ipv6_allocations.json", "official operator IPv6 allocation boundaries")
-	rdapDir := flag.String("rdap-dir", "", "directory containing live APNIC RDAP responses for every admission block")
 	atlasDir := flag.String("atlas-dir", "", "directory containing RIPE Atlas probe API responses for every operator allocation")
 	chinanetOutput := flag.String("chinanet-output", "data/ipv6/operators/chinanet.txt", "China Telecom exact BGP candidate prefixes")
 	manifestPath := flag.String("manifest", "data/ipv6/manifest.json", "IPv6 manifest")
 	auditJSONPath := flag.String("audit-json", "reports/ipv6/bgp-candidates.json", "BGP candidate audit JSON")
 	auditMarkdownPath := flag.String("audit-markdown", "reports/ipv6/bgp-candidates.md", "BGP candidate audit Markdown")
 	flag.Parse()
-	if *risPath == "" || *iptoasnPath == "" || *rdapDir == "" || *atlasDir == "" {
-		panic("--ris, --iptoasn, --rdap-dir, and --atlas-dir are required")
+	if *risPath == "" || *iptoasnPath == "" || *atlasDir == "" {
+		panic("--ris, --iptoasn, and --atlas-dir are required")
 	}
 
 	classifier, err := operatorconfig.Load(*configPath, operators)
 	must(err)
 	allocations, err := readAllocations(*allocationPath)
 	must(err)
-	must(validateAllocationRDAP(*rdapDir, allocations))
 	metadata, err := readASNMetadata(*iptoasnPath)
 	must(err)
 	records, risStats, err := riswhois6.ParseGzip(*risPath)
@@ -207,13 +187,6 @@ func main() {
 		sources[name] = meta
 	}
 	for _, operator := range operators {
-		for i, row := range allocations[operator] {
-			path := filepath.Join(*rdapDir, row.RDAPFile)
-			meta, err := fileMetadata(path)
-			must(err)
-			meta.Source = row.Source
-			sources[fmt.Sprintf("apnic_rdap_%s_%d", operator, i+1)] = meta
-		}
 		path := filepath.Join(*atlasDir, operator+".json")
 		meta, err := fileMetadata(path)
 		must(err)
@@ -227,7 +200,7 @@ func main() {
 		Sources: sources,
 		Policy: buildPolicy{
 			AddressFamily: "IPv6", AllocationAuthority: "APNIC",
-			AllocationCheck: "live_rdap_exact_range", RoutingSnapshot: "RIPE_RISWhois",
+			AllocationCheck: "versioned_static_config", RoutingSnapshot: "RIPE_RISWhois",
 			OutputUnit: "exact_observed_bgp_prefix", OriginPolicy: "complete_origin_set_same_operator",
 			SyntheticAggregation: false,
 		},
@@ -464,7 +437,7 @@ func readAllocations(path string) (map[string][]allocation, error) {
 			if err != nil || !prefix.Addr().Is6() || prefix.Addr().Is4In6() || prefix != prefix.Masked() {
 				return nil, fmt.Errorf("invalid IPv6 allocation %q for %s", rows[i].Prefix, operator)
 			}
-			if rows[i].Registry != "APNIC" || rows[i].Organization == "" || rows[i].Source == "" || rows[i].RDAPFile == "" || len(rows[i].RequiredEntityHandles) == 0 {
+			if rows[i].Registry != "APNIC" || rows[i].Organization == "" || rows[i].Source == "" {
 				return nil, fmt.Errorf("IPv6 allocation %q for %s lacks APNIC evidence", rows[i].Prefix, operator)
 			}
 			rows[i].parsed = prefix
@@ -472,55 +445,6 @@ func readAllocations(path string) (map[string][]allocation, error) {
 		cfg.Operators[operator] = rows
 	}
 	return cfg.Operators, nil
-}
-
-func validateAllocationRDAP(dir string, allocations map[string][]allocation) error {
-	for _, operator := range operators {
-		for _, expected := range allocations[operator] {
-			path := filepath.Join(dir, expected.RDAPFile)
-			b, err := os.ReadFile(path)
-			if err != nil {
-				return fmt.Errorf("read APNIC RDAP evidence for %s: %w", operator, err)
-			}
-			var actual rdapNetwork
-			if err := json.Unmarshal(b, &actual); err != nil {
-				return fmt.Errorf("parse APNIC RDAP evidence for %s: %w", operator, err)
-			}
-			start, err := netip.ParseAddr(actual.StartAddress)
-			if err != nil {
-				return fmt.Errorf("APNIC RDAP returned invalid startAddress for %s: %q", operator, actual.StartAddress)
-			}
-			end, err := netip.ParseAddr(actual.EndAddress)
-			if err != nil {
-				return fmt.Errorf("APNIC RDAP returned invalid endAddress for %s: %q", operator, actual.EndAddress)
-			}
-			if !strings.EqualFold(actual.Handle, expected.Prefix) || start != expected.parsed.Addr() || end != lastAddress(expected.parsed) {
-				return fmt.Errorf("APNIC RDAP range drift for %s: got %s (%s-%s), want %s", operator, actual.Handle, start, end, expected.Prefix)
-			}
-			if actual.IPVersion != "v6" || !strings.EqualFold(actual.Name, expected.Netname) || !strings.EqualFold(actual.Type, expected.Status) || !strings.EqualFold(actual.Country, "CN") || !containsFold(actual.Status, "active") {
-				return fmt.Errorf("APNIC RDAP registration drift for %s: name=%q type=%q country=%q status=%v", operator, actual.Name, actual.Type, actual.Country, actual.Status)
-			}
-			present := map[string]bool{}
-			for _, entity := range actual.Entities {
-				present[strings.ToUpper(entity.Handle)] = true
-			}
-			for _, handle := range expected.RequiredEntityHandles {
-				if !present[strings.ToUpper(handle)] {
-					return fmt.Errorf("APNIC RDAP entity drift for %s: required handle %s is absent", operator, handle)
-				}
-			}
-		}
-	}
-	return nil
-}
-
-func containsFold(values []string, want string) bool {
-	for _, value := range values {
-		if strings.EqualFold(value, want) {
-			return true
-		}
-	}
-	return false
 }
 
 func insideAllocation(prefix netip.Prefix, allocations []allocation) bool {

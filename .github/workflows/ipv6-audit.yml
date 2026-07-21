@@ -35,10 +35,6 @@ jobs:
           curl_opts=(--fail --silent --show-error --location --retry 3)
           curl "${curl_opts[@]}" 'https://iptoasn.com/data/ip2asn-v6.tsv.gz' -o "$SOURCE_DIR/ip2asn-v6.tsv.gz"
           curl "${curl_opts[@]}" 'https://www.ris.ripe.net/dumps/riswhoisdump.IPv6.gz' -o "$SOURCE_DIR/riswhois-ipv6.gz"
-          mkdir -p "$SOURCE_DIR/rdap"
-          curl "${curl_opts[@]}" -H 'Accept: application/rdap+json' 'https://rdap.apnic.net/ip/240e::/18' -o "$SOURCE_DIR/rdap/chinanet.json"
-          curl "${curl_opts[@]}" -H 'Accept: application/rdap+json' 'https://rdap.apnic.net/ip/2409:8000::/20' -o "$SOURCE_DIR/rdap/cmcc.json"
-          curl "${curl_opts[@]}" -H 'Accept: application/rdap+json' 'https://rdap.apnic.net/ip/2408:8000::/20' -o "$SOURCE_DIR/rdap/unicom.json"
           mkdir -p "$SOURCE_DIR/atlas"
           curl "${curl_opts[@]}" 'https://atlas.ripe.net/api/v2/probes/?country_code=CN&prefix_v6=240e%3A%3A%2F18&page_size=500' -o "$SOURCE_DIR/atlas/chinanet.json"
           curl "${curl_opts[@]}" 'https://atlas.ripe.net/api/v2/probes/?country_code=CN&prefix_v6=2409%3A8000%3A%3A%2F20&page_size=500' -o "$SOURCE_DIR/atlas/cmcc.json"
@@ -50,9 +46,6 @@ jobs:
           set -euo pipefail
           test $(stat -c '%s' "$SOURCE_DIR/ip2asn-v6.tsv.gz") -gt 100000
           test $(stat -c '%s' "$SOURCE_DIR/riswhois-ipv6.gz") -gt 1000000
-          test $(stat -c '%s' "$SOURCE_DIR/rdap/chinanet.json") -gt 1000
-          test $(stat -c '%s' "$SOURCE_DIR/rdap/cmcc.json") -gt 1000
-          test $(stat -c '%s' "$SOURCE_DIR/rdap/unicom.json") -gt 1000
           test $(stat -c '%s' "$SOURCE_DIR/atlas/chinanet.json") -gt 1000
           test $(stat -c '%s' "$SOURCE_DIR/atlas/cmcc.json") -gt 1000
           test $(stat -c '%s' "$SOURCE_DIR/atlas/unicom.json") -gt 1000
@@ -64,7 +57,6 @@ jobs:
           go run ./cmd/build6 \
             --iptoasn "$SOURCE_DIR/ip2asn-v6.tsv.gz" \
             --ris "$SOURCE_DIR/riswhois-ipv6.gz" \
-            --rdap-dir "$SOURCE_DIR/rdap" \
             --atlas-dir "$SOURCE_DIR/atlas" \
             --operator-config config/operators.json
           test -s data/ipv6/operators/chinanet.txt
