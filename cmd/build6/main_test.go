@@ -100,3 +100,36 @@ func TestSelectPrefixesRejectsLegacyOperatorSpace(t *testing.T) {
 		t.Fatalf("legacy space was admitted: accepted=%#v rejected=%#v", accepted, rejected)
 	}
 }
+
+func TestClassifyAtlasProbeRequiresExactCurrentAccessPrefix(t *testing.T) {
+	probe := atlasProbe{
+		ID: 1, ASNv6: 9808, PrefixV6: "2409:8a55:400::/40", IsPublic: true,
+		Status: atlasStatus{ID: 1, Name: "Connected"},
+		Tags: []atlasTag{{Slug: "home"}, {Slug: "ftth"}},
+	}
+	current := map[string]map[string]bool{"2409:8a55:400::/40": {"9808": true}}
+	allocations := []allocation{{parsed: netip.MustParsePrefix("2409:8000::/20")}}
+	got := classifyAtlasProbe("cmcc", probe, current, allocations)
+	if !got.AdmissionEligible || got.AccessClass != "fixed_access" || !got.ExactCurrentBGP {
+		t.Fatalf("strong exact Atlas access evidence was not eligible: %#v", got)
+	}
+	probe.PrefixV6 = "2409:8a55::/32"
+	got = classifyAtlasProbe("cmcc", probe, current, allocations)
+	if got.AdmissionEligible || got.DecisionReason != "not_exact_current_bgp_prefix_and_origin" {
+		t.Fatalf("covering Atlas prefix was admitted without an exact BGP match: %#v", got)
+	}
+}
+
+func TestClassifyAtlasProbeRejectsOfficeOrDatacentre(t *testing.T) {
+	probe := atlasProbe{
+		ID: 2, ASNv6: 4134, PrefixV6: "240e:6b0::/28", Description: "office data centre", IsPublic: true,
+		Status: atlasStatus{ID: 1, Name: "Connected"},
+		Tags: []atlasTag{{Slug: "home"}, {Slug: "office"}},
+	}
+	current := map[string]map[string]bool{"240e:6b0::/28": {"4134": true}}
+	allocations := []allocation{{parsed: netip.MustParsePrefix("240e::/18")}}
+	got := classifyAtlasProbe("chinanet", probe, current, allocations)
+	if got.AdmissionEligible || got.DecisionReason != "explicit_non_target_probe_signal" {
+		t.Fatalf("office/datacentre signal did not override a positive tag: %#v", got)
+	}
+}

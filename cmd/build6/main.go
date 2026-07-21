@@ -93,12 +93,61 @@ type manifest struct {
 }
 
 type audit struct {
-	GeneratedAt      string         `json:"generated_at"`
-	Scope            string         `json:"scope"`
-	RIS              riswhois6.Stats `json:"ris"`
+	GeneratedAt        string                    `json:"generated_at"`
+	Scope              string                    `json:"scope"`
+	RIS                riswhois6.Stats           `json:"ris"`
 	AcceptedByOperator map[string]int `json:"accepted_prefixes_by_operator"`
-	RejectedByReason map[string]int `json:"rejected_prefixes_by_reason"`
-	ChinanetASNs     []asnStat      `json:"chinanet_origin_asns"`
+	RejectedByReason   map[string]int             `json:"rejected_prefixes_by_reason"`
+	OriginASNs         map[string][]asnStat       `json:"origin_asns"`
+	Atlas              atlasAudit                 `json:"ripe_atlas_access_evidence"`
+}
+
+type atlasResponse struct {
+	Count   int          `json:"count"`
+	Results []atlasProbe `json:"results"`
+}
+
+type atlasProbe struct {
+	ID          int         `json:"id"`
+	ASNv6       int         `json:"asn_v6"`
+	PrefixV6    string      `json:"prefix_v6"`
+	Description string      `json:"description"`
+	IsAnchor    bool        `json:"is_anchor"`
+	IsPublic    bool        `json:"is_public"`
+	Status      atlasStatus `json:"status"`
+	Tags        []atlasTag  `json:"tags"`
+}
+
+type atlasStatus struct {
+	ID   int    `json:"id"`
+	Name string `json:"name"`
+}
+
+type atlasTag struct {
+	Name string `json:"name"`
+	Slug string `json:"slug"`
+}
+
+type atlasEvidence struct {
+	Operator          string   `json:"operator"`
+	ProbeID           int      `json:"probe_id"`
+	Prefix            string   `json:"prefix"`
+	ASN               string   `json:"asn"`
+	Status            string   `json:"status"`
+	AccessClass       string   `json:"access_class,omitempty"`
+	PositiveSignals   []string `json:"positive_signals,omitempty"`
+	NegativeSignals   []string `json:"negative_signals,omitempty"`
+	ExactCurrentBGP   bool     `json:"exact_current_bgp_prefix"`
+	AdmissionEligible bool     `json:"admission_eligible"`
+	DecisionReason    string   `json:"decision_reason"`
+}
+
+type atlasAudit struct {
+	SourceProbeCount    map[string]int  `json:"source_probe_count"`
+	ConnectedProbeCount map[string]int  `json:"connected_probe_count"`
+	EligiblePrefixCount map[string]int  `json:"eligible_prefix_count"`
+	RejectedByReason    map[string]int  `json:"rejected_by_reason"`
+	Evidence            []atlasEvidence `json:"evidence"`
 }
 
 func main() {
@@ -107,13 +156,14 @@ func main() {
 	configPath := flag.String("operator-config", "config/operators.json", "operator config")
 	allocationPath := flag.String("allocation-config", "config/ipv6_allocations.json", "official operator IPv6 allocation boundaries")
 	rdapDir := flag.String("rdap-dir", "", "directory containing live APNIC RDAP responses for every admission block")
+	atlasDir := flag.String("atlas-dir", "", "directory containing RIPE Atlas probe API responses for every operator allocation")
 	chinanetOutput := flag.String("chinanet-output", "data/ipv6/operators/chinanet.txt", "China Telecom exact BGP candidate prefixes")
 	manifestPath := flag.String("manifest", "data/ipv6/manifest.json", "IPv6 manifest")
 	auditJSONPath := flag.String("audit-json", "reports/ipv6/bgp-candidates.json", "BGP candidate audit JSON")
 	auditMarkdownPath := flag.String("audit-markdown", "reports/ipv6/bgp-candidates.md", "BGP candidate audit Markdown")
 	flag.Parse()
-	if *risPath == "" || *iptoasnPath == "" || *rdapDir == "" {
-		panic("--ris, --iptoasn, and --rdap-dir are required")
+	if *risPath == "" || *iptoasnPath == "" || *rdapDir == "" || *atlasDir == "" {
+		panic("--ris, --iptoasn, --rdap-dir, and --atlas-dir are required")
 	}
 
 	classifier, err := operatorconfig.Load(*configPath, operators)
@@ -127,6 +177,8 @@ func main() {
 	must(err)
 
 	accepted, rejected := selectPrefixes(records, metadata, classifier, allocations)
+	atlasResult, err := auditAtlasEvidence(*atlasDir, accepted, allocations)
+	must(err)
 	chinanet := accepted["chinanet"]
 	must(writePrefixes(*chinanetOutput, chinanet))
 
@@ -150,6 +202,10 @@ func main() {
 			must(err)
 			sources[fmt.Sprintf("apnic_rdap_%s_%d", operator, i+1)] = meta
 		}
+		path := filepath.Join(*atlasDir, operator+".json")
+		meta, err := fileMetadata(path)
+		must(err)
+		sources["ripe_atlas_probes_"+operator] = meta
 	}
 	result := manifest{
 		GeneratedAt: generatedAt,
@@ -166,6 +222,7 @@ func main() {
 			"No address subtraction, sibling merging, or synthetic CIDR aggregation",
 			"Prefixes with unknown, excluded, or cross-operator Origins are not emitted",
 			"BGP candidates are not a terminal-user allowlist until independent positive access-purpose evidence is defined",
+			"RIPE Atlas is report-only: only connected non-anchor probes with explicit access signals, no office/datacentre signal, and an exact current BGP-prefix match are marked admission-eligible",
 		},
 		RIS: risStats,
 		Operators: map[string]operatorOutput{
@@ -191,7 +248,12 @@ func main() {
 			"unicom": len(accepted["unicom"]),
 		},
 		RejectedByReason: rejected,
-		ChinanetASNs: chinanetASNs,
+		OriginASNs: map[string][]asnStat{
+			"chinanet": summarizeASNs(accepted["chinanet"], metadata),
+			"cmcc": summarizeASNs(accepted["cmcc"], metadata),
+			"unicom": summarizeASNs(accepted["unicom"], metadata),
+		},
+		Atlas: atlasResult,
 	}
 	must(writeJSON(*manifestPath, result))
 	must(writeJSON(*auditJSONPath, auditValue))
@@ -243,6 +305,134 @@ func selectPrefixes(records []riswhois6.Record, metadata map[string]asMeta, clas
 		accepted[operator] = append(accepted[operator], record)
 	}
 	return accepted, rejected
+}
+
+func auditAtlasEvidence(dir string, candidates map[string][]riswhois6.Record, allocations map[string][]allocation) (atlasAudit, error) {
+	result := atlasAudit{
+		SourceProbeCount:    map[string]int{},
+		ConnectedProbeCount: map[string]int{},
+		EligiblePrefixCount: map[string]int{},
+		RejectedByReason:    map[string]int{},
+	}
+	for _, operator := range operators {
+		b, err := os.ReadFile(filepath.Join(dir, operator+".json"))
+		if err != nil {
+			return result, fmt.Errorf("read RIPE Atlas evidence for %s: %w", operator, err)
+		}
+		var response atlasResponse
+		if err := json.Unmarshal(b, &response); err != nil {
+			return result, fmt.Errorf("parse RIPE Atlas evidence for %s: %w", operator, err)
+		}
+		if response.Count != len(response.Results) {
+			return result, fmt.Errorf("RIPE Atlas pagination is incomplete for %s: count=%d results=%d", operator, response.Count, len(response.Results))
+		}
+		result.SourceProbeCount[operator] = response.Count
+		current := map[string]map[string]bool{}
+		for _, record := range candidates[operator] {
+			origins := map[string]bool{}
+			for _, origin := range record.Origins {
+				origins[origin.ASN] = true
+			}
+			current[record.Prefix.String()] = origins
+		}
+		eligiblePrefixes := map[string]bool{}
+		for _, probe := range response.Results {
+			evidence := classifyAtlasProbe(operator, probe, current, allocations[operator])
+			if probe.Status.ID == 1 {
+				result.ConnectedProbeCount[operator]++
+			}
+			if evidence.AdmissionEligible {
+				eligiblePrefixes[evidence.Prefix] = true
+			} else {
+				result.RejectedByReason[evidence.DecisionReason]++
+			}
+			result.Evidence = append(result.Evidence, evidence)
+		}
+		result.EligiblePrefixCount[operator] = len(eligiblePrefixes)
+	}
+	sort.Slice(result.Evidence, func(i, j int) bool {
+		if result.Evidence[i].Operator != result.Evidence[j].Operator {
+			return result.Evidence[i].Operator < result.Evidence[j].Operator
+		}
+		if result.Evidence[i].AdmissionEligible != result.Evidence[j].AdmissionEligible {
+			return result.Evidence[i].AdmissionEligible
+		}
+		if result.Evidence[i].Prefix != result.Evidence[j].Prefix {
+			return result.Evidence[i].Prefix < result.Evidence[j].Prefix
+		}
+		return result.Evidence[i].ProbeID < result.Evidence[j].ProbeID
+	})
+	return result, nil
+}
+
+func classifyAtlasProbe(operator string, probe atlasProbe, current map[string]map[string]bool, allocations []allocation) atlasEvidence {
+	evidence := atlasEvidence{
+		Operator: operator,
+		ProbeID: probe.ID,
+		Prefix: probe.PrefixV6,
+		ASN: fmt.Sprintf("%d", probe.ASNv6),
+		Status: probe.Status.Name,
+	}
+	prefix, err := netip.ParsePrefix(probe.PrefixV6)
+	if err != nil || !prefix.Addr().Is6() || prefix.Addr().Is4In6() || prefix != prefix.Masked() || !insideAllocation(prefix, allocations) {
+		evidence.DecisionReason = "invalid_or_outside_operator_allocation"
+		return evidence
+	}
+	positiveFixed := map[string]bool{"home": true, "ftth": true, "gpon": true, "pppoe": true, "dsl": true, "residential": true}
+	positiveMobile := map[string]bool{"mobile": true, "cellular": true, "lte": true, "4g": true, "5g": true}
+	negative := map[string]bool{"office": true, "datacentre": true, "data-centre": true, "data-center": true, "hosting": true, "cloud": true, "server": true, "anchor": true}
+	for _, tag := range probe.Tags {
+		slug := strings.ToLower(strings.TrimSpace(tag.Slug))
+		if positiveFixed[slug] {
+			evidence.PositiveSignals = append(evidence.PositiveSignals, "tag:"+slug)
+			evidence.AccessClass = "fixed_access"
+		}
+		if positiveMobile[slug] {
+			evidence.PositiveSignals = append(evidence.PositiveSignals, "tag:"+slug)
+			evidence.AccessClass = "mobile_access"
+		}
+		if negative[slug] {
+			evidence.NegativeSignals = append(evidence.NegativeSignals, "tag:"+slug)
+		}
+	}
+	description := strings.ToLower(probe.Description)
+	for _, phrase := range []string{"home", "residential", "ftth", "gpon", "pppoe"} {
+		if strings.Contains(description, phrase) {
+			evidence.PositiveSignals = append(evidence.PositiveSignals, "description:"+phrase)
+			evidence.AccessClass = "fixed_access"
+		}
+	}
+	for _, phrase := range []string{"mobile access", "mobile broadband", "cellular", " lte", " 4g", " 5g"} {
+		if strings.Contains(description, phrase) {
+			evidence.PositiveSignals = append(evidence.PositiveSignals, "description:"+strings.TrimSpace(phrase))
+			evidence.AccessClass = "mobile_access"
+		}
+	}
+	for _, phrase := range []string{"office", "datacentre", "data centre", "data center", "hosting", "cloud", "server"} {
+		if strings.Contains(description, phrase) {
+			evidence.NegativeSignals = append(evidence.NegativeSignals, "description:"+phrase)
+		}
+	}
+	origins, exact := current[prefix.String()]
+	evidence.ExactCurrentBGP = exact && origins[evidence.ASN]
+	switch {
+	case probe.Status.ID != 1:
+		evidence.DecisionReason = "probe_not_currently_connected"
+	case probe.IsAnchor:
+		evidence.DecisionReason = "atlas_anchor"
+	case !probe.IsPublic:
+		evidence.DecisionReason = "probe_not_public"
+	case len(evidence.NegativeSignals) > 0:
+		evidence.DecisionReason = "explicit_non_target_probe_signal"
+	case len(evidence.PositiveSignals) == 0:
+		evidence.DecisionReason = "no_explicit_access_signal"
+	case !evidence.ExactCurrentBGP:
+		evidence.DecisionReason = "not_exact_current_bgp_prefix_and_origin"
+	default:
+		evidence.AdmissionEligible = true
+		evidence.DecisionReason = "eligible_exact_current_bgp_prefix_with_explicit_access_signal"
+	}
+	return evidence
 }
 
 func readAllocations(path string) (map[string][]allocation, error) {
@@ -478,7 +668,7 @@ func renderMarkdown(r audit) string {
 	fmt.Fprintf(&b, "生成时间：`%s`\n\n", r.GeneratedAt)
 	fmt.Fprintln(&b, "本报告直接以 RIPE RISWhois 的当前原始 IPv6 宣告前缀为单位；只准入完整位于电信 `240e::/18`、移动 `2409:8000::/20`、联通 `2408:8000::/20` 相应母段内的前缀。不使用 `china6`，不读取 APNIC `inet6num`，不进行地址切除或 CIDR 再聚合。")
 	fmt.Fprintln(&b)
-	fmt.Fprintln(&b, "BGP 只能证明前缀和 Origin，不能证明终端用户接入用途。因此电信输出是待继续验证的 BGP 候选，不是已经完成用途证明的正式白名单。")
+	fmt.Fprintln(&b, "BGP 只能证明前缀和 Origin，不能证明终端用户接入用途。RIPE Atlas 探针在本报告中仅作为正向接入证据；本轮只审计，不自动扩大正式白名单。")
 	fmt.Fprintln(&b)
 	fmt.Fprintf(&b, "RIS 行：**%d**；原始 IPv6 前缀：**%d**。\n", r.RIS.Rows, r.RIS.IPv6Prefixes)
 	fmt.Fprintln(&b, "\n## 三网 Origin 候选")
@@ -488,12 +678,33 @@ func renderMarkdown(r audit) string {
 	fmt.Fprintf(&b, "| chinanet | %d | 已输出候选，仍需终端用途正证据 |\n", r.AcceptedByOperator["chinanet"])
 	fmt.Fprintf(&b, "| cmcc | %d | 不输出，等待额外正证据 |\n", r.AcceptedByOperator["cmcc"])
 	fmt.Fprintf(&b, "| unicom | %d | 不输出，等待额外正证据 |\n", r.AcceptedByOperator["unicom"])
-	fmt.Fprintln(&b, "\n## 电信候选 Origin ASN")
+	fmt.Fprintln(&b, "\n## RIPE Atlas 正向接入证据")
 	fmt.Fprintln(&b)
-	fmt.Fprintln(&b, "| ASN | 原始 BGP 前缀 | 描述 |")
-	fmt.Fprintln(&b, "| --- | ---: | --- |")
-	for _, row := range r.ChinanetASNs {
-		fmt.Fprintf(&b, "| AS%s | %d | %s |\n", row.ASN, row.PrefixCount, strings.ReplaceAll(row.Description, "|", "\\|"))
+	fmt.Fprintln(&b, "只有当前在线、公开、非 Anchor、带明确终端接入信号、无办公/机房反证，且 Atlas 前缀与当前 RIS BGP 前缀及 Origin 精确一致的样本，才标记为可提升准入。")
+	fmt.Fprintln(&b)
+	fmt.Fprintln(&b, "| 运营商 | API 探针 | 当前在线 | 可提升的精确 BGP 前缀 |")
+	fmt.Fprintln(&b, "| --- | ---: | ---: | ---: |")
+	for _, operator := range operators {
+		fmt.Fprintf(&b, "| %s | %d | %d | %d |\n", operator, r.Atlas.SourceProbeCount[operator], r.Atlas.ConnectedProbeCount[operator], r.Atlas.EligiblePrefixCount[operator])
+	}
+	fmt.Fprintln(&b, "\n### 可提升样本")
+	fmt.Fprintln(&b)
+	fmt.Fprintln(&b, "| 运营商 | BGP 前缀 | Origin | 类型 | 证据 | 探针 |")
+	fmt.Fprintln(&b, "| --- | --- | ---: | --- | --- | ---: |")
+	for _, row := range r.Atlas.Evidence {
+		if !row.AdmissionEligible {
+			continue
+		}
+		fmt.Fprintf(&b, "| %s | `%s` | AS%s | %s | %s | %d |\n", row.Operator, row.Prefix, row.ASN, row.AccessClass, strings.Join(row.PositiveSignals, ", "), row.ProbeID)
+	}
+	fmt.Fprintln(&b, "\n## 三网候选 Origin ASN")
+	for _, operator := range operators {
+		fmt.Fprintf(&b, "\n### %s\n\n", operator)
+		fmt.Fprintln(&b, "| ASN | 原始 BGP 前缀 | 描述 |")
+		fmt.Fprintln(&b, "| --- | ---: | --- |")
+		for _, row := range r.OriginASNs[operator] {
+			fmt.Fprintf(&b, "| AS%s | %d | %s |\n", row.ASN, row.PrefixCount, strings.ReplaceAll(row.Description, "|", "\\|"))
+		}
 	}
 	fmt.Fprintln(&b, "\n## 未进入三网候选的原因")
 	fmt.Fprintln(&b)

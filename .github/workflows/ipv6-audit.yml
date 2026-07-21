@@ -39,6 +39,10 @@ jobs:
           curl "${curl_opts[@]}" -H 'Accept: application/rdap+json' 'https://rdap.apnic.net/ip/240e::/18' -o "$SOURCE_DIR/rdap/chinanet.json"
           curl "${curl_opts[@]}" -H 'Accept: application/rdap+json' 'https://rdap.apnic.net/ip/2409:8000::/20' -o "$SOURCE_DIR/rdap/cmcc.json"
           curl "${curl_opts[@]}" -H 'Accept: application/rdap+json' 'https://rdap.apnic.net/ip/2408:8000::/20' -o "$SOURCE_DIR/rdap/unicom.json"
+          mkdir -p "$SOURCE_DIR/atlas"
+          curl "${curl_opts[@]}" 'https://atlas.ripe.net/api/v2/probes/?country_code=CN&prefix_v6=240e%3A%3A%2F18&page_size=500' -o "$SOURCE_DIR/atlas/chinanet.json"
+          curl "${curl_opts[@]}" 'https://atlas.ripe.net/api/v2/probes/?country_code=CN&prefix_v6=2409%3A8000%3A%3A%2F20&page_size=500' -o "$SOURCE_DIR/atlas/cmcc.json"
+          curl "${curl_opts[@]}" 'https://atlas.ripe.net/api/v2/probes/?country_code=CN&prefix_v6=2408%3A8000%3A%3A%2F20&page_size=500' -o "$SOURCE_DIR/atlas/unicom.json"
           du -h "$SOURCE_DIR"/*
       - name: Validate downloaded sources
         shell: bash
@@ -49,6 +53,9 @@ jobs:
           test $(stat -c '%s' "$SOURCE_DIR/rdap/chinanet.json") -gt 1000
           test $(stat -c '%s' "$SOURCE_DIR/rdap/cmcc.json") -gt 1000
           test $(stat -c '%s' "$SOURCE_DIR/rdap/unicom.json") -gt 1000
+          test $(stat -c '%s' "$SOURCE_DIR/atlas/chinanet.json") -gt 1000
+          test $(stat -c '%s' "$SOURCE_DIR/atlas/cmcc.json") -gt 1000
+          test $(stat -c '%s' "$SOURCE_DIR/atlas/unicom.json") -gt 1000
       - name: Test IPv6 audit code
         run: go test ./...
       - name: Generate exact IPv6 BGP candidates
@@ -58,6 +65,7 @@ jobs:
             --iptoasn "$SOURCE_DIR/ip2asn-v6.tsv.gz" \
             --ris "$SOURCE_DIR/riswhois-ipv6.gz" \
             --rdap-dir "$SOURCE_DIR/rdap" \
+            --atlas-dir "$SOURCE_DIR/atlas" \
             --operator-config config/operators.json
           test -s data/ipv6/operators/chinanet.txt
           test -s data/ipv6/manifest.json
