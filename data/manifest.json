@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-21T09:15:00.28315102Z",
+  "generated_at": "2026-07-21T11:05:32.145010649Z",
   "scope": "IPv4; mainland China; current China Telecom, China Mobile, or China Unicom BGP origin plus a covering same-operator APNIC registration; current three-operator BGP units heal internal operator-registration conflict holes after all strong exclusions; small ambiguous customer-use fragments are accepted as best-effort error to keep the ACL deployably compact; dedicated premium backbone ASNs, cloud-provider CIDRs, strong APNIC registrations outside ordinary user access scope, independent holders and route origins, and strong RIPE RIS MOAS evidence are excluded",
   "sources": [
     {
@@ -17,8 +17,8 @@
     {
       "name": "iptoasn_ipv4",
       "url": "https://iptoasn.com/data/ip2asn-v4.tsv.gz",
-      "bytes": 6885879,
-      "sha256": "4819103eb004fc8eee9214e6e512e84712cc0763774ce8f459d79dc6672e617a"
+      "bytes": 6885296,
+      "sha256": "d24b250a0011663a8367c83295e5fe0403ceef2b0d076d05ce04506a33fa8cc3"
     },
     {
       "name": "apnic_organisation",
@@ -47,8 +47,8 @@
     {
       "name": "riswhois_ipv4",
       "url": "https://www.ris.ripe.net/dumps/riswhoisdump.IPv4.gz",
-      "bytes": 5360818,
-      "sha256": "b01268a47bc453d33dc35de9bbd2829da52fb55dfb27ccf5f9dbc394457cb060"
+      "bytes": 5373228,
+      "sha256": "400351e8a987e0f555f0b5a43061ac1906e84346ea720e43992a1e144dfb74b7"
     },
     {
       "name": "ip2region_ipv4_source",
@@ -174,186 +174,6 @@
       "name": "hybrid_admission_denials",
       "cidr_count": 1777,
       "address_count": 2529909
-    },
-    {
-      "name": "trial_bgp_prefix_observed_operator_origin",
-      "cidr_count": 16070,
-      "address_count": 222893699
-    },
-    {
-      "name": "trial_bgp_prefix_no_operator_origin",
-      "cidr_count": 178,
-      "address_count": 652803
-    },
-    {
-      "name": "trial_bgp_prefix_operator_conflict_denial",
-      "cidr_count": 2262,
-      "address_count": 5558478
-    },
-    {
-      "name": "trial_bgp_prefix_no_covering_parent_denial",
-      "cidr_count": 1765,
-      "address_count": 2532041
-    },
-    {
-      "name": "trial_bgp_prefix_covering_parent_admission",
-      "cidr_count": 12382,
-      "address_count": 214803180
-    },
-    {
-      "name": "trial_bgp_prefix_covering_parent_with_exact_conflict_carving",
-      "cidr_count": 15206,
-      "address_count": 220353883
-    },
-    {
-      "name": "trial_bgp_prefix_covering_parent_relaxed_conflicts",
-      "cidr_count": 14077,
-      "address_count": 220986641
-    },
-    {
-      "name": "trial_bgp_prefix_covering_parent_relaxed_added_vs_current",
-      "cidr_count": 0,
-      "address_count": 0
-    },
-    {
-      "name": "trial_bgp_prefix_covering_parent_relaxed_removed_vs_current",
-      "cidr_count": 5,
-      "address_count": 29952
-    },
-    {
-      "name": "trial_bgp_prefix_hybrid_conflict_healing",
-      "cidr_count": 14075,
-      "address_count": 221016593
-    },
-    {
-      "name": "trial_bgp_prefix_hybrid_added_vs_hierarchical",
-      "cidr_count": 146,
-      "address_count": 7519
-    },
-    {
-      "name": "trial_bgp_prefix_hybrid_removed_vs_hierarchical",
-      "cidr_count": 0,
-      "address_count": 0
-    },
-    {
-      "name": "trial_bgp_prefix_relaxed_admission",
-      "cidr_count": 15825,
-      "address_count": 223518938
-    },
-    {
-      "name": "trial_bgp_prefix_relaxed_added_vs_current",
-      "cidr_count": 1761,
-      "address_count": 2502345
-    },
-    {
-      "name": "trial_bgp_prefix_relaxed_removed_vs_current",
-      "cidr_count": 0,
-      "address_count": 0
-    },
-    {
-      "name": "trial_bgp_prefix_any_leaf_admission",
-      "cidr_count": 12837,
-      "address_count": 212881628
-    },
-    {
-      "name": "trial_bgp_prefix_majority_leaf_admission",
-      "cidr_count": 11825,
-      "address_count": 208102642
-    },
-    {
-      "name": "trial_bgp_prefix_full_leaf_admission",
-      "cidr_count": 7356,
-      "address_count": 164286230
-    },
-    {
-      "name": "trial_zhejiang_bgp_prefix_observed_operator_origin",
-      "cidr_count": 2474,
-      "address_count": 15980783
-    },
-    {
-      "name": "trial_zhejiang_bgp_prefix_no_operator_origin",
-      "cidr_count": 0,
-      "address_count": 0
-    },
-    {
-      "name": "trial_zhejiang_bgp_prefix_operator_conflict_denial",
-      "cidr_count": 1138,
-      "address_count": 2021608
-    },
-    {
-      "name": "trial_zhejiang_bgp_prefix_no_covering_parent_denial",
-      "cidr_count": 18,
-      "address_count": 28416
-    },
-    {
-      "name": "trial_zhejiang_bgp_prefix_covering_parent_admission",
-      "cidr_count": 1331,
-      "address_count": 13930759
-    },
-    {
-      "name": "trial_zhejiang_bgp_prefix_covering_parent_with_exact_conflict_carving",
-      "cidr_count": 2565,
-      "address_count": 15952151
-    },
-    {
-      "name": "trial_zhejiang_bgp_prefix_covering_parent_relaxed_conflicts",
-      "cidr_count": 2456,
-      "address_count": 15952367
-    },
-    {
-      "name": "trial_zhejiang_bgp_prefix_covering_parent_relaxed_added_vs_current",
-      "cidr_count": 0,
-      "address_count": 0
-    },
-    {
-      "name": "trial_zhejiang_bgp_prefix_covering_parent_relaxed_removed_vs_current",
-      "cidr_count": 0,
-      "address_count": 0
-    },
-    {
-      "name": "trial_zhejiang_bgp_prefix_hybrid_conflict_healing",
-      "cidr_count": 2456,
-      "address_count": 15952367
-    },
-    {
-      "name": "trial_zhejiang_bgp_prefix_hybrid_added_vs_hierarchical",
-      "cidr_count": 19,
-      "address_count": 216
-    },
-    {
-      "name": "trial_zhejiang_bgp_prefix_hybrid_removed_vs_hierarchical",
-      "cidr_count": 0,
-      "address_count": 0
-    },
-    {
-      "name": "trial_zhejiang_bgp_prefix_relaxed_admission",
-      "cidr_count": 2474,
-      "address_count": 15980783
-    },
-    {
-      "name": "trial_zhejiang_bgp_prefix_relaxed_added_vs_current",
-      "cidr_count": 18,
-      "address_count": 28416
-    },
-    {
-      "name": "trial_zhejiang_bgp_prefix_relaxed_removed_vs_current",
-      "cidr_count": 0,
-      "address_count": 0
-    },
-    {
-      "name": "trial_zhejiang_bgp_prefix_any_leaf_admission",
-      "cidr_count": 1334,
-      "address_count": 13929735
-    },
-    {
-      "name": "trial_zhejiang_bgp_prefix_majority_leaf_admission",
-      "cidr_count": 1185,
-      "address_count": 13833531
-    },
-    {
-      "name": "trial_zhejiang_bgp_prefix_full_leaf_admission",
-      "cidr_count": 578,
-      "address_count": 9683030
     },
     {
       "name": "final_output",
@@ -829,13 +649,13 @@
     ]
   },
   "ris_whois": {
-    "row_count": 1241656,
-    "prefix_count": 1219739,
-    "relevant_prefix_count": 46384,
-    "winning_segment_count": 56411,
-    "candidate_moas_segment_count": 202,
+    "row_count": 1245753,
+    "prefix_count": 1223880,
+    "relevant_prefix_count": 46385,
+    "winning_segment_count": 56412,
+    "candidate_moas_segment_count": 200,
     "strong_evidence_segment_count": 0,
-    "retained_ambiguous_moas_segment_count": 202,
+    "retained_ambiguous_moas_segment_count": 200,
     "effective_cidr_count": 0,
     "effective_address_count": 0
   },
@@ -108110,7 +107930,7 @@
       "matched_by": "description_patterns: china ?telecom",
       "exclusion_source": "explicit_policy",
       "reason": "China Telecom CN2 dedicated premium backbone; outside ordinary Internet user access scope",
-      "origin_address_count": 542720
+      "origin_address_count": 542464
     },
     {
       "asn": "4816",
@@ -109357,258 +109177,6 @@
       "cidr_count": 237,
       "address_count": 3750734,
       "sha256": "4b7ccef2e4cdd1f702b3c498cbc6bdc32eb86b6af990db04fe8b25f9f21f103e"
-    },
-    {
-      "name": "BGP prefix admission trial (nationwide, observed)",
-      "path": "experiments/bgp-prefix-admission/nationwide-observed.txt",
-      "cidr_count": 16070,
-      "address_count": 222893699,
-      "sha256": "080542e2526afd77160cd88ee459a4ad090b5fcf3f67f3a5d04bafb81078f746"
-    },
-    {
-      "name": "BGP prefix admission trial (Zhejiang, observed)",
-      "path": "experiments/bgp-prefix-admission/zhejiang-observed.txt",
-      "cidr_count": 2474,
-      "address_count": 15980783,
-      "sha256": "f319742bd28cb1b8f7061a3a1383b011abdb26a910aea474ba9da59132f2483b"
-    },
-    {
-      "name": "BGP prefix admission trial (nationwide, no_ris)",
-      "path": "experiments/bgp-prefix-admission/nationwide-no_ris.txt",
-      "cidr_count": 178,
-      "address_count": 652803,
-      "sha256": "1f8e63e48c1689a26e96f8d5634ab17496f0ff9dab00de11de302187c748474b"
-    },
-    {
-      "name": "BGP prefix admission trial (Zhejiang, no_ris)",
-      "path": "experiments/bgp-prefix-admission/zhejiang-no_ris.txt",
-      "cidr_count": 0,
-      "address_count": 0,
-      "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
-    },
-    {
-      "name": "BGP prefix admission trial (nationwide, conflict)",
-      "path": "experiments/bgp-prefix-admission/nationwide-conflict.txt",
-      "cidr_count": 2262,
-      "address_count": 5558478,
-      "sha256": "3e21128f4cc89f7f809a6f9c7d0e90088d27c97728ac3ae6adb110cff7e86928"
-    },
-    {
-      "name": "BGP prefix admission trial (Zhejiang, conflict)",
-      "path": "experiments/bgp-prefix-admission/zhejiang-conflict.txt",
-      "cidr_count": 1138,
-      "address_count": 2021608,
-      "sha256": "29740412f56e2c01c39b80b2361c624a553895423c0009171983961595c683df"
-    },
-    {
-      "name": "BGP prefix admission trial (nationwide, no_parent)",
-      "path": "experiments/bgp-prefix-admission/nationwide-no_parent.txt",
-      "cidr_count": 1765,
-      "address_count": 2532041,
-      "sha256": "4382db9b076efd8daa52d78d111bff7d1b8ec190577d69310fb292a9b84a1ad3"
-    },
-    {
-      "name": "BGP prefix admission trial (Zhejiang, no_parent)",
-      "path": "experiments/bgp-prefix-admission/zhejiang-no_parent.txt",
-      "cidr_count": 18,
-      "address_count": 28416,
-      "sha256": "1fd4713b7c817960ccc90841ba1de29d9f1dc4449f1b7dbfbd7238bbd0f27df1"
-    },
-    {
-      "name": "BGP prefix admission trial (nationwide, covering)",
-      "path": "experiments/bgp-prefix-admission/nationwide-covering.txt",
-      "cidr_count": 12382,
-      "address_count": 214803180,
-      "sha256": "e663e8f1a61bc851303a89ad6f9c26d2a0742ab828de729ebc30b24ce75e6e4f"
-    },
-    {
-      "name": "BGP prefix admission trial (Zhejiang, covering)",
-      "path": "experiments/bgp-prefix-admission/zhejiang-covering.txt",
-      "cidr_count": 1331,
-      "address_count": 13930759,
-      "sha256": "0273f81b877c703dd5e85a92421a6b0bd037a9942c8a3aaa6c34a33a0f62f9b5"
-    },
-    {
-      "name": "BGP prefix admission trial (nationwide, covering_carved)",
-      "path": "experiments/bgp-prefix-admission/nationwide-covering_carved.txt",
-      "cidr_count": 15206,
-      "address_count": 220353883,
-      "sha256": "6067c4b6ea4efe9070a9a271a53e903cfc4f430e828253e7fcaafa82a7f4695c"
-    },
-    {
-      "name": "BGP prefix admission trial (Zhejiang, covering_carved)",
-      "path": "experiments/bgp-prefix-admission/zhejiang-covering_carved.txt",
-      "cidr_count": 2565,
-      "address_count": 15952151,
-      "sha256": "9845104f66500c3a03113bf269a917bdefe8b0c5eb86ced593c5a51911782d7e"
-    },
-    {
-      "name": "BGP prefix admission trial (nationwide, covering_relaxed)",
-      "path": "experiments/bgp-prefix-admission/nationwide-covering_relaxed.txt",
-      "cidr_count": 14077,
-      "address_count": 220986641,
-      "sha256": "9c3eac2c78b5bd8383b06891a082c7ba06a87b6768509652add455f13e5d539f"
-    },
-    {
-      "name": "BGP prefix admission trial (Zhejiang, covering_relaxed)",
-      "path": "experiments/bgp-prefix-admission/zhejiang-covering_relaxed.txt",
-      "cidr_count": 2456,
-      "address_count": 15952367,
-      "sha256": "0be0090303f2af93c078d8689137f0eed0b60b415742f79209a87e038b9f64fe"
-    },
-    {
-      "name": "BGP prefix admission trial (nationwide, hybrid)",
-      "path": "experiments/bgp-prefix-admission/nationwide-hybrid.txt",
-      "cidr_count": 14075,
-      "address_count": 221016593,
-      "sha256": "cab9f28cf82465f1ab1e2b0cc89acbb569668b6b1ed1df6299c765d9527b3551"
-    },
-    {
-      "name": "BGP prefix admission trial (Zhejiang, hybrid)",
-      "path": "experiments/bgp-prefix-admission/zhejiang-hybrid.txt",
-      "cidr_count": 2456,
-      "address_count": 15952367,
-      "sha256": "0be0090303f2af93c078d8689137f0eed0b60b415742f79209a87e038b9f64fe"
-    },
-    {
-      "name": "BGP prefix admission trial (nationwide, relaxed)",
-      "path": "experiments/bgp-prefix-admission/nationwide-relaxed.txt",
-      "cidr_count": 15825,
-      "address_count": 223518938,
-      "sha256": "443c89b5ecf8bbc48dee5f953ff21179650ddacd04e911b4f2e7e6f5989edcc7"
-    },
-    {
-      "name": "BGP prefix admission trial (Zhejiang, relaxed)",
-      "path": "experiments/bgp-prefix-admission/zhejiang-relaxed.txt",
-      "cidr_count": 2474,
-      "address_count": 15980783,
-      "sha256": "f319742bd28cb1b8f7061a3a1383b011abdb26a910aea474ba9da59132f2483b"
-    },
-    {
-      "name": "BGP prefix admission trial (nationwide, any)",
-      "path": "experiments/bgp-prefix-admission/nationwide-any.txt",
-      "cidr_count": 12837,
-      "address_count": 212881628,
-      "sha256": "7cd04c72699ab40c888ee5b29612d4112e59f519d5feb381653b94abf390b442"
-    },
-    {
-      "name": "BGP prefix admission trial (Zhejiang, any)",
-      "path": "experiments/bgp-prefix-admission/zhejiang-any.txt",
-      "cidr_count": 1334,
-      "address_count": 13929735,
-      "sha256": "155f53a1469646abdf560be3e1f0e6e51284c82acd2acabd9249c667f2c7db51"
-    },
-    {
-      "name": "BGP prefix admission trial (nationwide, majority)",
-      "path": "experiments/bgp-prefix-admission/nationwide-majority.txt",
-      "cidr_count": 11825,
-      "address_count": 208102642,
-      "sha256": "91351307fcad9aeb1efea23d71ae6ddf2c4d2d0053d387160e31c0dfcfe96448"
-    },
-    {
-      "name": "BGP prefix admission trial (Zhejiang, majority)",
-      "path": "experiments/bgp-prefix-admission/zhejiang-majority.txt",
-      "cidr_count": 1185,
-      "address_count": 13833531,
-      "sha256": "a15591ae89344311b78d351bb3eee2c01fff1e26468e86dc08acf0fe5dc024e4"
-    },
-    {
-      "name": "BGP prefix admission trial (nationwide, full)",
-      "path": "experiments/bgp-prefix-admission/nationwide-full.txt",
-      "cidr_count": 7356,
-      "address_count": 164286230,
-      "sha256": "3ec42e61a8bf428e2e408612a7fbe400d71f569f6e2686770a33248c4c50b74d"
-    },
-    {
-      "name": "BGP prefix admission trial (Zhejiang, full)",
-      "path": "experiments/bgp-prefix-admission/zhejiang-full.txt",
-      "cidr_count": 578,
-      "address_count": 9683030,
-      "sha256": "102e6d72070453ee32d0e8fe6834066d4b39a8b98be481bdc6f84770c47a6544"
-    },
-    {
-      "name": "BGP relaxed admission delta (nationwide, added versus current dev)",
-      "path": "experiments/bgp-prefix-admission/nationwide-relaxed-added.txt",
-      "cidr_count": 1761,
-      "address_count": 2502345,
-      "sha256": "377eb90c8b200ddd0f69d091b0d72471147ad6494169240c79ec0b72160d4910"
-    },
-    {
-      "name": "BGP relaxed admission delta (nationwide, removed versus current dev)",
-      "path": "experiments/bgp-prefix-admission/nationwide-relaxed-removed.txt",
-      "cidr_count": 0,
-      "address_count": 0,
-      "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
-    },
-    {
-      "name": "BGP relaxed admission delta (Zhejiang, added versus current dev)",
-      "path": "experiments/bgp-prefix-admission/zhejiang-relaxed-added.txt",
-      "cidr_count": 18,
-      "address_count": 28416,
-      "sha256": "1fd4713b7c817960ccc90841ba1de29d9f1dc4449f1b7dbfbd7238bbd0f27df1"
-    },
-    {
-      "name": "BGP relaxed admission delta (Zhejiang, removed versus current dev)",
-      "path": "experiments/bgp-prefix-admission/zhejiang-relaxed-removed.txt",
-      "cidr_count": 0,
-      "address_count": 0,
-      "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
-    },
-    {
-      "name": "BGP covering-relaxed delta (nationwide, added versus current dev)",
-      "path": "experiments/bgp-prefix-admission/nationwide-covering_relaxed-added.txt",
-      "cidr_count": 0,
-      "address_count": 0,
-      "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
-    },
-    {
-      "name": "BGP covering-relaxed delta (nationwide, removed versus current dev)",
-      "path": "experiments/bgp-prefix-admission/nationwide-covering_relaxed-removed.txt",
-      "cidr_count": 5,
-      "address_count": 29952,
-      "sha256": "3f663c9a29992a88abdf3ed829f29a5b6ec5f2ebfca3ca7fedbc376a3d8088d3"
-    },
-    {
-      "name": "BGP covering-relaxed delta (Zhejiang, added versus current dev)",
-      "path": "experiments/bgp-prefix-admission/zhejiang-covering_relaxed-added.txt",
-      "cidr_count": 0,
-      "address_count": 0,
-      "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
-    },
-    {
-      "name": "BGP covering-relaxed delta (Zhejiang, removed versus current dev)",
-      "path": "experiments/bgp-prefix-admission/zhejiang-covering_relaxed-removed.txt",
-      "cidr_count": 0,
-      "address_count": 0,
-      "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
-    },
-    {
-      "name": "BGP hybrid conflict-healing delta (nationwide, added versus hierarchical baseline)",
-      "path": "experiments/bgp-prefix-admission/nationwide-hybrid-added.txt",
-      "cidr_count": 146,
-      "address_count": 7519,
-      "sha256": "2f7e3311877606bd217e5ca517f8265db972ca2edadb1e529597b5593f762c78"
-    },
-    {
-      "name": "BGP hybrid conflict-healing delta (nationwide, removed versus hierarchical baseline)",
-      "path": "experiments/bgp-prefix-admission/nationwide-hybrid-removed.txt",
-      "cidr_count": 0,
-      "address_count": 0,
-      "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
-    },
-    {
-      "name": "BGP hybrid conflict-healing delta (Zhejiang, added versus hierarchical baseline)",
-      "path": "experiments/bgp-prefix-admission/zhejiang-hybrid-added.txt",
-      "cidr_count": 19,
-      "address_count": 216,
-      "sha256": "a5bdcda7a0f2491c29fbf958142e652b45f8b490d326a0260b2ae4383d68de80"
-    },
-    {
-      "name": "BGP hybrid conflict-healing delta (Zhejiang, removed versus hierarchical baseline)",
-      "path": "experiments/bgp-prefix-admission/zhejiang-hybrid-removed.txt",
-      "cidr_count": 0,
-      "address_count": 0,
-      "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
     }
   ],
   "audits": [
@@ -109622,19 +109190,7 @@
       "registry_covered_address_count": 15952367,
       "strong_non_public_signal_address_count": 0,
       "sha256": "f3cddb08bd14f69d3eb3c99e8420bf7ba7216957f8629780da1f0916f0fc4f71",
-      "human_sha256": "0bb54de2231dc1193043d42627f73e9214f2651f0822c3d0efba0849ab47f431"
-    },
-    {
-      "name": "bgp_relaxed_added_apnic_registration",
-      "path": "audits/bgp-relaxed-added-apnic.json.gz",
-      "human_path": "audits/bgp-relaxed-added-apnic.md",
-      "cidr_count": 1761,
-      "fact_count": 5966,
-      "address_count": 2502345,
-      "registry_covered_address_count": 2502345,
-      "strong_non_public_signal_address_count": 0,
-      "sha256": "81299cada50a458346e590fcdfd0dda32e3d6b4d740bc5c9a8476e034084f33d",
-      "human_sha256": "43b5d562c4a930d4ad718a28c190ddb62db5c1bac8610592a4cd88d52ee1b0d8"
+      "human_sha256": "efa00a8dbb1b385ee7a532013bfd7ce43c5ee742c750ec0225c3925af3cfe4cb"
     }
   ]
 }
