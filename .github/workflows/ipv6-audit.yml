@@ -35,6 +35,10 @@ jobs:
           curl_opts=(--fail --silent --show-error --location --retry 3)
           curl "${curl_opts[@]}" 'https://iptoasn.com/data/ip2asn-v6.tsv.gz' -o "$SOURCE_DIR/ip2asn-v6.tsv.gz"
           curl "${curl_opts[@]}" 'https://www.ris.ripe.net/dumps/riswhoisdump.IPv6.gz' -o "$SOURCE_DIR/riswhois-ipv6.gz"
+          mkdir -p "$SOURCE_DIR/rdap"
+          curl "${curl_opts[@]}" -H 'Accept: application/rdap+json' 'https://rdap.apnic.net/ip/240e::/18' -o "$SOURCE_DIR/rdap/chinanet.json"
+          curl "${curl_opts[@]}" -H 'Accept: application/rdap+json' 'https://rdap.apnic.net/ip/2409:8000::/20' -o "$SOURCE_DIR/rdap/cmcc.json"
+          curl "${curl_opts[@]}" -H 'Accept: application/rdap+json' 'https://rdap.apnic.net/ip/2408:8000::/20' -o "$SOURCE_DIR/rdap/unicom.json"
           du -h "$SOURCE_DIR"/*
       - name: Validate downloaded sources
         shell: bash
@@ -42,6 +46,9 @@ jobs:
           set -euo pipefail
           test $(stat -c '%s' "$SOURCE_DIR/ip2asn-v6.tsv.gz") -gt 100000
           test $(stat -c '%s' "$SOURCE_DIR/riswhois-ipv6.gz") -gt 1000000
+          test $(stat -c '%s' "$SOURCE_DIR/rdap/chinanet.json") -gt 1000
+          test $(stat -c '%s' "$SOURCE_DIR/rdap/cmcc.json") -gt 1000
+          test $(stat -c '%s' "$SOURCE_DIR/rdap/unicom.json") -gt 1000
       - name: Test IPv6 audit code
         run: go test ./...
       - name: Generate exact IPv6 BGP candidates
@@ -50,6 +57,7 @@ jobs:
           go run ./cmd/build6 \
             --iptoasn "$SOURCE_DIR/ip2asn-v6.tsv.gz" \
             --ris "$SOURCE_DIR/riswhois-ipv6.gz" \
+            --rdap-dir "$SOURCE_DIR/rdap" \
             --operator-config config/operators.json
           test -s data/ipv6/operators/chinanet.txt
           test -s data/ipv6/manifest.json

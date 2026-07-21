@@ -2,6 +2,8 @@ package main
 
 import (
 	"net/netip"
+	"os"
+	"path/filepath"
 	"testing"
 
 	"github.com/closur3/cn-eyeball-prefixes/internal/operatorconfig"
@@ -42,6 +44,36 @@ func TestSelectPrefixesKeepsOnlyCompleteSameOperatorOriginSets(t *testing.T) {
 	}
 	if rejected["excluded_origin"] != 1 || rejected["cross_operator_moas"] != 1 {
 		t.Fatalf("unexpected rejected reasons: %#v", rejected)
+	}
+}
+
+func TestValidateAllocationRDAP(t *testing.T) {
+	dir := t.TempDir()
+	body := `{
+  "handle": "240e::/18",
+  "startAddress": "240e::",
+  "endAddress": "240e:3fff:ffff:ffff:ffff:ffff:ffff:ffff",
+  "ipVersion": "v6",
+  "name": "CT-IPv6-Networks",
+  "type": "ALLOCATED PORTABLE",
+  "country": "CN",
+  "status": ["active"],
+  "entities": [{"handle": "ORG-CT1-AP"}]
+}`
+	if err := os.WriteFile(filepath.Join(dir, "chinanet.json"), []byte(body), 0600); err != nil {
+		t.Fatal(err)
+	}
+	rows := map[string][]allocation{
+		"chinanet": {{Prefix: "240e::/18", Netname: "CT-IPv6-Networks", Status: "ALLOCATED PORTABLE", RDAPFile: "chinanet.json", RequiredEntityHandles: []string{"ORG-CT1-AP"}, parsed: netip.MustParsePrefix("240e::/18")}},
+		"cmcc": {},
+		"unicom": {},
+	}
+	if err := validateAllocationRDAP(dir, rows); err != nil {
+		t.Fatal(err)
+	}
+	rows["chinanet"][0].Netname = "wrong"
+	if err := validateAllocationRDAP(dir, rows); err == nil {
+		t.Fatal("registration drift was accepted")
 	}
 }
 

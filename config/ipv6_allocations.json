@@ -7,7 +7,11 @@
         "netname": "CT-IPv6-Networks",
         "organization": "China Telecom",
         "status": "ALLOCATED PORTABLE",
-        "source": "https://wq.apnic.net/apnic-bin/whois.pl?object_type=inet6num&searchtext=240e%3A%3A%2F18"
+        "source": "https://rdap.apnic.net/ip/240e::/18",
+        "rdap_file": "chinanet.json",
+        "required_entity_handles": [
+          "ORG-CT1-AP"
+        ]
       }
     ],
     "cmcc": [
@@ -17,7 +21,11 @@
         "netname": "CMNET-V6-20110823",
         "organization": "China Mobile",
         "status": "ALLOCATED PORTABLE",
-        "source": "https://wq.apnic.net/apnic-bin/whois.pl?object_type=inet6num&searchtext=2409%3A8000%3A%3A%2F20"
+        "source": "https://rdap.apnic.net/ip/2409:8000::/20",
+        "rdap_file": "cmcc.json",
+        "required_entity_handles": [
+          "ORG-CM1-AP"
+        ]
       }
     ],
     "unicom": [
@@ -27,7 +35,12 @@
         "netname": "CU-CN",
         "organization": "China Unicom",
         "status": "ALLOCATED PORTABLE",
-        "source": "https://wq.apnic.net/apnic-bin/whois.pl?object_type=inet6num&searchtext=2408%3A8000%3A%3A%2F20"
+        "source": "https://rdap.apnic.net/ip/2408:8000::/20",
+        "rdap_file": "unicom.json",
+        "required_entity_handles": [
+          "CH1302-AP",
+          "IRT-CU-CN"
+        ]
       }
     ]
   }
