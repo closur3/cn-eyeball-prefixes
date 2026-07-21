@@ -1,6 +1,6 @@
 # gaoyifan `china6.txt` 事实审计
 
-生成时间：`2026-07-21T19:26:09.127623199Z`
+生成时间：`2026-07-21T19:29:54.279980641Z`
 
 本报告只验证 `china6.txt` 的当前 BGP 可见性、国家登记边界和三网 IPv6 Origin 覆盖，不参与正式地址准入或排除。空间占比按精确 IPv6 地址数量计算，`/64 等价数`用于提高可读性。
 
@@ -162,11 +162,11 @@
 | ASN | 国家/地区 | 运营商识别 | /64 等价数 | 占比 | 描述 |
 | --- | --- | --- | ---: | ---: | --- |
 | AS137726 | CN | — | 17592186044416.0000 | 16.128255% | SINOPEC-NET China Petroleum & Chemical Corporation |
-| AS23910 | CN | — | 17433159925760.0000 | 15.982462% | CNGI-CERNET2-AS-AP China Next Generation Internet CERNET2 |
+| AS23910 | CN | — | 17433160384512.0000 | 15.982463% | CNGI-CERNET2-AS-AP China Next Generation Internet CERNET2 |
 | AS4134 | CN | chinanet | 17106975391744.0000 | 15.683421% | CHINANET-BACKBONE No.31,Jin-rong Street |
 | AS9808 | CN | cmcc | 16131965255680.0000 | 14.789546% | CHINAMOBILE-CN China Mobile Communications Group Co., Ltd. |
 | AS133111 | CN | — | 8830436048896.0000 | 8.095613% | CNT-NORTHCHINA CERNET New Technology Co., Ltd |
-| AS37963 | CN | — | 4423815135232.0000 | 4.055688% | ALIBABA-CN-NET Hangzhou Alibaba Advertising Co.,Ltd. |
+| AS37963 | CN | — | 4423815200768.0000 | 4.055688% | ALIBABA-CN-NET Hangzhou Alibaba Advertising Co.,Ltd. |
 | AS38365 | CN | — | 4402339905536.0000 | 4.036000% | BAIDU Beijing Baidu Netcom Science and Technology Co., Ltd. |
 | AS4837 | CN | unicom | 1709288128512.0000 | 1.567050% | CHINA169-BACKBONE CHINA UNICOM China169 Backbone |
 | AS24445 | CN | cmcc | 296385970176.0000 | 0.271722% | CMNET-V4HENAN-AS-AP Henan Mobile Communications Co.,Ltd |

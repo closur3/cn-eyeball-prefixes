@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-21T19:26:19.11628406Z",
+  "generated_at": "2026-07-21T19:30:04.052816188Z",
   "scope": "Whitelist admission audit of the most-specific APNIC inet6num evidence covering current mainland China Telecom, China Mobile, and China Unicom IPv6 origins inside gaoyifan china6.txt; only China Telecom currently has sufficient explicit end-user purpose evidence for a formal output",
   "inet6num_record_count": 148952,
   "inet6num_segment_count": 194099,
@@ -341,7 +341,7 @@
       "admission_decision": "not_admitted",
       "admission_reason": "Not admitted: no explicit end-user access purpose evidence",
       "space": {
-        "cidr_count": 0,
+        "cidr_count": 288,
         "address_count": "324517405178898092885440049709056",
         "slash64_equivalent": "17592123785216.0000",
         "percent_of_operator": "96.991219%"
@@ -375,7 +375,7 @@
       "admission_decision": "not_admitted",
       "admission_reason": "Not admitted: no explicit end-user access purpose evidence",
       "space": {
-        "cidr_count": 0,
+        "cidr_count": 438,
         "address_count": "100756633720857559371186001936384",
         "slash64_equivalent": "5462028058624.0000",
         "percent_of_operator": "31.177326%"
@@ -404,7 +404,7 @@
       "admission_decision": "not_admitted",
       "admission_reason": "Not admitted: no explicit end-user access purpose evidence",
       "space": {
-        "cidr_count": 0,
+        "cidr_count": 4136,
         "address_count": "39019994557634606571625390276608",
         "slash64_equivalent": "2115278143488.0000",
         "percent_of_operator": "99.592897%"
@@ -431,7 +431,7 @@
       "admission_decision": "exclude",
       "admission_reason": "Exclude: APNIC registration contains an explicit non-user-side purpose",
       "space": {
-        "cidr_count": 0,
+        "cidr_count": 1,
         "address_count": "20282409603651670423947251286016",
         "slash64_equivalent": "1099511627776.0000",
         "percent_of_operator": "6.276026%"
@@ -458,7 +458,7 @@
       "admission_decision": "exclude",
       "admission_reason": "Exclude: APNIC registration contains an explicit non-user-side purpose",
       "space": {
-        "cidr_count": 0,
+        "cidr_count": 1,
         "address_count": "20282409603651670423947251286016",
         "slash64_equivalent": "1099511627776.0000",
         "percent_of_operator": "6.276026%"
@@ -486,7 +486,7 @@
       "admission_reason": "Admit: most-specific APNIC registration explicitly identifies broadband, mobile, or user-address access",
       "explicit_user_purpose": true,
       "space": {
-        "cidr_count": 0,
+        "cidr_count": 1,
         "address_count": "20282409603651670423947251286016",
         "slash64_equivalent": "1099511627776.0000",
         "percent_of_operator": "6.276026%"
@@ -514,7 +514,7 @@
       "admission_reason": "Admit: most-specific APNIC registration explicitly identifies broadband, mobile, or user-address access",
       "explicit_user_purpose": true,
       "space": {
-        "cidr_count": 0,
+        "cidr_count": 279,
         "address_count": "20282358828767246609521913626624",
         "slash64_equivalent": "1099508875264.0000",
         "percent_of_operator": "6.276011%"
@@ -541,7 +541,7 @@
       "admission_decision": "exclude",
       "admission_reason": "Exclude: APNIC registration contains an explicit non-user-side purpose",
       "space": {
-        "cidr_count": 0,
+        "cidr_count": 522,
         "address_count": "20279222875191166261442725806080",
         "slash64_equivalent": "1099338874880.0000",
         "percent_of_operator": "6.275040%"
@@ -568,7 +568,7 @@
       "admission_decision": "exclude",
       "admission_reason": "Exclude: APNIC registration contains an explicit non-user-side purpose",
       "space": {
-        "cidr_count": 0,
+        "cidr_count": 37,
         "address_count": "20275291448425779487366581321728",
         "slash64_equivalent": "1099125751808.0000",
         "percent_of_operator": "6.273824%"
@@ -595,7 +595,7 @@
       "admission_decision": "exclude",
       "admission_reason": "Exclude: APNIC registration contains an explicit non-user-side purpose",
       "space": {
-        "cidr_count": 0,
+        "cidr_count": 184,
         "address_count": "20267786436937611869450005381120",
         "slash64_equivalent": "1098718904320.0000",
         "percent_of_operator": "6.271502%"
@@ -623,7 +623,7 @@
       "admission_reason": "Admit: most-specific APNIC registration explicitly identifies broadband, mobile, or user-address access",
       "explicit_user_purpose": true,
       "space": {
-        "cidr_count": 0,
+        "cidr_count": 30,
         "address_count": "20260126682944533578999067049984",
         "slash64_equivalent": "1098303668224.0000",
         "percent_of_operator": "6.269131%"
@@ -650,7 +650,7 @@
       "admission_decision": "exclude",
       "admission_reason": "Exclude: APNIC registration contains an explicit non-user-side purpose",
       "space": {
-        "cidr_count": 0,
+        "cidr_count": 537,
         "address_count": "20234930251012125477739840929792",
         "slash64_equivalent": "1096937766912.0000",
         "percent_of_operator": "6.261335%"
@@ -677,7 +677,7 @@
       "admission_decision": "exclude",
       "admission_reason": "Exclude: APNIC registration contains an explicit non-user-side purpose",
       "space": {
-        "cidr_count": 0,
+        "cidr_count": 100,
         "address_count": "20133538851446866143486408654848",
         "slash64_equivalent": "1091441328128.0000",
         "percent_of_operator": "6.229961%"
@@ -704,7 +704,7 @@
       "admission_decision": "exclude",
       "admission_reason": "Exclude: APNIC registration contains an explicit non-user-side purpose",
       "space": {
-        "cidr_count": 0,
+        "cidr_count": 877,
         "address_count": "19308472367002093638962112364544",
         "slash64_equivalent": "1046714384384.0000",
         "percent_of_operator": "5.974659%"
@@ -738,7 +738,7 @@
       "admission_decision": "exclude",
       "admission_reason": "Exclude: most-specific APNIC registration names an independent legal entity",
       "space": {
-        "cidr_count": 0,
+        "cidr_count": 58,
         "address_count": "9829222151261166319373901627392",
         "slash64_equivalent": "532843200512.0000",
         "percent_of_operator": "2.937741%"
@@ -768,7 +768,7 @@
       "admission_reason": "Admit: most-specific APNIC registration explicitly identifies broadband, mobile, or user-address access",
       "explicit_user_purpose": true,
       "space": {
-        "cidr_count": 0,
+        "cidr_count": 23,
         "address_count": "153502147019747924829141991424",
         "slash64_equivalent": "8321368064.0000",
         "percent_of_operator": "0.047498%"
@@ -797,7 +797,7 @@
       "admission_decision": "not_admitted",
       "admission_reason": "Not admitted: no explicit end-user access purpose evidence",
       "space": {
-        "cidr_count": 0,
+        "cidr_count": 1,
         "address_count": "79228162514264337593543950336",
         "slash64_equivalent": "4294967296.0000",
         "percent_of_operator": "0.024516%"
@@ -829,7 +829,7 @@
       "admission_decision": "exclude",
       "admission_reason": "Exclude: portable resource cannot be attributed to the current operator",
       "space": {
-        "cidr_count": 0,
+        "cidr_count": 1,
         "address_count": "79228162514264337593543950336",
         "slash64_equivalent": "4294967296.0000",
         "percent_of_operator": "0.024516%"
@@ -857,7 +857,7 @@
       "admission_decision": "exclude",
       "admission_reason": "Exclude: APNIC registration contains an explicit non-user-side purpose",
       "space": {
-        "cidr_count": 0,
+        "cidr_count": 1,
         "address_count": "79228162514264337593543950336",
         "slash64_equivalent": "4294967296.0000",
         "percent_of_operator": "0.023680%"
@@ -885,7 +885,7 @@
       "admission_decision": "exclude",
       "admission_reason": "Exclude: portable resource cannot be attributed to the current operator",
       "space": {
-        "cidr_count": 0,
+        "cidr_count": 1,
         "address_count": "79228162514264337593543950336",
         "slash64_equivalent": "4294967296.0000",
         "percent_of_operator": "0.202218%"
@@ -913,7 +913,7 @@
       "admission_decision": "exclude",
       "admission_reason": "Exclude: most-specific APNIC registration names an independent legal entity",
       "space": {
-        "cidr_count": 0,
+        "cidr_count": 1,
         "address_count": "79228162514264337593543950336",
         "slash64_equivalent": "4294967296.0000",
         "percent_of_operator": "0.023680%"
@@ -940,7 +940,7 @@
       "admission_decision": "exclude",
       "admission_reason": "Exclude: portable resource cannot be attributed to the current operator",
       "space": {
-        "cidr_count": 0,
+        "cidr_count": 1,
         "address_count": "79228162514264337593543950336",
         "slash64_equivalent": "4294967296.0000",
         "percent_of_operator": "0.202218%"
@@ -970,7 +970,7 @@
       "admission_decision": "exclude",
       "admission_reason": "Exclude: most-specific APNIC registration names an independent legal entity",
       "space": {
-        "cidr_count": 0,
+        "cidr_count": 1,
         "address_count": "79228162514264337593543950336",
         "slash64_equivalent": "4294967296.0000",
         "percent_of_operator": "0.024516%"
@@ -998,7 +998,7 @@
       "admission_decision": "exclude",
       "admission_reason": "Exclude: most-specific APNIC registration names an independent legal entity",
       "space": {
-        "cidr_count": 0,
+        "cidr_count": 1,
         "address_count": "79228162514264337593543950336",
         "slash64_equivalent": "4294967296.0000",
         "percent_of_operator": "0.023680%"
@@ -1025,7 +1025,7 @@
       "admission_decision": "not_admitted",
       "admission_reason": "Not admitted: no explicit end-user access purpose evidence",
       "space": {
-        "cidr_count": 0,
+        "cidr_count": 1,
         "address_count": "79228162514264337593543950336",
         "slash64_equivalent": "4294967296.0000",
         "percent_of_operator": "0.024516%"
@@ -1052,7 +1052,7 @@
       "admission_reason": "Admit: most-specific APNIC registration explicitly identifies broadband, mobile, or user-address access",
       "explicit_user_purpose": true,
       "space": {
-        "cidr_count": 0,
+        "cidr_count": 7,
         "address_count": "39304596247310823728047194112",
         "slash64_equivalent": "2130706432.0000",
         "percent_of_operator": "0.012162%"
@@ -1079,7 +1079,7 @@
       "admission_reason": "Admit: most-specific APNIC registration explicitly identifies broadband, mobile, or user-address access",
       "explicit_user_purpose": true,
       "space": {
-        "cidr_count": 0,
+        "cidr_count": 2,
         "address_count": "14855280471424563298789490688",
         "slash64_equivalent": "805306368.0000",
         "percent_of_operator": "0.004597%"
@@ -1106,7 +1106,7 @@
       "admission_reason": "Admit: most-specific APNIC registration explicitly identifies broadband, mobile, or user-address access",
       "explicit_user_purpose": true,
       "space": {
-        "cidr_count": 0,
+        "cidr_count": 1,
         "address_count": "2475880078570760549798248448",
         "slash64_equivalent": "134217728.0000",
         "percent_of_operator": "0.000766%"
@@ -1133,7 +1133,7 @@
       "admission_decision": "exclude",
       "admission_reason": "Exclude: most-specific APNIC registration names an independent legal entity",
       "space": {
-        "cidr_count": 0,
+        "cidr_count": 2,
         "address_count": "618970019642690137449562112",
         "slash64_equivalent": "33554432.0000",
         "percent_of_operator": "0.001580%"
@@ -1161,7 +1161,7 @@
       "admission_decision": "exclude",
       "admission_reason": "Exclude: most-specific APNIC registration names an independent legal entity",
       "space": {
-        "cidr_count": 0,
+        "cidr_count": 2,
         "address_count": "310693935640959697899487232",
         "slash64_equivalent": "16842752.0000",
         "percent_of_operator": "0.000793%"
@@ -1188,7 +1188,7 @@
       "admission_decision": "exclude",
       "admission_reason": "Exclude: most-specific APNIC registration names an independent legal entity",
       "space": {
-        "cidr_count": 0,
+        "cidr_count": 6,
         "address_count": "76162326635721638006489088",
         "slash64_equivalent": "4128768.0000",
         "percent_of_operator": "0.000024%"
@@ -1218,7 +1218,7 @@
       "admission_decision": "exclude",
       "admission_reason": "Exclude: most-specific APNIC registration names an independent legal entity",
       "space": {
-        "cidr_count": 0,
+        "cidr_count": 3,
         "address_count": "41103477866897391940009984",
         "slash64_equivalent": "2228224.0000",
         "percent_of_operator": "0.000105%"
@@ -1245,7 +1245,7 @@
       "admission_decision": "exclude",
       "admission_reason": "Exclude: most-specific APNIC registration names an independent legal entity",
       "space": {
-        "cidr_count": 0,
+        "cidr_count": 2,
         "address_count": "38685626227668133590597632",
         "slash64_equivalent": "2097152.0000",
         "percent_of_operator": "0.000099%"
@@ -1273,7 +1273,7 @@
       "admission_decision": "exclude",
       "admission_reason": "Exclude: APNIC registration contains an explicit non-user-side purpose",
       "space": {
-        "cidr_count": 0,
+        "cidr_count": 2,
         "address_count": "20551738933448695970004992",
         "slash64_equivalent": "1114112.0000",
         "percent_of_operator": "0.000006%"
@@ -1300,7 +1300,7 @@
       "admission_decision": "exclude",
       "admission_reason": "Exclude: portable resource cannot be attributed to the current operator",
       "space": {
-        "cidr_count": 0,
+        "cidr_count": 1,
         "address_count": "19342813113834066795298816",
         "slash64_equivalent": "1048576.0000",
         "percent_of_operator": "0.000049%"
@@ -1335,7 +1335,7 @@
       "admission_decision": "exclude",
       "admission_reason": "Exclude: most-specific APNIC registration is outside mainland China",
       "space": {
-        "cidr_count": 0,
+        "cidr_count": 3,
         "address_count": "3626777458843887524118528",
         "slash64_equivalent": "196608.0000",
         "percent_of_operator": "0.000001%"
@@ -1363,7 +1363,7 @@
       "admission_decision": "exclude",
       "admission_reason": "Exclude: APNIC registration contains an explicit non-user-side purpose",
       "space": {
-        "cidr_count": 0,
+        "cidr_count": 3,
         "address_count": "3626777458843887524118528",
         "slash64_equivalent": "196608.0000",
         "percent_of_operator": "0.000001%"
@@ -1390,7 +1390,7 @@
       "admission_decision": "exclude",
       "admission_reason": "Exclude: most-specific APNIC registration names an independent legal entity",
       "space": {
-        "cidr_count": 0,
+        "cidr_count": 3,
         "address_count": "3626777458843887524118528",
         "slash64_equivalent": "196608.0000",
         "percent_of_operator": "0.000009%"
@@ -1417,7 +1417,7 @@
       "admission_decision": "exclude",
       "admission_reason": "Exclude: most-specific APNIC registration is outside mainland China",
       "space": {
-        "cidr_count": 0,
+        "cidr_count": 2,
         "address_count": "2417851639229258349412352",
         "slash64_equivalent": "131072.0000",
         "percent_of_operator": "0.000001%"
@@ -1444,7 +1444,7 @@
       "admission_decision": "exclude",
       "admission_reason": "Exclude: portable resource cannot be attributed to the current operator",
       "space": {
-        "cidr_count": 0,
+        "cidr_count": 2,
         "address_count": "2417851639229258349412352",
         "slash64_equivalent": "131072.0000",
         "percent_of_operator": "0.000006%"
@@ -1470,7 +1470,7 @@
       "admission_decision": "exclude",
       "admission_reason": "Exclude: portable resource cannot be attributed to the current operator",
       "space": {
-        "cidr_count": 0,
+        "cidr_count": 1,
         "address_count": "1208925819614629174706176",
         "slash64_equivalent": "65536.0000",
         "percent_of_operator": "0.000000%"
@@ -1497,7 +1497,7 @@
       "admission_decision": "exclude",
       "admission_reason": "Exclude: most-specific APNIC registration is outside mainland China",
       "space": {
-        "cidr_count": 0,
+        "cidr_count": 1,
         "address_count": "1208925819614629174706176",
         "slash64_equivalent": "65536.0000",
         "percent_of_operator": "0.000000%"
@@ -1524,7 +1524,7 @@
       "admission_decision": "exclude",
       "admission_reason": "Exclude: most-specific APNIC registration is outside mainland China",
       "space": {
-        "cidr_count": 0,
+        "cidr_count": 1,
         "address_count": "1208925819614629174706176",
         "slash64_equivalent": "65536.0000",
         "percent_of_operator": "0.000000%"
@@ -1553,7 +1553,7 @@
       "admission_decision": "exclude",
       "admission_reason": "Exclude: most-specific APNIC registration names an independent legal entity",
       "space": {
-        "cidr_count": 0,
+        "cidr_count": 1,
         "address_count": "1208925819614629174706176",
         "slash64_equivalent": "65536.0000",
         "percent_of_operator": "0.000000%"
@@ -1582,7 +1582,7 @@
       "admission_decision": "exclude",
       "admission_reason": "Exclude: most-specific APNIC registration names an independent legal entity",
       "space": {
-        "cidr_count": 0,
+        "cidr_count": 1,
         "address_count": "1208925819614629174706176",
         "slash64_equivalent": "65536.0000",
         "percent_of_operator": "0.000000%"
@@ -1609,7 +1609,7 @@
       "admission_decision": "exclude",
       "admission_reason": "Exclude: APNIC registration contains an explicit non-user-side purpose",
       "space": {
-        "cidr_count": 0,
+        "cidr_count": 1,
         "address_count": "1208925819614629174706176",
         "slash64_equivalent": "65536.0000",
         "percent_of_operator": "0.000000%"
@@ -1638,7 +1638,7 @@
       "admission_decision": "exclude",
       "admission_reason": "Exclude: APNIC registration contains an explicit non-user-side purpose",
       "space": {
-        "cidr_count": 0,
+        "cidr_count": 1,
         "address_count": "1208925819614629174706176",
         "slash64_equivalent": "65536.0000",
         "percent_of_operator": "0.000000%"
@@ -1667,7 +1667,7 @@
       "admission_decision": "exclude",
       "admission_reason": "Exclude: most-specific APNIC registration names an independent legal entity",
       "space": {
-        "cidr_count": 0,
+        "cidr_count": 1,
         "address_count": "1208925819614629174706176",
         "slash64_equivalent": "65536.0000",
         "percent_of_operator": "0.000000%"
@@ -1696,7 +1696,7 @@
       "admission_decision": "exclude",
       "admission_reason": "Exclude: APNIC registration contains an explicit non-user-side purpose",
       "space": {
-        "cidr_count": 0,
+        "cidr_count": 1,
         "address_count": "1208925819614629174706176",
         "slash64_equivalent": "65536.0000",
         "percent_of_operator": "0.000000%"
@@ -1723,7 +1723,7 @@
       "admission_decision": "exclude",
       "admission_reason": "Exclude: most-specific APNIC registration names an independent legal entity",
       "space": {
-        "cidr_count": 0,
+        "cidr_count": 1,
         "address_count": "1208925819614629174706176",
         "slash64_equivalent": "65536.0000",
         "percent_of_operator": "0.000000%"
@@ -1750,7 +1750,7 @@
       "admission_decision": "exclude",
       "admission_reason": "Exclude: most-specific APNIC registration names an independent legal entity",
       "space": {
-        "cidr_count": 0,
+        "cidr_count": 1,
         "address_count": "1208925819614629174706176",
         "slash64_equivalent": "65536.0000",
         "percent_of_operator": "0.000000%"
@@ -1778,7 +1778,7 @@
       "admission_decision": "exclude",
       "admission_reason": "Exclude: portable resource cannot be attributed to the current operator",
       "space": {
-        "cidr_count": 0,
+        "cidr_count": 1,
         "address_count": "1208925819614629174706176",
         "slash64_equivalent": "65536.0000",
         "percent_of_operator": "0.000003%"
@@ -1805,7 +1805,7 @@
       "admission_decision": "exclude",
       "admission_reason": "Exclude: most-specific APNIC registration names an independent legal entity",
       "space": {
-        "cidr_count": 0,
+        "cidr_count": 1,
         "address_count": "1208925819614629174706176",
         "slash64_equivalent": "65536.0000",
         "percent_of_operator": "0.000003%"
@@ -1833,7 +1833,7 @@
       "admission_decision": "exclude",
       "admission_reason": "Exclude: most-specific APNIC registration names an independent legal entity",
       "space": {
-        "cidr_count": 0,
+        "cidr_count": 1,
         "address_count": "1208925819614629174706176",
         "slash64_equivalent": "65536.0000",
         "percent_of_operator": "0.000000%"
@@ -1862,7 +1862,7 @@
       "admission_decision": "exclude",
       "admission_reason": "Exclude: APNIC registration contains an explicit non-user-side purpose",
       "space": {
-        "cidr_count": 0,
+        "cidr_count": 1,
         "address_count": "1208925819614629174706176",
         "slash64_equivalent": "65536.0000",
         "percent_of_operator": "0.000000%"
@@ -1889,7 +1889,7 @@
       "admission_decision": "exclude",
       "admission_reason": "Exclude: most-specific APNIC registration names an independent legal entity",
       "space": {
-        "cidr_count": 0,
+        "cidr_count": 1,
         "address_count": "1208925819614629174706176",
         "slash64_equivalent": "65536.0000",
         "percent_of_operator": "0.000003%"
@@ -1916,7 +1916,7 @@
       "admission_decision": "exclude",
       "admission_reason": "Exclude: portable resource cannot be attributed to the current operator",
       "space": {
-        "cidr_count": 0,
+        "cidr_count": 1,
         "address_count": "1208925819614629174706176",
         "slash64_equivalent": "65536.0000",
         "percent_of_operator": "0.000000%"
@@ -1944,7 +1944,7 @@
       "admission_decision": "exclude",
       "admission_reason": "Exclude: most-specific APNIC registration names an independent legal entity",
       "space": {
-        "cidr_count": 0,
+        "cidr_count": 1,
         "address_count": "1208925819614629174706176",
         "slash64_equivalent": "65536.0000",
         "percent_of_operator": "0.000003%"
@@ -1972,7 +1972,7 @@
       "admission_decision": "exclude",
       "admission_reason": "Exclude: most-specific APNIC registration names an independent legal entity",
       "space": {
-        "cidr_count": 0,
+        "cidr_count": 1,
         "address_count": "1208925819614629174706176",
         "slash64_equivalent": "65536.0000",
         "percent_of_operator": "0.000003%"
@@ -2001,7 +2001,7 @@
       "admission_decision": "exclude",
       "admission_reason": "Exclude: most-specific APNIC registration names an independent legal entity",
       "space": {
-        "cidr_count": 0,
+        "cidr_count": 1,
         "address_count": "1208925819614629174706176",
         "slash64_equivalent": "65536.0000",
         "percent_of_operator": "0.000000%"
@@ -2030,7 +2030,7 @@
       "admission_decision": "exclude",
       "admission_reason": "Exclude: most-specific APNIC registration names an independent legal entity",
       "space": {
-        "cidr_count": 0,
+        "cidr_count": 1,
         "address_count": "1208925819614629174706176",
         "slash64_equivalent": "65536.0000",
         "percent_of_operator": "0.000003%"
@@ -2057,7 +2057,7 @@
       "admission_decision": "exclude",
       "admission_reason": "Exclude: most-specific APNIC registration names an independent legal entity",
       "space": {
-        "cidr_count": 0,
+        "cidr_count": 1,
         "address_count": "1208925819614629174706176",
         "slash64_equivalent": "65536.0000",
         "percent_of_operator": "0.000003%"
@@ -2084,7 +2084,7 @@
       "admission_decision": "exclude",
       "admission_reason": "Exclude: most-specific APNIC registration names an independent legal entity",
       "space": {
-        "cidr_count": 0,
+        "cidr_count": 1,
         "address_count": "1208925819614629174706176",
         "slash64_equivalent": "65536.0000",
         "percent_of_operator": "0.000000%"
@@ -2114,7 +2114,7 @@
       "admission_decision": "exclude",
       "admission_reason": "Exclude: most-specific APNIC registration names an independent legal entity",
       "space": {
-        "cidr_count": 0,
+        "cidr_count": 1,
         "address_count": "1208925819614629174706176",
         "slash64_equivalent": "65536.0000",
         "percent_of_operator": "0.000003%"
@@ -2142,7 +2142,7 @@
       "admission_decision": "exclude",
       "admission_reason": "Exclude: most-specific APNIC registration names an independent legal entity",
       "space": {
-        "cidr_count": 0,
+        "cidr_count": 1,
         "address_count": "1208925819614629174706176",
         "slash64_equivalent": "65536.0000",
         "percent_of_operator": "0.000000%"
@@ -2171,7 +2171,7 @@
       "admission_decision": "exclude",
       "admission_reason": "Exclude: most-specific APNIC registration names an independent legal entity",
       "space": {
-        "cidr_count": 0,
+        "cidr_count": 1,
         "address_count": "1208925819614629174706176",
         "slash64_equivalent": "65536.0000",
         "percent_of_operator": "0.000000%"
@@ -2206,7 +2206,7 @@
       "admission_decision": "exclude",
       "admission_reason": "Exclude: APNIC registration contains an explicit non-user-side purpose",
       "space": {
-        "cidr_count": 0,
+        "cidr_count": 1,
         "address_count": "1208925819614629174706176",
         "slash64_equivalent": "65536.0000",
         "percent_of_operator": "0.000000%"
@@ -2239,7 +2239,7 @@
       "admission_decision": "exclude",
       "admission_reason": "Exclude: portable resource cannot be attributed to the current operator",
       "space": {
-        "cidr_count": 0,
+        "cidr_count": 1,
         "address_count": "1208925819614629174706176",
         "slash64_equivalent": "65536.0000",
         "percent_of_operator": "0.000000%"
@@ -2259,7 +2259,7 @@
       "36": 1
     },
     "chinanet/same_operator": {
-      "18": 327,
+      "18": 328,
       "24": 1657,
       "31": 9,
       "32": 2,

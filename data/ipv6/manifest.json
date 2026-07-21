@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-21T19:26:19.11628406Z",
+  "generated_at": "2026-07-21T19:30:04.052816188Z",
   "scope": "IPv6 end-user access prefix allowlist; only prefixes with explicit positive purpose evidence are admitted",
   "status": {
     "chinanet": "ready",
@@ -56,7 +56,7 @@
       "admission_reason": "Admit: most-specific APNIC registration explicitly identifies broadband, mobile, or user-address access",
       "explicit_user_purpose": true,
       "space": {
-        "cidr_count": 0,
+        "cidr_count": 1,
         "address_count": "20282409603651670423947251286016",
         "slash64_equivalent": "1099511627776.0000",
         "percent_of_operator": "6.276026%"
@@ -84,7 +84,7 @@
       "admission_reason": "Admit: most-specific APNIC registration explicitly identifies broadband, mobile, or user-address access",
       "explicit_user_purpose": true,
       "space": {
-        "cidr_count": 0,
+        "cidr_count": 279,
         "address_count": "20282358828767246609521913626624",
         "slash64_equivalent": "1099508875264.0000",
         "percent_of_operator": "6.276011%"
@@ -112,7 +112,7 @@
       "admission_reason": "Admit: most-specific APNIC registration explicitly identifies broadband, mobile, or user-address access",
       "explicit_user_purpose": true,
       "space": {
-        "cidr_count": 0,
+        "cidr_count": 30,
         "address_count": "20260126682944533578999067049984",
         "slash64_equivalent": "1098303668224.0000",
         "percent_of_operator": "6.269131%"
@@ -142,7 +142,7 @@
       "admission_reason": "Admit: most-specific APNIC registration explicitly identifies broadband, mobile, or user-address access",
       "explicit_user_purpose": true,
       "space": {
-        "cidr_count": 0,
+        "cidr_count": 23,
         "address_count": "153502147019747924829141991424",
         "slash64_equivalent": "8321368064.0000",
         "percent_of_operator": "0.047498%"
@@ -169,7 +169,7 @@
       "admission_reason": "Admit: most-specific APNIC registration explicitly identifies broadband, mobile, or user-address access",
       "explicit_user_purpose": true,
       "space": {
-        "cidr_count": 0,
+        "cidr_count": 7,
         "address_count": "39304596247310823728047194112",
         "slash64_equivalent": "2130706432.0000",
         "percent_of_operator": "0.012162%"
@@ -196,7 +196,7 @@
       "admission_reason": "Admit: most-specific APNIC registration explicitly identifies broadband, mobile, or user-address access",
       "explicit_user_purpose": true,
       "space": {
-        "cidr_count": 0,
+        "cidr_count": 2,
         "address_count": "14855280471424563298789490688",
         "slash64_equivalent": "805306368.0000",
         "percent_of_operator": "0.004597%"
@@ -223,7 +223,7 @@
       "admission_reason": "Admit: most-specific APNIC registration explicitly identifies broadband, mobile, or user-address access",
       "explicit_user_purpose": true,
       "space": {
-        "cidr_count": 0,
+        "cidr_count": 1,
         "address_count": "2475880078570760549798248448",
         "slash64_equivalent": "134217728.0000",
         "percent_of_operator": "0.000766%"

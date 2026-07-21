@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-21T19:26:09.127623199Z",
+  "generated_at": "2026-07-21T19:29:54.279980641Z",
   "scope": "Factual validation of gaoyifan/china-operator-ip china6.txt against current IPtoASN IPv6 origins, RIPE RISWhois IPv6 visibility, APNIC delegated country registration, and the repository's three-operator ASN policy; no address is admitted or excluded by this audit",
   "sources": {
     "apnic_delegated": {
@@ -24,8 +24,8 @@
     },
     "iptoasn_v6": {
       "path": "/home/runner/work/cn-eyeball-prefixes/cn-eyeball-prefixes/.tmp/cn-eyeball-ipv6-sources/ip2asn-v6.tsv.gz",
-      "bytes": 1974689,
-      "sha256": "816bd185c5a950b8dc8a5cf2d97606d28f7ed4c3e5f6e7fa698ca738d0af3269"
+      "bytes": 1975215,
+      "sha256": "95aafeb0d0a8862a4f03b3bfdbfc29a825e548afc70d1ca98a479733fe804de9"
     },
     "operator_config": {
       "path": "config/operators.json",
@@ -766,9 +766,9 @@
       "asn": "23910",
       "country": "CN",
       "description": "CNGI-CERNET2-AS-AP China Next Generation Internet CERNET2",
-      "address_count": "321585039546544126817789448028160",
-      "slash64_equivalent": "17433159925760.0000",
-      "percent_of_china6": "15.982462%"
+      "address_count": "321585048009024864120193670971392",
+      "slash64_equivalent": "17433160384512.0000",
+      "percent_of_china6": "15.982463%"
     },
     {
       "asn": "4134",
@@ -800,8 +800,8 @@
       "asn": "37963",
       "country": "CN",
       "description": "ALIBABA-CN-NET Hangzhou Alibaba Advertising Co.,Ltd.",
-      "address_count": "81604985629027514658025124134912",
-      "slash64_equivalent": "4423815135232.0000",
+      "address_count": "81604986837953334272654298841088",
+      "slash64_equivalent": "4423815200768.0000",
       "percent_of_china6": "4.055688%"
     },
     {
