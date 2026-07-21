@@ -1,6 +1,6 @@
 # 中国三网普通互联网接入用户侧公网 IPv4 候选列表
 
-本仓库自动维护上述候选列表，明确用于 ACL 白名单。`dev` 分支采用全国混合准入：地址必须具有中国电信、中国移动或中国联通的当前 BGP Origin，并存在归属于同一家运营商的 APNIC 覆盖登记；在此边界内，以实际 BGP 宣告单元修复三网内部登记冲突造成的细碎孔洞。
+本仓库自动维护上述候选列表，明确用于 ACL 白名单。正式版本采用全国混合准入：地址必须具有中国电信、中国移动或中国联通的当前 BGP Origin，并存在归属于同一家运营商的 APNIC 覆盖登记；在此边界内，以实际 BGP 宣告单元修复三网内部登记冲突造成的细碎孔洞。
 
 APNIC 最具体登记不再作为逐地址切割边界：其中的客户、项目和历史子登记会保留审计，只有命中云厂商 CIDR、明确非普通用户侧用途、独立资源持有人、独立 route origin、强 MOAS 等强证据时才会删除。三网之间的登记冲突若同时位于同运营商 APNIC 父级和当前三网 BGP 宣告单元内，则作为 best-effort 误差整体保留；这可能带入极小范围的企业、网吧等非目标地址，但避免 ACL CIDR 爆炸式膨胀。规则不枚举省、市或县级分支名称，所有地区使用完全相同的全国规则。
 
@@ -92,8 +92,7 @@ flowchart TD
 - 独立资源持有人以及登记给可关联独立 ASN 主体的三网 origin 前缀采用 APNIC [`aut-num`](https://ftp.apnic.net/apnic/whois/apnic.db.aut-num.gz) 自动交叉验证。最具体 inetnum 为 `ALLOCATED/ASSIGNED PORTABLE` 或 `ALLOCATED/ASSIGNED NON-PORTABLE`、登记主体自身不能识别为三网，并能通过相同 `org` handle 或长度不少于五字符的精确 `netname == as-name` 连接到 IPtoASN 当前仍活跃的非三网 ASN 时，按该登记前缀排除。若关联 ASN 当前不活跃，则还必须从 inetnum 的 `descr` 或 organisation 名称识别出完整法定主体名称，形成第二项独立证据；单独的企业词、netname、历史 ASN 或模糊名称不会触发。
 - APNIC route 独立 origin 强关联用于处理当前由三网 ASN 宣告、但 route 对象指向活跃非三网 ASN 的前缀：inetnum、route、aut-num 三者必须共享同一 `org` handle，或共享只归属于该 ASN 的专用 maintainer。公共 maintainer 会因关联多个活跃 ASN 自动失效。满足条件的前缀自动排除，同时将完整登记证据写入 manifest 的 `apnic_route_origin_audit`；该段以 `enforced: true` 明确表示审计结论已参与最终 CIDR 删除。
 - [RIPE RISWhois](https://ris.ripe.net/docs/ris-whois/) 提供多个 RIS 采集点汇总的当前前缀/origin 与可见 peer 数。这里只处理三网候选范围，并按最具体 BGP 前缀判断：当前三网 origin 和备用 origin 均须至少被 10 个 peer、且达到该前缀最高可见度的 5%；备用 origin 的当前 IPtoASN 描述还必须命中同一套强非普通用户侧规则，才会剔除。普通 MOAS、低可见度 origin、描述未知或证据含糊的情况只计入审计统计并继续保留。
-- `data/experiments/bgp-prefix-admission/*-relaxed.txt` 是宽松 BGP 准入试验：以当前三网 BGP Origin 作为正向准入证据，不要求 APNIC 登记再次写明运营商，也不因三网之间的最具体登记冲突切碎前缀；RIS 未覆盖部分回退到当前 `dev` 准入结果。APNIC 在该方案中只参与云、IDC、独立主体等强非目标排除，其他 route Origin 和强 MOAS 排除也继续生效。`*-covering_relaxed.txt` 保留“仍要求三网 APNIC 父级、只放宽冲突”的过渡对照；两档方案都提供 `*-added.txt` 与 `*-removed.txt` 完整差集。真正宽松方案的全部新增地址还会反查为 `data/audits/bgp-relaxed-added-apnic.md` 和对应 gzip JSON，供提升为正式策略前审计。
-- `data/experiments/bgp-prefix-admission/*-hybrid.txt` 镜像当前正式混合准入结果；`*-hybrid-added.txt` 与 `*-hybrid-removed.txt` 继续相对原分层准入基线列出完整差集。生成器和独立校验器都强制保证：删除量为零、新增地址全部位于三网内部登记冲突和当前三网 Origin 范围内、不与任何强排除重叠；新增地址不得超过分层基线的 0.1%，最终 CIDR 不得超过分层基线的 1.10 倍。
+- hybrid 的安全边界由生成器和独立校验器直接强制：相对基础分层准入删除量必须为零，冲突修复地址必须同时位于当前三网 Origin、RIS 已观测范围、同运营商 APNIC 父级和三网内部登记冲突内，且不得与任何强排除重叠；修复地址不得超过分层基线的 0.1%，最终 CIDR 不得超过分层基线的 1.10 倍。仓库只发布正式结果，不生成或提交其他准入策略的试验列表和对照报告。
 - 省级归属采用 [lionsoul2014/ip2region](https://github.com/lionsoul2014/ip2region) IPv4 源数据；构建器先按省份合并其有序区间，再与三个运营商最终地址池求交。它只用于地域切分，不参与运营商判定。
 - 仅处理 IPv4 和中国大陆 31 个省级行政区；非中国大陆地址及无法归入省级行政区的网段不进入省级文件。
 - 相邻或重叠网段会合并为最大 CIDR 集合。三个运营商文件互不重叠且其并集严格等于 `cn.txt`；31 个省级文件互不重叠且均为 `cn.txt` 的子集。由于 ip2region 可能没有覆盖全国表中的全部地址，省级并集不强制等于全国表，实际归属覆盖量会作为 `province_attributed_output` 阶段写入 manifest。生成后校验器会检查这些关系、上游包含关系、排除证据和 manifest 文件摘要。

@@ -54,55 +54,43 @@ func TestRelevantAPNICRecords(t *testing.T) {
 	}
 }
 
-func TestBGPPrefixAdmissionTrialsKeepTheRouteUnitAtomic(t *testing.T) {
+func TestBGPConflictHealingKeepsTheRouteUnitAtomic(t *testing.T) {
 	segments := []riswhois.Segment{{
 		Lo: 0, Hi: 255,
 		Record: riswhois.Record{Lo: 0, Hi: 255, Prefix: "0.0.0.0/24", Origins: []riswhois.Origin{{ASN: "4134", SeenPeers: 100}}},
 	}}
-	trials := bgpPrefixAdmissionTrials(
+	observed, eligible := bgpConflictHealingRanges(
 		segments,
 		map[string]string{"4134": "chinanet"},
 		map[string][]span{"chinanet": {{0, 255}}},
 		map[string][]span{"chinanet": {{0, 127}, {144, 255}}},
-		map[string][]span{"chinanet": {{0, 127}, {144, 255}}},
 		map[string][]span{"chinanet": {{0, 255}}},
-		map[string][]span{"chinanet": {{0, 63}}},
-		map[string][]span{"chinanet": nil},
 	)
-	if got := trials["any"]; len(got) != 2 || got[0] != (span{0, 127}) || got[1] != (span{144, 255}) {
-		t.Fatalf("any-evidence trial split on APNIC evidence instead of retaining the route unit after strong exclusions: %#v", got)
+	if len(observed) != 2 || observed[0] != (span{0, 127}) || observed[1] != (span{144, 255}) {
+		t.Fatalf("unexpected RIS-observed retained ranges: %#v", observed)
 	}
-	if len(trials["majority"]) != 0 || len(trials["full"]) != 0 {
-		t.Fatalf("stricter policies unexpectedly admitted a unit with only 25%% positive coverage: %#v", trials)
-	}
-	if got := trials["covering"]; len(got) != 2 || got[0] != (span{0, 127}) || got[1] != (span{144, 255}) {
-		t.Fatalf("covering-parent policy did not retain the BGP unit after strong exclusions: %#v", got)
-	}
-	if got := trials["relaxed"]; len(got) != 2 || got[0] != (span{0, 127}) || got[1] != (span{144, 255}) {
-		t.Fatalf("relaxed policy did not retain the BGP unit after strong exclusions: %#v", got)
+	if len(eligible) != 2 || eligible[0] != (span{0, 127}) || eligible[1] != (span{144, 255}) {
+		t.Fatalf("same-operator parent did not make the retained BGP unit eligible for conflict healing: %#v", eligible)
 	}
 }
 
-func TestRelaxedBGPPrefixAdmissionDoesNotRequireAPNICParent(t *testing.T) {
+func TestBGPConflictHealingRequiresAPNICParent(t *testing.T) {
 	segments := []riswhois.Segment{{
 		Lo: 0, Hi: 255,
 		Record: riswhois.Record{Lo: 0, Hi: 255, Prefix: "0.0.0.0/24", Origins: []riswhois.Origin{{ASN: "4134", SeenPeers: 100}}},
 	}}
-	trials := bgpPrefixAdmissionTrials(
+	observed, eligible := bgpConflictHealingRanges(
 		segments,
 		map[string]string{"4134": "chinanet"},
 		map[string][]span{"chinanet": {{0, 255}}},
 		map[string][]span{"chinanet": {{0, 255}}},
 		map[string][]span{"chinanet": nil},
-		map[string][]span{"chinanet": nil},
-		map[string][]span{"chinanet": nil},
-		map[string][]span{"chinanet": nil},
 	)
-	if got := trials["relaxed"]; len(got) != 1 || got[0] != (span{0, 255}) {
-		t.Fatalf("relaxed policy still depended on APNIC positive admission: %#v", got)
+	if len(observed) != 1 || observed[0] != (span{0, 255}) {
+		t.Fatalf("RIS observation unexpectedly depended on APNIC parent evidence: %#v", observed)
 	}
-	if len(trials["covering_relaxed"]) != 0 {
-		t.Fatalf("covering-relaxed control unexpectedly admitted a route without an APNIC operator parent: %#v", trials["covering_relaxed"])
+	if len(eligible) != 0 {
+		t.Fatalf("conflict healing unexpectedly admitted a route without an APNIC operator parent: %#v", eligible)
 	}
 }
 
