@@ -63,6 +63,18 @@ type operatorCoverage struct {
 	MissingFromChina6 spaceStat `json:"missing_from_china6"`
 }
 
+type operatorListAudit struct {
+	Operator             string    `json:"operator"`
+	Upstream             spaceStat `json:"upstream"`
+	MatchingCurrentOrigin spaceStat `json:"matching_current_origin"`
+	OtherOperatorOrigin   spaceStat `json:"other_operator_origin"`
+	NoThreeOperatorOrigin spaceStat `json:"no_three_operator_origin"`
+	OutsideChina6         spaceStat `json:"outside_china6"`
+	CurrentOriginMissing  spaceStat `json:"current_origin_missing_from_upstream"`
+	OriginAgreement       string    `json:"origin_agreement"`
+	CurrentOriginCoverage string    `json:"current_origin_coverage"`
+}
+
 type report struct {
 	GeneratedAt           string                       `json:"generated_at"`
 	Scope                 string                       `json:"scope"`
@@ -76,6 +88,7 @@ type report struct {
 	IPtoASNCountrySpace   map[string]spaceStat         `json:"iptoasn_country_space"`
 	APNICDelegatedSpace   map[string]spaceStat         `json:"apnic_delegated_space"`
 	OperatorCoverage      []operatorCoverage           `json:"operator_coverage"`
+	OperatorListAudit     []operatorListAudit           `json:"operator_list_audit"`
 	TopOrigins            []originStat                 `json:"top_origins"`
 	NonCNOrigins          []originStat                 `json:"non_cn_origins"`
 	AllOriginCount        int                          `json:"all_origin_count"`
@@ -85,6 +98,9 @@ type report struct {
 
 func main() {
 	china6Path := flag.String("china6", "", "gaoyifan china6.txt")
+	chinanet6Path := flag.String("chinanet6", "", "gaoyifan chinanet6.txt")
+	cmcc6Path := flag.String("cmcc6", "", "gaoyifan cmcc6.txt")
+	unicom6Path := flag.String("unicom6", "", "gaoyifan unicom6.txt")
 	iptoasnPath := flag.String("iptoasn", "", "IPtoASN IPv6 TSV gzip")
 	delegatedPath := flag.String("delegated", "", "APNIC delegated-latest file")
 	risPath := flag.String("ris", "", "RIPE RISWhois IPv6 dump")
@@ -92,7 +108,7 @@ func main() {
 	jsonPath := flag.String("json", "reports/ipv6/china6-validation.json", "JSON report path")
 	markdownPath := flag.String("markdown", "reports/ipv6/china6-validation.md", "Markdown report path")
 	flag.Parse()
-	for name, path := range map[string]string{"china6": *china6Path, "iptoasn": *iptoasnPath, "delegated": *delegatedPath, "ris": *risPath} {
+	for name, path := range map[string]string{"china6": *china6Path, "chinanet6": *chinanet6Path, "cmcc6": *cmcc6Path, "unicom6": *unicom6Path, "iptoasn": *iptoasnPath, "delegated": *delegatedPath, "ris": *risPath} {
 		if path == "" {
 			panic("--" + name + " is required")
 		}
@@ -189,12 +205,45 @@ func main() {
 	delegatedStats["UNREGISTERED_OR_NON_APNIC"] = makeStat(ipset6.Subtract(china6, delegatedCovered), total, 20)
 
 	operatorCoverageRows := make([]operatorCoverage, 0, len(operators))
+	currentByOperator := map[string][]ipset6.Range{}
+	var allCurrentOperator []ipset6.Range
 	for _, operator := range operators {
 		current := ipset6.Merge(operatorRanges[operator])
 		inside := ipset6.Intersect(current, china6)
+		currentByOperator[operator] = inside
+		allCurrentOperator = append(allCurrentOperator, inside...)
 		missing := ipset6.Subtract(current, china6)
 		operatorCoverageRows = append(operatorCoverageRows, operatorCoverage{
 			Operator: operator, CurrentOrigin: makeStat(current, total, 10), InsideChina6: makeStat(inside, total, 10), MissingFromChina6: makeStat(missing, total, 30),
+		})
+	}
+	allCurrentOperator = ipset6.Merge(allCurrentOperator)
+	upstreamPaths := map[string]string{"chinanet": *chinanet6Path, "cmcc": *cmcc6Path, "unicom": *unicom6Path}
+	operatorListRows := make([]operatorListAudit, 0, len(operators))
+	for _, operator := range operators {
+		upstream, _ := readCIDRs(upstreamPaths[operator])
+		matching := ipset6.Intersect(upstream, currentByOperator[operator])
+		var otherCurrent []ipset6.Range
+		for _, other := range operators {
+			if other != operator {
+				otherCurrent = append(otherCurrent, currentByOperator[other]...)
+			}
+		}
+		otherOrigin := ipset6.Intersect(upstream, otherCurrent)
+		noThreeOrigin := ipset6.Subtract(upstream, allCurrentOperator)
+		missing := ipset6.Subtract(currentByOperator[operator], upstream)
+		upstreamCount := ipset6.AddressCount(upstream)
+		currentCount := ipset6.AddressCount(currentByOperator[operator])
+		operatorListRows = append(operatorListRows, operatorListAudit{
+			Operator: operator,
+			Upstream: makeStat(upstream, total, 10),
+			MatchingCurrentOrigin: makeStat(matching, total, 10),
+			OtherOperatorOrigin: makeStat(otherOrigin, total, 20),
+			NoThreeOperatorOrigin: makeStat(noThreeOrigin, total, 20),
+			OutsideChina6: makeStat(ipset6.Subtract(upstream, china6), total, 20),
+			CurrentOriginMissing: makeStat(missing, total, 20),
+			OriginAgreement: percent(ipset6.AddressCount(matching), upstreamCount),
+			CurrentOriginCoverage: percent(ipset6.AddressCount(matching), currentCount),
 		})
 	}
 
@@ -211,13 +260,14 @@ func main() {
 		IPtoASNCountrySpace:   countryStats,
 		APNICDelegatedSpace:   delegatedStats,
 		OperatorCoverage:      operatorCoverageRows,
+		OperatorListAudit:     operatorListRows,
 		TopOrigins:            topOrigins,
 		NonCNOrigins:          nonCNOrigins,
 		AllOriginCount:        len(allOrigins),
 		ForeignOriginSpace:    makeStat(foreignOrigin, total, 30),
 		UnknownCountrySpace:   makeStat(unknownCountry, total, 30),
 	}
-	for name, path := range map[string]string{"china6": *china6Path, "iptoasn_v6": *iptoasnPath, "apnic_delegated": *delegatedPath, "riswhois_ipv6": *risPath, "operator_config": *configPath} {
+	for name, path := range map[string]string{"china6": *china6Path, "chinanet6": *chinanet6Path, "cmcc6": *cmcc6Path, "unicom6": *unicom6Path, "iptoasn_v6": *iptoasnPath, "apnic_delegated": *delegatedPath, "riswhois_ipv6": *risPath, "operator_config": *configPath} {
 		meta, err := fileMeta(path)
 		must(err)
 		reportValue.Sources[name] = meta
@@ -457,6 +507,24 @@ func renderMarkdown(r report) string {
 		if len(row.MissingFromChina6.Samples) > 0 {
 			fmt.Fprintf(&b, "\n%s 的 china6 外样本：`%s`\n\n", row.Operator, strings.Join(row.MissingFromChina6.Samples, "`, `"))
 		}
+	}
+
+	fmt.Fprintln(&b, "\n## gaoyifan 三网 IPv6 分表与当前 Origin")
+	fmt.Fprintln(&b)
+	fmt.Fprintln(&b, "分表只作为独立交叉验证。`一致率`以相应上游分表为分母；`覆盖率`以 `APNIC delegated CN + 当前同运营商 Origin` 为分母。")
+	fmt.Fprintln(&b)
+	fmt.Fprintln(&b, "| 运营商 | 上游 CIDR | 当前 Origin 一致 | 一致率 | 当前 Origin 覆盖率 | 另一运营商 Origin | 无当前三网 Origin | china6 外 | 当前 Origin 漏项 |")
+	fmt.Fprintln(&b, "| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |")
+	for _, row := range r.OperatorListAudit {
+		fmt.Fprintf(&b, "| %s | %d | %d | %s | %s | %d | %d | %d | %d |\n",
+			row.Operator, row.Upstream.CIDRCount, row.MatchingCurrentOrigin.CIDRCount, row.OriginAgreement,
+			row.CurrentOriginCoverage, row.OtherOperatorOrigin.CIDRCount, row.NoThreeOperatorOrigin.CIDRCount,
+			row.OutsideChina6.CIDRCount, row.CurrentOriginMissing.CIDRCount)
+	}
+	for _, row := range r.OperatorListAudit {
+		appendSamples(&b, row.Operator+"：另一运营商 Origin 冲突样本", row.OtherOperatorOrigin.Samples)
+		appendSamples(&b, row.Operator+"：无当前三网 Origin 样本", row.NoThreeOperatorOrigin.Samples)
+		appendSamples(&b, row.Operator+"：当前 Origin 漏项样本", row.CurrentOriginMissing.Samples)
 	}
 
 	fmt.Fprintln(&b, "\n## china6 内地址量最大的 Origin")

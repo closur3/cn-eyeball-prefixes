@@ -33,6 +33,9 @@ jobs:
           mkdir -p "$SOURCE_DIR"
           curl_opts=(--fail --silent --show-error --location --retry 3)
           curl "${curl_opts[@]}" 'https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/china6.txt' -o "$SOURCE_DIR/china6.txt"
+          curl "${curl_opts[@]}" 'https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/chinanet6.txt' -o "$SOURCE_DIR/chinanet6.txt"
+          curl "${curl_opts[@]}" 'https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/cmcc6.txt' -o "$SOURCE_DIR/cmcc6.txt"
+          curl "${curl_opts[@]}" 'https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/unicom6.txt' -o "$SOURCE_DIR/unicom6.txt"
           curl "${curl_opts[@]}" 'https://iptoasn.com/data/ip2asn-v6.tsv.gz' -o "$SOURCE_DIR/ip2asn-v6.tsv.gz"
           curl "${curl_opts[@]}" 'https://ftp.apnic.net/stats/apnic/delegated-apnic-latest' -o "$SOURCE_DIR/delegated-apnic-latest"
           curl "${curl_opts[@]}" 'https://www.ris.ripe.net/dumps/riswhoisdump.IPv6.gz' -o "$SOURCE_DIR/riswhois-ipv6.gz"
@@ -45,6 +48,9 @@ jobs:
         run: |
           set -euo pipefail
           test -s "$SOURCE_DIR/china6.txt"
+          test -s "$SOURCE_DIR/chinanet6.txt"
+          test -s "$SOURCE_DIR/cmcc6.txt"
+          test -s "$SOURCE_DIR/unicom6.txt"
           test $(stat -c '%s' "$SOURCE_DIR/ip2asn-v6.tsv.gz") -gt 100000
           test $(stat -c '%s' "$SOURCE_DIR/delegated-apnic-latest") -gt 100000
           test $(stat -c '%s' "$SOURCE_DIR/riswhois-ipv6.gz") -gt 1000000
@@ -58,6 +64,9 @@ jobs:
         run: |
           go run ./cmd/audit6 \
             --china6 "$SOURCE_DIR/china6.txt" \
+            --chinanet6 "$SOURCE_DIR/chinanet6.txt" \
+            --cmcc6 "$SOURCE_DIR/cmcc6.txt" \
+            --unicom6 "$SOURCE_DIR/unicom6.txt" \
             --iptoasn "$SOURCE_DIR/ip2asn-v6.tsv.gz" \
             --delegated "$SOURCE_DIR/delegated-apnic-latest" \
             --ris "$SOURCE_DIR/riswhois-ipv6.gz" \
