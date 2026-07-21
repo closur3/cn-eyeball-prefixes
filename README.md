@@ -1,6 +1,6 @@
 # 中国三网终端用户接入网 IPv4 地址前缀候选列表
 
-本仓库自动维护中国电信、中国移动和中国联通终端用户接入网的 IPv4 地址前缀候选列表，供 ACL 白名单使用。这里的终端用户接入网特指以住宅宽带和移动数据用户为主要流量来源的互联网接入网络；企业专线、机构统一出口、云、IDC、托管、内容网络和专用骨干不属于目标范围。
+本仓库自动维护中国电信、中国移动和中国联通终端用户接入网的 IPv4 地址前缀候选列表，供 ACL 白名单使用。这里的终端用户接入网特指以住宅宽带和移动数据用户为主要流量来源的互联网接入网络；企业专线、机构统一出口和专用骨干，以及 IDC 与托管服务、云计算和 CDN，均不属于目标范围。
 
 这是一个 **best-effort 候选列表**，不是地址实际用途的保证。生成器先识别当前 BGP Origin 属于三网的地址范围，以强证据排除可识别的非目标网络，再要求剩余地址具有同运营商 APNIC 父级登记；最后只在严格边界内，以当前 BGP 宣告单元修复三网内部登记冲突造成的细碎孔洞。
 
@@ -9,7 +9,7 @@
 | 范围 | 处理 |
 | --- | --- |
 | 三网终端用户接入网的 IPv4 地址前缀 | 目标范围，满足准入条件后保留 |
-| 云计算、IDC、托管、CDN、VPS 和服务器业务 | 有可靠 ASN、CIDR 或 APNIC 证据时排除 |
+| IDC 与托管服务、云计算和 CDN | 有可靠 ASN、CIDR 或 APNIC 证据时排除 |
 | 企业办公出口、企业宽带或互联网专线、企业 NAT 和固定企业地址 | 非目标；有可靠证据时排除 |
 | 学校、酒店、商场、园区及其他机构的统一上网出口 | 非目标；有可靠证据时排除 |
 | 政务、行业专网、VPN/MPLS、IoT/M2M、OA、监控等专用网络 | 有明确用途登记时排除 |
@@ -41,7 +41,7 @@ flowchart TD
     H --> M
     J --> M
     L --> M
-    M --> N["正式 hybrid 地址池"]
+    M --> N["正式地址池"]
 
     N --> O["data/operators：三网独立列表"]
     N --> P["data/cn.txt：全国合表"]
@@ -65,7 +65,7 @@ flowchart TD
 
 ### 2. 强证据排除
 
-所有强排除都先于 hybrid 准入执行，后续冲突修复不得将其放回。
+所有强排除都先于 BGP 登记冲突修复执行，后续冲突修复不得将其放回。
 
 - 云厂商 CIDR 使用 [axpwx/IP-Data](https://github.com/axpwx/IP-Data) 的阿里云、腾讯云、华为云、UCloud、金山云、百度智能云和京东云独立 IPv4 文件，不使用其宽泛的 `all-cidr`。只有与三网候选实际相交的部分影响结果。
 - APNIC 前缀证据来自 [`inetnum`](https://ftp.apnic.net/apnic/whois/apnic.db.inetnum.gz)、[`organisation`](https://ftp.apnic.net/apnic/whois/apnic.db.organisation.gz)、[`aut-num`](https://ftp.apnic.net/apnic/whois/apnic.db.aut-num.gz) 和 [`route`](https://ftp.apnic.net/apnic/whois/apnic.db.route.gz)。重叠 `inetnum` 按最具体记录解析，`org` handle 会关联到结构化组织名称。
@@ -82,7 +82,7 @@ flowchart TD
 
 ### 4. BGP 冲突孔洞修复
 
-正式模式为 `hybrid_bgp_conflict_healing_with_strong_exclusions`。只有同时满足以下条件的地址，才能从三网登记冲突范围恢复：
+正式模式为 `bgp_registration_conflict_healing_with_strong_exclusions`。只有同时满足以下条件的地址，才能从三网登记冲突范围恢复：
 
 1. 位于强排除后的三网 Origin 候选内；
 2. 当前被 RIS 观测为同一家运营商的 BGP Origin；
@@ -90,7 +90,7 @@ flowchart TD
 4. 确实属于三网之间的最具体登记冲突；
 5. 不与云、APNIC 用途、独立资源/route Origin 或强 MOAS 排除重叠。
 
-生成器和独立校验器同时强制：hybrid 不得删除基础分层准入地址，修复地址不得超过基础分层地址量的 `0.1%`，最终 CIDR 数不得超过基础分层的 `1.10` 倍，且最终 CIDR 数不得超过父级准入前候选的 `2.0` 倍。仓库只生成正式 hybrid 结果，不保留其他准入策略的试验列表或对照报告。
+生成器和独立校验器同时强制：BGP 登记冲突修复不得删除基础分层准入地址，修复地址不得超过基础分层地址量的 `0.1%`，最终 CIDR 数不得超过基础分层的 `1.10` 倍，且最终 CIDR 数不得超过父级准入前候选的 `2.0` 倍。仓库只生成正式结果，不保留其他准入策略的试验列表或对照报告。
 
 ### 5. 聚合与省级切分
 
@@ -107,25 +107,23 @@ flowchart TD
 | `data/operators/unicom.txt` | 中国联通正式 IPv4 CIDR |
 | `data/cn.txt` | 三网地址的去重合表 |
 | `data/provinces/<pinyin>.txt` | 相应省级行政区内的三网地址合表 |
-| `data/manifest.json` | 上游摘要、各阶段统计、hybrid 阈值、纳入/排除 ASN、前缀级排除证据及输出文件摘要 |
-| `data/audits/zhejiang-apnic.md` | 浙江正式结果的可读 APNIC 抽样审计 |
-| `data/audits/zhejiang-apnic.json.gz` | 上述审计的完整机器可读事实 |
+| `data/manifest.json` | 上游摘要、各阶段统计、冲突修复阈值、纳入/排除 ASN、前缀级排除证据及输出文件摘要 |
 | `config/operators.json` | 全国通用的三网识别、ASN 例外和强排除规则 |
 
 省级文件使用拼音命名，例如 `beijing.txt`、`guangdong.txt`、`shaanxi.txt` 和 `xinjiang.txt`。所有文本文件每行一个 CIDR，按地址排序且内部无重叠。
 
-## Manifest 与审计
+## Manifest
 
 `data/manifest.json` 是每次生成的事实清单，记录：
 
 - 本次生成时间，以及所有上游的 URL、文件大小和 SHA-256；
-- 从 Origin 候选、中国边界、各类强排除、父级准入、hybrid 修复到最终输出的地址量和 CIDR 数；
+- 从 Origin 候选、中国边界、各类强排除、父级准入、BGP 登记冲突修复到最终输出的地址量和 CIDR 数；
 - 三网纳入 ASN 汇总及显式/描述规则排除的 ASN；
 - 每个实际生效的云、APNIC、独立 route Origin 和强 MOAS 前缀及其证据；
-- hybrid 修复地址量、CIDR 变化和全部安全阈值；
-- 全国、运营商、省级列表及审计文件的摘要。
+- BGP 登记冲突修复地址量、CIDR 变化和全部安全阈值；
+- 全国、运营商和省级列表的摘要。
 
-浙江审计只用于检查全国正式规则在一个小范围内的表现，不包含任何浙江专用准入或排除规则。校验器会独立重算全国表、三网表、各阶段统计和 manifest 证据，并要求正式结果不与已启用的强排除范围重叠。
+校验器会独立重算全国表、三网表、各阶段统计和 manifest 证据，并要求正式结果不与已启用的强排除范围重叠。
 
 ## 自动更新
 
@@ -138,7 +136,7 @@ flowchart TD
 1. 下载全部上游到 runner 临时目录；
 2. 拒绝空文件以及异常小的 APNIC/RIS 数据；
 3. 运行 `go test ./...` 和 `go vet ./...`；
-4. 生成正式列表、manifest 和浙江审计；
+4. 生成正式列表和 manifest；
 5. 使用独立校验器重算并核验所有关系、阈值和摘要；
 6. 仅在 `data/` 实际变化时由 GitHub Actions 提交结果。
 

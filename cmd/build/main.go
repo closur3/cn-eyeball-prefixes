@@ -16,7 +16,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/closur3/cn-eyeball-prefixes/internal/apnicaudit"
 	"github.com/closur3/cn-eyeball-prefixes/internal/apnicautnum"
 	"github.com/closur3/cn-eyeball-prefixes/internal/apnicinetnum"
 	"github.com/closur3/cn-eyeball-prefixes/internal/apnicorg"
@@ -99,23 +98,10 @@ type operatorAdmissionMeta struct {
 	FinalCIDRCount            int     `json:"final_cidr_count"`
 	CIDRExpansionRatio        float64 `json:"cidr_expansion_ratio"`
 	MaximumCIDRExpansionRatio float64 `json:"maximum_cidr_expansion_ratio"`
-	HybridCIDRRatio           float64 `json:"hybrid_cidr_ratio"`
-	MaximumHybridCIDRRatio    float64 `json:"maximum_hybrid_cidr_ratio"`
-	HybridAddedAddressRatio   float64 `json:"hybrid_added_address_ratio"`
-	MaximumHybridAddedAddressRatio float64 `json:"maximum_hybrid_added_address_ratio"`
-}
-
-type auditMeta struct {
-	Name                              string `json:"name"`
-	Path                              string `json:"path"`
-	HumanPath                         string `json:"human_path"`
-	CIDRCount                         int    `json:"cidr_count"`
-	FactCount                         int    `json:"fact_count"`
-	AddressCount                      uint64 `json:"address_count"`
-	RegistryCoveredAddressCount       uint64 `json:"registry_covered_address_count"`
-	StrongNonPublicSignalAddressCount uint64 `json:"strong_non_public_signal_address_count"`
-	SHA256                            string `json:"sha256"`
-	HumanSHA256                       string `json:"human_sha256"`
+	ConflictHealingCIDRRatio          float64 `json:"conflict_healing_cidr_ratio"`
+	MaximumConflictHealingCIDRRatio   float64 `json:"maximum_conflict_healing_cidr_ratio"`
+	ConflictHealedAddressRatio        float64 `json:"conflict_healed_address_ratio"`
+	MaximumConflictHealedAddressRatio float64 `json:"maximum_conflict_healed_address_ratio"`
 }
 
 type cloudSourceMeta struct {
@@ -266,7 +252,6 @@ type manifest struct {
 	IncludedASNs                  []includedASNMeta     `json:"included_asns"`
 	ExcludedASNs                  []excludedASNMeta     `json:"excluded_asns"`
 	Lists                         []listMeta            `json:"lists"`
-	Audits                        []auditMeta           `json:"audits"`
 }
 
 type province struct {
@@ -277,8 +262,9 @@ type province struct {
 var operators = []string{"chinanet", "cmcc", "unicom"}
 
 const maxAdmissionCIDRExpansionRatio = 2.0
-const maxHybridCIDRRatio = 1.10
-const maxHybridAddedAddressRatio = 0.001
+const maxConflictHealingCIDRRatio = 1.10
+const maxConflictHealedAddressRatio = 0.001
+
 var cloudSources = []string{
 	"ipdata_aliyun", "ipdata_tencent", "ipdata_huawei", "ipdata_ucloud", "ipdata_ksyun", "ipdata_baidu", "ipdata_jdcloud",
 }
@@ -827,53 +813,6 @@ func writeManifest(path string, m manifest) {
 	}
 }
 
-func exclusionRegistrant(entry prefixExclusionMeta) string {
-	for _, values := range [][]string{entry.RegistryOrganizationNames, entry.RegistryDescriptions, entry.RegistryNetnames, entry.RegistryOrganizations} {
-		for _, value := range values {
-			if value = strings.TrimSpace(value); value != "" {
-				return value
-			}
-		}
-	}
-	if entry.Provider != "" {
-		return entry.Provider
-	}
-	return entry.ASNDescription
-}
-
-func provinceExclusionEvidence(entries []prefixExclusionMeta, candidatesByOperator map[string][]span) []apnicaudit.Exclusion {
-	var out []apnicaudit.Exclusion
-	for _, entry := range entries {
-		prefix, err := netip.ParsePrefix(entry.CIDR)
-		if err != nil || !prefix.Addr().Is4() {
-			panic("invalid exclusion CIDR while building province audit: " + entry.CIDR)
-		}
-		hits := intersect(candidatesByOperator[entry.Operator], []span{{n(prefix.Addr()), end(prefix)}})
-		for _, cidr := range spanCIDRs(hits) {
-			p := netip.MustParsePrefix(cidr)
-			out = append(out, apnicaudit.Exclusion{
-				CIDR: cidr, AddressCount: uint64(1) << uint(32-p.Bits()), Source: entry.Source,
-				Category: entry.Category, Operator: entry.Operator, ASN: entry.ASN,
-				Registrant: exclusionRegistrant(entry), Reason: entry.Reason,
-			})
-		}
-	}
-	sort.Slice(out, func(i, j int) bool {
-		a, b := netip.MustParsePrefix(out[i].CIDR), netip.MustParsePrefix(out[j].CIDR)
-		if n(a.Addr()) != n(b.Addr()) {
-			return n(a.Addr()) < n(b.Addr())
-		}
-		if a.Bits() != b.Bits() {
-			return a.Bits() < b.Bits()
-		}
-		if out[i].Category != out[j].Category {
-			return out[i].Category < out[j].Category
-		}
-		return out[i].Reason < out[j].Reason
-	})
-	return out
-}
-
 func apnicOperatorAdmissionRanges(records []apnicinetnum.Record, classifier *operatorconfig.Classifier) map[string][]span {
 	out := map[string][]span{}
 	for _, record := range records {
@@ -965,71 +904,13 @@ func bgpConflictHealingRanges(segments []riswhois.Segment, asnOperators map[stri
 	return merge(observed), merge(eligible)
 }
 
-func hybridAdmissionByOperator(hierarchicalByOperator map[string][]span, hybridEligible []span, eligibleByOperator map[string][]span) map[string][]span {
+func conflictHealedAdmissionByOperator(hierarchicalByOperator map[string][]span, conflictHealingEligible []span, eligibleByOperator map[string][]span) map[string][]span {
 	out := map[string][]span{}
 	for _, operator := range operators {
-		healed := intersect(hybridEligible, eligibleByOperator[operator])
+		healed := intersect(conflictHealingEligible, eligibleByOperator[operator])
 		out[operator] = merge(append(append([]span{}, hierarchicalByOperator[operator]...), healed...))
 	}
 	return out
-}
-
-func auditRegistrant(registry *apnicaudit.Registry) string {
-	if registry == nil {
-		return "(no APNIC registration)"
-	}
-	for _, values := range [][]string{registry.OrganizationNames, registry.Descriptions, registry.Netnames, registry.Organizations} {
-		for _, value := range values {
-			if value = strings.TrimSpace(value); value != "" {
-				return value
-			}
-		}
-	}
-	return "(unnamed APNIC registration)"
-}
-
-func admissionExclusionEvidence(report apnicaudit.Report, deniedByOperator map[string][]span) []apnicaudit.Exclusion {
-	var out []apnicaudit.Exclusion
-	for _, record := range report.CIDRs {
-		for _, fact := range record.Facts {
-			lo := n(netip.MustParseAddr(fact.Start))
-			hi := n(netip.MustParseAddr(fact.End))
-			denied := intersect([]span{{lo, hi}}, deniedByOperator[fact.Operator])
-			for _, cidr := range spanCIDRs(denied) {
-				prefix := netip.MustParsePrefix(cidr)
-				out = append(out, apnicaudit.Exclusion{
-					CIDR: cidr, AddressCount: uint64(1) << uint(32-prefix.Bits()), Source: "apnic_inetnum",
-					Category: "apnic_operator_admission_" + fact.Classification, Operator: fact.Operator,
-					Registrant: auditRegistrant(fact.Registry), Reason: fact.Reason,
-				})
-			}
-		}
-	}
-	return out
-}
-
-func writeGzipJSON(path string, value any) (string, error) {
-	if e := os.MkdirAll(filepath.Dir(path), 0755); e != nil {
-		return "", e
-	}
-	f, e := os.Create(path)
-	if e != nil {
-		return "", e
-	}
-	z := gzip.NewWriter(f)
-	encodeErr := json.NewEncoder(z).Encode(value)
-	closeGzipErr := z.Close()
-	closeFileErr := f.Close()
-	if encodeErr != nil {
-		return "", encodeErr
-	}
-	if closeGzipErr != nil {
-		return "", closeGzipErr
-	}
-	if closeFileErr != nil {
-		return "", closeFileErr
-	}
-	return sha(path)
 }
 
 func provinceSet() map[string]bool {
@@ -1364,17 +1245,17 @@ func main() {
 	for asn, record := range includedASNRecords {
 		asnOperators[asn] = record.meta.Operator
 	}
-	observedBGPRanges, hybridEligibleRanges := bgpConflictHealingRanges(risSegments, asnOperators, preCloudByOperator, preAdmissionByOperator, operatorAdmissionRanges)
+	observedBGPRanges, conflictHealingEligibleRanges := bgpConflictHealingRanges(risSegments, asnOperators, preCloudByOperator, preAdmissionByOperator, operatorAdmissionRanges)
 	var hierarchicalRanges []span
 	for _, operator := range operators {
 		hierarchicalRanges = append(hierarchicalRanges, hierarchicalByOperator[operator]...)
 	}
 	hierarchicalRanges = merge(hierarchicalRanges)
-	ranges = hybridAdmissionByOperator(hierarchicalByOperator, hybridEligibleRanges, preAdmissionByOperator)
+	ranges = conflictHealedAdmissionByOperator(hierarchicalByOperator, conflictHealingEligibleRanges, preAdmissionByOperator)
 	var finalRanges, admissionDeniedRanges, assignedRanges []span
 	for _, operator := range operators {
 		if len(intersect(ranges[operator], merge(assignedRanges))) != 0 {
-			panic("hybrid per-operator address sets overlap")
+			panic("conflict-healed per-operator address sets overlap")
 		}
 		assignedRanges = append(assignedRanges, ranges[operator]...)
 		finalRanges = append(finalRanges, ranges[operator]...)
@@ -1383,29 +1264,29 @@ func main() {
 	}
 	finalRanges = merge(finalRanges)
 	admissionDeniedRanges = merge(admissionDeniedRanges)
-	bgpHybridAdded := subtract(finalRanges, hierarchicalRanges)
-	bgpHybridRemoved := subtract(hierarchicalRanges, finalRanges)
-	if len(bgpHybridRemoved) != 0 {
-		panic("hybrid admission removes addresses from the hierarchical baseline")
+	bgpConflictHealedAdded := subtract(finalRanges, hierarchicalRanges)
+	bgpConflictHealedRemoved := subtract(hierarchicalRanges, finalRanges)
+	if len(bgpConflictHealedRemoved) != 0 {
+		panic("BGP conflict healing removes addresses from the hierarchical baseline")
 	}
-	if len(subtract(bgpHybridAdded, preAdmissionRanges)) != 0 {
-		panic("hybrid admission adds addresses without a current three-operator origin or after a strong exclusion")
+	if len(subtract(bgpConflictHealedAdded, preAdmissionRanges)) != 0 {
+		panic("BGP conflict healing adds addresses without a current three-operator origin or after a strong exclusion")
 	}
-	if len(subtract(bgpHybridAdded, observedBGPRanges)) != 0 {
-		panic("hybrid admission adds addresses without a current RIS-observed three-operator origin")
+	if len(subtract(bgpConflictHealedAdded, observedBGPRanges)) != 0 {
+		panic("BGP conflict healing adds addresses without a current RIS-observed three-operator origin")
 	}
-	if len(subtract(bgpHybridAdded, hybridEligibleRanges)) != 0 {
-		panic("hybrid admission adds addresses outside a same-operator APNIC parent")
+	if len(subtract(bgpConflictHealedAdded, conflictHealingEligibleRanges)) != 0 {
+		panic("BGP conflict healing adds addresses outside a same-operator APNIC parent")
 	}
 	var allOperatorConflicts []span
 	for _, operator := range operators {
 		allOperatorConflicts = append(allOperatorConflicts, operatorConflictRanges[operator]...)
 	}
-	if len(subtract(bgpHybridAdded, merge(allOperatorConflicts))) != 0 {
-		panic("hybrid admission adds addresses outside three-operator registration conflicts")
+	if len(subtract(bgpConflictHealedAdded, merge(allOperatorConflicts))) != 0 {
+		panic("BGP conflict healing adds addresses outside three-operator registration conflicts")
 	}
 	if len(intersect(finalRanges, excludedRanges)) != 0 {
-		panic("hybrid admission overlaps an enforced strong exclusion")
+		panic("BGP conflict healing overlaps an enforced strong exclusion")
 	}
 	includedASNs := includedASNList(includedASNRecords, chinaRanges, excludedRanges, ranges)
 	preAdmissionCIDRCount := len(spanCIDRs(preAdmissionRanges))
@@ -1415,13 +1296,13 @@ func main() {
 		panic(fmt.Sprintf("operator parent-registration admission expands ACL from %d to %d CIDRs, exceeding the 2.0x limit", preAdmissionCIDRCount, finalCIDRCount))
 	}
 	admissionExpansionRatio := float64(finalCIDRCount) / float64(preAdmissionCIDRCount)
-	hybridCIDRRatio := float64(finalCIDRCount) / float64(hierarchicalCIDRCount)
-	hybridAddedAddressRatio := float64(addressCount(bgpHybridAdded)) / float64(addressCount(hierarchicalRanges))
-	if hybridCIDRRatio > maxHybridCIDRRatio {
-		panic(fmt.Sprintf("hybrid admission expands ACL from %d to %d CIDRs, exceeding the %.2fx limit", hierarchicalCIDRCount, finalCIDRCount, maxHybridCIDRRatio))
+	conflictHealingCIDRRatio := float64(finalCIDRCount) / float64(hierarchicalCIDRCount)
+	conflictHealedAddressRatio := float64(addressCount(bgpConflictHealedAdded)) / float64(addressCount(hierarchicalRanges))
+	if conflictHealingCIDRRatio > maxConflictHealingCIDRRatio {
+		panic(fmt.Sprintf("BGP conflict healing expands ACL from %d to %d CIDRs, exceeding the %.2fx limit", hierarchicalCIDRCount, finalCIDRCount, maxConflictHealingCIDRRatio))
 	}
-	if hybridAddedAddressRatio > maxHybridAddedAddressRatio {
-		panic(fmt.Sprintf("hybrid admission adds %.6f of hierarchical addresses, exceeding the %.6f limit", hybridAddedAddressRatio, maxHybridAddedAddressRatio))
+	if conflictHealedAddressRatio > maxConflictHealedAddressRatio {
+		panic(fmt.Sprintf("BGP conflict healing adds %.6f of hierarchical addresses, exceeding the %.6f limit", conflictHealedAddressRatio, maxConflictHealedAddressRatio))
 	}
 	if addressCount(finalRanges) < 100000000 {
 		panic("final output contains fewer than 100,000,000 IPv4 addresses")
@@ -1459,24 +1340,6 @@ func main() {
 			by[o][p.Name] = intersect(ranges[o], provinceRanges)
 		}
 	}
-	zhejiangProvinceRanges := merge(provinceSourceRanges["浙江省"])
-	zhejiangPreAdmissionByOperator := map[string][]span{}
-	zhejiangPreAdmissionOperatorRanges := map[string][]apnicaudit.Range{}
-	var zhejiangPreAdmissionRows, zhejiangRows []span
-	for _, operator := range operators {
-		zhejiangPreAdmissionByOperator[operator] = intersect(preAdmissionByOperator[operator], zhejiangProvinceRanges)
-		for _, row := range zhejiangPreAdmissionByOperator[operator] {
-			zhejiangPreAdmissionOperatorRanges[operator] = append(zhejiangPreAdmissionOperatorRanges[operator], apnicaudit.Range{Lo: row.lo, Hi: row.hi})
-		}
-		zhejiangPreAdmissionRows = append(zhejiangPreAdmissionRows, zhejiangPreAdmissionByOperator[operator]...)
-		zhejiangRows = append(zhejiangRows, by[operator]["浙江省"]...)
-	}
-	zhejiangPreAdmissionRows = merge(zhejiangPreAdmissionRows)
-	zhejiangRows = merge(zhejiangRows)
-	zhejiangPreAdmissionAudit, e := apnicaudit.Build("浙江省 pre-admission IPv4 APNIC registration audit", spanCIDRs(zhejiangPreAdmissionRows), zhejiangPreAdmissionOperatorRanges, apnicAllSegments, classifier)
-	if e != nil {
-		panic(e)
-	}
 	var provinceAttributed []span
 	for _, p := range provinces {
 		for _, operator := range operators {
@@ -1499,7 +1362,7 @@ func main() {
 	m := manifest{
 		GeneratedAt: time.Now().UTC().Format(time.RFC3339Nano),
 		Scope:       "IPv4; mainland China; current China Telecom, China Mobile, or China Unicom BGP origin plus a covering same-operator APNIC registration; current three-operator BGP units heal internal operator-registration conflict holes after all strong exclusions; small ambiguous customer-use fragments are accepted as best-effort error to keep the ACL deployably compact; dedicated premium backbone ASNs, cloud-provider CIDRs, strong APNIC registrations outside ordinary user access scope, independent holders and route origins, and strong RIPE RIS MOAS evidence are excluded",
-		OperatorAdmission: operatorAdmissionMeta{Mode: "hybrid_bgp_conflict_healing_with_strong_exclusions", PreCIDRCount: preAdmissionCIDRCount, DeniedCIDRCount: len(spanCIDRs(admissionDeniedRanges)), HierarchicalCIDRCount: hierarchicalCIDRCount, ConflictHealedCIDRCount: len(spanCIDRs(bgpHybridAdded)), ConflictHealedAddressCount: addressCount(bgpHybridAdded), FinalCIDRCount: finalCIDRCount, CIDRExpansionRatio: admissionExpansionRatio, MaximumCIDRExpansionRatio: maxAdmissionCIDRExpansionRatio, HybridCIDRRatio: hybridCIDRRatio, MaximumHybridCIDRRatio: maxHybridCIDRRatio, HybridAddedAddressRatio: hybridAddedAddressRatio, MaximumHybridAddedAddressRatio: maxHybridAddedAddressRatio},
+		OperatorAdmission: operatorAdmissionMeta{Mode: "bgp_registration_conflict_healing_with_strong_exclusions", PreCIDRCount: preAdmissionCIDRCount, DeniedCIDRCount: len(spanCIDRs(admissionDeniedRanges)), HierarchicalCIDRCount: hierarchicalCIDRCount, ConflictHealedCIDRCount: len(spanCIDRs(bgpConflictHealedAdded)), ConflictHealedAddressCount: addressCount(bgpConflictHealedAdded), FinalCIDRCount: finalCIDRCount, CIDRExpansionRatio: admissionExpansionRatio, MaximumCIDRExpansionRatio: maxAdmissionCIDRExpansionRatio, ConflictHealingCIDRRatio: conflictHealingCIDRRatio, MaximumConflictHealingCIDRRatio: maxConflictHealingCIDRRatio, ConflictHealedAddressRatio: conflictHealedAddressRatio, MaximumConflictHealedAddressRatio: maxConflictHealedAddressRatio},
 		Stages: []stageMeta{
 			stage("operator_origin_candidates", originCandidates),
 			stage("china_origin_intersection", preCloudCandidates),
@@ -1513,9 +1376,9 @@ func main() {
 			stage("effective_ris_moas_exclusions", risRanges),
 			stage("pre_operator_parent_registration_admission", preAdmissionRanges),
 			stage("operator_parent_registration_admissions", hierarchicalRanges),
-			stage("hybrid_bgp_conflict_healed_additions", bgpHybridAdded),
-			stage("hybrid_bgp_conflict_healing_admissions", finalRanges),
-			stage("hybrid_admission_denials", admissionDeniedRanges),
+			stage("bgp_conflict_healed_additions", bgpConflictHealedAdded),
+			stage("bgp_conflict_healing_admissions", finalRanges),
+			stage("operator_registration_admission_denials", admissionDeniedRanges),
 			stage("final_output", finalRanges),
 			stage("province_attributed_output", provinceAttributed),
 		},
@@ -1580,49 +1443,6 @@ func main() {
 		}
 		m.Lists = append(m.Lists, listMeta{Name: p.Name, Path: filepath.ToSlash(path), fileMeta: meta})
 	}
-
-	zhejiangOperatorRanges := map[string][]apnicaudit.Range{}
-	zhejiangCandidatesByOperator := map[string][]span{}
-	var zhejiangCandidates []span
-	for _, operator := range operators {
-		zhejiangCandidatesByOperator[operator] = intersect(preCloudByOperator[operator], zhejiangProvinceRanges)
-		zhejiangCandidates = append(zhejiangCandidates, zhejiangCandidatesByOperator[operator]...)
-		for _, row := range by[operator]["浙江省"] {
-			zhejiangOperatorRanges[operator] = append(zhejiangOperatorRanges[operator], apnicaudit.Range{Lo: row.lo, Hi: row.hi})
-		}
-	}
-	zhejiangAudit, e := apnicaudit.Build("浙江省 retained IPv4 APNIC registration audit", spanCIDRs(zhejiangRows), zhejiangOperatorRanges, apnicAllSegments, classifier)
-	if e != nil {
-		panic(e)
-	}
-	if zhejiangAudit.Summary.StrongNonPublicSignalAddressCount != 0 {
-		panic(fmt.Sprintf("Zhejiang ACL retains %d addresses that still match an enforced non-public APNIC rule", zhejiangAudit.Summary.StrongNonPublicSignalAddressCount))
-	}
-	zhejiangCandidates = merge(zhejiangCandidates)
-	zhejiangExcluded := subtract(zhejiangCandidates, zhejiangRows)
-	zhejiangEvidence := provinceExclusionEvidence(excludedPrefixes, zhejiangCandidatesByOperator)
-	zhejiangEvidence = append(zhejiangEvidence, admissionExclusionEvidence(zhejiangPreAdmissionAudit, admissionDeniedByOperator)...)
-	apnicaudit.AttachComparison(&zhejiangAudit, addressCount(zhejiangCandidates), addressCount(zhejiangExcluded), zhejiangEvidence)
-	auditPath := filepath.Join("audits", "zhejiang-apnic.json.gz")
-	auditSHA, e := writeGzipJSON(filepath.Join(*out, auditPath), zhejiangAudit)
-	if e != nil {
-		panic(e)
-	}
-	humanAuditPath := filepath.Join("audits", "zhejiang-apnic.md")
-	humanAuditBytes := []byte(apnicaudit.RenderMarkdown(zhejiangAudit, filepath.Base(auditPath)))
-	if e := os.WriteFile(filepath.Join(*out, humanAuditPath), humanAuditBytes, 0644); e != nil {
-		panic(e)
-	}
-	humanAuditSHA, e := sha(filepath.Join(*out, humanAuditPath))
-	if e != nil {
-		panic(e)
-	}
-	m.Audits = append(m.Audits, auditMeta{
-		Name: "zhejiang_apnic_registration", Path: filepath.ToSlash(auditPath), HumanPath: filepath.ToSlash(humanAuditPath),
-		CIDRCount: zhejiangAudit.Summary.CIDRCount, FactCount: zhejiangAudit.Summary.FactCount,
-		AddressCount: zhejiangAudit.Summary.AddressCount, RegistryCoveredAddressCount: zhejiangAudit.Summary.RegistryCoveredAddressCount,
-		StrongNonPublicSignalAddressCount: zhejiangAudit.Summary.StrongNonPublicSignalAddressCount, SHA256: auditSHA, HumanSHA256: humanAuditSHA,
-	})
 
 	if hasOldManifest && sameManifestContent(oldManifest, m) {
 		m.GeneratedAt = oldManifest.GeneratedAt
