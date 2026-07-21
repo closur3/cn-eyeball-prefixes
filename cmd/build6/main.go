@@ -62,7 +62,7 @@ type rdapEntity struct {
 }
 
 type sourceMeta struct {
-	Path   string `json:"path"`
+	Source string `json:"source"`
 	Bytes  int64  `json:"bytes"`
 	SHA256 string `json:"sha256"`
 }
@@ -87,9 +87,19 @@ type manifest struct {
 	Scope       string                    `json:"scope"`
 	OutputKind  string                    `json:"output_kind"`
 	Sources     map[string]sourceMeta     `json:"sources"`
-	Constraints []string                  `json:"constraints"`
+	Policy      buildPolicy               `json:"policy"`
 	RIS         riswhois6.Stats           `json:"ris"`
 	Operators   map[string]operatorOutput `json:"operators"`
+}
+
+type buildPolicy struct {
+	AddressFamily         string `json:"address_family"`
+	AllocationAuthority  string `json:"allocation_authority"`
+	AllocationCheck      string `json:"allocation_check"`
+	RoutingSnapshot      string `json:"routing_snapshot"`
+	OutputUnit           string `json:"output_unit"`
+	OriginPolicy         string `json:"origin_policy"`
+	SyntheticAggregation bool  `json:"synthetic_aggregation"`
 }
 
 type audit struct {
@@ -185,14 +195,15 @@ func main() {
 	generatedAt := time.Now().UTC().Format(time.RFC3339Nano)
 	chinanetASNs := summarizeASNs(chinanet, metadata)
 	sources := map[string]sourceMeta{}
-	for name, path := range map[string]string{
-		"riswhois_ipv6": *risPath,
-		"iptoasn_v6_asn_metadata_only": *iptoasnPath,
-		"operator_config": *configPath,
-		"operator_ipv6_allocations": *allocationPath,
+	for name, item := range map[string]struct{ path, source string }{
+		"riswhois_ipv6":                  {*risPath, "https://www.ris.ripe.net/dumps/riswhoisdump.IPv6.gz"},
+		"iptoasn_v6_asn_metadata_only":   {*iptoasnPath, "https://iptoasn.com/data/ip2asn-v6.tsv.gz"},
+		"operator_config":                {*configPath, filepath.ToSlash(*configPath)},
+		"operator_ipv6_allocations":      {*allocationPath, filepath.ToSlash(*allocationPath)},
 	} {
-		meta, err := fileMetadata(path)
+		meta, err := fileMetadata(item.path)
 		must(err)
+		meta.Source = item.source
 		sources[name] = meta
 	}
 	for _, operator := range operators {
@@ -200,11 +211,13 @@ func main() {
 			path := filepath.Join(*rdapDir, row.RDAPFile)
 			meta, err := fileMetadata(path)
 			must(err)
+			meta.Source = row.Source
 			sources[fmt.Sprintf("apnic_rdap_%s_%d", operator, i+1)] = meta
 		}
 		path := filepath.Join(*atlasDir, operator+".json")
 		meta, err := fileMetadata(path)
 		must(err)
+		meta.Source = atlasURL(operator)
 		sources["ripe_atlas_probes_"+operator] = meta
 	}
 	result := manifest{
@@ -212,30 +225,24 @@ func main() {
 		Scope: "Current exact IPv6 BGP prefixes fully contained by each operator's official APNIC 240x allocation and whose complete observed Origin set is attributed to that operator",
 		OutputKind: "exact_bgp_prefix_candidates",
 		Sources: sources,
-		Constraints: []string{
-			"No gaoyifan china6 intersection",
-			"No APNIC inet6num input",
-			"Admission boundaries are the official allocations 240e::/18, 2409:8000::/20, and 2408:8000::/20 recorded in versioned configuration",
-			"Every build validates each admission boundary against a freshly downloaded APNIC RDAP response and fails closed on registration drift",
-			"Legacy 2001:: and 2400:: operator prefixes are outside the admission boundary",
-			"Every emitted CIDR is an exact prefix present in the RIPE RISWhois IPv6 dump",
-			"No address subtraction, sibling merging, or synthetic CIDR aggregation",
-			"Prefixes with unknown, excluded, or cross-operator Origins are not emitted",
-			"BGP candidates are not a terminal-user allowlist until independent positive access-purpose evidence is defined",
-			"RIPE Atlas is report-only: only connected non-anchor probes with explicit access signals, no office/datacentre signal, and an exact current BGP-prefix match are marked admission-eligible",
+		Policy: buildPolicy{
+			AddressFamily: "IPv6", AllocationAuthority: "APNIC",
+			AllocationCheck: "live_rdap_exact_range", RoutingSnapshot: "RIPE_RISWhois",
+			OutputUnit: "exact_observed_bgp_prefix", OriginPolicy: "complete_origin_set_same_operator",
+			SyntheticAggregation: false,
 		},
 		RIS: risStats,
 		Operators: map[string]operatorOutput{
 			"chinanet": {
-				Status: "bgp_candidates_require_access_purpose_evidence",
+				Status: "candidate",
 				Path: filepath.ToSlash(*chinanetOutput),
 				PrefixCount: len(chinanet),
 				Slash64Equivalent: uniqueSlash64(chinanet),
 				OriginASNs: chinanetASNs,
 				AdmissionBlocks: publicAllocations(allocations["chinanet"]),
 			},
-			"cmcc": {Status: "pending_additional_positive_evidence", Slash64Equivalent: "0.0000", AdmissionBlocks: publicAllocations(allocations["cmcc"])},
-			"unicom": {Status: "pending_additional_positive_evidence", Slash64Equivalent: "0.0000", AdmissionBlocks: publicAllocations(allocations["unicom"])},
+			"cmcc": {Status: "not_emitted", Slash64Equivalent: "0.0000", AdmissionBlocks: publicAllocations(allocations["cmcc"])},
+			"unicom": {Status: "not_emitted", Slash64Equivalent: "0.0000", AdmissionBlocks: publicAllocations(allocations["unicom"])},
 		},
 	}
 	auditValue := audit{
@@ -632,6 +639,15 @@ func writePrefixes(path string, records []riswhois6.Record) error {
 	return writeFile(path, []byte(b.String()))
 }
 
+func atlasURL(operator string) string {
+	prefix := map[string]string{
+		"chinanet": "240e%3A%3A%2F18",
+		"cmcc":     "2409%3A8000%3A%3A%2F20",
+		"unicom":   "2408%3A8000%3A%3A%2F20",
+	}[operator]
+	return "https://atlas.ripe.net/api/v2/probes/?country_code=CN&prefix_v6=" + prefix + "&page_size=500"
+}
+
 func fileMetadata(path string) (sourceMeta, error) {
 	f, err := os.Open(path)
 	if err != nil {
@@ -643,7 +659,7 @@ func fileMetadata(path string) (sourceMeta, error) {
 	if err != nil {
 		return sourceMeta{}, err
 	}
-	return sourceMeta{Path: filepath.ToSlash(path), Bytes: n, SHA256: hex.EncodeToString(h.Sum(nil))}, nil
+	return sourceMeta{Bytes: n, SHA256: hex.EncodeToString(h.Sum(nil))}, nil
 }
 
 func writeJSON(path string, value any) error {
@@ -666,7 +682,7 @@ func renderMarkdown(r audit) string {
 	fmt.Fprintln(&b, "# 三网 IPv6 原始 BGP 前缀审计")
 	fmt.Fprintln(&b)
 	fmt.Fprintf(&b, "生成时间：`%s`\n\n", r.GeneratedAt)
-	fmt.Fprintln(&b, "本报告直接以 RIPE RISWhois 的当前原始 IPv6 宣告前缀为单位；只准入完整位于电信 `240e::/18`、移动 `2409:8000::/20`、联通 `2408:8000::/20` 相应母段内的前缀。不使用 `china6`，不读取 APNIC `inet6num`，不进行地址切除或 CIDR 再聚合。")
+	fmt.Fprintln(&b, "输入边界由 APNIC RDAP 实时校验；路由状态来自 RIPE RISWhois；统计单位为当前观测到的原始 BGP 前缀。")
 	fmt.Fprintln(&b)
 	fmt.Fprintln(&b, "BGP 只能证明前缀和 Origin，不能证明终端用户接入用途。RIPE Atlas 探针在本报告中仅作为正向接入证据；本轮只审计，不自动扩大正式白名单。")
 	fmt.Fprintln(&b)
@@ -675,9 +691,9 @@ func renderMarkdown(r audit) string {
 	fmt.Fprintln(&b)
 	fmt.Fprintln(&b, "| 运营商 | 原始 BGP 前缀 | 状态 |")
 	fmt.Fprintln(&b, "| --- | ---: | --- |")
-	fmt.Fprintf(&b, "| chinanet | %d | 已输出候选，仍需终端用途正证据 |\n", r.AcceptedByOperator["chinanet"])
-	fmt.Fprintf(&b, "| cmcc | %d | 不输出，等待额外正证据 |\n", r.AcceptedByOperator["cmcc"])
-	fmt.Fprintf(&b, "| unicom | %d | 不输出，等待额外正证据 |\n", r.AcceptedByOperator["unicom"])
+	fmt.Fprintf(&b, "| chinanet | %d | candidate |\n", r.AcceptedByOperator["chinanet"])
+	fmt.Fprintf(&b, "| cmcc | %d | not_emitted |\n", r.AcceptedByOperator["cmcc"])
+	fmt.Fprintf(&b, "| unicom | %d | not_emitted |\n", r.AcceptedByOperator["unicom"])
 	fmt.Fprintln(&b, "\n## RIPE Atlas 正向接入证据")
 	fmt.Fprintln(&b)
 	fmt.Fprintln(&b, "只有当前在线、公开、非 Anchor、带明确终端接入信号、无办公/机房反证，且 Atlas 前缀与当前 RIS BGP 前缀及 Origin 精确一致的样本，才标记为可提升准入。")
