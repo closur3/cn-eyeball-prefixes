@@ -1,6 +1,6 @@
 # 三网 IPv6 APNIC 登记颗粒度审计
 
-生成时间：`2026-07-21T19:07:20.803633176Z`
+生成时间：`2026-07-21T19:12:57.388278953Z`
 
 审计对象是 `当前三网 IPv6 Origin ∩ china6`。`inet6num` 按最具体记录解析；`route6` 只统计与当前 BGP Origin 相同的登记。报告包含首轮规则预演，但不生成正式地址列表。
 
@@ -36,14 +36,16 @@ APNIC `inet6num` 记录：**148952**；解析后最具体区间：**194099**；`
 | chinanet | `240e:83::/34` | 0.004597% | BeiJing-Telecom-UserAddress-Highguaranteed; BeiJing Telecom UserAddress for High-guaranteed | ALLOCATED NON-PORTABLE | Retain: non-portable assignment under the current three-operator Origin |
 | chinanet | `240e:83::/36` | 0.000766% | BeiJing-Telecom-UserAddress-Highguaranteed; BeiJing Telecom UserAddress for High-guaranteed | ASSIGNED NON-PORTABLE | Retain: non-portable assignment under the current three-operator Origin |
 
-## 保留但只有泛化运营商证据的样本
+> `ALLOCATED PORTABLE` 的运营商总分配对象只证明地址资源归属，不提供终端用户或业务用途证据。候选地址回落到这类父级对象，表示 APNIC 没有覆盖它的更具体用途登记，不能把父级 Description 解读为该地址的实际用途。
+
+## 保留但没有更具体用途登记的样本
 
 | 运营商 | APNIC 前缀 | 占运营商候选 | netname / description / org | status | 首轮处理依据 |
 | --- | --- | ---: | --- | --- | --- |
-| cmcc | `2409:8000::/20` | 96.991219% | CMNET-V6-20110823; China Mobile Communications Corporation; Mobile Communications Network Operator in China; Internet Service Provider in China; China Mobile | ALLOCATED PORTABLE | Retain: most-specific APNIC registration is attributed to the current operator |
-| chinanet | `240e::/18` | 31.177326% | CT-IPv6-Networks; Chinatelecom networks with tens of high-end routers and switches; Including users who access to Internet through Chinatelecom's networks.; China Telecom | ALLOCATED PORTABLE | Retain: most-specific APNIC registration is attributed to the current operator |
-| unicom | `2408:8000::/20` | 99.592897% | CU-CN; China Unicom; No.21, Jin-Rong Street; Beijng 100033 | ALLOCATED PORTABLE | Retain: most-specific APNIC registration is attributed to the current operator |
-| chinanet | `2001:c68::/32` | 0.024516% | CHINANET-20020830; China Telecom; Internet Service Provider; Beijing,China | ALLOCATED PORTABLE | Retain: most-specific APNIC registration is attributed to the current operator |
+| cmcc | `2409:8000::/20` | 96.991219% | CMNET-V6-20110823; China Mobile Communications Corporation; Mobile Communications Network Operator in China; Internet Service Provider in China; China Mobile | ALLOCATED PORTABLE | Retain: operator allocation parent; no more-specific APNIC purpose registration covers this candidate space |
+| chinanet | `240e::/18` | 31.177326% | CT-IPv6-Networks; Chinatelecom networks with tens of high-end routers and switches; Including users who access to Internet through Chinatelecom's networks.; China Telecom | ALLOCATED PORTABLE | Retain: operator allocation parent; no more-specific APNIC purpose registration covers this candidate space |
+| unicom | `2408:8000::/20` | 99.592897% | CU-CN; China Unicom; No.21, Jin-Rong Street; Beijng 100033 | ALLOCATED PORTABLE | Retain: operator allocation parent; no more-specific APNIC purpose registration covers this candidate space |
+| chinanet | `2001:c68::/32` | 0.024516% | CHINANET-20020830; China Telecom; Internet Service Provider; Beijing,China | ALLOCATED PORTABLE | Retain: operator allocation parent; no more-specific APNIC purpose registration covers this candidate space |
 | chinanet | `240e:ed::/32` | 0.024516% | China-Telecom-Jiangsu-province-network; China Telecom Jiangsu province network for customer | ALLOCATED NON-PORTABLE | Retain: most-specific APNIC registration is attributed to the current operator |
 
 ## 首轮排除样本
@@ -148,8 +150,8 @@ APNIC `inet6num` 记录：**148952**；解析后最具体区间：**194099**；`
 | unicom | `2404:7600::/32` | 0.000003% | DSNET; Shanghai Data Solution Co., Ltd.; 2F,NO.4Buliding 498 Guoshoujing Rd.Shanghai ZJ.Hi-Tech Park | ALLOCATED PORTABLE | Most-specific APNIC registration names an independent legal entity without operator attribution (`independent_legal_entity_patterns`) |
 | unicom | `2405:1480::/32` | 0.000003% | SKBJNET; Beijing Sankuai Technology Co.,Ltd.; Wangjing International R&D Park Phase 3,No.6 Wangjing East Road,; Chaoyang District,Beijing 100102,PRC | ALLOCATED PORTABLE | Most-specific APNIC registration names an independent legal entity without operator attribution (`independent_legal_entity_patterns`) |
 | chinanet | `2405:1480::/32` | 0.000000% | SKBJNET; Beijing Sankuai Technology Co.,Ltd.; Wangjing International R&D Park Phase 3,No.6 Wangjing East Road,; Chaoyang District,Beijing 100102,PRC | ALLOCATED PORTABLE | Most-specific APNIC registration names an independent legal entity without operator attribution (`independent_legal_entity_patterns`) |
-| unicom | `2405:7040::/32` | 0.000003% | COSCOSHIPPING; CHINA COSCO SHIPPING CORPORATION LIMITED | ALLOCATED PORTABLE | Most-specific APNIC registration names an independent legal entity without operator attribution (`independent_legal_entity_patterns`) |
 | chinanet | `2405:7040::/32` | 0.000000% | COSCOSHIPPING; CHINA COSCO SHIPPING CORPORATION LIMITED | ALLOCATED PORTABLE | Most-specific APNIC registration names an independent legal entity without operator attribution (`independent_legal_entity_patterns`) |
+| unicom | `2405:7040::/32` | 0.000003% | COSCOSHIPPING; CHINA COSCO SHIPPING CORPORATION LIMITED | ALLOCATED PORTABLE | Most-specific APNIC registration names an independent legal entity without operator attribution (`independent_legal_entity_patterns`) |
 | unicom | `2405:a900::/32` | 0.000003% | QIHOO; Beijing Qihu Technology Company Limited; 112 Room, D buliding , Deshengyuan square,; No.28 xinjiekouwaiwai,Xicheng District; Beijing,China | ALLOCATED PORTABLE | Most-specific APNIC registration names an independent legal entity without operator attribution (`independent_legal_entity_patterns`) |
 | cmcc | `2407:6c40::/32` | 0.000000% | BJ-SHOUZIXIN; Beijing Shougang Automation Information Technology Co.,Ltd; Building 1, Yard 1, Shimen Road, Shijingshan, Beijing | ALLOCATED PORTABLE | Most-specific APNIC registration names an independent legal entity without operator attribution (`independent_legal_entity_patterns`) |
 | cmcc | `2407:8f40::/32` | 0.000000% | CNIXP; ShenZhen QianHai New-Type Internet Exchange Point Co.,Ltd; Group A 4F, Qianhai Shenzhen-Hong Kong Innovation Center,; Menghai Rd. 4008, Qianhai Cooperation Zone, Shenzhen | ALLOCATED PORTABLE | Most-specific APNIC registration names an independent legal entity without operator attribution (`independent_legal_entity_patterns`) |

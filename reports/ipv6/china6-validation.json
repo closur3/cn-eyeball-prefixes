@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-21T19:07:11.137262404Z",
+  "generated_at": "2026-07-21T19:12:47.440222701Z",
   "scope": "Factual validation of gaoyifan/china-operator-ip china6.txt against current IPtoASN IPv6 origins, RIPE RISWhois IPv6 visibility, APNIC delegated country registration, and the repository's three-operator ASN policy; no address is admitted or excluded by this audit",
   "sources": {
     "apnic_delegated": {

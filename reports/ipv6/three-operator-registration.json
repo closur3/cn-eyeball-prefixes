@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-21T19:07:20.803633176Z",
+  "generated_at": "2026-07-21T19:12:57.388278953Z",
   "scope": "Read-only audit and first-pass policy preview of the most-specific APNIC inet6num and same-origin route6 evidence covering current mainland China Telecom, China Mobile, and China Unicom IPv6 origins inside gaoyifan china6.txt; no formal prefix list is emitted",
   "inet6num_record_count": 148952,
   "inet6num_segment_count": 194099,
@@ -339,7 +339,7 @@
       "matched_by": "description_patterns: china mobile",
       "reason": "Most-specific APNIC registration is attributed to the current BGP operator",
       "first_pass_decision": "retain",
-      "first_pass_reason": "Retain: most-specific APNIC registration is attributed to the current operator",
+      "first_pass_reason": "Retain: operator allocation parent; no more-specific APNIC purpose registration covers this candidate space",
       "space": {
         "cidr_count": 0,
         "address_count": "324517405178898092885440049709056",
@@ -373,7 +373,7 @@
       "matched_by": "description_patterns: china ?telecom",
       "reason": "Most-specific APNIC registration is attributed to the current BGP operator",
       "first_pass_decision": "retain",
-      "first_pass_reason": "Retain: most-specific APNIC registration is attributed to the current operator",
+      "first_pass_reason": "Retain: operator allocation parent; no more-specific APNIC purpose registration covers this candidate space",
       "space": {
         "cidr_count": 0,
         "address_count": "100756633720857559371186001936384",
@@ -402,7 +402,7 @@
       "matched_by": "description_patterns: unicom",
       "reason": "Most-specific APNIC registration is attributed to the current BGP operator",
       "first_pass_decision": "retain",
-      "first_pass_reason": "Retain: most-specific APNIC registration is attributed to the current operator",
+      "first_pass_reason": "Retain: operator allocation parent; no more-specific APNIC purpose registration covers this candidate space",
       "space": {
         "cidr_count": 0,
         "address_count": "39019994557634606571625390276608",
@@ -795,7 +795,7 @@
       "matched_by": "description_patterns: china ?telecom",
       "reason": "Most-specific APNIC registration is attributed to the current BGP operator",
       "first_pass_decision": "retain",
-      "first_pass_reason": "Retain: most-specific APNIC registration is attributed to the current operator",
+      "first_pass_reason": "Retain: operator allocation parent; no more-specific APNIC purpose registration covers this candidate space",
       "space": {
         "cidr_count": 0,
         "address_count": "79228162514264337593543950336",
@@ -2037,33 +2037,6 @@
       }
     },
     {
-      "operator": "unicom",
-      "category": "independent_legal_entity",
-      "registry_prefix": "2405:7040::/32",
-      "registry_prefix_length": 32,
-      "netnames": [
-        "COSCOSHIPPING"
-      ],
-      "descriptions": [
-        "CHINA COSCO SHIPPING CORPORATION LIMITED"
-      ],
-      "maintainers": [
-        "MAINT-CNNIC-AP"
-      ],
-      "country": "CN",
-      "status": "ALLOCATED PORTABLE",
-      "matched_by": "independent_legal_entity_patterns",
-      "reason": "Most-specific APNIC registration names an independent legal entity without operator attribution",
-      "first_pass_decision": "exclude",
-      "first_pass_reason": "Exclude: most-specific APNIC registration names an independent legal entity",
-      "space": {
-        "cidr_count": 0,
-        "address_count": "1208925819614629174706176",
-        "slash64_equivalent": "65536.0000",
-        "percent_of_operator": "0.000003%"
-      }
-    },
-    {
       "operator": "chinanet",
       "category": "independent_legal_entity",
       "registry_prefix": "2405:7040::/32",
@@ -2088,6 +2061,33 @@
         "address_count": "1208925819614629174706176",
         "slash64_equivalent": "65536.0000",
         "percent_of_operator": "0.000000%"
+      }
+    },
+    {
+      "operator": "unicom",
+      "category": "independent_legal_entity",
+      "registry_prefix": "2405:7040::/32",
+      "registry_prefix_length": 32,
+      "netnames": [
+        "COSCOSHIPPING"
+      ],
+      "descriptions": [
+        "CHINA COSCO SHIPPING CORPORATION LIMITED"
+      ],
+      "maintainers": [
+        "MAINT-CNNIC-AP"
+      ],
+      "country": "CN",
+      "status": "ALLOCATED PORTABLE",
+      "matched_by": "independent_legal_entity_patterns",
+      "reason": "Most-specific APNIC registration names an independent legal entity without operator attribution",
+      "first_pass_decision": "exclude",
+      "first_pass_reason": "Exclude: most-specific APNIC registration names an independent legal entity",
+      "space": {
+        "cidr_count": 0,
+        "address_count": "1208925819614629174706176",
+        "slash64_equivalent": "65536.0000",
+        "percent_of_operator": "0.000003%"
       }
     },
     {
