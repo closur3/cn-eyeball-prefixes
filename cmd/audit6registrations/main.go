@@ -68,6 +68,9 @@ type operatorSummary struct {
 	RegistryUncovered           spaceStat `json:"registry_uncovered"`
 	SameOriginRoute6Covered     spaceStat `json:"same_origin_route6_covered"`
 	StrongRoutePurposeSignal    spaceStat `json:"strong_route_purpose_signal"`
+	FirstPassRetained           spaceStat `json:"first_pass_retained"`
+	FirstPassExcluded           spaceStat `json:"first_pass_excluded"`
+	ExplicitUserPurpose         spaceStat `json:"explicit_user_purpose"`
 }
 
 type report struct {
@@ -127,6 +130,8 @@ func main() {
 
 	categoryRanges := map[string]map[string][]ipset6.Range{}
 	coveredByOperator := map[string][]ipset6.Range{}
+	firstPassExcluded := map[string][]ipset6.Range{}
+	explicitUserPurpose := map[string][]ipset6.Range{}
 	facts := map[string]*registrationFact{}
 	prefixLengths := map[string]map[int]int{}
 	for _, origin := range origins {
@@ -137,6 +142,12 @@ func main() {
 				categoryRanges[origin.Operator] = map[string][]ipset6.Range{}
 			}
 			categoryRanges[origin.Operator][category] = append(categoryRanges[origin.Operator][category], hit.Range)
+			if excludeFirstPass(category, hit.Record) {
+				firstPassExcluded[origin.Operator] = append(firstPassExcluded[origin.Operator], hit.Range)
+			}
+			if isExplicitUserPurpose(hit.Record) {
+				explicitUserPurpose[origin.Operator] = append(explicitUserPurpose[origin.Operator], hit.Range)
+			}
 			lengthKey := origin.Operator + "/" + category
 			if prefixLengths[lengthKey] == nil {
 				prefixLengths[lengthKey] = map[int]int{}
@@ -178,7 +189,7 @@ func main() {
 
 	result := report{
 		GeneratedAt:            time.Now().UTC().Format(time.RFC3339Nano),
-		Scope:                  "Read-only audit of the most-specific APNIC inet6num and same-origin route6 evidence covering current mainland China Telecom, China Mobile, and China Unicom IPv6 origins inside gaoyifan china6.txt; no prefix is admitted or excluded",
+		Scope:                  "Read-only audit and first-pass policy preview of the most-specific APNIC inet6num and same-origin route6 evidence covering current mainland China Telecom, China Mobile, and China Unicom IPv6 origins inside gaoyifan china6.txt; no formal prefix list is emitted",
 		Inet6numRecordCount:    len(inetRecords),
 		Inet6numSegmentCount:   len(segments),
 		Route6RecordCount:      len(routeRecords),
@@ -188,11 +199,16 @@ func main() {
 		candidate := candidateByOperator[operator]
 		total := ipset6.AddressCount(candidate)
 		covered := ipset6.Intersect(candidate, coveredByOperator[operator])
+		uncovered := ipset6.Subtract(candidate, covered)
+		excluded := ipset6.Intersect(candidate, append(firstPassExcluded[operator], uncovered...))
 		result.Operators = append(result.Operators, operatorSummary{
 			Operator: operator, Candidate: makeStat(candidate, total), MostSpecificRegistryCovered: makeStat(covered, total),
-			RegistryUncovered: makeStat(ipset6.Subtract(candidate, covered), total),
+			RegistryUncovered: makeStat(uncovered, total),
 			SameOriginRoute6Covered: makeStat(ipset6.Intersect(candidate, routeCovered[operator]), total),
 			StrongRoutePurposeSignal: makeStat(ipset6.Intersect(candidate, routeStrong[operator]), total),
+			FirstPassRetained: makeStat(ipset6.Subtract(candidate, excluded), total),
+			FirstPassExcluded: makeStat(excluded, total),
+			ExplicitUserPurpose: makeStat(ipset6.Intersect(candidate, explicitUserPurpose[operator]), total),
 		})
 		for _, category := range []string{"same_operator", "strong_non_public", "other_operator", "independent_legal_entity", "other_or_unclassified"} {
 			result.Categories = append(result.Categories, categoryStat{Operator: operator, Category: category, Space: makeStat(categoryRanges[operator][category], total)})
@@ -216,6 +232,19 @@ func main() {
 
 func classifyRegistration(record apnic6.InetRecord, operator string, classifier *operatorconfig.Classifier) (string, string, string) {
 	text := apnic6.InetSearchText(record)
+	lower := strings.ToLower(text)
+	for _, rule := range []struct{ needle, label, reason string }{
+		{"ct-ipv6-volte-address", "ipv6_explicit_service: volte", "APNIC inet6num explicitly identifies a VoLTE service address pool rather than ordinary Internet access"},
+		{"ipv6 address for volte", "ipv6_explicit_service: volte", "APNIC inet6num explicitly identifies a VoLTE service address pool rather than ordinary Internet access"},
+		{"ct-ipv6-platform-address", "ipv6_explicit_service: own platform", "APNIC inet6num explicitly identifies the operator's own platform address pool"},
+		{"ipv6 address for own platform", "ipv6_explicit_service: own platform", "APNIC inet6num explicitly identifies the operator's own platform address pool"},
+		{"ct-ipv6-network-address", "ipv6_explicit_service: network", "APNIC inet6num explicitly identifies a generic network address pool without end-user purpose"},
+		{"ipv6 address for network", "ipv6_explicit_service: network", "APNIC inet6num explicitly identifies a generic network address pool without end-user purpose"},
+	} {
+		if strings.Contains(lower, rule.needle) {
+			return "strong_non_public", rule.label, rule.reason
+		}
+	}
 	if result := classifier.ClassifyAPNICInetnum(text); result.Excluded {
 		return "strong_non_public", result.MatchedBy, result.Reason
 	}
@@ -229,6 +258,30 @@ func classifyRegistration(record apnic6.InetRecord, operator string, classifier 
 		return "independent_legal_entity", "independent_legal_entity_patterns", "Most-specific APNIC registration names an independent legal entity without operator attribution"
 	}
 	return "other_or_unclassified", "", "Most-specific APNIC registration has no current strong operator or non-public classification"
+}
+
+func excludeFirstPass(category string, record apnic6.InetRecord) bool {
+	if record.Country != "" && !strings.EqualFold(record.Country, "CN") {
+		return true
+	}
+	switch category {
+	case "strong_non_public", "other_operator", "independent_legal_entity":
+		return true
+	case "other_or_unclassified":
+		return strings.Contains(strings.ToUpper(record.Status), "PORTABLE")
+	default:
+		return false
+	}
+}
+
+func isExplicitUserPurpose(record apnic6.InetRecord) bool {
+	text := strings.ToLower(apnic6.InetSearchText(record))
+	for _, phrase := range []string{"fixed broadband", "user address", "useraddress", "ipv6 address for mobile"} {
+		if strings.Contains(text, phrase) {
+			return true
+		}
+	}
+	return false
 }
 
 func readCIDRs(path string) []ipset6.Range {
@@ -350,7 +403,7 @@ func renderMarkdown(r report) string {
 	fmt.Fprintln(&b, "# 三网 IPv6 APNIC 登记颗粒度审计")
 	fmt.Fprintln(&b)
 	fmt.Fprintf(&b, "生成时间：`%s`\n\n", r.GeneratedAt)
-	fmt.Fprintln(&b, "审计对象是 `当前三网 IPv6 Origin ∩ china6`。`inet6num` 按最具体记录解析；`route6` 只统计与当前 BGP Origin 相同的登记。报告不执行正式准入或排除。")
+	fmt.Fprintln(&b, "审计对象是 `当前三网 IPv6 Origin ∩ china6`。`inet6num` 按最具体记录解析；`route6` 只统计与当前 BGP Origin 相同的登记。报告包含首轮规则预演，但不生成正式地址列表。")
 	fmt.Fprintln(&b)
 	fmt.Fprintf(&b, "APNIC `inet6num` 记录：**%d**；解析后最具体区间：**%d**；`route6` 前缀：**%d**。\n", r.Inet6numRecordCount, r.Inet6numSegmentCount, r.Route6RecordCount)
 
@@ -360,6 +413,16 @@ func renderMarkdown(r report) string {
 	fmt.Fprintln(&b, "| --- | ---: | ---: | ---: | ---: | ---: |")
 	for _, row := range r.Operators {
 		fmt.Fprintf(&b, "| %s | %d | %s | %s | %s | %s |\n", row.Operator, row.Candidate.CIDRCount, row.MostSpecificRegistryCovered.PercentOfOperator, row.RegistryUncovered.PercentOfOperator, row.SameOriginRoute6Covered.PercentOfOperator, row.StrongRoutePurposeSignal.PercentOfOperator)
+	}
+
+	fmt.Fprintln(&b, "\n## 首轮准入规则预演")
+	fmt.Fprintln(&b)
+	fmt.Fprintln(&b, "预演排除明确非目标用途、其他运营商登记、独立法定主体登记、无法归属三网的 portable 资源、非 CN 登记及无 APNIC 登记；其余保留。`明确用户侧正证据`只是保留结果中的事实标记，不是唯一准入条件。")
+	fmt.Fprintln(&b)
+	fmt.Fprintln(&b, "| 运营商 | 保留 CIDR | 保留空间 | 排除 CIDR | 排除空间 | 明确用户侧正证据 |")
+	fmt.Fprintln(&b, "| --- | ---: | ---: | ---: | ---: | ---: |")
+	for _, row := range r.Operators {
+		fmt.Fprintf(&b, "| %s | %d | %s | %d | %s | %s |\n", row.Operator, row.FirstPassRetained.CIDRCount, row.FirstPassRetained.PercentOfOperator, row.FirstPassExcluded.CIDRCount, row.FirstPassExcluded.PercentOfOperator, row.ExplicitUserPurpose.PercentOfOperator)
 	}
 
 	fmt.Fprintln(&b, "\n## 最具体 inet6num 分类")
