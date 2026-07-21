@@ -1,8 +1,8 @@
 # 三网 IPv6 APNIC 登记颗粒度审计
 
-生成时间：`2026-07-21T18:44:58.671193336Z`
+生成时间：`2026-07-21T18:49:45.780799294Z`
 
-审计对象是 `当前三网 IPv6 Origin ∩ china6`。`inet6num` 按最具体记录解析；`route6` 只统计与当前 BGP Origin 相同的登记。报告不执行正式准入或排除。
+审计对象是 `当前三网 IPv6 Origin ∩ china6`。`inet6num` 按最具体记录解析；`route6` 只统计与当前 BGP Origin 相同的登记。报告包含首轮规则预演，但不生成正式地址列表。
 
 APNIC `inet6num` 记录：**148952**；解析后最具体区间：**194099**；`route6` 前缀：**1014144**。
 
@@ -14,12 +14,22 @@ APNIC `inet6num` 记录：**148952**；解析后最具体区间：**194099**；`
 | cmcc | 352 | 100.000000% | 0.000000% | 0.000000% | 0.000000% |
 | unicom | 4161 | 100.000000% | 0.000000% | 99.552494% | 0.000000% |
 
+## 首轮准入规则预演
+
+预演排除明确非目标用途、其他运营商登记、独立法定主体登记、无法归属三网的 portable 资源、非 CN 登记及无 APNIC 登记；其余保留。`明确用户侧正证据`只是保留结果中的事实标记，不是唯一准入条件。
+
+| 运营商 | 保留 CIDR | 保留空间 | 排除 CIDR | 排除空间 | 明确用户侧正证据 |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| chinanet | 771 | 50.095024% | 2320 | 49.904976% | 18.838693% |
+| cmcc | 288 | 96.991219% | 64 | 3.008781% | 0.000000% |
+| unicom | 4136 | 99.592897% | 25 | 0.407103% | 0.000000% |
+
 ## 最具体 inet6num 分类
 
 | 运营商 | 分类 | CIDR | /64 等价数 | 占运营商候选 |
 | --- | --- | ---: | ---: | ---: |
-| chinanet | same_operator | 1338 | 12074240245760.0000 | 68.919917% |
-| chinanet | strong_non_public | 1708 | 5433325584384.0000 | 31.013492% |
+| chinanet | same_operator | 778 | 8776263991296.0000 | 50.095027% |
+| chinanet | strong_non_public | 2268 | 8731301838848.0000 | 49.838382% |
 | chinanet | other_operator | 0 | 0.0000 | 0.000000% |
 | chinanet | independent_legal_entity | 15 | 4299620352.0000 | 0.024542% |
 | chinanet | other_or_unclassified | 14 | 7365394432.0000 | 0.042042% |
@@ -38,7 +48,10 @@ APNIC `inet6num` 记录：**148952**；解析后最具体区间：**194099**；`
 
 | 运营商 | APNIC 前缀 | 占运营商候选 | netname / description / org | status | 依据 |
 | --- | --- | ---: | --- | --- | --- |
+| chinanet | `240e:500::/24` | 6.276026% | CT-IPV6-VOLTE-ADDRESS; Chinatelecom IPv6 address for volte | ALLOCATED NON-PORTABLE | APNIC inet6num explicitly identifies a VoLTE service address pool rather than ordinary Internet access (`ipv6_explicit_service: volte`) |
 | chinanet | `240e:a00::/24` | 6.276026% | CT-IPV6-INTERNET-CAFE-ADDRESS; Chinatelecom IPv6 address for Internet cafe leased line | ALLOCATED NON-PORTABLE | APNIC inetnum registration explicitly identifies a dedicated line or circuit (`exclude_apnic_inetnum_rules: \b(?:leased|dedicated|private|special)[ -]?(?:line|circuit)s?\b`) |
+| chinanet | `240e:100::/24` | 6.275040% | CT-IPV6-NETWORK-ADDRESS; Chinatelecom IPv6 address for network | ALLOCATED NON-PORTABLE | APNIC inet6num explicitly identifies a generic network address pool without end-user purpose (`ipv6_explicit_service: network`) |
+| chinanet | `240e:200::/24` | 6.273824% | CT-IPV6-PLATFORM-ADDRESS; Chinatelecom IPv6 address for own platform | ALLOCATED NON-PORTABLE | APNIC inet6num explicitly identifies the operator's own platform address pool (`ipv6_explicit_service: own platform`) |
 | chinanet | `240e:800::/24` | 6.271502% | CT-IPV6-IOT-ADDRESS; Chinatelecom IPv6 address for IOT | ALLOCATED NON-PORTABLE | APNIC inetnum registration explicitly identifies an IoT or M2M network (`exclude_apnic_inetnum_rules: (?:^|[^a-z0-9])(?:iot|m2m)(?:[^a-z0-9]|$)|\binternet of things\b`) |
 | chinanet | `240e:600::/24` | 6.261335% | CT-IPV6-LEASED-LINE-ADDRESS; Chinatelecom IPv6 address for LEASED LINE | ALLOCATED NON-PORTABLE | APNIC inetnum registration explicitly identifies a dedicated line or circuit (`exclude_apnic_inetnum_rules: \b(?:leased|dedicated|private|special)[ -]?(?:line|circuit)s?\b`) |
 | chinanet | `240e:700::/24` | 6.229961% | CT-IPV6-LEASED-LINE-ADDRESS; Chinatelecom IPv6 address for LEASED LINE | ALLOCATED NON-PORTABLE | APNIC inetnum registration explicitly identifies a dedicated line or circuit (`exclude_apnic_inetnum_rules: \b(?:leased|dedicated|private|special)[ -]?(?:line|circuit)s?\b`) |
@@ -76,10 +89,10 @@ APNIC `inet6num` 记录：**148952**；解析后最具体区间：**194099**；`
 | unicom | `2403:e7c0::/32` | 0.000003% | TaiJi-ZY; Taiji Computer Corporation Limited | ALLOCATED PORTABLE | Most-specific APNIC registration names an independent legal entity without operator attribution (`independent_legal_entity_patterns`) |
 | unicom | `2404:6500::/32` | 0.000003% | IFLYTEK; ANHUI USTC iFLYTEK Co., Ltd.; No. 666 West Wangjiang Road, Hefei, Anhui | ALLOCATED PORTABLE | Most-specific APNIC registration names an independent legal entity without operator attribution (`independent_legal_entity_patterns`) |
 | unicom | `2404:7600::/32` | 0.000003% | DSNET; Shanghai Data Solution Co., Ltd.; 2F,NO.4Buliding 498 Guoshoujing Rd.Shanghai ZJ.Hi-Tech Park | ALLOCATED PORTABLE | Most-specific APNIC registration names an independent legal entity without operator attribution (`independent_legal_entity_patterns`) |
-| unicom | `2405:1480::/32` | 0.000003% | SKBJNET; Beijing Sankuai Technology Co.,Ltd.; Wangjing International R&D Park Phase 3,No.6 Wangjing East Road,; Chaoyang District,Beijing 100102,PRC | ALLOCATED PORTABLE | Most-specific APNIC registration names an independent legal entity without operator attribution (`independent_legal_entity_patterns`) |
 | chinanet | `2405:1480::/32` | 0.000000% | SKBJNET; Beijing Sankuai Technology Co.,Ltd.; Wangjing International R&D Park Phase 3,No.6 Wangjing East Road,; Chaoyang District,Beijing 100102,PRC | ALLOCATED PORTABLE | Most-specific APNIC registration names an independent legal entity without operator attribution (`independent_legal_entity_patterns`) |
-| chinanet | `2405:7040::/32` | 0.000000% | COSCOSHIPPING; CHINA COSCO SHIPPING CORPORATION LIMITED | ALLOCATED PORTABLE | Most-specific APNIC registration names an independent legal entity without operator attribution (`independent_legal_entity_patterns`) |
+| unicom | `2405:1480::/32` | 0.000003% | SKBJNET; Beijing Sankuai Technology Co.,Ltd.; Wangjing International R&D Park Phase 3,No.6 Wangjing East Road,; Chaoyang District,Beijing 100102,PRC | ALLOCATED PORTABLE | Most-specific APNIC registration names an independent legal entity without operator attribution (`independent_legal_entity_patterns`) |
 | unicom | `2405:7040::/32` | 0.000003% | COSCOSHIPPING; CHINA COSCO SHIPPING CORPORATION LIMITED | ALLOCATED PORTABLE | Most-specific APNIC registration names an independent legal entity without operator attribution (`independent_legal_entity_patterns`) |
+| chinanet | `2405:7040::/32` | 0.000000% | COSCOSHIPPING; CHINA COSCO SHIPPING CORPORATION LIMITED | ALLOCATED PORTABLE | Most-specific APNIC registration names an independent legal entity without operator attribution (`independent_legal_entity_patterns`) |
 | unicom | `2405:a900::/32` | 0.000003% | QIHOO; Beijing Qihu Technology Company Limited; 112 Room, D buliding , Deshengyuan square,; No.28 xinjiekouwaiwai,Xicheng District; Beijing,China | ALLOCATED PORTABLE | Most-specific APNIC registration names an independent legal entity without operator attribution (`independent_legal_entity_patterns`) |
 | cmcc | `2407:6c40::/32` | 0.000000% | BJ-SHOUZIXIN; Beijing Shougang Automation Information Technology Co.,Ltd; Building 1, Yard 1, Shimen Road, Shijingshan, Beijing | ALLOCATED PORTABLE | Most-specific APNIC registration names an independent legal entity without operator attribution (`independent_legal_entity_patterns`) |
 | cmcc | `2407:8f40::/32` | 0.000000% | CNIXP; ShenZhen QianHai New-Type Internet Exchange Point Co.,Ltd; Group A 4F, Qianhai Shenzhen-Hong Kong Innovation Center,; Menghai Rd. 4008, Qianhai Cooperation Zone, Shenzhen | ALLOCATED PORTABLE | Most-specific APNIC registration names an independent legal entity without operator attribution (`independent_legal_entity_patterns`) |
@@ -114,11 +127,8 @@ APNIC `inet6num` 记录：**148952**；解析后最具体区间：**194099**；`
 | cmcc | `2409:8000::/20` | 96.991219% | CMNET-V6-20110823; China Mobile Communications Corporation; Mobile Communications Network Operator in China; Internet Service Provider in China; China Mobile | ALLOCATED PORTABLE | Most-specific APNIC registration is attributed to the current BGP operator (`description_patterns: china mobile`) |
 | chinanet | `240e::/18` | 31.177326% | CT-IPv6-Networks; Chinatelecom networks with tens of high-end routers and switches; Including users who access to Internet through Chinatelecom's networks.; China Telecom | ALLOCATED PORTABLE | Most-specific APNIC registration is attributed to the current BGP operator (`description_patterns: china ?telecom`) |
 | unicom | `2408:8000::/20` | 99.592897% | CU-CN; China Unicom; No.21, Jin-Rong Street; Beijng 100033 | ALLOCATED PORTABLE | Most-specific APNIC registration is attributed to the current BGP operator (`description_patterns: unicom`) |
-| chinanet | `240e:500::/24` | 6.276026% | CT-IPV6-VOLTE-ADDRESS; Chinatelecom IPv6 address for volte | ALLOCATED NON-PORTABLE | Most-specific APNIC registration is attributed to the current BGP operator (`description_patterns: china ?telecom`) |
 | chinanet | `240e:b00::/24` | 6.276026% | CT-IPV6-BROADBAND-ADDRESS; Chinatelecom IPv6 address for fixed broadband | ALLOCATED NON-PORTABLE | Most-specific APNIC registration is attributed to the current BGP operator (`description_patterns: china ?telecom`) |
 | chinanet | `240e:400::/24` | 6.276011% | CT-IPV6-MOBILE-ADDRESS; Chinatelecom IPv6 address for mobile | ALLOCATED NON-PORTABLE | Most-specific APNIC registration is attributed to the current BGP operator (`description_patterns: china ?telecom`) |
-| chinanet | `240e:100::/24` | 6.275040% | CT-IPV6-NETWORK-ADDRESS; Chinatelecom IPv6 address for network | ALLOCATED NON-PORTABLE | Most-specific APNIC registration is attributed to the current BGP operator (`description_patterns: china ?telecom`) |
-| chinanet | `240e:200::/24` | 6.273824% | CT-IPV6-PLATFORM-ADDRESS; Chinatelecom IPv6 address for own platform | ALLOCATED NON-PORTABLE | Most-specific APNIC registration is attributed to the current BGP operator (`description_patterns: china ?telecom`) |
 | chinanet | `240e:300::/24` | 6.269131% | CT-IPV6-BROADBAND-ADDRESS; Chinatelecom IPv6 address for fixed broadband | ALLOCATED NON-PORTABLE | Most-specific APNIC registration is attributed to the current BGP operator (`description_patterns: china ?telecom`) |
 | chinanet | `240e:16::/31` | 0.047498% | CHINANET-SC-IPv6-USER-ADDRESS; CHINANET Sichuan province network; Data Communication Division; China Telecom | ALLOCATED NON-PORTABLE | Most-specific APNIC registration is attributed to the current BGP operator (`description_patterns: china ?telecom`) |
 | chinanet | `2001:c68::/32` | 0.024516% | CHINANET-20020830; China Telecom; Internet Service Provider; Beijing,China | ALLOCATED PORTABLE | Most-specific APNIC registration is attributed to the current BGP operator (`description_patterns: china ?telecom`) |

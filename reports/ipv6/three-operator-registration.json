@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-07-21T18:44:58.671193336Z",
-  "scope": "Read-only audit of the most-specific APNIC inet6num and same-origin route6 evidence covering current mainland China Telecom, China Mobile, and China Unicom IPv6 origins inside gaoyifan china6.txt; no prefix is admitted or excluded",
+  "generated_at": "2026-07-21T18:49:45.780799294Z",
+  "scope": "Read-only audit and first-pass policy preview of the most-specific APNIC inet6num and same-origin route6 evidence covering current mainland China Telecom, China Mobile, and China Unicom IPv6 origins inside gaoyifan china6.txt; no formal prefix list is emitted",
   "inet6num_record_count": 148952,
   "inet6num_segment_count": 194099,
   "route6_record_count": 1014144,
@@ -36,6 +36,24 @@
         "address_count": "0",
         "slash64_equivalent": "0.0000",
         "percent_of_operator": "0.000000%"
+      },
+      "first_pass_retained": {
+        "cidr_count": 771,
+        "address_count": "161893487308269286583670463791104",
+        "slash64_equivalent": "8776263532544.0000",
+        "percent_of_operator": "50.095024%"
+      },
+      "first_pass_excluded": {
+        "cidr_count": 2320,
+        "address_count": "161279302217020631148494388723712",
+        "slash64_equivalent": "8742968492032.0000",
+        "percent_of_operator": "49.904976%"
+      },
+      "explicit_user_purpose": {
+        "cidr_count": 320,
+        "address_count": "60881530872160756760044866895872",
+        "slash64_equivalent": "3300394401792.0000",
+        "percent_of_operator": "18.838693%"
       }
     },
     {
@@ -65,6 +83,24 @@
         "percent_of_operator": "0.000000%"
       },
       "strong_route_purpose_signal": {
+        "cidr_count": 0,
+        "address_count": "0",
+        "slash64_equivalent": "0.0000",
+        "percent_of_operator": "0.000000%"
+      },
+      "first_pass_retained": {
+        "cidr_count": 288,
+        "address_count": "324517405178898092885440049709056",
+        "slash64_equivalent": "17592123785216.0000",
+        "percent_of_operator": "96.991219%"
+      },
+      "first_pass_excluded": {
+        "cidr_count": 64,
+        "address_count": "10066910265581418176042057596928",
+        "slash64_equivalent": "545728299008.0000",
+        "percent_of_operator": "3.008781%"
+      },
+      "explicit_user_purpose": {
         "cidr_count": 0,
         "address_count": "0",
         "slash64_equivalent": "0.0000",
@@ -102,6 +138,24 @@
         "address_count": "0",
         "slash64_equivalent": "0.0000",
         "percent_of_operator": "0.000000%"
+      },
+      "first_pass_retained": {
+        "cidr_count": 4136,
+        "address_count": "39019994557634606571625390276608",
+        "slash64_equivalent": "2115278143488.0000",
+        "percent_of_operator": "99.592897%"
+      },
+      "first_pass_excluded": {
+        "cidr_count": 25,
+        "address_count": "159500836936675714794034036736",
+        "slash64_equivalent": "8646557696.0000",
+        "percent_of_operator": "0.407103%"
+      },
+      "explicit_user_purpose": {
+        "cidr_count": 0,
+        "address_count": "0",
+        "slash64_equivalent": "0.0000",
+        "percent_of_operator": "0.000000%"
       }
     }
   ],
@@ -110,20 +164,20 @@
       "operator": "chinanet",
       "category": "same_operator",
       "space": {
-        "cidr_count": 1338,
-        "address_count": "222730419698018640058831245148160",
-        "slash64_equivalent": "12074240245760.0000",
-        "percent_of_operator": "68.919917%"
+        "cidr_count": 778,
+        "address_count": "161893495770750023886074686734336",
+        "slash64_equivalent": "8776263991296.0000",
+        "percent_of_operator": "50.095027%"
       }
     },
     {
       "operator": "chinanet",
       "category": "strong_non_public",
       "space": {
-        "cidr_count": 1708,
-        "address_count": "100227166524270038304685811564544",
-        "slash64_equivalent": "5433325584384.0000",
-        "percent_of_operator": "31.013492%"
+        "cidr_count": 2268,
+        "address_count": "161064090451538654477442369978368",
+        "slash64_equivalent": "8731301838848.0000",
+        "percent_of_operator": "49.838382%"
       }
     },
     {
@@ -352,7 +406,7 @@
     },
     {
       "operator": "chinanet",
-      "category": "same_operator",
+      "category": "strong_non_public",
       "registry_prefix": "240e:500::/24",
       "registry_prefix_length": 24,
       "netnames": [
@@ -366,8 +420,8 @@
       ],
       "country": "CN",
       "status": "ALLOCATED NON-PORTABLE",
-      "matched_by": "description_patterns: china ?telecom",
-      "reason": "Most-specific APNIC registration is attributed to the current BGP operator",
+      "matched_by": "ipv6_explicit_service: volte",
+      "reason": "APNIC inet6num explicitly identifies a VoLTE service address pool rather than ordinary Internet access",
       "space": {
         "cidr_count": 0,
         "address_count": "20282409603651670423947251286016",
@@ -452,7 +506,7 @@
     },
     {
       "operator": "chinanet",
-      "category": "same_operator",
+      "category": "strong_non_public",
       "registry_prefix": "240e:100::/24",
       "registry_prefix_length": 24,
       "netnames": [
@@ -466,8 +520,8 @@
       ],
       "country": "CN",
       "status": "ALLOCATED NON-PORTABLE",
-      "matched_by": "description_patterns: china ?telecom",
-      "reason": "Most-specific APNIC registration is attributed to the current BGP operator",
+      "matched_by": "ipv6_explicit_service: network",
+      "reason": "APNIC inet6num explicitly identifies a generic network address pool without end-user purpose",
       "space": {
         "cidr_count": 0,
         "address_count": "20279222875191166261442725806080",
@@ -477,7 +531,7 @@
     },
     {
       "operator": "chinanet",
-      "category": "same_operator",
+      "category": "strong_non_public",
       "registry_prefix": "240e:200::/24",
       "registry_prefix_length": 24,
       "netnames": [
@@ -491,8 +545,8 @@
       ],
       "country": "CN",
       "status": "ALLOCATED NON-PORTABLE",
-      "matched_by": "description_patterns: china ?telecom",
-      "reason": "Most-specific APNIC registration is attributed to the current BGP operator",
+      "matched_by": "ipv6_explicit_service: own platform",
+      "reason": "APNIC inet6num explicitly identifies the operator's own platform address pool",
       "space": {
         "cidr_count": 0,
         "address_count": "20275291448425779487366581321728",
@@ -1800,33 +1854,6 @@
       }
     },
     {
-      "operator": "unicom",
-      "category": "independent_legal_entity",
-      "registry_prefix": "2405:1480::/32",
-      "registry_prefix_length": 32,
-      "netnames": [
-        "SKBJNET"
-      ],
-      "descriptions": [
-        "Beijing Sankuai Technology Co.,Ltd.",
-        "Wangjing International R\u0026D Park Phase 3,No.6 Wangjing East Road,",
-        "Chaoyang District,Beijing 100102,PRC"
-      ],
-      "maintainers": [
-        "MAINT-CNNIC-AP"
-      ],
-      "country": "CN",
-      "status": "ALLOCATED PORTABLE",
-      "matched_by": "independent_legal_entity_patterns",
-      "reason": "Most-specific APNIC registration names an independent legal entity without operator attribution",
-      "space": {
-        "cidr_count": 0,
-        "address_count": "1208925819614629174706176",
-        "slash64_equivalent": "65536.0000",
-        "percent_of_operator": "0.000003%"
-      }
-    },
-    {
       "operator": "chinanet",
       "category": "independent_legal_entity",
       "registry_prefix": "2405:1480::/32",
@@ -1854,15 +1881,17 @@
       }
     },
     {
-      "operator": "chinanet",
+      "operator": "unicom",
       "category": "independent_legal_entity",
-      "registry_prefix": "2405:7040::/32",
+      "registry_prefix": "2405:1480::/32",
       "registry_prefix_length": 32,
       "netnames": [
-        "COSCOSHIPPING"
+        "SKBJNET"
       ],
       "descriptions": [
-        "CHINA COSCO SHIPPING CORPORATION LIMITED"
+        "Beijing Sankuai Technology Co.,Ltd.",
+        "Wangjing International R\u0026D Park Phase 3,No.6 Wangjing East Road,",
+        "Chaoyang District,Beijing 100102,PRC"
       ],
       "maintainers": [
         "MAINT-CNNIC-AP"
@@ -1875,7 +1904,7 @@
         "cidr_count": 0,
         "address_count": "1208925819614629174706176",
         "slash64_equivalent": "65536.0000",
-        "percent_of_operator": "0.000000%"
+        "percent_of_operator": "0.000003%"
       }
     },
     {
@@ -1901,6 +1930,31 @@
         "address_count": "1208925819614629174706176",
         "slash64_equivalent": "65536.0000",
         "percent_of_operator": "0.000003%"
+      }
+    },
+    {
+      "operator": "chinanet",
+      "category": "independent_legal_entity",
+      "registry_prefix": "2405:7040::/32",
+      "registry_prefix_length": 32,
+      "netnames": [
+        "COSCOSHIPPING"
+      ],
+      "descriptions": [
+        "CHINA COSCO SHIPPING CORPORATION LIMITED"
+      ],
+      "maintainers": [
+        "MAINT-CNNIC-AP"
+      ],
+      "country": "CN",
+      "status": "ALLOCATED PORTABLE",
+      "matched_by": "independent_legal_entity_patterns",
+      "reason": "Most-specific APNIC registration names an independent legal entity without operator attribution",
+      "space": {
+        "cidr_count": 0,
+        "address_count": "1208925819614629174706176",
+        "slash64_equivalent": "65536.0000",
+        "percent_of_operator": "0.000000%"
       }
     },
     {
@@ -2063,14 +2117,14 @@
     },
     "chinanet/same_operator": {
       "18": 327,
-      "24": 1956,
+      "24": 1657,
       "31": 9,
       "32": 2,
       "44": 4
     },
     "chinanet/strong_non_public": {
       "21": 1,
-      "24": 816,
+      "24": 1115,
       "32": 8
     },
     "cmcc/independent_legal_entity": {
