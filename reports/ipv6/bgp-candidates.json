@@ -1,0 +1,962 @@
+{
+  "generated_at": "2026-07-21T20:04:36.257132313Z",
+  "scope": "Current exact IPv6 BGP prefixes whose complete observed Origin set is attributed to one Chinese operator; BGP Origin alone does not prove terminal-user access purpose",
+  "ris": {
+    "rows": 308993,
+    "ipv6_prefixes": 296767
+  },
+  "accepted_prefixes_by_operator": {
+    "chinanet": 4041,
+    "cmcc": 17881,
+    "unicom": 4488
+  },
+  "rejected_prefixes_by_reason": {
+    "cross_operator_moas": 6,
+    "excluded_origin": 3588,
+    "missing_asn_metadata": 2457,
+    "non_cn_origin": 258083,
+    "non_operator_origin": 6223
+  },
+  "chinanet_origin_asns": [
+    {
+      "asn": "134774",
+      "description": "CHINANET-GUANGDONG-SHENZHEN-MAN CHINANET Guangdong province Shenzhen MAN network",
+      "prefix_count": 768
+    },
+    {
+      "asn": "4134",
+      "description": "CHINANET-BACKBONE No.31,Jin-rong Street",
+      "prefix_count": 663
+    },
+    {
+      "asn": "140292",
+      "description": "CHINATELECOM-JIANGSU-SUZHOU-5G-NETWORK CHINATELECOM Jiangsu province Suzhou 5G network",
+      "prefix_count": 614
+    },
+    {
+      "asn": "140345",
+      "description": "CHINATELECOM-YUNNAN-SHENGJI-5G-NETWORK CHINATELECOM Yunnan province Shengji 5G network",
+      "prefix_count": 209
+    },
+    {
+      "asn": "140647",
+      "description": "CHINATELECOM-GUIZHOU-SHENGJI-5G-NETWORK CHINATELECOM Guizhou province Shengji 5G network",
+      "prefix_count": 188
+    },
+    {
+      "asn": "132225",
+      "description": "CHINATELECOM-QINGHAI-5G-NETWORK China Telecom",
+      "prefix_count": 180
+    },
+    {
+      "asn": "140330",
+      "description": "CHINATELECOM-FUJIAN-XIAMEN-5G-NETWORK CHINATELECOM Fujian province Xiamen 5G network",
+      "prefix_count": 105
+    },
+    {
+      "asn": "4812",
+      "description": "CHINANET-SH-AP China Telecom Group",
+      "prefix_count": 103
+    },
+    {
+      "asn": "4811",
+      "description": "CHINANET-SHANGHAI-MAN China Telecom Group",
+      "prefix_count": 102
+    },
+    {
+      "asn": "140329",
+      "description": "CHINATELECOM-FUJIAN-FUZHOU-5G-NETWORK CHINATELECOM Fujian province Fuzhou 5G network",
+      "prefix_count": 87
+    },
+    {
+      "asn": "134767",
+      "description": "CHINANET-SICHUAN-CHENGDU-MAN CHINANET Sichuan province Chengdu MAN network",
+      "prefix_count": 80
+    },
+    {
+      "asn": "151058",
+      "description": "CT-HAINAN China Telecom",
+      "prefix_count": 73
+    },
+    {
+      "asn": "140061",
+      "description": "CHINANET-QINGHAI-AS-AP Qinghai Telecom",
+      "prefix_count": 51
+    },
+    {
+      "asn": "134772",
+      "description": "CHINANET-GUANGDONG-DONGGUAN-MAN CHINANET Guangdong province Dongguan MAN network",
+      "prefix_count": 49
+    },
+    {
+      "asn": "134419",
+      "description": "CHINATELECOM-GUANGXI-BEIHAI-MAN Beihai",
+      "prefix_count": 44
+    },
+    {
+      "asn": "134762",
+      "description": "CHINANET-LIAONING-DALIAN-MAN CHINANET Liaoning province Dalian MAN network",
+      "prefix_count": 32
+    },
+    {
+      "asn": "137694",
+      "description": "CHINATELECOM-XINJIANG-KEZHOU-MAN CHINATELECOM Xinjiang Kezhou MAN network",
+      "prefix_count": 26
+    },
+    {
+      "asn": "131285",
+      "description": "CHINATELECOM-HUBEI-SHENGJI-5G-NETWORK CHINATELECOM Hubei province Shengji 5G network",
+      "prefix_count": 25
+    },
+    {
+      "asn": "140494",
+      "description": "CHINATELECOM-ZHEJIANG-HUZHOU-5G-NETWORK CHINATELECOM ZHEJIANG province HUZHOU 5G network",
+      "prefix_count": 23
+    },
+    {
+      "asn": "17638",
+      "description": "CHINATELECOM-TJ-AS-AP ASN for TIANJIN Provincial Net of CT",
+      "prefix_count": 19
+    },
+    {
+      "asn": "4847",
+      "description": "CNIX-AP China Networks Inter-Exchange",
+      "prefix_count": 16
+    },
+    {
+      "asn": "137695",
+      "description": "CHINATELECOM-XINJIANG-WULUMUQI-MAN CHINATELECOM Xinjiang Wulumuqi MAN network",
+      "prefix_count": 11
+    },
+    {
+      "asn": "140485",
+      "description": "CHINATELECOM-ZHEJIANG-HANGZHOU-5GC-NETWORK CHINATELECOM ZHEJIANG province HANGZHOU 5GC network",
+      "prefix_count": 11
+    },
+    {
+      "asn": "131325",
+      "description": "CHINATELECOM-JIANGSU-NANTONG-MAN CHINATELECOM JIANGSU province NANTONG MAN network",
+      "prefix_count": 10
+    },
+    {
+      "asn": "140293",
+      "description": "CHINATELECOM-JIANGSU-CHANGZHOU-5G-NETWORK CHINATELECOM Jiangsu province Changzhou 5G network",
+      "prefix_count": 10
+    },
+    {
+      "asn": "58542",
+      "description": "CHINATELECOM-TIANJIN Tianjij,300000",
+      "prefix_count": 10
+    },
+    {
+      "asn": "134773",
+      "description": "CHINANET-GUANGDONG-GUANGZHOU-MAN CHINANET Guangdong province Guangzhou MAN network",
+      "prefix_count": 9
+    },
+    {
+      "asn": "17897",
+      "description": "CHINATELECOM-HLJ-AS-AP asn for Heilongjiang Provincial Net of CT",
+      "prefix_count": 9
+    },
+    {
+      "asn": "140486",
+      "description": "CHINATELECOM-ZHEJIANG-JINHUA-5GC-NETWORK CHINATELECOM ZHEJIANG province JINHUA 5GC network",
+      "prefix_count": 8
+    },
+    {
+      "asn": "136197",
+      "description": "CHINATELECOM-HEBEI-XIONGAN Xiongan, Hebei Province, P.R.China.",
+      "prefix_count": 7
+    },
+    {
+      "asn": "140553",
+      "description": "CHINATELECOM-XINJIANG-SHENGJI-5G-NETWORK CHINATELECOM XINJIANG province Shengji 5G network",
+      "prefix_count": 7
+    },
+    {
+      "asn": "140053",
+      "description": "CHINANET-HUIZHOU-AS-AP China Telecom",
+      "prefix_count": 6
+    },
+    {
+      "asn": "140309",
+      "description": "CHINATELECOM-GUANGDONG-ZHONGSHAN-5G-NETWORK CHINATELECOM Guangdong province Zhongshan 5G network",
+      "prefix_count": 6
+    },
+    {
+      "asn": "140311",
+      "description": "CHINATELECOM-GUANGDONG-JIANGMEN-5G-NETWORK CHINATELECOM Guangdong province Jiangmen 5G network",
+      "prefix_count": 6
+    },
+    {
+      "asn": "140318",
+      "description": "CHINATELECOM-GUANGDONG-HEYUAN-5G-NETWORK CHINATELECOM Guangdong province Heyuan 5G network",
+      "prefix_count": 6
+    },
+    {
+      "asn": "140319",
+      "description": "CHINATELECOM-GUANGDONG-QINGYUAN-5G-NETWORK CHINATELECOM Guangdong province Qingyuan 5G network",
+      "prefix_count": 6
+    },
+    {
+      "asn": "140320",
+      "description": "CHINATELECOM-GUANGDONG-SHANWEI-5G-NETWORK CHINATELECOM Guangdong province Shanwei 5G network",
+      "prefix_count": 6
+    },
+    {
+      "asn": "136198",
+      "description": "CHINANET-GUANGDONG-YUEXI-MAN CHINANET Guangdong province Yuexi MAN network",
+      "prefix_count": 5
+    },
+    {
+      "asn": "151823",
+      "description": "CT-CENTRALSOUTH-CHINA-IIP China Telecom",
+      "prefix_count": 5
+    },
+    {
+      "asn": "17633",
+      "description": "CHINATELECOM-SD-AS-AP ASN for Shandong Provincial Net of CT",
+      "prefix_count": 5
+    },
+    {
+      "asn": "17799",
+      "description": "CHINATELECOM-LN-AS-AP asn for Liaoning Provincial Net of CT",
+      "prefix_count": 5
+    },
+    {
+      "asn": "132536",
+      "description": "CHINANET-TIANJIN-MAN-NEW China Telecom",
+      "prefix_count": 4
+    },
+    {
+      "asn": "138387",
+      "description": "CHINATELECOM-SHAANXI-XIAN-5G-NETWORK CHINATELECOM Shaanxi province Xian 5G network",
+      "prefix_count": 4
+    },
+    {
+      "asn": "138409",
+      "description": "CHINATELECOM-SHAANXI-TONGCHUAN-5G-NETWORK CHINATELECOM Shaanxi province Tongchuan 5G network",
+      "prefix_count": 4
+    },
+    {
+      "asn": "138436",
+      "description": "CHINATELECOM-SHAANXI-BAOJI-5G-NETWORK CHINATELECOM Shaanxi province Baoji 5G network",
+      "prefix_count": 4
+    },
+    {
+      "asn": "138513",
+      "description": "CHINATELECOM-SHAANXI-WEINAN-5G-NETWORK CHINATELECOM Shaanxi province Weinan 5G network",
+      "prefix_count": 4
+    },
+    {
+      "asn": "138514",
+      "description": "CHINATELECOM-SHAANXI-XIANYANG-5G-NETWORK CHINATELECOM Shaanxi province Xianyang 5G network",
+      "prefix_count": 4
+    },
+    {
+      "asn": "138597",
+      "description": "CHINATELECOM-SHAANXI-HANZHONG-5G-NETWORK CHINATELECOM Shaanxi province Hanzhong 5G network",
+      "prefix_count": 4
+    },
+    {
+      "asn": "138635",
+      "description": "CHINATELECOM-SHAANXI-ANKANG-5G-NETWORK CHINATELECOM Shaanxi province Ankang 5G network",
+      "prefix_count": 4
+    },
+    {
+      "asn": "138641",
+      "description": "CHINATELECOM-SHAANXI-YULIN-5G-NETWORK CHINATELECOM Shaanxi province Yulin 5G network",
+      "prefix_count": 4
+    },
+    {
+      "asn": "138679",
+      "description": "CHINATELECOM-SHAANXI-YANAN-5G-NETWORK CHINATELECOM Shaanxi province Yanan 5G network",
+      "prefix_count": 4
+    },
+    {
+      "asn": "140238",
+      "description": "CHINATELECOM-SHAANXI-SHANGLUO-5G-NETWORK CHINATELECOM Shaanxi province Shangluo 5G network",
+      "prefix_count": 4
+    },
+    {
+      "asn": "140328",
+      "description": "CHINATELECOM-FUJIAN-SHENGJI-5G-NETWORK CHINATELECOM Fujian province Shengji 5G network",
+      "prefix_count": 4
+    },
+    {
+      "asn": "140331",
+      "description": "CHINATELECOM-FUJIAN-NINGDE-5G-NETWORK CHINATELECOM Fujian province NINGDE 5G network",
+      "prefix_count": 4
+    },
+    {
+      "asn": "140332",
+      "description": "CHINATELECOM-FUJIAN-PUTIAN-5G-NETWORK CHINATELECOM Fujian province Putian 5G network",
+      "prefix_count": 4
+    },
+    {
+      "asn": "140333",
+      "description": "CHINATELECOM-FUJIAN-QUANZHOU-5G-NETWORK CHINATELECOM Fujian province Quanzhou 5G network",
+      "prefix_count": 4
+    },
+    {
+      "asn": "140334",
+      "description": "CHINATELECOM-FUJIAN-ZHANGZHOU-5G-NETWORK CHINATELECOM Fujian province Zhangzhou 5G network",
+      "prefix_count": 4
+    },
+    {
+      "asn": "140335",
+      "description": "CHINATELECOM-FUJIAN-LONGYAN--5G-NETWORK CHINATELECOM Fujian province Longyan 5G network",
+      "prefix_count": 4
+    },
+    {
+      "asn": "140336",
+      "description": "CHINATELECOM-FUJIAN-SANMING-5G-NETWORK CHINATELECOM Fujian province Sanming 5G network",
+      "prefix_count": 4
+    },
+    {
+      "asn": "140337",
+      "description": "CHINATELECOM-FUJIAN-NANPING-5G-NETWORK CHINATELECOM Fujian province Nanping 5G network",
+      "prefix_count": 4
+    },
+    {
+      "asn": "140346",
+      "description": "CHINATELECOM-YUNNAN-KUNMING-5G-NETWORK CHINATELECOM Yunnan province Kunming 5G network",
+      "prefix_count": 4
+    },
+    {
+      "asn": "140348",
+      "description": "CHINATELECOM-YUNNAN-BAOSHAN-5G-NETWORK CHINATELECOM Yunnan province Baoshan 5G network",
+      "prefix_count": 4
+    },
+    {
+      "asn": "140349",
+      "description": "CHINATELECOM-YUNNAN-CHUXIONG-5G-NETWORK CHINATELECOM Yunnan province Chuxiong 5G network",
+      "prefix_count": 4
+    },
+    {
+      "asn": "140350",
+      "description": "CHINATELECOM-YUNNAN-DALI-5G-NETWORK CHINATELECOM Yunnan province Dali 5G network",
+      "prefix_count": 4
+    },
+    {
+      "asn": "140351",
+      "description": "CHINATELECOM-YUNNAN-DEHONG-5G-NETWORK CHINATELECOM Yunnan province Dehong 5G network",
+      "prefix_count": 4
+    },
+    {
+      "asn": "140353",
+      "description": "CHINATELECOM-YUNNAN-HONGHE-5G-NETWORK CHINATELECOM Yunnan province Honghe 5G network",
+      "prefix_count": 4
+    },
+    {
+      "asn": "140354",
+      "description": "CHINATELECOM-YUNNAN-LIJIANG-5G-NETWORK CHINATELECOM Yunnan province Lijiang 5G network",
+      "prefix_count": 4
+    },
+    {
+      "asn": "140355",
+      "description": "CHINATELECOM-YUNNAN-LINCANG-5G-NETWORK CHINATELECOM Yunnan province Lincang 5G network",
+      "prefix_count": 4
+    },
+    {
+      "asn": "140356",
+      "description": "CHINATELECOM-YUNNAN-NUJIANG-5G-NETWORK CHINATELECOM Yunnan province Nujiang 5G network",
+      "prefix_count": 4
+    },
+    {
+      "asn": "140357",
+      "description": "CHINATELECOM-YUNNAN-PUER-5G-NETWORK CHINATELECOM Yunnan province Puer 5G network",
+      "prefix_count": 4
+    },
+    {
+      "asn": "140358",
+      "description": "CHINATELECOM-YUNNAN-QUJING-5G-NETWORK CHINATELECOM Yunnan province Qujing 5G network",
+      "prefix_count": 4
+    },
+    {
+      "asn": "140359",
+      "description": "CHINATELECOM-YUNNAN-WENSHAN-5G-NETWORK CHINATELECOM Yunnan province Wenshan 5G network",
+      "prefix_count": 4
+    },
+    {
+      "asn": "140360",
+      "description": "CHINATELECOM-YUNNAN-YUXI-5G-NETWORK CHINATELECOM Yunnan province Yuxi 5G network",
+      "prefix_count": 4
+    },
+    {
+      "asn": "140361",
+      "description": "CHINATELECOM-YUNNAN-ZHAOTONG-5G-NETWORK CHINATELECOM Yunnan province Zhaotong 5G network",
+      "prefix_count": 4
+    },
+    {
+      "asn": "140649",
+      "description": "CHINATELECOM-GUIZHOU-ZUNYI-5G-NETWORK CHINATELECOM Guizhou province Zunyi 5G network",
+      "prefix_count": 4
+    },
+    {
+      "asn": "140650",
+      "description": "CHINATELECOM-GUIZHOU-ANSHUN-5G-NETWORK CHINATELECOM Guizhou province Anshun 5G network",
+      "prefix_count": 4
+    },
+    {
+      "asn": "140651",
+      "description": "CHINATELECOM-GUIZHOU-QIANNAN-5G-NETWORK CHINATELECOM Guizhou province Qiannan 5G network",
+      "prefix_count": 4
+    },
+    {
+      "asn": "140652",
+      "description": "CHINATELECOM-GUIZHOU-QIANDONGNAN-5G-NETWORK CHINATELECOM Guizhou province Qiandongnan 5G network",
+      "prefix_count": 4
+    },
+    {
+      "asn": "140653",
+      "description": "CHINATELECOM-GUIZHOU-TONGREN-5G-NETWORK CHINATELECOM Guizhou province Tongren 5G network",
+      "prefix_count": 4
+    },
+    {
+      "asn": "140654",
+      "description": "CHINATELECOM-GUIZHOU-BIJIE-5G-NETWORK CHINATELECOM Guizhou province Bijie 5G network",
+      "prefix_count": 4
+    },
+    {
+      "asn": "140655",
+      "description": "CHINATELECOM-GUIZHOU-LIUPANSHUI-5G-NETWORK CHINATELECOM Guizhou province Liupanshui 5G network",
+      "prefix_count": 4
+    },
+    {
+      "asn": "140656",
+      "description": "CHINATELECOM-GUIZHOU-QIANXINAN-5G-NETWORK CHINATELECOM Guizhou province Qianxinan 5G network",
+      "prefix_count": 4
+    },
+    {
+      "asn": "140657",
+      "description": "CHINATELECOM-GUIZHOU-GUIAN-5G-NETWORK CHINATELECOM Guizhou province Guian 5G network",
+      "prefix_count": 4
+    },
+    {
+      "asn": "137401",
+      "description": "CHINATELECOM-HUBEI-HUANGSHI-5G-NETWORK CHINATELECOM Hubei province Huangshi 5G network",
+      "prefix_count": 3
+    },
+    {
+      "asn": "137402",
+      "description": "CHINATELECOM-HUBEI-SHIYAN-5G-NETWORK CHINATELECOM Hubei province Shiyan 5G network",
+      "prefix_count": 3
+    },
+    {
+      "asn": "140245",
+      "description": "CHINATELECOM-ANHUI-SHENGJI-5G-NETWORK CHINATELECOM Anhui province Shengji 5G network",
+      "prefix_count": 3
+    },
+    {
+      "asn": "140246",
+      "description": "CHINATELECOM-ANHUI-HEFEI-5G-NETWORK CHINATELECOM Anhui province Hefei 5G network",
+      "prefix_count": 3
+    },
+    {
+      "asn": "140247",
+      "description": "CHINATELECOM-ANHUI-WUHU-5G-NETWORK CHINATELECOM Anhui province Wuhu 5G network",
+      "prefix_count": 3
+    },
+    {
+      "asn": "140248",
+      "description": "CHINATELECOM-ANHUI-ANQING-5G-NETWORK CHINATELECOM Anhui province Anqing 5G network",
+      "prefix_count": 3
+    },
+    {
+      "asn": "140249",
+      "description": "CHINATELECOM-ANHUI-BENGBU-5G-NETWORK CHINATELECOM Anhui province Bengbu 5G network",
+      "prefix_count": 3
+    },
+    {
+      "asn": "140250",
+      "description": "CHINATELECOM-ANHUI-FUYANG-5G-NETWORK CHINATELECOM Anhui province Fuyang 5G network",
+      "prefix_count": 3
+    },
+    {
+      "asn": "140251",
+      "description": "CHINATELECOM-ANHUI-BOZHOU-5G-NETWORK CHINATELECOM Anhui province Bozhou 5G network",
+      "prefix_count": 3
+    },
+    {
+      "asn": "140252",
+      "description": "CHINATELECOM-ANHUI-HUAIBEI-5G-NETWORK CHINATELECOM Anhui province Huaibei 5G network",
+      "prefix_count": 3
+    },
+    {
+      "asn": "140253",
+      "description": "CHINATELECOM-ANHUI-HUAINAN-5G-NETWORK CHINATELECOM Anhui province Huainan 5G network",
+      "prefix_count": 3
+    },
+    {
+      "asn": "140254",
+      "description": "CHINATELECOM-ANHUI-SHUZHOU-5G-NETWORK CHINATELECOM Anhui province Shuzhou 5G network",
+      "prefix_count": 3
+    },
+    {
+      "asn": "140255",
+      "description": "CHINATELECOM-ANHUI-CHUZHOU-5G-NETWORK CHINATELECOM Anhui province Chuzhou 5G network",
+      "prefix_count": 3
+    },
+    {
+      "asn": "140256",
+      "description": "CHINATELECOM-ANHUI-LIUAN-5G-NETWORK CHINATELECOM Anhui province Liuan 5G network",
+      "prefix_count": 3
+    },
+    {
+      "asn": "140257",
+      "description": "CHINATELECOM-ANHUI-CHIZHOU-5G-NETWORK CHINATELECOM Anhui province Chizhou 5G network",
+      "prefix_count": 3
+    },
+    {
+      "asn": "140258",
+      "description": "CHINATELECOM-ANHUI-MAANSHAN-5G-NETWORK CHINATELECOM Anhui province Maanshan 5G network",
+      "prefix_count": 3
+    },
+    {
+      "asn": "140259",
+      "description": "CHINATELECOM-ANHUI-TONGLING-5G-NETWORK CHINATELECOM Anhui province Tongling 5G network",
+      "prefix_count": 3
+    },
+    {
+      "asn": "140260",
+      "description": "CHINATELECOM-ANHUI-XUANCHENG-5G-NETWORK CHINATELECOM Anhui province Xuancheng 5G network",
+      "prefix_count": 3
+    },
+    {
+      "asn": "140261",
+      "description": "CHINATELECOM-ANHUI-HUANGSHAN-5G-NETWORK CHINATELECOM Anhui province Huangshan 5G network",
+      "prefix_count": 3
+    },
+    {
+      "asn": "140290",
+      "description": "CHINATELECOM-JIANGSU-5G-CORE-NETWORK CHINATELECOM Jiangsu province 5G CORE network",
+      "prefix_count": 3
+    },
+    {
+      "asn": "140291",
+      "description": "CHINATELECOM-JIANGSU-NANJING-5G-NETWORK CHINATELECOM Jiangsu province Nanjing 5G network",
+      "prefix_count": 3
+    },
+    {
+      "asn": "140294",
+      "description": "CHINATELECOM-JIANGSU-YANGZHOU-5G-NETWORK CHINATELECOM Jiangsu provinceYangzhou 5G network",
+      "prefix_count": 3
+    },
+    {
+      "asn": "140295",
+      "description": "CHINATELECOM-JIANGSU-LIANYUNGANG-5G-NETWORK CHINATELECOM Jiangsu province Lianyungang 5G network",
+      "prefix_count": 3
+    },
+    {
+      "asn": "140296",
+      "description": "CHINATELECOM-JIANGSU-WUXI-5G-NETWORK CHINATELECOM Jiangsu province Wuxi 5G network",
+      "prefix_count": 3
+    },
+    {
+      "asn": "140297",
+      "description": "CHINATELECOM-JIANGSU-XUZHOU-5G-NETWORK CHINATELECOM Jiangsu province Xuzhou 5G network",
+      "prefix_count": 3
+    },
+    {
+      "asn": "140298",
+      "description": "CHINATELECOM-JIANGSU-YANCHENG-5G-NETWORK CHINATELECOM Jiangsu province Yancheng 5G network",
+      "prefix_count": 3
+    },
+    {
+      "asn": "140299",
+      "description": "CHINATELECOM-JIANGSU-NANTONG-5G-NETWORK CHINATELECOM Jiangsu province Nantong 5G network",
+      "prefix_count": 3
+    },
+    {
+      "asn": "140300",
+      "description": "CHINATELECOM-JIANGSU-SUQIAN-5G-NETWORK CHINATELECOM Jiangsu province Suqian 5G network",
+      "prefix_count": 3
+    },
+    {
+      "asn": "140301",
+      "description": "CHINATELECOM-JIANGSU-TAIZHOU-5G-NETWORK CHINATELECOM Jiangsu province Taizhou 5G network",
+      "prefix_count": 3
+    },
+    {
+      "asn": "140302",
+      "description": "CHINATELECOM-JIANGSU-ZHENJIANG-5G-NETWORK CHINATELECOM Jiangsu province Zhenjiang 5G network",
+      "prefix_count": 3
+    },
+    {
+      "asn": "140303",
+      "description": "CHINATELECOM-JIANGSU-HUAIAN-5G-NETWORK CHINATELECOM Jiangsu province Huaian 5G network",
+      "prefix_count": 3
+    },
+    {
+      "asn": "140308",
+      "description": "CHINATELECOM-GUANGDONG-ZHUHAI-5G-NETWORK CHINATELECOM Guangdong province Zhuhai 5G network",
+      "prefix_count": 3
+    },
+    {
+      "asn": "140347",
+      "description": "CHINATELECOM-YUNNAN-XISHUANGBANNA-5G-NETWORK CHINATELECOM Yunnan province Xishuangbanna 5G network",
+      "prefix_count": 3
+    },
+    {
+      "asn": "140352",
+      "description": "CHINATELECOM-YUNNAN-DIQING-5G-NETWORK CHINATELECOM Yunnan province Diqing 5G network",
+      "prefix_count": 3
+    },
+    {
+      "asn": "140364",
+      "description": "CHINATELECOM-HUNAN-5G-CORE-NETWORK-5G-NETWORK CHINATELECOM Hunan province 5G Core Network 5G network",
+      "prefix_count": 3
+    },
+    {
+      "asn": "140365",
+      "description": "CHINATELECOM-HUNAN-CHANGSHA-5G-NETWORK CHINATELECOM Hunan province Changsha 5G network",
+      "prefix_count": 3
+    },
+    {
+      "asn": "140366",
+      "description": "CHINATELECOM-HUNAN-HENGYANG-5G-NETWORK CHINATELECOM Hunan province Hengyang 5G network",
+      "prefix_count": 3
+    },
+    {
+      "asn": "140367",
+      "description": "CHINATELECOM-HUNAN-YUEYANG-5G-NETWORK CHINATELECOM Hunan province Yueyang 5G network",
+      "prefix_count": 3
+    },
+    {
+      "asn": "140368",
+      "description": "CHINATELECOM-HUNAN-ZHUZHOU-5G-NETWORK CHINATELECOM Hunan province Zhuzhou 5G network",
+      "prefix_count": 3
+    },
+    {
+      "asn": "140369",
+      "description": "CHINATELECOM-HUNAN-XIANGTAN-5G-NETWORK CHINATELECOM Hunan province Xiangtan 5G network",
+      "prefix_count": 3
+    },
+    {
+      "asn": "140370",
+      "description": "CHINATELECOM-HUNAN-CHENZHOU-5G-NETWORK CHINATELECOM Hunan province Chenzhou 5G network",
+      "prefix_count": 3
+    },
+    {
+      "asn": "140371",
+      "description": "CHINATELECOM-HUNAN-YONGZHOU-5G-NETWORK CHINATELECOM Hunan province Yongzhou 5G network",
+      "prefix_count": 3
+    },
+    {
+      "asn": "140372",
+      "description": "CHINATELECOM-HUNAN-YIYANG-5G-NETWORK CHINATELECOM Hunan province Yiyang 5G network",
+      "prefix_count": 3
+    },
+    {
+      "asn": "140373",
+      "description": "CHINATELECOM-HUNAN-CHANGDE-5G-NETWORK CHINATELECOM Hunan province Changde 5G network",
+      "prefix_count": 3
+    },
+    {
+      "asn": "140374",
+      "description": "CHINATELECOM-HUNAN-ZHANGJIAJIE-5G-NETWORK CHINATELECOM Hunan province Zhangjiajie 5G network",
+      "prefix_count": 3
+    },
+    {
+      "asn": "140375",
+      "description": "CHINATELECOM-HUNAN-XIANGXI-5G-NETWORK CHINATELECOM Hunan province Xiangxi 5G network",
+      "prefix_count": 3
+    },
+    {
+      "asn": "140376",
+      "description": "CHINATELECOM-HUNAN-HUAIHUA-5G-NETWORK CHINATELECOM Hunan province Huaihua 5G network",
+      "prefix_count": 3
+    },
+    {
+      "asn": "140377",
+      "description": "CHINATELECOM-HUNAN-SHAOYANG-5G-NETWORK CHINATELECOM Hunan province Shaoyang 5G network",
+      "prefix_count": 3
+    },
+    {
+      "asn": "140378",
+      "description": "CHINATELECOM-HUNAN-DOUDI-5G-NETWORK CHINATELECOM Hunan province Loudi 5G network",
+      "prefix_count": 3
+    },
+    {
+      "asn": "140508",
+      "description": "CHINATELECOM-GUANGXI-SHENGJI-5G-NETWORK CHINATELECOM GUANGXI province Shengji 5G network",
+      "prefix_count": 3
+    },
+    {
+      "asn": "140509",
+      "description": "CHINATELECOM-GUANGXI-NANNING-5G-NETWORK CHINATELECOM GUANGXI province NanNing 5G network",
+      "prefix_count": 3
+    },
+    {
+      "asn": "140510",
+      "description": "CHINATELECOM-GUANGXI-LIUZHOU-5G-NETWORK CHINATELECOM GUANGXI province LiuZhou 5G network",
+      "prefix_count": 3
+    },
+    {
+      "asn": "140511",
+      "description": "CHINATELECOM-GUANGXI-GUILIN-5G-NETWORK CHINATELECOM GUANGXI province GuiLin 5G network",
+      "prefix_count": 3
+    },
+    {
+      "asn": "140512",
+      "description": "CHINATELECOM-GUANGXI-YULIN-5G-NETWORK CHINATELECOM GUANGXI province YuLin 5G network",
+      "prefix_count": 3
+    },
+    {
+      "asn": "140513",
+      "description": "CHINATELECOM-GUANGXI-BAISE-5G-NETWORK CHINATELECOM GUANGXI province BaiSe 5G network",
+      "prefix_count": 3
+    },
+    {
+      "asn": "140514",
+      "description": "CHINATELECOM-GUANGXI-GUIGANG-5G-NETWORK CHINATELECOM GUANGXI province GuiGang 5G network",
+      "prefix_count": 3
+    },
+    {
+      "asn": "140515",
+      "description": "CHINATELECOM-GUANGXI-HECHI-5G-NETWORK CHINATELECOM GUANGXI province HeChi 5G network",
+      "prefix_count": 3
+    },
+    {
+      "asn": "140516",
+      "description": "CHINATELECOM-GUANGXI-QINZHOU-5G-NETWORK CHINATELECOM GUANGXI province QinZhou 5G network",
+      "prefix_count": 3
+    },
+    {
+      "asn": "140517",
+      "description": "CHINATELECOM-GUANGXI-WUZHOU-5G-NETWORK CHINATELECOM GUANGXI province WuZhou 5G network",
+      "prefix_count": 3
+    },
+    {
+      "asn": "140518",
+      "description": "CHINATELECOM-GUANGXI-BEIHAI-5G-NETWORK CHINATELECOM GUANGXI province BeiHai 5G network",
+      "prefix_count": 3
+    },
+    {
+      "asn": "140519",
+      "description": "CHINATELECOM-GUANGXI-CHONGZUO-5G-NETWORK CHINATELECOM GUANGXI province ChongZuo 5G network",
+      "prefix_count": 3
+    },
+    {
+      "asn": "140520",
+      "description": "CHINATELECOM-GUANGXI-LAIBIN-5G-NETWORK CHINATELECOM GUANGXI province LaiBin 5G network",
+      "prefix_count": 3
+    },
+    {
+      "asn": "140521",
+      "description": "CHINATELECOM-GUANGXI-HEZHOU-5G-NETWORK CHINATELECOM GUANGXI province HeZhou 5G network",
+      "prefix_count": 3
+    },
+    {
+      "asn": "140522",
+      "description": "CHINATELECOM-GUANGXI-FANGCHENGGANG-5G-NETWORK CHINATELECOM GUANGXI province FangChengGang 5G network",
+      "prefix_count": 3
+    },
+    {
+      "asn": "140528",
+      "description": "CHINATELECOM-HUBEI-YICHANG-5G-NETWORK CHINATELECOM Hubei province Yichang 5G network",
+      "prefix_count": 3
+    },
+    {
+      "asn": "140529",
+      "description": "CHINATELECOM-HUBEI-XIANGYANG-5G-NETWORK CHINATELECOM Hubei province Xiangyang 5G network",
+      "prefix_count": 3
+    },
+    {
+      "asn": "140530",
+      "description": "CHINATELECOM-HUBEI-EZHOU-5G-NETWORK CHINATELECOM Hubei province Ezhou 5G network",
+      "prefix_count": 3
+    },
+    {
+      "asn": "140531",
+      "description": "CHINATELECOM-HUBEI-JINGMEN-5G-NETWORK CHINATELECOM Hubei province Jingmen 5G network",
+      "prefix_count": 3
+    },
+    {
+      "asn": "140532",
+      "description": "CHINATELECOM-HUBEI-XIAOGAN-5G-NETWORK CHINATELECOM Hubei province Xiaogan 5G network",
+      "prefix_count": 3
+    },
+    {
+      "asn": "140533",
+      "description": "CHINATELECOM-HUBEI-JINGZHOU-5G-NETWORK CHINATELECOM Hubei province Jingzhou 5G network",
+      "prefix_count": 3
+    },
+    {
+      "asn": "140534",
+      "description": "CHINATELECOM-HUBEI-HUANGGANG-5G-NETWORK CHINATELECOM Hubei province Huanggang 5G network",
+      "prefix_count": 3
+    },
+    {
+      "asn": "140535",
+      "description": "CHINATELECOM-HUBEI-XIANNING-5G-NETWORK CHINATELECOM Hubei province Xianning 5G network",
+      "prefix_count": 3
+    },
+    {
+      "asn": "140536",
+      "description": "CHINATELECOM-HUBEI-SUIZHOU-5G-NETWORK CHINATELECOM Hubei province Suizhou 5G network",
+      "prefix_count": 3
+    },
+    {
+      "asn": "140537",
+      "description": "CHINATELECOM-HUBEI-ENSHI-5G-NETWORK CHINATELECOM Hubei province Enshi 5G network",
+      "prefix_count": 3
+    },
+    {
+      "asn": "140538",
+      "description": "CHINATELECOM-HUBEI-XIANTAO-5G-NETWORK CHINATELECOM Hubei province Xiantao 5G network",
+      "prefix_count": 3
+    },
+    {
+      "asn": "141025",
+      "description": "CT-LIAONING-SHENYANG-MAN Shenyang MAN, Liaoning, China Telecom",
+      "prefix_count": 3
+    },
+    {
+      "asn": "134775",
+      "description": "CHINANET-GUANGDONG-ZHUSANJIAO-MAN CHINANET Guangdong province Zhusanjiao MAN network",
+      "prefix_count": 2
+    },
+    {
+      "asn": "136199",
+      "description": "CHINANET-GUANGDONG-YUEDONG-MAN CHINANET Guangdong province Yuedong MAN network",
+      "prefix_count": 2
+    },
+    {
+      "asn": "136200",
+      "description": "CHINANET-GUANGDONG-FOSHAN-MAN CHINANET Guangdong province Foshan MAN network",
+      "prefix_count": 2
+    },
+    {
+      "asn": "140083",
+      "description": "CHINANET-ANHUI-AS-AP China Telecom",
+      "prefix_count": 2
+    },
+    {
+      "asn": "140310",
+      "description": "CHINATELECOM-GUANGDONG-DONGGUAN-5G-NETWORK CHINATELECOM Guangdong province Dongguan 5G network",
+      "prefix_count": 2
+    },
+    {
+      "asn": "140312",
+      "description": "CHINATELECOM-GUANGDONG-ZHANJIANG-5G-NETWORK CHINATELECOM Guangdong province Zhanjiang 5G network",
+      "prefix_count": 2
+    },
+    {
+      "asn": "140313",
+      "description": "CHINATELECOM-GUANGDONG-ZHAOQING-5G-NETWORK CHINATELECOM Guangdong province Zhaoqing 5G network",
+      "prefix_count": 2
+    },
+    {
+      "asn": "140314",
+      "description": "CHINATELECOM-GUANGDONG-SHANTOU-5G-NETWORK CHINATELECOM Guangdong province Shantou 5G network",
+      "prefix_count": 2
+    },
+    {
+      "asn": "140315",
+      "description": "CHINATELECOM-GUANGDONG-JIEYANG-5G-NETWORK CHINATELECOM Guangdong province Jieyang 5G network",
+      "prefix_count": 2
+    },
+    {
+      "asn": "140316",
+      "description": "CHINATELECOM-GUANGDONG-CHAOZHOU-5G-NETWORK CHINATELECOM Guangdong province Chaozhou 5G network",
+      "prefix_count": 2
+    },
+    {
+      "asn": "142404",
+      "description": "CHINANET-AS-AP China Telecom",
+      "prefix_count": 2
+    },
+    {
+      "asn": "139721",
+      "description": "CHINATELECOM-ANHUI-HEFEI-MAN HeFei",
+      "prefix_count": 1
+    },
+    {
+      "asn": "140056",
+      "description": "CHINANET-MAOMING-AS-AP China Telecom",
+      "prefix_count": 1
+    },
+    {
+      "asn": "140852",
+      "description": "CHINATELECOM-JIANGXI-SHENGJI-5G-NETWORK CHINATELECOM Jiangxi province Shengji 5G network",
+      "prefix_count": 1
+    },
+    {
+      "asn": "140853",
+      "description": "CHINATELECOM-JIANGXI-NANCHANG-5G-NETWORK CHINATELECOM Jiangxi province Nanchang 5G network",
+      "prefix_count": 1
+    },
+    {
+      "asn": "140854",
+      "description": "CHINATELECOM-JIANGXI-JIUJIANG-5G-NETWORK CHINATELECOM Jiangxi province Jiujiang 5G network",
+      "prefix_count": 1
+    },
+    {
+      "asn": "140855",
+      "description": "CHINATELECOM-JIANGXI-JINGDEZHEN-5G-NETWORK CHINATELECOM Jiangxi province Jingdezhen 5G network",
+      "prefix_count": 1
+    },
+    {
+      "asn": "140856",
+      "description": "CHINATELECOM-JIANGXI-SHANGRAO-5G-NETWORK CHINATELECOM Jiangxi province Shangrao 5G network",
+      "prefix_count": 1
+    },
+    {
+      "asn": "140857",
+      "description": "CHINATELECOM-JIANGXI-YINGTAN-5G-NETWORK CHINATELECOM Jiangxi province yingtan 5G network",
+      "prefix_count": 1
+    },
+    {
+      "asn": "140858",
+      "description": "CHINATELECOM-JIANGXI-YICHUN-5G-NETWORK CHINATELECOM Jiangxi province Yichun 5G network",
+      "prefix_count": 1
+    },
+    {
+      "asn": "140859",
+      "description": "CHINATELECOM-JIANGXI-PINGXIANG-5G-NETWORK CHINATELECOM Jiangxi province Pingxiang 5G network",
+      "prefix_count": 1
+    },
+    {
+      "asn": "140860",
+      "description": "CHINATELECOM-JIANGXI-XINYU-5G-NETWORK CHINATELECOM Jiangxi province Xinyu 5G network",
+      "prefix_count": 1
+    },
+    {
+      "asn": "140861",
+      "description": "CHINATELECOM-JIANGXI-GANZHOU-5G-NETWORK CHINATELECOM Jiangxi province Ganzhou 5G network",
+      "prefix_count": 1
+    },
+    {
+      "asn": "140862",
+      "description": "CHINATELECOM-JIANGXI-JIAN-5G-NETWORK CHINATELECOM Jiangxi province Jian 5G network",
+      "prefix_count": 1
+    },
+    {
+      "asn": "140863",
+      "description": "CHINATELECOM-JIANGXI-FUZHOU-5G-NETWORK CHINATELECOM Jiangxi province Fuzhou 5G network",
+      "prefix_count": 1
+    },
+    {
+      "asn": "141006",
+      "description": "CT-NEIMENGGU-WULANCHABU-MAN China Telecom",
+      "prefix_count": 1
+    },
+    {
+      "asn": "4813",
+      "description": "BACKBONE-GUANGDONG-AP China TelecomGroup",
+      "prefix_count": 1
+    },
+    {
+      "asn": "58571",
+      "description": "CHINATELECOM-GUIZHOU CHINANET Guizhou province network",
+      "prefix_count": 1
+    },
+    {
+      "asn": "59265",
+      "description": "CT-CNGI China telecom ACAEURA China Next Generation Internet",
+      "prefix_count": 1
+    }
+  ]
+}
