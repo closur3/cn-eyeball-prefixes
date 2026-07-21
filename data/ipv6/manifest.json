@@ -1,0 +1,38 @@
+{
+  "generated_at": "2026-07-21T21:23:20.447494995Z",
+  "sources": {
+    "apnic_inet6num": {
+      "source": "https://ftp.apnic.net/apnic/whois/apnic.db.inet6num.gz",
+      "bytes": 3381255,
+      "sha256": "021e710f96dd46604f870a515a5aca28b6bb9205aad65420a1976ead51c704c0"
+    },
+    "iptoasn_ipv6": {
+      "source": "https://iptoasn.com/data/ip2asn-v6.tsv.gz",
+      "bytes": 1975215,
+      "sha256": "95aafeb0d0a8862a4f03b3bfdbfc29a825e548afc70d1ca98a479733fe804de9"
+    },
+    "riswhois_ipv6": {
+      "source": "https://www.ris.ripe.net/dumps/riswhoisdump.IPv6.gz",
+      "bytes": 1264413,
+      "sha256": "79a5c1ea01ba36196c2513bf349a05c52796365ed7168aac795be24f519a39c9"
+    }
+  },
+  "telecom_boundary": "240e::/18",
+  "output_unit": "exact_current_bgp_prefix",
+  "outputs": {
+    "fixed_broadband": {
+      "path": "data/ipv6/operators/chinanet-fixed.txt",
+      "prefix_count": 965,
+      "description": "Chinatelecom IPv6 address for fixed broadband"
+    },
+    "mobile": {
+      "path": "data/ipv6/operators/chinanet-mobile.txt",
+      "prefix_count": 1440,
+      "description": "Chinatelecom IPv6 address for mobile"
+    }
+  },
+  "rejected_bgp_prefixes": {
+    "description_not_admitted": 2891,
+    "non_telecom_origin": 88
+  }
+}
