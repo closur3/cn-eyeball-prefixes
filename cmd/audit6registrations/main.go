@@ -57,6 +57,9 @@ type registrationFact struct {
 	Status            string   `json:"status,omitempty"`
 	MatchedBy         string   `json:"matched_by,omitempty"`
 	Reason            string   `json:"reason,omitempty"`
+	FirstPassDecision string   `json:"first_pass_decision"`
+	FirstPassReason   string   `json:"first_pass_reason"`
+	ExplicitUserPurpose bool   `json:"explicit_user_purpose,omitempty"`
 	Space             spaceStat `json:"space"`
 	count             *big.Int
 }
@@ -138,14 +141,20 @@ func main() {
 		for _, hit := range intersectSegments(segments, origin.Range) {
 			coveredByOperator[origin.Operator] = append(coveredByOperator[origin.Operator], hit.Range)
 			category, matchedBy, reason := classifyRegistration(hit.Record, origin.Operator, classifier)
+			excluded, firstPassReason := firstPassDecision(category, hit.Record)
+			explicitUser := isExplicitUserPurpose(hit.Record)
+			decision := "retain"
+			if excluded {
+				decision = "exclude"
+			}
 			if categoryRanges[origin.Operator] == nil {
 				categoryRanges[origin.Operator] = map[string][]ipset6.Range{}
 			}
 			categoryRanges[origin.Operator][category] = append(categoryRanges[origin.Operator][category], hit.Range)
-			if excludeFirstPass(category, hit.Record) {
+			if excluded {
 				firstPassExcluded[origin.Operator] = append(firstPassExcluded[origin.Operator], hit.Range)
 			}
-			if isExplicitUserPurpose(hit.Record) {
+			if explicitUser {
 				explicitUserPurpose[origin.Operator] = append(explicitUserPurpose[origin.Operator], hit.Range)
 			}
 			lengthKey := origin.Operator + "/" + category
@@ -160,7 +169,9 @@ func main() {
 					Operator: origin.Operator, Category: category, RegistryPrefix: hit.Record.Prefix.String(), RegistryPrefixLen: hit.Record.Prefix.Bits(),
 					Netnames: hit.Record.Netnames, Descriptions: hit.Record.Descriptions, Organizations: hit.Record.Organizations,
 					OrganizationNames: hit.Record.OrganizationNames, Maintainers: hit.Record.Maintainers, Country: hit.Record.Country,
-					Status: hit.Record.Status, MatchedBy: matchedBy, Reason: reason, count: new(big.Int),
+					Status: hit.Record.Status, MatchedBy: matchedBy, Reason: reason,
+					FirstPassDecision: decision,
+					FirstPassReason: firstPassReason, ExplicitUserPurpose: explicitUser, count: new(big.Int),
 				}
 				facts[key] = fact
 			}
@@ -260,17 +271,24 @@ func classifyRegistration(record apnic6.InetRecord, operator string, classifier 
 	return "other_or_unclassified", "", "Most-specific APNIC registration has no current strong operator or non-public classification"
 }
 
-func excludeFirstPass(category string, record apnic6.InetRecord) bool {
+func firstPassDecision(category string, record apnic6.InetRecord) (bool, string) {
 	if record.Country != "" && !strings.EqualFold(record.Country, "CN") {
-		return true
+		return true, "Exclude: most-specific APNIC registration is outside mainland China"
 	}
 	switch category {
-	case "strong_non_public", "other_operator", "independent_legal_entity":
-		return true
+	case "strong_non_public":
+		return true, "Exclude: APNIC registration contains an explicit non-user-side purpose"
+	case "other_operator":
+		return true, "Exclude: most-specific APNIC registration belongs to another operator"
+	case "independent_legal_entity":
+		return true, "Exclude: most-specific APNIC registration names an independent legal entity"
 	case "other_or_unclassified":
-		return strings.Contains(strings.ToUpper(record.Status), "PORTABLE")
+		if strings.Contains(strings.ToUpper(record.Status), "PORTABLE") {
+			return true, "Exclude: portable resource cannot be attributed to the current operator"
+		}
+		return false, "Retain: non-portable assignment under the current three-operator Origin"
 	default:
-		return false
+		return false, "Retain: most-specific APNIC registration is attributed to the current operator"
 	}
 }
 
@@ -425,6 +443,16 @@ func renderMarkdown(r report) string {
 		fmt.Fprintf(&b, "| %s | %d | %s | %d | %s | %s |\n", row.Operator, row.FirstPassRetained.CIDRCount, row.FirstPassRetained.PercentOfOperator, row.FirstPassExcluded.CIDRCount, row.FirstPassExcluded.PercentOfOperator, row.ExplicitUserPurpose.PercentOfOperator)
 	}
 
+	renderFactSamples(&b, "明确用户侧正证据样本", r.RegistrationFacts, 100, func(fact registrationFact) bool {
+		return fact.FirstPassDecision == "retain" && fact.ExplicitUserPurpose
+	})
+	renderFactSamples(&b, "保留但只有泛化运营商证据的样本", r.RegistrationFacts, 30, func(fact registrationFact) bool {
+		return fact.FirstPassDecision == "retain" && !fact.ExplicitUserPurpose
+	})
+	renderFactSamples(&b, "首轮排除样本", r.RegistrationFacts, 30, func(fact registrationFact) bool {
+		return fact.FirstPassDecision == "exclude"
+	})
+
 	fmt.Fprintln(&b, "\n## 最具体 inet6num 分类")
 	fmt.Fprintln(&b)
 	fmt.Fprintln(&b, "| 运营商 | 分类 | CIDR | /64 等价数 | 占运营商候选 |")
@@ -458,6 +486,27 @@ func renderMarkdown(r report) string {
 		}
 	}
 	return b.String()
+}
+
+func renderFactSamples(b *strings.Builder, title string, facts []registrationFact, limit int, include func(registrationFact) bool) {
+	fmt.Fprintf(b, "\n## %s\n\n", title)
+	fmt.Fprintln(b, "| 运营商 | APNIC 前缀 | 占运营商候选 | netname / description / org | status | 首轮处理依据 |")
+	fmt.Fprintln(b, "| --- | --- | ---: | --- | --- | --- |")
+	shown := 0
+	for _, fact := range facts {
+		if !include(fact) || shown >= limit {
+			continue
+		}
+		labelParts := append([]string{}, fact.Netnames...)
+		labelParts = append(labelParts, fact.Descriptions...)
+		labelParts = append(labelParts, fact.OrganizationNames...)
+		label := strings.ReplaceAll(strings.Join(labelParts, "; "), "|", "\\|")
+		fmt.Fprintf(b, "| %s | `%s` | %s | %s | %s | %s |\n", fact.Operator, fact.RegistryPrefix, fact.Space.PercentOfOperator, label, fact.Status, fact.FirstPassReason)
+		shown++
+	}
+	if shown == 0 {
+		fmt.Fprintln(b, "| — | — | — | 无 | — | — |")
+	}
 }
 
 func must(err error) {
