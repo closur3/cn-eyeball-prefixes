@@ -77,8 +77,10 @@ type report struct {
 	APNICDelegatedSpace   map[string]spaceStat         `json:"apnic_delegated_space"`
 	OperatorCoverage      []operatorCoverage           `json:"operator_coverage"`
 	TopOrigins            []originStat                 `json:"top_origins"`
+	NonCNOrigins          []originStat                 `json:"non_cn_origins"`
 	AllOriginCount        int                          `json:"all_origin_count"`
-	ForeignOrUnknownSpace spaceStat                    `json:"foreign_or_unknown_space"`
+	ForeignOriginSpace    spaceStat                    `json:"foreign_origin_space"`
+	UnknownCountrySpace   spaceStat                    `json:"unknown_country_space"`
 }
 
 func main() {
@@ -102,13 +104,14 @@ func main() {
 	origins := readIPtoASN(*iptoasnPath)
 	risVisible := readRIS(*risPath)
 	delegated := readDelegated(*delegatedPath)
+	apnicCN := delegated["CN"]
 	total := ipset6.AddressCount(china6)
 
 	visibleRanges := make([]ipset6.Range, 0, len(origins))
 	countryRanges := map[string][]ipset6.Range{}
 	originCounts := map[string]*originStat{}
 	operatorRanges := map[string][]ipset6.Range{}
-	var foreignOrUnknown []ipset6.Range
+	var foreignOrigin, unknownCountry []ipset6.Range
 	for _, record := range origins {
 		if record.ASN == "0" {
 			continue
@@ -118,7 +121,7 @@ func main() {
 		if len(hits) == 0 {
 			result := classifier.Classify(record.ASN, record.Description)
 			if result.Operator != "" && !result.Excluded {
-				operatorRanges[result.Operator] = append(operatorRanges[result.Operator], record.Range)
+				operatorRanges[result.Operator] = append(operatorRanges[result.Operator], intersectOne(apnicCN, record.Range)...)
 			}
 			continue
 		}
@@ -127,8 +130,10 @@ func main() {
 			country = "UNKNOWN"
 		}
 		countryRanges[country] = append(countryRanges[country], hits...)
-		if country != "CN" {
-			foreignOrUnknown = append(foreignOrUnknown, hits...)
+		if country == "UNKNOWN" {
+			unknownCountry = append(unknownCountry, hits...)
+		} else if country != "CN" {
+			foreignOrigin = append(foreignOrigin, hits...)
 		}
 		result := classifier.Classify(record.ASN, record.Description)
 		key := record.ASN + "\x00" + country + "\x00" + record.Description
@@ -139,7 +144,7 @@ func main() {
 		}
 		entry.count.Add(entry.count, ipset6.AddressCount(hits))
 		if result.Operator != "" && !result.Excluded {
-			operatorRanges[result.Operator] = append(operatorRanges[result.Operator], record.Range)
+			operatorRanges[result.Operator] = append(operatorRanges[result.Operator], intersectOne(apnicCN, record.Range)...)
 		}
 	}
 
@@ -159,6 +164,12 @@ func main() {
 	topOrigins := allOrigins
 	if len(topOrigins) > 50 {
 		topOrigins = topOrigins[:50]
+	}
+	var nonCNOrigins []originStat
+	for _, entry := range allOrigins {
+		if entry.Country != "CN" && entry.Country != "UNKNOWN" {
+			nonCNOrigins = append(nonCNOrigins, entry)
+		}
 	}
 
 	countryStats := map[string]spaceStat{}
@@ -201,8 +212,10 @@ func main() {
 		APNICDelegatedSpace:   delegatedStats,
 		OperatorCoverage:      operatorCoverageRows,
 		TopOrigins:            topOrigins,
+		NonCNOrigins:          nonCNOrigins,
 		AllOriginCount:        len(allOrigins),
-		ForeignOrUnknownSpace: makeStat(foreignOrUnknown, total, 30),
+		ForeignOriginSpace:    makeStat(foreignOrigin, total, 30),
+		UnknownCountrySpace:   makeStat(unknownCountry, total, 30),
 	}
 	for name, path := range map[string]string{"china6": *china6Path, "iptoasn_v6": *iptoasnPath, "apnic_delegated": *delegatedPath, "riswhois_ipv6": *risPath, "operator_config": *configPath} {
 		meta, err := fileMeta(path)
@@ -265,11 +278,14 @@ func readRIS(path string) []ipset6.Range {
 	var out []ipset6.Range
 	for scanner.Scan() {
 		line := strings.TrimSpace(scanner.Text())
-		if !strings.HasPrefix(line, "route6:") && !strings.HasPrefix(line, "route:") {
+		if line == "" || strings.HasPrefix(line, "%") || strings.HasPrefix(line, "#") {
 			continue
 		}
-		value := strings.TrimSpace(strings.SplitN(line, ":", 2)[1])
-		prefix, err := netip.ParsePrefix(value)
+		fields := strings.Fields(line)
+		if len(fields) != 3 {
+			continue
+		}
+		prefix, err := netip.ParsePrefix(fields[1])
 		if err != nil || !prefix.Addr().Is6() || prefix.Addr().Is4In6() {
 			continue
 		}
@@ -411,7 +427,8 @@ func renderMarkdown(r report) string {
 	markdownStatRow(&b, "IPtoASN 未覆盖", r.NotIPtoASNVisible)
 	markdownStatRow(&b, "RIS 当前可见", r.RISVisibleChina6)
 	markdownStatRow(&b, "RIS 未观测", r.NotRISVisible)
-	markdownStatRow(&b, "IPtoASN 非 CN/未知", r.ForeignOrUnknownSpace)
+	markdownStatRow(&b, "IPtoASN 明确非 CN Origin", r.ForeignOriginSpace)
+	markdownStatRow(&b, "IPtoASN 国家未知", r.UnknownCountrySpace)
 	fmt.Fprintln(&b)
 	fmt.Fprintf(&b, "原始 CIDR：**%d**；规范化后 CIDR：**%d**。\n", r.InputCIDRCount, r.CanonicalChina6.CIDRCount)
 
@@ -431,7 +448,7 @@ func renderMarkdown(r report) string {
 		markdownStatRow(&b, key, r.APNICDelegatedSpace[key])
 	}
 
-	fmt.Fprintln(&b, "\n## 三网当前 Origin 对 china6 的覆盖")
+	fmt.Fprintln(&b, "\n## APNIC 登记 CN 的三网当前 Origin 对 china6 的覆盖")
 	fmt.Fprintln(&b)
 	fmt.Fprintln(&b, "| 运营商 | 当前 Origin CIDR | 已在 china6 | china6 外 | china6 外 /64 等价数 |")
 	fmt.Fprintln(&b, "| --- | ---: | ---: | ---: | ---: |")
@@ -457,9 +474,18 @@ func renderMarkdown(r report) string {
 		fmt.Fprintf(&b, "| AS%s | %s | %s | %s | %s | %s |\n", row.ASN, row.Country, operator, row.Slash64Equivalent, row.PercentOfChina6, strings.ReplaceAll(row.Description, "|", "\\|"))
 	}
 
+	fmt.Fprintln(&b, "\n## china6 内明确非 CN Origin")
+	fmt.Fprintln(&b)
+	fmt.Fprintln(&b, "| ASN | 国家/地区 | /64 等价数 | 占比 | 描述 |")
+	fmt.Fprintln(&b, "| --- | --- | ---: | ---: | --- |")
+	for _, row := range r.NonCNOrigins {
+		fmt.Fprintf(&b, "| AS%s | %s | %s | %s | %s |\n", row.ASN, row.Country, row.Slash64Equivalent, row.PercentOfChina6, strings.ReplaceAll(row.Description, "|", "\\|"))
+	}
+
 	appendSamples(&b, "IPtoASN 未覆盖样本", r.NotIPtoASNVisible.Samples)
 	appendSamples(&b, "RIS 未观测样本", r.NotRISVisible.Samples)
-	appendSamples(&b, "非 CN/未知样本", r.ForeignOrUnknownSpace.Samples)
+	appendSamples(&b, "明确非 CN Origin 样本", r.ForeignOriginSpace.Samples)
+	appendSamples(&b, "IPtoASN 国家未知样本", r.UnknownCountrySpace.Samples)
 	return b.String()
 }
 
