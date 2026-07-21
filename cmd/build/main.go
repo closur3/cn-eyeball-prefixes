@@ -93,9 +93,16 @@ type operatorAdmissionMeta struct {
 	Mode                      string  `json:"mode"`
 	PreCIDRCount              int     `json:"pre_cidr_count"`
 	DeniedCIDRCount           int     `json:"denied_cidr_count"`
+	HierarchicalCIDRCount     int     `json:"hierarchical_cidr_count"`
+	ConflictHealedCIDRCount   int     `json:"conflict_healed_cidr_count"`
+	ConflictHealedAddressCount uint64 `json:"conflict_healed_address_count"`
 	FinalCIDRCount            int     `json:"final_cidr_count"`
 	CIDRExpansionRatio        float64 `json:"cidr_expansion_ratio"`
 	MaximumCIDRExpansionRatio float64 `json:"maximum_cidr_expansion_ratio"`
+	HybridCIDRRatio           float64 `json:"hybrid_cidr_ratio"`
+	MaximumHybridCIDRRatio    float64 `json:"maximum_hybrid_cidr_ratio"`
+	HybridAddedAddressRatio   float64 `json:"hybrid_added_address_ratio"`
+	MaximumHybridAddedAddressRatio float64 `json:"maximum_hybrid_added_address_ratio"`
 }
 
 type auditMeta struct {
@@ -270,6 +277,8 @@ type province struct {
 var operators = []string{"chinanet", "cmcc", "unicom"}
 
 const maxAdmissionCIDRExpansionRatio = 2.0
+const maxHybridCIDRRatio = 1.10
+const maxHybridAddedAddressRatio = 0.001
 var cloudSources = []string{
 	"ipdata_aliyun", "ipdata_tencent", "ipdata_huawei", "ipdata_ucloud", "ipdata_ksyun", "ipdata_baidu", "ipdata_jdcloud",
 }
@@ -1024,6 +1033,15 @@ func bgpPrefixAdmissionTrials(segments []riswhois.Segment, asnOperators map[stri
 	return out
 }
 
+func hybridAdmissionByOperator(hierarchicalByOperator map[string][]span, coveringRelaxed []span, eligibleByOperator map[string][]span) map[string][]span {
+	out := map[string][]span{}
+	for _, operator := range operators {
+		healed := intersect(coveringRelaxed, eligibleByOperator[operator])
+		out[operator] = merge(append(append([]span{}, hierarchicalByOperator[operator]...), healed...))
+	}
+	return out
+}
+
 func auditRegistrant(registry *apnicaudit.Registry) string {
 	if registry == nil {
 		return "(no APNIC registration)"
@@ -1065,7 +1083,7 @@ func buildRelaxedAddedAudit(cidrs []string, operatorRanges map[string][]apnicaud
 	}
 	report.Notes = []string{
 		"Every added address has a current China Telecom, China Mobile, or China Unicom RIS origin and has already passed all enforced cloud, APNIC-purpose, independent-holder, route-origin, and strong MOAS exclusions.",
-		"These addresses are absent from the current dev output because APNIC does not provide the same positive parent-admission result, or because the most-specific registration names another operator.",
+		"These addresses are absent from the current hybrid dev output because APNIC does not provide a covering positive registration for the same operator; internal three-operator registration conflicts with such a parent are already healed by the formal hybrid policy.",
 		"The report maps every added address to the most-specific APNIC inetnum object so the cost of removing APNIC positive admission can be reviewed as data rather than inferred from CIDR counts.",
 	}
 	return report, nil
@@ -1413,37 +1431,81 @@ func main() {
 	operatorAdmissionRanges := apnicOperatorAdmissionRanges(apnicRecords, classifier)
 	operatorConflictRanges := apnicOperatorConflictRanges(apnicAllSegments, classifier)
 	preAdmissionByOperator := map[string][]span{}
+	hierarchicalByOperator := map[string][]span{}
 	admissionDeniedByOperator := map[string][]span{}
-	var preAdmissionRanges, admissionDeniedRanges []span
+	var preAdmissionRanges []span
 	for _, o := range operators {
 		preAdmissionByOperator[o] = subtract(preCloudByOperator[o], excludedRanges)
 		parentAdmitted := intersect(preAdmissionByOperator[o], operatorAdmissionRanges[o])
-		ranges[o] = subtract(parentAdmitted, operatorConflictRanges[o])
-		admissionDeniedByOperator[o] = subtract(preAdmissionByOperator[o], ranges[o])
+		hierarchicalByOperator[o] = subtract(parentAdmitted, operatorConflictRanges[o])
 		preAdmissionRanges = append(preAdmissionRanges, preAdmissionByOperator[o]...)
-		admissionDeniedRanges = append(admissionDeniedRanges, admissionDeniedByOperator[o]...)
 	}
 	preAdmissionRanges = merge(preAdmissionRanges)
-	admissionDeniedRanges = merge(admissionDeniedRanges)
 	asnOperators := map[string]string{}
 	for asn, record := range includedASNRecords {
 		asnOperators[asn] = record.meta.Operator
 	}
 	leafAdmissionRanges := apnicOperatorLeafAdmissionRanges(apnicAllSegments, classifier)
-	bgpAdmissionTrials := bgpPrefixAdmissionTrials(risSegments, asnOperators, preCloudByOperator, preAdmissionByOperator, ranges, operatorAdmissionRanges, leafAdmissionRanges, operatorConflictRanges)
-	includedASNs := includedASNList(includedASNRecords, chinaRanges, excludedRanges, ranges)
-	var finalRanges []span
+	bgpAdmissionTrials := bgpPrefixAdmissionTrials(risSegments, asnOperators, preCloudByOperator, preAdmissionByOperator, hierarchicalByOperator, operatorAdmissionRanges, leafAdmissionRanges, operatorConflictRanges)
+	var hierarchicalRanges []span
 	for _, operator := range operators {
+		hierarchicalRanges = append(hierarchicalRanges, hierarchicalByOperator[operator]...)
+	}
+	hierarchicalRanges = merge(hierarchicalRanges)
+	ranges = hybridAdmissionByOperator(hierarchicalByOperator, bgpAdmissionTrials["covering_relaxed"], preAdmissionByOperator)
+	var finalRanges, admissionDeniedRanges, assignedRanges []span
+	for _, operator := range operators {
+		if len(intersect(ranges[operator], merge(assignedRanges))) != 0 {
+			panic("hybrid per-operator address sets overlap")
+		}
+		assignedRanges = append(assignedRanges, ranges[operator]...)
 		finalRanges = append(finalRanges, ranges[operator]...)
+		admissionDeniedByOperator[operator] = subtract(preAdmissionByOperator[operator], ranges[operator])
+		admissionDeniedRanges = append(admissionDeniedRanges, admissionDeniedByOperator[operator]...)
 	}
 	finalRanges = merge(finalRanges)
-	bgpAdmissionTrials["hybrid"] = merge(append(append([]span{}, finalRanges...), bgpAdmissionTrials["covering_relaxed"]...))
+	admissionDeniedRanges = merge(admissionDeniedRanges)
+	bgpAdmissionTrials["hybrid"] = finalRanges
+	bgpHybridAdded := subtract(finalRanges, hierarchicalRanges)
+	bgpHybridRemoved := subtract(hierarchicalRanges, finalRanges)
+	if len(bgpHybridRemoved) != 0 {
+		panic("hybrid admission removes addresses from the hierarchical baseline")
+	}
+	if len(subtract(bgpHybridAdded, preAdmissionRanges)) != 0 {
+		panic("hybrid admission adds addresses without a current three-operator origin or after a strong exclusion")
+	}
+	if len(subtract(bgpHybridAdded, bgpAdmissionTrials["observed"])) != 0 {
+		panic("hybrid admission adds addresses without a current RIS-observed three-operator origin")
+	}
+	if len(subtract(bgpHybridAdded, bgpAdmissionTrials["covering_relaxed"])) != 0 {
+		panic("hybrid admission adds addresses outside a same-operator APNIC parent")
+	}
+	var allOperatorConflicts []span
+	for _, operator := range operators {
+		allOperatorConflicts = append(allOperatorConflicts, operatorConflictRanges[operator]...)
+	}
+	if len(subtract(bgpHybridAdded, merge(allOperatorConflicts))) != 0 {
+		panic("hybrid admission adds addresses outside three-operator registration conflicts")
+	}
+	if len(intersect(finalRanges, excludedRanges)) != 0 {
+		panic("hybrid admission overlaps an enforced strong exclusion")
+	}
+	includedASNs := includedASNList(includedASNRecords, chinaRanges, excludedRanges, ranges)
 	preAdmissionCIDRCount := len(spanCIDRs(preAdmissionRanges))
+	hierarchicalCIDRCount := len(spanCIDRs(hierarchicalRanges))
 	finalCIDRCount := len(spanCIDRs(finalRanges))
 	if finalCIDRCount > preAdmissionCIDRCount*2 {
 		panic(fmt.Sprintf("operator parent-registration admission expands ACL from %d to %d CIDRs, exceeding the 2.0x limit", preAdmissionCIDRCount, finalCIDRCount))
 	}
 	admissionExpansionRatio := float64(finalCIDRCount) / float64(preAdmissionCIDRCount)
+	hybridCIDRRatio := float64(finalCIDRCount) / float64(hierarchicalCIDRCount)
+	hybridAddedAddressRatio := float64(addressCount(bgpHybridAdded)) / float64(addressCount(hierarchicalRanges))
+	if hybridCIDRRatio > maxHybridCIDRRatio {
+		panic(fmt.Sprintf("hybrid admission expands ACL from %d to %d CIDRs, exceeding the %.2fx limit", hierarchicalCIDRCount, finalCIDRCount, maxHybridCIDRRatio))
+	}
+	if hybridAddedAddressRatio > maxHybridAddedAddressRatio {
+		panic(fmt.Sprintf("hybrid admission adds %.6f of hierarchical addresses, exceeding the %.6f limit", hybridAddedAddressRatio, maxHybridAddedAddressRatio))
+	}
 	if addressCount(finalRanges) < 100000000 {
 		panic("final output contains fewer than 100,000,000 IPv4 addresses")
 	}
@@ -1483,16 +1545,18 @@ func main() {
 	zhejiangProvinceRanges := merge(provinceSourceRanges["浙江省"])
 	zhejiangPreAdmissionByOperator := map[string][]span{}
 	zhejiangPreAdmissionOperatorRanges := map[string][]apnicaudit.Range{}
-	var zhejiangPreAdmissionRows, zhejiangRows []span
+	var zhejiangPreAdmissionRows, zhejiangHierarchicalRows, zhejiangRows []span
 	for _, operator := range operators {
 		zhejiangPreAdmissionByOperator[operator] = intersect(preAdmissionByOperator[operator], zhejiangProvinceRanges)
 		for _, row := range zhejiangPreAdmissionByOperator[operator] {
 			zhejiangPreAdmissionOperatorRanges[operator] = append(zhejiangPreAdmissionOperatorRanges[operator], apnicaudit.Range{Lo: row.lo, Hi: row.hi})
 		}
 		zhejiangPreAdmissionRows = append(zhejiangPreAdmissionRows, zhejiangPreAdmissionByOperator[operator]...)
+		zhejiangHierarchicalRows = append(zhejiangHierarchicalRows, intersect(hierarchicalByOperator[operator], zhejiangProvinceRanges)...)
 		zhejiangRows = append(zhejiangRows, by[operator]["浙江省"]...)
 	}
 	zhejiangPreAdmissionRows = merge(zhejiangPreAdmissionRows)
+	zhejiangHierarchicalRows = merge(zhejiangHierarchicalRows)
 	zhejiangRows = merge(zhejiangRows)
 	zhejiangBGPAdmissionTrials := map[string][]span{}
 	for _, policy := range []string{"observed", "no_ris", "conflict", "no_parent", "covering", "covering_carved", "covering_relaxed", "hybrid", "relaxed", "any", "majority", "full"} {
@@ -1502,14 +1566,14 @@ func main() {
 	bgpRelaxedRemoved := subtract(finalRanges, bgpAdmissionTrials["relaxed"])
 	bgpCoveringRelaxedAdded := subtract(bgpAdmissionTrials["covering_relaxed"], finalRanges)
 	bgpCoveringRelaxedRemoved := subtract(finalRanges, bgpAdmissionTrials["covering_relaxed"])
-	bgpHybridAdded := subtract(bgpAdmissionTrials["hybrid"], finalRanges)
-	bgpHybridRemoved := subtract(finalRanges, bgpAdmissionTrials["hybrid"])
+	// Hybrid deltas remain relative to the former hierarchical baseline so the
+	// exact best-effort trade-off stays visible after hybrid becomes formal.
 	zhejiangBGPRelaxedAdded := subtract(zhejiangBGPAdmissionTrials["relaxed"], zhejiangRows)
 	zhejiangBGPRelaxedRemoved := subtract(zhejiangRows, zhejiangBGPAdmissionTrials["relaxed"])
 	zhejiangBGPCoveringRelaxedAdded := subtract(zhejiangBGPAdmissionTrials["covering_relaxed"], zhejiangRows)
 	zhejiangBGPCoveringRelaxedRemoved := subtract(zhejiangRows, zhejiangBGPAdmissionTrials["covering_relaxed"])
-	zhejiangBGPHybridAdded := subtract(zhejiangBGPAdmissionTrials["hybrid"], zhejiangRows)
-	zhejiangBGPHybridRemoved := subtract(zhejiangRows, zhejiangBGPAdmissionTrials["hybrid"])
+	zhejiangBGPHybridAdded := subtract(zhejiangBGPAdmissionTrials["hybrid"], zhejiangHierarchicalRows)
+	zhejiangBGPHybridRemoved := subtract(zhejiangHierarchicalRows, zhejiangBGPAdmissionTrials["hybrid"])
 	zhejiangPreAdmissionAudit, e := apnicaudit.Build("浙江省 pre-admission IPv4 APNIC registration audit", spanCIDRs(zhejiangPreAdmissionRows), zhejiangPreAdmissionOperatorRanges, apnicAllSegments, classifier)
 	if e != nil {
 		panic(e)
@@ -1535,8 +1599,8 @@ func main() {
 
 	m := manifest{
 		GeneratedAt: time.Now().UTC().Format(time.RFC3339Nano),
-		Scope:       "IPv4; mainland China; nationwide admission requires both a China Telecom, China Mobile, or China Unicom current BGP origin and a covering APNIC inetnum registration attributable to the same operator; most-specific registrations are used for strong exclusions and operator-conflict denials, not as a mandatory leaf-level admission boundary; dedicated premium backbone ASNs, cloud-provider CIDRs, strong APNIC registrations outside ordinary user access scope, independent holders and route origins, and strong RIPE RIS MOAS evidence are excluded",
-		OperatorAdmission: operatorAdmissionMeta{Mode: "covering_operator_registration_with_strong_leaf_exclusions", PreCIDRCount: preAdmissionCIDRCount, DeniedCIDRCount: len(spanCIDRs(admissionDeniedRanges)), FinalCIDRCount: finalCIDRCount, CIDRExpansionRatio: admissionExpansionRatio, MaximumCIDRExpansionRatio: maxAdmissionCIDRExpansionRatio},
+		Scope:       "IPv4; mainland China; current China Telecom, China Mobile, or China Unicom BGP origin plus a covering same-operator APNIC registration; current three-operator BGP units heal internal operator-registration conflict holes after all strong exclusions; small ambiguous customer-use fragments are accepted as best-effort error to keep the ACL deployably compact; dedicated premium backbone ASNs, cloud-provider CIDRs, strong APNIC registrations outside ordinary user access scope, independent holders and route origins, and strong RIPE RIS MOAS evidence are excluded",
+		OperatorAdmission: operatorAdmissionMeta{Mode: "hybrid_bgp_conflict_healing_with_strong_exclusions", PreCIDRCount: preAdmissionCIDRCount, DeniedCIDRCount: len(spanCIDRs(admissionDeniedRanges)), HierarchicalCIDRCount: hierarchicalCIDRCount, ConflictHealedCIDRCount: len(spanCIDRs(bgpHybridAdded)), ConflictHealedAddressCount: addressCount(bgpHybridAdded), FinalCIDRCount: finalCIDRCount, CIDRExpansionRatio: admissionExpansionRatio, MaximumCIDRExpansionRatio: maxAdmissionCIDRExpansionRatio, HybridCIDRRatio: hybridCIDRRatio, MaximumHybridCIDRRatio: maxHybridCIDRRatio, HybridAddedAddressRatio: hybridAddedAddressRatio, MaximumHybridAddedAddressRatio: maxHybridAddedAddressRatio},
 		Stages: []stageMeta{
 			stage("operator_origin_candidates", originCandidates),
 			stage("china_origin_intersection", preCloudCandidates),
@@ -1549,8 +1613,10 @@ func main() {
 			stage("effective_apnic_independent_route_origin_exclusions", routeOriginCandidateRanges),
 			stage("effective_ris_moas_exclusions", risRanges),
 			stage("pre_operator_parent_registration_admission", preAdmissionRanges),
-			stage("operator_parent_registration_denials", admissionDeniedRanges),
-			stage("operator_parent_registration_admissions", finalRanges),
+			stage("operator_parent_registration_admissions", hierarchicalRanges),
+			stage("hybrid_bgp_conflict_healed_additions", bgpHybridAdded),
+			stage("hybrid_bgp_conflict_healing_admissions", finalRanges),
+			stage("hybrid_admission_denials", admissionDeniedRanges),
 			stage("trial_bgp_prefix_observed_operator_origin", bgpAdmissionTrials["observed"]),
 			stage("trial_bgp_prefix_no_operator_origin", bgpAdmissionTrials["no_ris"]),
 			stage("trial_bgp_prefix_operator_conflict_denial", bgpAdmissionTrials["conflict"]),
@@ -1561,8 +1627,8 @@ func main() {
 			stage("trial_bgp_prefix_covering_parent_relaxed_added_vs_current", bgpCoveringRelaxedAdded),
 			stage("trial_bgp_prefix_covering_parent_relaxed_removed_vs_current", bgpCoveringRelaxedRemoved),
 			stage("trial_bgp_prefix_hybrid_conflict_healing", bgpAdmissionTrials["hybrid"]),
-			stage("trial_bgp_prefix_hybrid_added_vs_current", bgpHybridAdded),
-			stage("trial_bgp_prefix_hybrid_removed_vs_current", bgpHybridRemoved),
+			stage("trial_bgp_prefix_hybrid_added_vs_hierarchical", bgpHybridAdded),
+			stage("trial_bgp_prefix_hybrid_removed_vs_hierarchical", bgpHybridRemoved),
 			stage("trial_bgp_prefix_relaxed_admission", bgpAdmissionTrials["relaxed"]),
 			stage("trial_bgp_prefix_relaxed_added_vs_current", bgpRelaxedAdded),
 			stage("trial_bgp_prefix_relaxed_removed_vs_current", bgpRelaxedRemoved),
@@ -1579,8 +1645,8 @@ func main() {
 			stage("trial_zhejiang_bgp_prefix_covering_parent_relaxed_added_vs_current", zhejiangBGPCoveringRelaxedAdded),
 			stage("trial_zhejiang_bgp_prefix_covering_parent_relaxed_removed_vs_current", zhejiangBGPCoveringRelaxedRemoved),
 			stage("trial_zhejiang_bgp_prefix_hybrid_conflict_healing", zhejiangBGPAdmissionTrials["hybrid"]),
-			stage("trial_zhejiang_bgp_prefix_hybrid_added_vs_current", zhejiangBGPHybridAdded),
-			stage("trial_zhejiang_bgp_prefix_hybrid_removed_vs_current", zhejiangBGPHybridRemoved),
+			stage("trial_zhejiang_bgp_prefix_hybrid_added_vs_hierarchical", zhejiangBGPHybridAdded),
+			stage("trial_zhejiang_bgp_prefix_hybrid_removed_vs_hierarchical", zhejiangBGPHybridRemoved),
 			stage("trial_zhejiang_bgp_prefix_relaxed_admission", zhejiangBGPAdmissionTrials["relaxed"]),
 			stage("trial_zhejiang_bgp_prefix_relaxed_added_vs_current", zhejiangBGPRelaxedAdded),
 			stage("trial_zhejiang_bgp_prefix_relaxed_removed_vs_current", zhejiangBGPRelaxedRemoved),
@@ -1681,10 +1747,10 @@ func main() {
 		{"BGP covering-relaxed delta (nationwide, removed versus current dev)", filepath.Join("experiments", "bgp-prefix-admission", "nationwide-covering_relaxed-removed.txt"), bgpCoveringRelaxedRemoved},
 		{"BGP covering-relaxed delta (Zhejiang, added versus current dev)", filepath.Join("experiments", "bgp-prefix-admission", "zhejiang-covering_relaxed-added.txt"), zhejiangBGPCoveringRelaxedAdded},
 		{"BGP covering-relaxed delta (Zhejiang, removed versus current dev)", filepath.Join("experiments", "bgp-prefix-admission", "zhejiang-covering_relaxed-removed.txt"), zhejiangBGPCoveringRelaxedRemoved},
-		{"BGP hybrid conflict-healing delta (nationwide, added versus current dev)", filepath.Join("experiments", "bgp-prefix-admission", "nationwide-hybrid-added.txt"), bgpHybridAdded},
-		{"BGP hybrid conflict-healing delta (nationwide, removed versus current dev)", filepath.Join("experiments", "bgp-prefix-admission", "nationwide-hybrid-removed.txt"), bgpHybridRemoved},
-		{"BGP hybrid conflict-healing delta (Zhejiang, added versus current dev)", filepath.Join("experiments", "bgp-prefix-admission", "zhejiang-hybrid-added.txt"), zhejiangBGPHybridAdded},
-		{"BGP hybrid conflict-healing delta (Zhejiang, removed versus current dev)", filepath.Join("experiments", "bgp-prefix-admission", "zhejiang-hybrid-removed.txt"), zhejiangBGPHybridRemoved},
+		{"BGP hybrid conflict-healing delta (nationwide, added versus hierarchical baseline)", filepath.Join("experiments", "bgp-prefix-admission", "nationwide-hybrid-added.txt"), bgpHybridAdded},
+		{"BGP hybrid conflict-healing delta (nationwide, removed versus hierarchical baseline)", filepath.Join("experiments", "bgp-prefix-admission", "nationwide-hybrid-removed.txt"), bgpHybridRemoved},
+		{"BGP hybrid conflict-healing delta (Zhejiang, added versus hierarchical baseline)", filepath.Join("experiments", "bgp-prefix-admission", "zhejiang-hybrid-added.txt"), zhejiangBGPHybridAdded},
+		{"BGP hybrid conflict-healing delta (Zhejiang, removed versus hierarchical baseline)", filepath.Join("experiments", "bgp-prefix-admission", "zhejiang-hybrid-removed.txt"), zhejiangBGPHybridRemoved},
 	} {
 		meta, e := write(filepath.Join(*out, trial.path), trial.rows)
 		if e != nil {

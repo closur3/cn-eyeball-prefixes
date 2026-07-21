@@ -105,3 +105,26 @@ func TestRelaxedBGPPrefixAdmissionDoesNotRequireAPNICParent(t *testing.T) {
 		t.Fatalf("covering-relaxed control unexpectedly admitted a route without an APNIC operator parent: %#v", trials["covering_relaxed"])
 	}
 }
+
+func TestHybridAdmissionHealsOnlyEligibleOperatorRanges(t *testing.T) {
+	hierarchical := map[string][]span{
+		"chinanet": {{0, 63}},
+		"cmcc":     {{128, 191}},
+		"unicom":   nil,
+	}
+	eligible := map[string][]span{
+		"chinanet": {{0, 127}},
+		"cmcc":     {{128, 255}},
+		"unicom":   nil,
+	}
+	got := hybridAdmissionByOperator(hierarchical, []span{{64, 223}}, eligible)
+	if len(got["chinanet"]) != 1 || got["chinanet"][0] != (span{0, 127}) {
+		t.Fatalf("chinanet hybrid admission did not heal its eligible conflict hole: %#v", got["chinanet"])
+	}
+	if len(got["cmcc"]) != 1 || got["cmcc"][0] != (span{128, 223}) {
+		t.Fatalf("cmcc hybrid admission escaped its BGP-covered eligible range: %#v", got["cmcc"])
+	}
+	if len(got["unicom"]) != 0 {
+		t.Fatalf("hybrid admission invented an ineligible operator range: %#v", got["unicom"])
+	}
+}
