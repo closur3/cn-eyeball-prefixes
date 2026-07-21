@@ -1,6 +1,6 @@
 {
   "operators": {
-    "chinanet": {
+    "chinatelecom": {
       "description_patterns": [
         "china ?telecom",
         "chinanet"
@@ -9,7 +9,7 @@
         "4847": "China Telecom Beijing provincial network; public description is China Networks Inter-Exchange"
       }
     },
-    "cmcc": {
+    "chinamobile": {
       "description_patterns": [
         "china mobile",
         "cmnet",
@@ -17,7 +17,7 @@
       ],
       "include_asns": {}
     },
-    "unicom": {
+    "chinaunicom": {
       "description_patterns": [
         "unicom",
         "(?:^|[^a-z0-9])cnc(?:group)?(?:[^a-z0-9]|$)"

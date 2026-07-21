@@ -30,7 +30,7 @@ type span struct{ lo, hi uint32 }
 var cloudSources = []string{
 	"ipdata_aliyun", "ipdata_tencent", "ipdata_huawei", "ipdata_ucloud", "ipdata_ksyun", "ipdata_baidu", "ipdata_jdcloud",
 }
-var operators = []string{"chinanet", "cmcc", "unicom"}
+var operators = []string{"chinatelecom", "chinamobile", "chinaunicom"}
 
 const maxAdmissionCIDRExpansionRatio = 2.0
 const maxConflictHealingCIDRRatio = 1.10

@@ -259,7 +259,7 @@ type province struct {
 	Slug string
 }
 
-var operators = []string{"chinanet", "cmcc", "unicom"}
+var operators = []string{"chinatelecom", "chinamobile", "chinaunicom"}
 
 const maxAdmissionCIDRExpansionRatio = 2.0
 const maxConflictHealingCIDRRatio = 1.10
