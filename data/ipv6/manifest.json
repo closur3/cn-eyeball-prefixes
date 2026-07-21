@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-21T21:28:58.051928328Z",
+  "generated_at": "2026-07-21T21:43:50.372661274Z",
   "sources": {
     "apnic_inet6num": {
       "source": "https://ftp.apnic.net/apnic/whois/apnic.db.inet6num.gz",
@@ -8,8 +8,8 @@
     },
     "iptoasn_ipv6": {
       "source": "https://iptoasn.com/data/ip2asn-v6.tsv.gz",
-      "bytes": 1975215,
-      "sha256": "95aafeb0d0a8862a4f03b3bfdbfc29a825e548afc70d1ca98a479733fe804de9"
+      "bytes": 1976298,
+      "sha256": "76b6be06cc17f3bdc87316a4704c95a15af0b236d950c4c80fc31935e86f3dc9"
     },
     "riswhois_ipv6": {
       "source": "https://www.ris.ripe.net/dumps/riswhoisdump.IPv6.gz",
