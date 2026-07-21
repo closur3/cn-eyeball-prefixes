@@ -1,0 +1,2096 @@
+{
+  "generated_at": "2026-07-21T18:38:50.120445381Z",
+  "scope": "Read-only audit of the most-specific APNIC inet6num and same-origin route6 evidence covering current mainland China Telecom, China Mobile, and China Unicom IPv6 origins inside gaoyifan china6.txt; no prefix is admitted or excluded",
+  "inet6num_record_count": 148952,
+  "inet6num_segment_count": 194099,
+  "route6_record_count": 1014144,
+  "operators": [
+    {
+      "operator": "chinanet",
+      "candidate": {
+        "cidr_count": 3090,
+        "address_count": "323172789525289917732164852514816",
+        "slash64_equivalent": "17519232024576.0000",
+        "percent_of_operator": "100.000000%"
+      },
+      "most_specific_registry_covered": {
+        "cidr_count": 3074,
+        "address_count": "323172767764625164668839707803648",
+        "slash64_equivalent": "17519230844928.0000",
+        "percent_of_operator": "99.999993%"
+      },
+      "registry_uncovered": {
+        "cidr_count": 16,
+        "address_count": "21760664753063325144711168",
+        "slash64_equivalent": "1179648.0000",
+        "percent_of_operator": "0.000007%"
+      },
+      "same_origin_route6_covered": {
+        "cidr_count": 6285,
+        "address_count": "315567976375009833718700218253312",
+        "slash64_equivalent": "17106974277632.0000",
+        "percent_of_operator": "97.646828%"
+      },
+      "strong_route_purpose_signal": {
+        "cidr_count": 0,
+        "address_count": "0",
+        "slash64_equivalent": "0.0000",
+        "percent_of_operator": "0.000000%"
+      }
+    },
+    {
+      "operator": "cmcc",
+      "candidate": {
+        "cidr_count": 352,
+        "address_count": "334584315444479511061482107305984",
+        "slash64_equivalent": "18137852084224.0000",
+        "percent_of_operator": "100.000000%"
+      },
+      "most_specific_registry_covered": {
+        "cidr_count": 352,
+        "address_count": "334584315444479511061482107305984",
+        "slash64_equivalent": "18137852084224.0000",
+        "percent_of_operator": "100.000000%"
+      },
+      "registry_uncovered": {
+        "cidr_count": 0,
+        "address_count": "0",
+        "slash64_equivalent": "0.0000",
+        "percent_of_operator": "0.000000%"
+      },
+      "same_origin_route6_covered": {
+        "cidr_count": 0,
+        "address_count": "0",
+        "slash64_equivalent": "0.0000",
+        "percent_of_operator": "0.000000%"
+      },
+      "strong_route_purpose_signal": {
+        "cidr_count": 0,
+        "address_count": "0",
+        "slash64_equivalent": "0.0000",
+        "percent_of_operator": "0.000000%"
+      }
+    },
+    {
+      "operator": "unicom",
+      "candidate": {
+        "cidr_count": 4161,
+        "address_count": "39179495394571282286419424313344",
+        "slash64_equivalent": "2123924701184.0000",
+        "percent_of_operator": "100.000000%"
+      },
+      "most_specific_registry_covered": {
+        "cidr_count": 4161,
+        "address_count": "39179495394571282286419424313344",
+        "slash64_equivalent": "2123924701184.0000",
+        "percent_of_operator": "100.000000%"
+      },
+      "registry_uncovered": {
+        "cidr_count": 0,
+        "address_count": "0",
+        "slash64_equivalent": "0.0000",
+        "percent_of_operator": "0.000000%"
+      },
+      "same_origin_route6_covered": {
+        "cidr_count": 4105,
+        "address_count": "39004164882952572617211787608064",
+        "slash64_equivalent": "2114420015104.0000",
+        "percent_of_operator": "99.552494%"
+      },
+      "strong_route_purpose_signal": {
+        "cidr_count": 0,
+        "address_count": "0",
+        "slash64_equivalent": "0.0000",
+        "percent_of_operator": "0.000000%"
+      }
+    }
+  ],
+  "categories": [
+    {
+      "operator": "chinanet",
+      "category": "same_operator",
+      "space": {
+        "cidr_count": 1338,
+        "address_count": "222730419698018640058831245148160",
+        "slash64_equivalent": "12074240245760.0000",
+        "percent_of_operator": "68.919917%"
+      }
+    },
+    {
+      "operator": "chinanet",
+      "category": "strong_non_public",
+      "space": {
+        "cidr_count": 1708,
+        "address_count": "100227166524270038304685811564544",
+        "slash64_equivalent": "5433325584384.0000",
+        "percent_of_operator": "31.013492%"
+      }
+    },
+    {
+      "operator": "chinanet",
+      "category": "other_operator",
+      "space": {
+        "cidr_count": 0,
+        "address_count": "0",
+        "slash64_equivalent": "0.0000",
+        "percent_of_operator": "0.000000%"
+      }
+    },
+    {
+      "operator": "chinanet",
+      "category": "independent_legal_entity",
+      "space": {
+        "cidr_count": 15,
+        "address_count": "79313996247456976264948088832",
+        "slash64_equivalent": "4299620352.0000",
+        "percent_of_operator": "0.024542%"
+      }
+    },
+    {
+      "operator": "chinanet",
+      "category": "other_or_unclassified",
+      "space": {
+        "cidr_count": 14,
+        "address_count": "135867546089029329057703002112",
+        "slash64_equivalent": "7365394432.0000",
+        "percent_of_operator": "0.042042%"
+      }
+    },
+    {
+      "operator": "cmcc",
+      "category": "same_operator",
+      "space": {
+        "cidr_count": 288,
+        "address_count": "324517405178898092885440049709056",
+        "slash64_equivalent": "17592123785216.0000",
+        "percent_of_operator": "96.991219%"
+      }
+    },
+    {
+      "operator": "cmcc",
+      "category": "strong_non_public",
+      "space": {
+        "cidr_count": 2,
+        "address_count": "79229371440083952222718656512",
+        "slash64_equivalent": "4295032832.0000",
+        "percent_of_operator": "0.023680%"
+      }
+    },
+    {
+      "operator": "cmcc",
+      "category": "other_operator",
+      "space": {
+        "cidr_count": 0,
+        "address_count": "0",
+        "slash64_equivalent": "0.0000",
+        "percent_of_operator": "0.000000%"
+      }
+    },
+    {
+      "operator": "cmcc",
+      "category": "independent_legal_entity",
+      "space": {
+        "cidr_count": 62,
+        "address_count": "9987680894141334223819338940416",
+        "slash64_equivalent": "541433266176.0000",
+        "percent_of_operator": "2.985101%"
+      }
+    },
+    {
+      "operator": "cmcc",
+      "category": "other_or_unclassified",
+      "space": {
+        "cidr_count": 0,
+        "address_count": "0",
+        "slash64_equivalent": "0.0000",
+        "percent_of_operator": "0.000000%"
+      }
+    },
+    {
+      "operator": "unicom",
+      "category": "same_operator",
+      "space": {
+        "cidr_count": 4136,
+        "address_count": "39019994557634606571625390276608",
+        "slash64_equivalent": "2115278143488.0000",
+        "percent_of_operator": "99.592897%"
+      }
+    },
+    {
+      "operator": "unicom",
+      "category": "strong_non_public",
+      "space": {
+        "cidr_count": 0,
+        "address_count": "0",
+        "slash64_equivalent": "0.0000",
+        "percent_of_operator": "0.000000%"
+      }
+    },
+    {
+      "operator": "unicom",
+      "category": "other_operator",
+      "space": {
+        "cidr_count": 0,
+        "address_count": "0",
+        "slash64_equivalent": "0.0000",
+        "percent_of_operator": "0.000000%"
+      }
+    },
+    {
+      "operator": "unicom",
+      "category": "independent_legal_entity",
+      "space": {
+        "cidr_count": 19,
+        "address_count": "1021542317574361652626718720",
+        "slash64_equivalent": "55377920.0000",
+        "percent_of_operator": "0.002607%"
+      }
+    },
+    {
+      "operator": "unicom",
+      "category": "other_or_unclassified",
+      "space": {
+        "cidr_count": 6,
+        "address_count": "158479294619101353141407318016",
+        "slash64_equivalent": "8591179776.0000",
+        "percent_of_operator": "0.404495%"
+      }
+    }
+  ],
+  "registration_facts": [
+    {
+      "operator": "cmcc",
+      "category": "same_operator",
+      "registry_prefix": "2409:8000::/20",
+      "registry_prefix_length": 20,
+      "netnames": [
+        "CMNET-V6-20110823"
+      ],
+      "descriptions": [
+        "China Mobile Communications Corporation",
+        "Mobile Communications Network Operator in China",
+        "Internet Service Provider in China"
+      ],
+      "organizations": [
+        "ORG-CM1-AP"
+      ],
+      "organization_names": [
+        "China Mobile"
+      ],
+      "maintainers": [
+        "APNIC-HM"
+      ],
+      "country": "CN",
+      "status": "ALLOCATED PORTABLE",
+      "matched_by": "description_patterns: china mobile",
+      "reason": "Most-specific APNIC registration is attributed to the current BGP operator",
+      "space": {
+        "cidr_count": 0,
+        "address_count": "324517405178898092885440049709056",
+        "slash64_equivalent": "17592123785216.0000",
+        "percent_of_operator": "96.991219%"
+      }
+    },
+    {
+      "operator": "chinanet",
+      "category": "same_operator",
+      "registry_prefix": "240e::/18",
+      "registry_prefix_length": 18,
+      "netnames": [
+        "CT-IPv6-Networks"
+      ],
+      "descriptions": [
+        "Chinatelecom networks with tens of high-end routers and switches",
+        "Including users who access to Internet through Chinatelecom's networks."
+      ],
+      "organizations": [
+        "ORG-CT1-AP"
+      ],
+      "organization_names": [
+        "China Telecom"
+      ],
+      "maintainers": [
+        "APNIC-HM"
+      ],
+      "country": "CN",
+      "status": "ALLOCATED PORTABLE",
+      "matched_by": "description_patterns: china ?telecom",
+      "reason": "Most-specific APNIC registration is attributed to the current BGP operator",
+      "space": {
+        "cidr_count": 0,
+        "address_count": "100756633720857559371186001936384",
+        "slash64_equivalent": "5462028058624.0000",
+        "percent_of_operator": "31.177326%"
+      }
+    },
+    {
+      "operator": "unicom",
+      "category": "same_operator",
+      "registry_prefix": "2408:8000::/20",
+      "registry_prefix_length": 20,
+      "netnames": [
+        "CU-CN"
+      ],
+      "descriptions": [
+        "China Unicom",
+        "No.21, Jin-Rong Street",
+        "Beijng 100033"
+      ],
+      "maintainers": [
+        "APNIC-HM"
+      ],
+      "country": "CN",
+      "status": "ALLOCATED PORTABLE",
+      "matched_by": "description_patterns: unicom",
+      "reason": "Most-specific APNIC registration is attributed to the current BGP operator",
+      "space": {
+        "cidr_count": 0,
+        "address_count": "39019994557634606571625390276608",
+        "slash64_equivalent": "2115278143488.0000",
+        "percent_of_operator": "99.592897%"
+      }
+    },
+    {
+      "operator": "chinanet",
+      "category": "same_operator",
+      "registry_prefix": "240e:500::/24",
+      "registry_prefix_length": 24,
+      "netnames": [
+        "CT-IPV6-VOLTE-ADDRESS"
+      ],
+      "descriptions": [
+        "Chinatelecom IPv6 address for volte"
+      ],
+      "maintainers": [
+        "MAINT-CHINANET-CN"
+      ],
+      "country": "CN",
+      "status": "ALLOCATED NON-PORTABLE",
+      "matched_by": "description_patterns: china ?telecom",
+      "reason": "Most-specific APNIC registration is attributed to the current BGP operator",
+      "space": {
+        "cidr_count": 0,
+        "address_count": "20282409603651670423947251286016",
+        "slash64_equivalent": "1099511627776.0000",
+        "percent_of_operator": "6.276026%"
+      }
+    },
+    {
+      "operator": "chinanet",
+      "category": "strong_non_public",
+      "registry_prefix": "240e:a00::/24",
+      "registry_prefix_length": 24,
+      "netnames": [
+        "CT-IPV6-INTERNET-CAFE-ADDRESS"
+      ],
+      "descriptions": [
+        "Chinatelecom IPv6 address for Internet cafe leased line"
+      ],
+      "maintainers": [
+        "MAINT-CHINANET-CN"
+      ],
+      "country": "CN",
+      "status": "ALLOCATED NON-PORTABLE",
+      "matched_by": "exclude_apnic_inetnum_rules: \\b(?:leased|dedicated|private|special)[ -]?(?:line|circuit)s?\\b",
+      "reason": "APNIC inetnum registration explicitly identifies a dedicated line or circuit",
+      "space": {
+        "cidr_count": 0,
+        "address_count": "20282409603651670423947251286016",
+        "slash64_equivalent": "1099511627776.0000",
+        "percent_of_operator": "6.276026%"
+      }
+    },
+    {
+      "operator": "chinanet",
+      "category": "same_operator",
+      "registry_prefix": "240e:b00::/24",
+      "registry_prefix_length": 24,
+      "netnames": [
+        "CT-IPV6-BROADBAND-ADDRESS"
+      ],
+      "descriptions": [
+        "Chinatelecom IPv6 address for fixed broadband"
+      ],
+      "maintainers": [
+        "MAINT-CHINANET-CN"
+      ],
+      "country": "CN",
+      "status": "ALLOCATED NON-PORTABLE",
+      "matched_by": "description_patterns: china ?telecom",
+      "reason": "Most-specific APNIC registration is attributed to the current BGP operator",
+      "space": {
+        "cidr_count": 0,
+        "address_count": "20282409603651670423947251286016",
+        "slash64_equivalent": "1099511627776.0000",
+        "percent_of_operator": "6.276026%"
+      }
+    },
+    {
+      "operator": "chinanet",
+      "category": "same_operator",
+      "registry_prefix": "240e:400::/24",
+      "registry_prefix_length": 24,
+      "netnames": [
+        "CT-IPV6-MOBILE-ADDRESS"
+      ],
+      "descriptions": [
+        "Chinatelecom IPv6 address for mobile"
+      ],
+      "maintainers": [
+        "MAINT-CHINANET-CN"
+      ],
+      "country": "CN",
+      "status": "ALLOCATED NON-PORTABLE",
+      "matched_by": "description_patterns: china ?telecom",
+      "reason": "Most-specific APNIC registration is attributed to the current BGP operator",
+      "space": {
+        "cidr_count": 0,
+        "address_count": "20282358828767246609521913626624",
+        "slash64_equivalent": "1099508875264.0000",
+        "percent_of_operator": "6.276011%"
+      }
+    },
+    {
+      "operator": "chinanet",
+      "category": "same_operator",
+      "registry_prefix": "240e:100::/24",
+      "registry_prefix_length": 24,
+      "netnames": [
+        "CT-IPV6-NETWORK-ADDRESS"
+      ],
+      "descriptions": [
+        "Chinatelecom IPv6 address for network"
+      ],
+      "maintainers": [
+        "MAINT-CHINANET-CN"
+      ],
+      "country": "CN",
+      "status": "ALLOCATED NON-PORTABLE",
+      "matched_by": "description_patterns: china ?telecom",
+      "reason": "Most-specific APNIC registration is attributed to the current BGP operator",
+      "space": {
+        "cidr_count": 0,
+        "address_count": "20279222875191166261442725806080",
+        "slash64_equivalent": "1099338874880.0000",
+        "percent_of_operator": "6.275040%"
+      }
+    },
+    {
+      "operator": "chinanet",
+      "category": "same_operator",
+      "registry_prefix": "240e:200::/24",
+      "registry_prefix_length": 24,
+      "netnames": [
+        "CT-IPV6-PLATFORM-ADDRESS"
+      ],
+      "descriptions": [
+        "Chinatelecom IPv6 address for own platform"
+      ],
+      "maintainers": [
+        "MAINT-CHINANET-CN"
+      ],
+      "country": "CN",
+      "status": "ALLOCATED NON-PORTABLE",
+      "matched_by": "description_patterns: china ?telecom",
+      "reason": "Most-specific APNIC registration is attributed to the current BGP operator",
+      "space": {
+        "cidr_count": 0,
+        "address_count": "20275291448425779487366581321728",
+        "slash64_equivalent": "1099125751808.0000",
+        "percent_of_operator": "6.273824%"
+      }
+    },
+    {
+      "operator": "chinanet",
+      "category": "strong_non_public",
+      "registry_prefix": "240e:800::/24",
+      "registry_prefix_length": 24,
+      "netnames": [
+        "CT-IPV6-IOT-ADDRESS"
+      ],
+      "descriptions": [
+        "Chinatelecom IPv6 address for IOT"
+      ],
+      "maintainers": [
+        "MAINT-CHINANET-CN"
+      ],
+      "country": "CN",
+      "status": "ALLOCATED NON-PORTABLE",
+      "matched_by": "exclude_apnic_inetnum_rules: (?:^|[^a-z0-9])(?:iot|m2m)(?:[^a-z0-9]|$)|\\binternet of things\\b",
+      "reason": "APNIC inetnum registration explicitly identifies an IoT or M2M network",
+      "space": {
+        "cidr_count": 0,
+        "address_count": "20267786436937611869450005381120",
+        "slash64_equivalent": "1098718904320.0000",
+        "percent_of_operator": "6.271502%"
+      }
+    },
+    {
+      "operator": "chinanet",
+      "category": "same_operator",
+      "registry_prefix": "240e:300::/24",
+      "registry_prefix_length": 24,
+      "netnames": [
+        "CT-IPV6-BROADBAND-ADDRESS"
+      ],
+      "descriptions": [
+        "Chinatelecom IPv6 address for fixed broadband"
+      ],
+      "maintainers": [
+        "MAINT-CHINANET-CN"
+      ],
+      "country": "CN",
+      "status": "ALLOCATED NON-PORTABLE",
+      "matched_by": "description_patterns: china ?telecom",
+      "reason": "Most-specific APNIC registration is attributed to the current BGP operator",
+      "space": {
+        "cidr_count": 0,
+        "address_count": "20260126682944533578999067049984",
+        "slash64_equivalent": "1098303668224.0000",
+        "percent_of_operator": "6.269131%"
+      }
+    },
+    {
+      "operator": "chinanet",
+      "category": "strong_non_public",
+      "registry_prefix": "240e:600::/24",
+      "registry_prefix_length": 24,
+      "netnames": [
+        "CT-IPV6-LEASED-LINE-ADDRESS"
+      ],
+      "descriptions": [
+        "Chinatelecom IPv6 address for LEASED LINE"
+      ],
+      "maintainers": [
+        "MAINT-CHINANET-CN"
+      ],
+      "country": "CN",
+      "status": "ALLOCATED NON-PORTABLE",
+      "matched_by": "exclude_apnic_inetnum_rules: \\b(?:leased|dedicated|private|special)[ -]?(?:line|circuit)s?\\b",
+      "reason": "APNIC inetnum registration explicitly identifies a dedicated line or circuit",
+      "space": {
+        "cidr_count": 0,
+        "address_count": "20234930251012125477739840929792",
+        "slash64_equivalent": "1096937766912.0000",
+        "percent_of_operator": "6.261335%"
+      }
+    },
+    {
+      "operator": "chinanet",
+      "category": "strong_non_public",
+      "registry_prefix": "240e:700::/24",
+      "registry_prefix_length": 24,
+      "netnames": [
+        "CT-IPV6-LEASED-LINE-ADDRESS"
+      ],
+      "descriptions": [
+        "Chinatelecom IPv6 address for LEASED LINE"
+      ],
+      "maintainers": [
+        "MAINT-CHINANET-CN"
+      ],
+      "country": "CN",
+      "status": "ALLOCATED NON-PORTABLE",
+      "matched_by": "exclude_apnic_inetnum_rules: \\b(?:leased|dedicated|private|special)[ -]?(?:line|circuit)s?\\b",
+      "reason": "APNIC inetnum registration explicitly identifies a dedicated line or circuit",
+      "space": {
+        "cidr_count": 0,
+        "address_count": "20133538851446866143486408654848",
+        "slash64_equivalent": "1091441328128.0000",
+        "percent_of_operator": "6.229961%"
+      }
+    },
+    {
+      "operator": "chinanet",
+      "category": "strong_non_public",
+      "registry_prefix": "240e:900::/24",
+      "registry_prefix_length": 24,
+      "netnames": [
+        "CT-IPV6-IDC-ADDRESS"
+      ],
+      "descriptions": [
+        "Chinatelecom IPv6 address for IDC \u0026 Cloud service"
+      ],
+      "maintainers": [
+        "MAINT-CHINANET-CN"
+      ],
+      "country": "CN",
+      "status": "ALLOCATED NON-PORTABLE",
+      "matched_by": "exclude_apnic_inetnum_rules: idc(?:[^a-z0-9]|$)|\\binternet data cent(?:er|re)\\b",
+      "reason": "APNIC inetnum registration explicitly identifies an IDC network",
+      "space": {
+        "cidr_count": 0,
+        "address_count": "19308472367002093638962112364544",
+        "slash64_equivalent": "1046714384384.0000",
+        "percent_of_operator": "5.974659%"
+      }
+    },
+    {
+      "operator": "cmcc",
+      "category": "independent_legal_entity",
+      "registry_prefix": "240a:4000::/21",
+      "registry_prefix_length": 21,
+      "netnames": [
+        "CBN-CN"
+      ],
+      "descriptions": [
+        "China Broadcasting Network Corporation Ltd.",
+        "No.10 Baiyun Road, Xicheng District, Beijing"
+      ],
+      "organizations": [
+        "ORG-CINI1-AP"
+      ],
+      "organization_names": [
+        "China Internet Network Information Center"
+      ],
+      "maintainers": [
+        "MAINT-CNNIC-AP"
+      ],
+      "country": "CN",
+      "status": "ALLOCATED PORTABLE",
+      "matched_by": "independent_legal_entity_patterns",
+      "reason": "Most-specific APNIC registration names an independent legal entity without operator attribution",
+      "space": {
+        "cidr_count": 0,
+        "address_count": "9829222151261166319373901627392",
+        "slash64_equivalent": "532843200512.0000",
+        "percent_of_operator": "2.937741%"
+      }
+    },
+    {
+      "operator": "chinanet",
+      "category": "same_operator",
+      "registry_prefix": "240e:16::/31",
+      "registry_prefix_length": 31,
+      "netnames": [
+        "CHINANET-SC-IPv6-USER-ADDRESS"
+      ],
+      "descriptions": [
+        "CHINANET Sichuan province network",
+        "Data Communication Division",
+        "China Telecom"
+      ],
+      "maintainers": [
+        "MAINT-CHINANET-CN"
+      ],
+      "country": "CN",
+      "status": "ALLOCATED NON-PORTABLE",
+      "matched_by": "description_patterns: china ?telecom",
+      "reason": "Most-specific APNIC registration is attributed to the current BGP operator",
+      "space": {
+        "cidr_count": 0,
+        "address_count": "153502147019747924829141991424",
+        "slash64_equivalent": "8321368064.0000",
+        "percent_of_operator": "0.047498%"
+      }
+    },
+    {
+      "operator": "chinanet",
+      "category": "same_operator",
+      "registry_prefix": "2001:c68::/32",
+      "registry_prefix_length": 32,
+      "netnames": [
+        "CHINANET-20020830"
+      ],
+      "descriptions": [
+        "China Telecom",
+        "Internet Service Provider",
+        "Beijing,China"
+      ],
+      "maintainers": [
+        "APNIC-HM"
+      ],
+      "country": "CN",
+      "status": "ALLOCATED PORTABLE",
+      "matched_by": "description_patterns: china ?telecom",
+      "reason": "Most-specific APNIC registration is attributed to the current BGP operator",
+      "space": {
+        "cidr_count": 0,
+        "address_count": "79228162514264337593543950336",
+        "slash64_equivalent": "4294967296.0000",
+        "percent_of_operator": "0.024516%"
+      }
+    },
+    {
+      "operator": "chinanet",
+      "category": "other_or_unclassified",
+      "registry_prefix": "2400:75a0::/28",
+      "registry_prefix_length": 28,
+      "netnames": [
+        "DCCLGOOXNAHP-CN"
+      ],
+      "descriptions": [
+        "Digital City Construction Leading Group Office of Xiongan New Area, Hebei Province"
+      ],
+      "organizations": [
+        "ORG-DCCL2-AP"
+      ],
+      "organization_names": [
+        "Digital City Construction Leading Group Office of Xiongan New Area, Hebei Province"
+      ],
+      "maintainers": [
+        "APNIC-HM"
+      ],
+      "country": "CN",
+      "status": "ALLOCATED PORTABLE",
+      "reason": "Most-specific APNIC registration has no current strong operator or non-public classification",
+      "space": {
+        "cidr_count": 0,
+        "address_count": "79228162514264337593543950336",
+        "slash64_equivalent": "4294967296.0000",
+        "percent_of_operator": "0.024516%"
+      }
+    },
+    {
+      "operator": "cmcc",
+      "category": "strong_non_public",
+      "registry_prefix": "2401:1320::/32",
+      "registry_prefix_length": 32,
+      "netnames": [
+        "YUNSILKIPCOM"
+      ],
+      "descriptions": [
+        "Silk Road Information Port Cloud Computing Technology Co., Ltd",
+        "No. 72 Beibinhe East Road, Chengguan District, Lanzhou , Gansu"
+      ],
+      "maintainers": [
+        "MAINT-CNNIC-AP"
+      ],
+      "country": "CN",
+      "status": "ALLOCATED PORTABLE",
+      "matched_by": "exclude_apnic_inetnum_rules: \\bcloud computing\\b",
+      "reason": "APNIC inetnum registration explicitly identifies a cloud-computing network",
+      "space": {
+        "cidr_count": 0,
+        "address_count": "79228162514264337593543950336",
+        "slash64_equivalent": "4294967296.0000",
+        "percent_of_operator": "0.023680%"
+      }
+    },
+    {
+      "operator": "unicom",
+      "category": "other_or_unclassified",
+      "registry_prefix": "2402:18a0::/32",
+      "registry_prefix_length": 32,
+      "netnames": [
+        "SAUNET"
+      ],
+      "descriptions": [
+        "Shenyang Aerospace University",
+        "Shenyang Aerospace University, No.37 Daoyi South Avenue,",
+        "Daoyi District, Shenyang, Liaoning Province, China"
+      ],
+      "maintainers": [
+        "MAINT-CNNIC-AP"
+      ],
+      "country": "CN",
+      "status": "ALLOCATED PORTABLE",
+      "reason": "Most-specific APNIC registration has no current strong operator or non-public classification",
+      "space": {
+        "cidr_count": 0,
+        "address_count": "79228162514264337593543950336",
+        "slash64_equivalent": "4294967296.0000",
+        "percent_of_operator": "0.202218%"
+      }
+    },
+    {
+      "operator": "cmcc",
+      "category": "independent_legal_entity",
+      "registry_prefix": "2402:9a80::/32",
+      "registry_prefix_length": 32,
+      "netnames": [
+        "JSMNET"
+      ],
+      "descriptions": [
+        "Jishi Media Co ., Ltd.",
+        "No.1027-1, Xinmin Street, Changchun"
+      ],
+      "maintainers": [
+        "MAINT-CNNIC-AP"
+      ],
+      "country": "CN",
+      "status": "ALLOCATED PORTABLE",
+      "matched_by": "independent_legal_entity_patterns",
+      "reason": "Most-specific APNIC registration names an independent legal entity without operator attribution",
+      "space": {
+        "cidr_count": 0,
+        "address_count": "79228162514264337593543950336",
+        "slash64_equivalent": "4294967296.0000",
+        "percent_of_operator": "0.023680%"
+      }
+    },
+    {
+      "operator": "unicom",
+      "category": "other_or_unclassified",
+      "registry_prefix": "2402:ef40::/32",
+      "registry_prefix_length": 32,
+      "netnames": [
+        "DRCSCNET"
+      ],
+      "descriptions": [
+        "Development \u0026 Research Center of State Council Net.",
+        "No.225 Chaonei Street Dongcheng District Beijing China"
+      ],
+      "maintainers": [
+        "MAINT-CNNIC-AP"
+      ],
+      "country": "CN",
+      "status": "ALLOCATED PORTABLE",
+      "reason": "Most-specific APNIC registration has no current strong operator or non-public classification",
+      "space": {
+        "cidr_count": 0,
+        "address_count": "79228162514264337593543950336",
+        "slash64_equivalent": "4294967296.0000",
+        "percent_of_operator": "0.202218%"
+      }
+    },
+    {
+      "operator": "chinanet",
+      "category": "independent_legal_entity",
+      "registry_prefix": "2404:1c80::/32",
+      "registry_prefix_length": 32,
+      "netnames": [
+        "GDXCNET"
+      ],
+      "descriptions": [
+        "BeiJing guangdianxinchuang communication \u0026",
+        "technology C0.,LTD.",
+        "Room 2205,Building 2,Zhubang 2000 Business Center,",
+        "No.99 Balizhuang Xili,Chaoyang District"
+      ],
+      "maintainers": [
+        "MAINT-CNNIC-AP"
+      ],
+      "country": "CN",
+      "status": "ALLOCATED PORTABLE",
+      "matched_by": "independent_legal_entity_patterns",
+      "reason": "Most-specific APNIC registration names an independent legal entity without operator attribution",
+      "space": {
+        "cidr_count": 0,
+        "address_count": "79228162514264337593543950336",
+        "slash64_equivalent": "4294967296.0000",
+        "percent_of_operator": "0.024516%"
+      }
+    },
+    {
+      "operator": "cmcc",
+      "category": "independent_legal_entity",
+      "registry_prefix": "2407:37c0::/32",
+      "registry_prefix_length": 32,
+      "netnames": [
+        "JSMNET"
+      ],
+      "descriptions": [
+        "Jishi Media Co ., Ltd.",
+        "No.1027-1, Xinmin Street, Changchun"
+      ],
+      "maintainers": [
+        "MAINT-CNNIC-AP"
+      ],
+      "country": "CN",
+      "status": "ALLOCATED PORTABLE",
+      "matched_by": "independent_legal_entity_patterns",
+      "reason": "Most-specific APNIC registration names an independent legal entity without operator attribution",
+      "space": {
+        "cidr_count": 0,
+        "address_count": "79228162514264337593543950336",
+        "slash64_equivalent": "4294967296.0000",
+        "percent_of_operator": "0.023680%"
+      }
+    },
+    {
+      "operator": "chinanet",
+      "category": "same_operator",
+      "registry_prefix": "240e:ed::/32",
+      "registry_prefix_length": 32,
+      "netnames": [
+        "China-Telecom-Jiangsu-province-network"
+      ],
+      "descriptions": [
+        "China Telecom Jiangsu province network for customer"
+      ],
+      "maintainers": [
+        "MAINT-CHINANET-JS"
+      ],
+      "country": "CN",
+      "status": "ALLOCATED NON-PORTABLE",
+      "matched_by": "description_patterns: china ?telecom",
+      "reason": "Most-specific APNIC registration is attributed to the current BGP operator",
+      "space": {
+        "cidr_count": 0,
+        "address_count": "79228162514264337593543950336",
+        "slash64_equivalent": "4294967296.0000",
+        "percent_of_operator": "0.024516%"
+      }
+    },
+    {
+      "operator": "chinanet",
+      "category": "other_or_unclassified",
+      "registry_prefix": "240e:83:8000::/33",
+      "registry_prefix_length": 33,
+      "netnames": [
+        "BeiJing-Telecom-UserAddress-lowguaranteed"
+      ],
+      "descriptions": [
+        "BeiJing Telecom UserAddress for low-guaranteed"
+      ],
+      "maintainers": [
+        "MAINT-CHINANET-BJ"
+      ],
+      "country": "CN",
+      "status": "ALLOCATED NON-PORTABLE",
+      "reason": "Most-specific APNIC registration has no current strong operator or non-public classification",
+      "space": {
+        "cidr_count": 0,
+        "address_count": "39304596247310823728047194112",
+        "slash64_equivalent": "2130706432.0000",
+        "percent_of_operator": "0.012162%"
+      }
+    },
+    {
+      "operator": "chinanet",
+      "category": "other_or_unclassified",
+      "registry_prefix": "240e:83::/34",
+      "registry_prefix_length": 34,
+      "netnames": [
+        "BeiJing-Telecom-UserAddress-Highguaranteed"
+      ],
+      "descriptions": [
+        "BeiJing Telecom UserAddress for High-guaranteed"
+      ],
+      "maintainers": [
+        "MAINT-CHINANET-BJ"
+      ],
+      "country": "CN",
+      "status": "ALLOCATED NON-PORTABLE",
+      "reason": "Most-specific APNIC registration has no current strong operator or non-public classification",
+      "space": {
+        "cidr_count": 0,
+        "address_count": "14855280471424563298789490688",
+        "slash64_equivalent": "805306368.0000",
+        "percent_of_operator": "0.004597%"
+      }
+    },
+    {
+      "operator": "chinanet",
+      "category": "other_or_unclassified",
+      "registry_prefix": "240e:83::/36",
+      "registry_prefix_length": 36,
+      "netnames": [
+        "BeiJing-Telecom-UserAddress-Highguaranteed"
+      ],
+      "descriptions": [
+        "BeiJing Telecom UserAddress for High-guaranteed"
+      ],
+      "maintainers": [
+        "MAINT-CHINANET-BJ"
+      ],
+      "country": "CN",
+      "status": "ASSIGNED NON-PORTABLE",
+      "reason": "Most-specific APNIC registration has no current strong operator or non-public classification",
+      "space": {
+        "cidr_count": 0,
+        "address_count": "2475880078570760549798248448",
+        "slash64_equivalent": "134217728.0000",
+        "percent_of_operator": "0.000766%"
+      }
+    },
+    {
+      "operator": "unicom",
+      "category": "independent_legal_entity",
+      "registry_prefix": "2406:cac0::/32",
+      "registry_prefix_length": 32,
+      "netnames": [
+        "DFM"
+      ],
+      "descriptions": [
+        "Dongfeng Communication Technology Co.,Ltd."
+      ],
+      "maintainers": [
+        "MAINT-CNNIC-AP"
+      ],
+      "country": "CN",
+      "status": "ALLOCATED PORTABLE",
+      "matched_by": "independent_legal_entity_patterns",
+      "reason": "Most-specific APNIC registration names an independent legal entity without operator attribution",
+      "space": {
+        "cidr_count": 0,
+        "address_count": "618970019642690137449562112",
+        "slash64_equivalent": "33554432.0000",
+        "percent_of_operator": "0.001580%"
+      }
+    },
+    {
+      "operator": "unicom",
+      "category": "independent_legal_entity",
+      "registry_prefix": "2407:6c40::/32",
+      "registry_prefix_length": 32,
+      "netnames": [
+        "BJ-SHOUZIXIN"
+      ],
+      "descriptions": [
+        "Beijing Shougang Automation Information Technology Co.,Ltd",
+        "Building 1, Yard 1, Shimen Road, Shijingshan, Beijing"
+      ],
+      "maintainers": [
+        "MAINT-CNNIC-AP"
+      ],
+      "country": "CN",
+      "status": "ALLOCATED PORTABLE",
+      "matched_by": "independent_legal_entity_patterns",
+      "reason": "Most-specific APNIC registration names an independent legal entity without operator attribution",
+      "space": {
+        "cidr_count": 0,
+        "address_count": "310693935640959697899487232",
+        "slash64_equivalent": "16842752.0000",
+        "percent_of_operator": "0.000793%"
+      }
+    },
+    {
+      "operator": "chinanet",
+      "category": "independent_legal_entity",
+      "registry_prefix": "2402:f8c0::/32",
+      "registry_prefix_length": 32,
+      "netnames": [
+        "Digital-Guangdong"
+      ],
+      "descriptions": [
+        "Digital Guangdong Network Construction Co, Ltd"
+      ],
+      "maintainers": [
+        "MAINT-CNNIC-AP"
+      ],
+      "country": "CN",
+      "status": "ALLOCATED PORTABLE",
+      "matched_by": "independent_legal_entity_patterns",
+      "reason": "Most-specific APNIC registration names an independent legal entity without operator attribution",
+      "space": {
+        "cidr_count": 0,
+        "address_count": "76162326635721638006489088",
+        "slash64_equivalent": "4128768.0000",
+        "percent_of_operator": "0.000024%"
+      }
+    },
+    {
+      "operator": "unicom",
+      "category": "independent_legal_entity",
+      "registry_prefix": "2400:cb80::/32",
+      "registry_prefix_length": 32,
+      "netnames": [
+        "BMW-SF-CN"
+      ],
+      "descriptions": [
+        "BMW Automotive Finance (China) Co., Ltd.",
+        "22nd Floor, Tower B, Gateway Plaza",
+        "No. 18 Xia Guang Li North Road, East Third Ring",
+        "Chaoyang District, Beijing 100027, PR China"
+      ],
+      "maintainers": [
+        "MAINT-CNNIC-AP"
+      ],
+      "country": "CN",
+      "status": "ALLOCATED PORTABLE",
+      "matched_by": "independent_legal_entity_patterns",
+      "reason": "Most-specific APNIC registration names an independent legal entity without operator attribution",
+      "space": {
+        "cidr_count": 0,
+        "address_count": "41103477866897391940009984",
+        "slash64_equivalent": "2228224.0000",
+        "percent_of_operator": "0.000105%"
+      }
+    },
+    {
+      "operator": "unicom",
+      "category": "independent_legal_entity",
+      "registry_prefix": "2402:dfc0::/32",
+      "registry_prefix_length": 32,
+      "netnames": [
+        "JD-finance-network"
+      ],
+      "descriptions": [
+        "Beijing JD Finance Technology Holding Co., Ltd."
+      ],
+      "maintainers": [
+        "MAINT-CNNIC-AP"
+      ],
+      "country": "CN",
+      "status": "ALLOCATED PORTABLE",
+      "matched_by": "independent_legal_entity_patterns",
+      "reason": "Most-specific APNIC registration names an independent legal entity without operator attribution",
+      "space": {
+        "cidr_count": 0,
+        "address_count": "38685626227668133590597632",
+        "slash64_equivalent": "2097152.0000",
+        "percent_of_operator": "0.000099%"
+      }
+    },
+    {
+      "operator": "chinanet",
+      "category": "strong_non_public",
+      "registry_prefix": "2406:d440::/32",
+      "registry_prefix_length": 32,
+      "netnames": [
+        "VOLCANO-ENGINE"
+      ],
+      "descriptions": [
+        "Beijing Volcano Engine Technology Co., Ltd.",
+        "1309, 13/F, Building 4, Zijin Digital Park, Haidian District, Beijing"
+      ],
+      "maintainers": [
+        "MAINT-CNNIC-AP"
+      ],
+      "country": "CN",
+      "status": "ALLOCATED PORTABLE",
+      "matched_by": "exclude_apnic_inetnum_rules: (?:^|[^a-z0-9])(?:aliyun|qcloud|ucloud|ksyun|jdcloud|ctyun|qingcloud|volcengine|cloudflare|akamai|wangsu|chinanetcenter|baishancloud|sinnet|westclouddata|nwcd)(?:[^a-z0-9]|$)|\\bbeijing guanghuan xinwang(?:[ |.,-]+digital technology)?\\b|\\b(?:alibaba|huawei|tencent|baidu|kingsoft|jingdong|jd|tianyi|china telecom|china unicom|china mobile|google|oracle|ibm)[ -]?(?:ai[ -]?)?cloud\\b|\\bamazon web services\\b|\\bmicrosoft azure\\b|\\bvolcano engine\\b",
+      "reason": "APNIC inetnum registration explicitly identifies a known cloud or CDN brand",
+      "space": {
+        "cidr_count": 0,
+        "address_count": "20551738933448695970004992",
+        "slash64_equivalent": "1114112.0000",
+        "percent_of_operator": "0.000006%"
+      }
+    },
+    {
+      "operator": "unicom",
+      "category": "other_or_unclassified",
+      "registry_prefix": "2400:89c0::/32",
+      "registry_prefix_length": 32,
+      "netnames": [
+        "SINA"
+      ],
+      "descriptions": [
+        "15F,Ideal Plaza No.58 Bei Si Huan Xi Road Haidian District",
+        "Beijing,China,100080"
+      ],
+      "maintainers": [
+        "MAINT-CNNIC-AP"
+      ],
+      "country": "CN",
+      "status": "ALLOCATED PORTABLE",
+      "reason": "Most-specific APNIC registration has no current strong operator or non-public classification",
+      "space": {
+        "cidr_count": 0,
+        "address_count": "19342813113834066795298816",
+        "slash64_equivalent": "1048576.0000",
+        "percent_of_operator": "0.000049%"
+      }
+    },
+    {
+      "operator": "chinanet",
+      "category": "same_operator",
+      "registry_prefix": "2400:9380::/31",
+      "registry_prefix_length": 31,
+      "netnames": [
+        "CTGI-AS-AP"
+      ],
+      "descriptions": [
+        "China Telecom Global Limited",
+        "38/F DAH SING Financial Center",
+        "108 Gloucester Road Wan Chai"
+      ],
+      "organizations": [
+        "ORG-CTGL1-AP"
+      ],
+      "organization_names": [
+        "China Telecom Global Limited"
+      ],
+      "maintainers": [
+        "APNIC-HM"
+      ],
+      "country": "HK",
+      "status": "ALLOCATED PORTABLE",
+      "matched_by": "description_patterns: china ?telecom",
+      "reason": "Most-specific APNIC registration is attributed to the current BGP operator",
+      "space": {
+        "cidr_count": 0,
+        "address_count": "3626777458843887524118528",
+        "slash64_equivalent": "196608.0000",
+        "percent_of_operator": "0.000001%"
+      }
+    },
+    {
+      "operator": "chinanet",
+      "category": "strong_non_public",
+      "registry_prefix": "2401:1d40::/32",
+      "registry_prefix_length": 32,
+      "netnames": [
+        "BJKSCNET"
+      ],
+      "descriptions": [
+        "Beijing Kingsoft Cloud Internet Technology Co., Ltd.",
+        "Kingsoft Tower,No.33 Xiao Ying West Road,Haidian District,Beijing,China"
+      ],
+      "maintainers": [
+        "MAINT-CNNIC-AP"
+      ],
+      "country": "CN",
+      "status": "ALLOCATED PORTABLE",
+      "matched_by": "exclude_apnic_inetnum_rules: (?:^|[^a-z0-9])(?:aliyun|qcloud|ucloud|ksyun|jdcloud|ctyun|qingcloud|volcengine|cloudflare|akamai|wangsu|chinanetcenter|baishancloud|sinnet|westclouddata|nwcd)(?:[^a-z0-9]|$)|\\bbeijing guanghuan xinwang(?:[ |.,-]+digital technology)?\\b|\\b(?:alibaba|huawei|tencent|baidu|kingsoft|jingdong|jd|tianyi|china telecom|china unicom|china mobile|google|oracle|ibm)[ -]?(?:ai[ -]?)?cloud\\b|\\bamazon web services\\b|\\bmicrosoft azure\\b|\\bvolcano engine\\b",
+      "reason": "APNIC inetnum registration explicitly identifies a known cloud or CDN brand",
+      "space": {
+        "cidr_count": 0,
+        "address_count": "3626777458843887524118528",
+        "slash64_equivalent": "196608.0000",
+        "percent_of_operator": "0.000001%"
+      }
+    },
+    {
+      "operator": "unicom",
+      "category": "independent_legal_entity",
+      "registry_prefix": "2402:f140::/32",
+      "registry_prefix_length": 32,
+      "netnames": [
+        "AIPO-CN"
+      ],
+      "descriptions": [
+        "AIPO Cloud (Guizhou) Technology Co., Ltd."
+      ],
+      "maintainers": [
+        "MAINT-CNNIC-AP"
+      ],
+      "country": "CN",
+      "status": "ALLOCATED PORTABLE",
+      "matched_by": "independent_legal_entity_patterns",
+      "reason": "Most-specific APNIC registration names an independent legal entity without operator attribution",
+      "space": {
+        "cidr_count": 0,
+        "address_count": "3626777458843887524118528",
+        "slash64_equivalent": "196608.0000",
+        "percent_of_operator": "0.000009%"
+      }
+    },
+    {
+      "operator": "chinanet",
+      "category": "same_operator",
+      "registry_prefix": "2400:9380:8000::/44",
+      "registry_prefix_length": 44,
+      "netnames": [
+        "CTGI-AS-AP"
+      ],
+      "descriptions": [
+        "Chinatelecom global limit 38/F., DAH SING Financial Center, 108 Gloucester Road, Wan Chai, Hong Kong"
+      ],
+      "maintainers": [
+        "MAINT-CTGL-HK"
+      ],
+      "country": "HK",
+      "status": "ALLOCATED NON-PORTABLE",
+      "matched_by": "description_patterns: china ?telecom",
+      "reason": "Most-specific APNIC registration is attributed to the current BGP operator",
+      "space": {
+        "cidr_count": 0,
+        "address_count": "2417851639229258349412352",
+        "slash64_equivalent": "131072.0000",
+        "percent_of_operator": "0.000001%"
+      }
+    },
+    {
+      "operator": "unicom",
+      "category": "other_or_unclassified",
+      "registry_prefix": "2405:6f00::/32",
+      "registry_prefix_length": 32,
+      "netnames": [
+        "SPINET"
+      ],
+      "descriptions": [
+        "State Power Information Net",
+        "No.1,Baiguanglu No.2 Street,Xuanwu District,Beijing"
+      ],
+      "maintainers": [
+        "MAINT-CNNIC-AP"
+      ],
+      "country": "CN",
+      "status": "ALLOCATED PORTABLE",
+      "reason": "Most-specific APNIC registration has no current strong operator or non-public classification",
+      "space": {
+        "cidr_count": 0,
+        "address_count": "2417851639229258349412352",
+        "slash64_equivalent": "131072.0000",
+        "percent_of_operator": "0.000006%"
+      }
+    },
+    {
+      "operator": "chinanet",
+      "category": "other_or_unclassified",
+      "registry_prefix": "2400:6e60::/32",
+      "registry_prefix_length": 32,
+      "netnames": [
+        "SINOCHEM"
+      ],
+      "descriptions": [
+        "Sinochem Corporation"
+      ],
+      "maintainers": [
+        "MAINT-CNNIC-AP"
+      ],
+      "country": "CN",
+      "status": "ALLOCATED PORTABLE",
+      "reason": "Most-specific APNIC registration has no current strong operator or non-public classification",
+      "space": {
+        "cidr_count": 0,
+        "address_count": "1208925819614629174706176",
+        "slash64_equivalent": "65536.0000",
+        "percent_of_operator": "0.000000%"
+      }
+    },
+    {
+      "operator": "chinanet",
+      "category": "same_operator",
+      "registry_prefix": "2400:9380:8020::/44",
+      "registry_prefix_length": 44,
+      "netnames": [
+        "CTGI-AS-AP"
+      ],
+      "descriptions": [
+        "Chinatelecom global litie Singpore site"
+      ],
+      "maintainers": [
+        "MAINT-CTGL-HK"
+      ],
+      "country": "SG",
+      "status": "ALLOCATED NON-PORTABLE",
+      "matched_by": "description_patterns: china ?telecom",
+      "reason": "Most-specific APNIC registration is attributed to the current BGP operator",
+      "space": {
+        "cidr_count": 0,
+        "address_count": "1208925819614629174706176",
+        "slash64_equivalent": "65536.0000",
+        "percent_of_operator": "0.000000%"
+      }
+    },
+    {
+      "operator": "chinanet",
+      "category": "same_operator",
+      "registry_prefix": "2400:9380:8040::/44",
+      "registry_prefix_length": 44,
+      "netnames": [
+        "CTGI-AS-AP"
+      ],
+      "descriptions": [
+        "Chinatelecom global litie Japan site"
+      ],
+      "maintainers": [
+        "MAINT-CTGL-HK"
+      ],
+      "country": "JP",
+      "status": "ALLOCATED NON-PORTABLE",
+      "matched_by": "description_patterns: china ?telecom",
+      "reason": "Most-specific APNIC registration is attributed to the current BGP operator",
+      "space": {
+        "cidr_count": 0,
+        "address_count": "1208925819614629174706176",
+        "slash64_equivalent": "65536.0000",
+        "percent_of_operator": "0.000000%"
+      }
+    },
+    {
+      "operator": "chinanet",
+      "category": "independent_legal_entity",
+      "registry_prefix": "2400:9600::/32",
+      "registry_prefix_length": 32,
+      "netnames": [
+        "DMTNET"
+      ],
+      "descriptions": [
+        "Shanghai DMT Information Network cor.,LTD.",
+        "23F YUNHUA Science \u0026 Tech.Building, No.912",
+        "Gonghexin Road, Shanghai, P.R.China"
+      ],
+      "maintainers": [
+        "MAINT-CNNIC-AP"
+      ],
+      "country": "CN",
+      "status": "ALLOCATED PORTABLE",
+      "matched_by": "independent_legal_entity_patterns",
+      "reason": "Most-specific APNIC registration names an independent legal entity without operator attribution",
+      "space": {
+        "cidr_count": 0,
+        "address_count": "1208925819614629174706176",
+        "slash64_equivalent": "65536.0000",
+        "percent_of_operator": "0.000000%"
+      }
+    },
+    {
+      "operator": "chinanet",
+      "category": "independent_legal_entity",
+      "registry_prefix": "2400:be00::/32",
+      "registry_prefix_length": 32,
+      "netnames": [
+        "ZSPNET"
+      ],
+      "descriptions": [
+        "BEIJING ZHONGGUANCUN SOFTWARE PARK DEVELOPMENT CO.,Ltd.",
+        "P.O.Box 5118,Zhongguancun Software Park,",
+        "Haidian District, Beijing P.R.C."
+      ],
+      "maintainers": [
+        "MAINT-CNNIC-AP"
+      ],
+      "country": "CN",
+      "status": "ALLOCATED PORTABLE",
+      "matched_by": "independent_legal_entity_patterns",
+      "reason": "Most-specific APNIC registration names an independent legal entity without operator attribution",
+      "space": {
+        "cidr_count": 0,
+        "address_count": "1208925819614629174706176",
+        "slash64_equivalent": "65536.0000",
+        "percent_of_operator": "0.000000%"
+      }
+    },
+    {
+      "operator": "chinanet",
+      "category": "strong_non_public",
+      "registry_prefix": "2401:3480::/32",
+      "registry_prefix_length": 32,
+      "netnames": [
+        "UCLOUD-NET"
+      ],
+      "descriptions": [
+        "Shanghai UCloud Information Technology Company Limited"
+      ],
+      "maintainers": [
+        "MAINT-CNNIC-AP"
+      ],
+      "country": "CN",
+      "status": "ALLOCATED PORTABLE",
+      "matched_by": "exclude_apnic_inetnum_rules: (?:^|[^a-z0-9])(?:aliyun|qcloud|ucloud|ksyun|jdcloud|ctyun|qingcloud|volcengine|cloudflare|akamai|wangsu|chinanetcenter|baishancloud|sinnet|westclouddata|nwcd)(?:[^a-z0-9]|$)|\\bbeijing guanghuan xinwang(?:[ |.,-]+digital technology)?\\b|\\b(?:alibaba|huawei|tencent|baidu|kingsoft|jingdong|jd|tianyi|china telecom|china unicom|china mobile|google|oracle|ibm)[ -]?(?:ai[ -]?)?cloud\\b|\\bamazon web services\\b|\\bmicrosoft azure\\b|\\bvolcano engine\\b",
+      "reason": "APNIC inetnum registration explicitly identifies a known cloud or CDN brand",
+      "space": {
+        "cidr_count": 0,
+        "address_count": "1208925819614629174706176",
+        "slash64_equivalent": "65536.0000",
+        "percent_of_operator": "0.000000%"
+      }
+    },
+    {
+      "operator": "cmcc",
+      "category": "strong_non_public",
+      "registry_prefix": "2401:8be0::/32",
+      "registry_prefix_length": 32,
+      "netnames": [
+        "SIHE-SCCC"
+      ],
+      "descriptions": [
+        "Sichuan Sihe Cloud Computing Co., Ltd.",
+        "JM-B-15 block, Jiumian Industrial Park, Wudu District,",
+        "Hanwang Town, Mianzhu, Deyang, Sichuan"
+      ],
+      "maintainers": [
+        "MAINT-CNNIC-AP"
+      ],
+      "country": "CN",
+      "status": "ALLOCATED PORTABLE",
+      "matched_by": "exclude_apnic_inetnum_rules: \\bcloud computing\\b",
+      "reason": "APNIC inetnum registration explicitly identifies a cloud-computing network",
+      "space": {
+        "cidr_count": 0,
+        "address_count": "1208925819614629174706176",
+        "slash64_equivalent": "65536.0000",
+        "percent_of_operator": "0.000000%"
+      }
+    },
+    {
+      "operator": "chinanet",
+      "category": "independent_legal_entity",
+      "registry_prefix": "2401:a140::/32",
+      "registry_prefix_length": 32,
+      "netnames": [
+        "CLOUDTIMES"
+      ],
+      "descriptions": [
+        "Bei Jing Cloud Times Technology Co.,Ltd",
+        "Room 2804,Tianchang Park, Building 7, Beiyuan Road Olympic Media Village,",
+        "Chaoyang District, Beijing,China"
+      ],
+      "maintainers": [
+        "MAINT-CNNIC-AP"
+      ],
+      "country": "CN",
+      "status": "ALLOCATED PORTABLE",
+      "matched_by": "independent_legal_entity_patterns",
+      "reason": "Most-specific APNIC registration names an independent legal entity without operator attribution",
+      "space": {
+        "cidr_count": 0,
+        "address_count": "1208925819614629174706176",
+        "slash64_equivalent": "65536.0000",
+        "percent_of_operator": "0.000000%"
+      }
+    },
+    {
+      "operator": "chinanet",
+      "category": "strong_non_public",
+      "registry_prefix": "2402:92c0::/32",
+      "registry_prefix_length": 32,
+      "netnames": [
+        "YOVOLECLOUD"
+      ],
+      "descriptions": [
+        "Beijing Yovole Cloud Computing Technology Company Limited",
+        "Room 304,No.2 Building, Fuhai Center,",
+        "Daliushu Road, Haidian Distirct, Beijing"
+      ],
+      "maintainers": [
+        "MAINT-CNNIC-AP"
+      ],
+      "country": "CN",
+      "status": "ALLOCATED PORTABLE",
+      "matched_by": "exclude_apnic_inetnum_rules: \\bcloud computing\\b",
+      "reason": "APNIC inetnum registration explicitly identifies a cloud-computing network",
+      "space": {
+        "cidr_count": 0,
+        "address_count": "1208925819614629174706176",
+        "slash64_equivalent": "65536.0000",
+        "percent_of_operator": "0.000000%"
+      }
+    },
+    {
+      "operator": "chinanet",
+      "category": "independent_legal_entity",
+      "registry_prefix": "2402:f140::/32",
+      "registry_prefix_length": 32,
+      "netnames": [
+        "AIPO-CN"
+      ],
+      "descriptions": [
+        "AIPO Cloud (Guizhou) Technology Co., Ltd."
+      ],
+      "maintainers": [
+        "MAINT-CNNIC-AP"
+      ],
+      "country": "CN",
+      "status": "ALLOCATED PORTABLE",
+      "matched_by": "independent_legal_entity_patterns",
+      "reason": "Most-specific APNIC registration names an independent legal entity without operator attribution",
+      "space": {
+        "cidr_count": 0,
+        "address_count": "1208925819614629174706176",
+        "slash64_equivalent": "65536.0000",
+        "percent_of_operator": "0.000000%"
+      }
+    },
+    {
+      "operator": "chinanet",
+      "category": "independent_legal_entity",
+      "registry_prefix": "2403:1ec0::/32",
+      "registry_prefix_length": 32,
+      "netnames": [
+        "JD"
+      ],
+      "descriptions": [
+        "Beijing Jingdong Shangke Information Technology Co. Ltd."
+      ],
+      "maintainers": [
+        "MAINT-CNNIC-AP"
+      ],
+      "country": "CN",
+      "status": "ALLOCATED PORTABLE",
+      "matched_by": "independent_legal_entity_patterns",
+      "reason": "Most-specific APNIC registration names an independent legal entity without operator attribution",
+      "space": {
+        "cidr_count": 0,
+        "address_count": "1208925819614629174706176",
+        "slash64_equivalent": "65536.0000",
+        "percent_of_operator": "0.000000%"
+      }
+    },
+    {
+      "operator": "unicom",
+      "category": "other_or_unclassified",
+      "registry_prefix": "2403:4c80::/32",
+      "registry_prefix_length": 32,
+      "netnames": [
+        "YWNET"
+      ],
+      "descriptions": [
+        "Beijing Yiwangxin Technology Co;Ltd.",
+        "Unit2201, Zhongyu Plaza Number jia-6 Gongtibei Road",
+        "Chaoyang District, Beijing China"
+      ],
+      "maintainers": [
+        "MAINT-CNNIC-AP"
+      ],
+      "country": "CN",
+      "status": "ALLOCATED PORTABLE",
+      "reason": "Most-specific APNIC registration has no current strong operator or non-public classification",
+      "space": {
+        "cidr_count": 0,
+        "address_count": "1208925819614629174706176",
+        "slash64_equivalent": "65536.0000",
+        "percent_of_operator": "0.000003%"
+      }
+    },
+    {
+      "operator": "unicom",
+      "category": "independent_legal_entity",
+      "registry_prefix": "2403:6740::/32",
+      "registry_prefix_length": 32,
+      "netnames": [
+        "LDST"
+      ],
+      "descriptions": [
+        "Beijing Dicai Network Communications Technology Co., Ltd."
+      ],
+      "maintainers": [
+        "MAINT-CNNIC-AP"
+      ],
+      "country": "CN",
+      "status": "ALLOCATED PORTABLE",
+      "matched_by": "independent_legal_entity_patterns",
+      "reason": "Most-specific APNIC registration names an independent legal entity without operator attribution",
+      "space": {
+        "cidr_count": 0,
+        "address_count": "1208925819614629174706176",
+        "slash64_equivalent": "65536.0000",
+        "percent_of_operator": "0.000003%"
+      }
+    },
+    {
+      "operator": "chinanet",
+      "category": "independent_legal_entity",
+      "registry_prefix": "2403:8080::/32",
+      "registry_prefix_length": 32,
+      "netnames": [
+        "DXTNET"
+      ],
+      "descriptions": [
+        "Beijing Teletron Telecom Engineering Co., Ltd.",
+        "Jian Guo Road, Chaoyang District, Beijing, PR.China"
+      ],
+      "maintainers": [
+        "MAINT-CNNIC-AP"
+      ],
+      "country": "CN",
+      "status": "ALLOCATED PORTABLE",
+      "matched_by": "independent_legal_entity_patterns",
+      "reason": "Most-specific APNIC registration names an independent legal entity without operator attribution",
+      "space": {
+        "cidr_count": 0,
+        "address_count": "1208925819614629174706176",
+        "slash64_equivalent": "65536.0000",
+        "percent_of_operator": "0.000000%"
+      }
+    },
+    {
+      "operator": "chinanet",
+      "category": "strong_non_public",
+      "registry_prefix": "2403:a200::/32",
+      "registry_prefix_length": 32,
+      "netnames": [
+        "CHINA-21VIANET"
+      ],
+      "descriptions": [
+        "21ViaNet(China),Inc.",
+        "BOE Science Park, 10 Jiuxianqiao Road, Chaoyang,",
+        "Beijing 100016, China"
+      ],
+      "maintainers": [
+        "MAINT-CNNIC-AP"
+      ],
+      "country": "CN",
+      "status": "ALLOCATED PORTABLE",
+      "matched_by": "exclude_apnic_inetnum_rules: (?:^|[^a-z0-9])(?:21vianet|cnisp)(?:[^a-z0-9]|$)",
+      "reason": "APNIC inetnum registration explicitly identifies 21Vianet or CNISP",
+      "space": {
+        "cidr_count": 0,
+        "address_count": "1208925819614629174706176",
+        "slash64_equivalent": "65536.0000",
+        "percent_of_operator": "0.000000%"
+      }
+    },
+    {
+      "operator": "unicom",
+      "category": "independent_legal_entity",
+      "registry_prefix": "2403:e7c0::/32",
+      "registry_prefix_length": 32,
+      "netnames": [
+        "TaiJi-ZY"
+      ],
+      "descriptions": [
+        "Taiji Computer Corporation Limited"
+      ],
+      "maintainers": [
+        "MAINT-CNNIC-AP"
+      ],
+      "country": "CN",
+      "status": "ALLOCATED PORTABLE",
+      "matched_by": "independent_legal_entity_patterns",
+      "reason": "Most-specific APNIC registration names an independent legal entity without operator attribution",
+      "space": {
+        "cidr_count": 0,
+        "address_count": "1208925819614629174706176",
+        "slash64_equivalent": "65536.0000",
+        "percent_of_operator": "0.000003%"
+      }
+    },
+    {
+      "operator": "chinanet",
+      "category": "other_or_unclassified",
+      "registry_prefix": "2403:f4c0::/32",
+      "registry_prefix_length": 32,
+      "netnames": [
+        "AGRI-NET"
+      ],
+      "descriptions": [
+        "Information center of MARA",
+        "No.11 Nongzhanguan Nanli,Chaoyang District,Beijing"
+      ],
+      "maintainers": [
+        "MAINT-CNNIC-AP"
+      ],
+      "country": "CN",
+      "status": "ALLOCATED PORTABLE",
+      "reason": "Most-specific APNIC registration has no current strong operator or non-public classification",
+      "space": {
+        "cidr_count": 0,
+        "address_count": "1208925819614629174706176",
+        "slash64_equivalent": "65536.0000",
+        "percent_of_operator": "0.000000%"
+      }
+    },
+    {
+      "operator": "unicom",
+      "category": "independent_legal_entity",
+      "registry_prefix": "2404:6500::/32",
+      "registry_prefix_length": 32,
+      "netnames": [
+        "IFLYTEK"
+      ],
+      "descriptions": [
+        "ANHUI USTC iFLYTEK Co., Ltd.",
+        "No. 666 West Wangjiang Road, Hefei, Anhui"
+      ],
+      "maintainers": [
+        "MAINT-CNNIC-AP"
+      ],
+      "country": "CN",
+      "status": "ALLOCATED PORTABLE",
+      "matched_by": "independent_legal_entity_patterns",
+      "reason": "Most-specific APNIC registration names an independent legal entity without operator attribution",
+      "space": {
+        "cidr_count": 0,
+        "address_count": "1208925819614629174706176",
+        "slash64_equivalent": "65536.0000",
+        "percent_of_operator": "0.000003%"
+      }
+    },
+    {
+      "operator": "unicom",
+      "category": "independent_legal_entity",
+      "registry_prefix": "2404:7600::/32",
+      "registry_prefix_length": 32,
+      "netnames": [
+        "DSNET"
+      ],
+      "descriptions": [
+        "Shanghai Data Solution Co., Ltd.",
+        "2F,NO.4Buliding 498 Guoshoujing Rd.Shanghai ZJ.Hi-Tech Park"
+      ],
+      "maintainers": [
+        "MAINT-CNNIC-AP"
+      ],
+      "country": "CN",
+      "status": "ALLOCATED PORTABLE",
+      "matched_by": "independent_legal_entity_patterns",
+      "reason": "Most-specific APNIC registration names an independent legal entity without operator attribution",
+      "space": {
+        "cidr_count": 0,
+        "address_count": "1208925819614629174706176",
+        "slash64_equivalent": "65536.0000",
+        "percent_of_operator": "0.000003%"
+      }
+    },
+    {
+      "operator": "chinanet",
+      "category": "independent_legal_entity",
+      "registry_prefix": "2405:1480::/32",
+      "registry_prefix_length": 32,
+      "netnames": [
+        "SKBJNET"
+      ],
+      "descriptions": [
+        "Beijing Sankuai Technology Co.,Ltd.",
+        "Wangjing International R\u0026D Park Phase 3,No.6 Wangjing East Road,",
+        "Chaoyang District,Beijing 100102,PRC"
+      ],
+      "maintainers": [
+        "MAINT-CNNIC-AP"
+      ],
+      "country": "CN",
+      "status": "ALLOCATED PORTABLE",
+      "matched_by": "independent_legal_entity_patterns",
+      "reason": "Most-specific APNIC registration names an independent legal entity without operator attribution",
+      "space": {
+        "cidr_count": 0,
+        "address_count": "1208925819614629174706176",
+        "slash64_equivalent": "65536.0000",
+        "percent_of_operator": "0.000000%"
+      }
+    },
+    {
+      "operator": "unicom",
+      "category": "independent_legal_entity",
+      "registry_prefix": "2405:1480::/32",
+      "registry_prefix_length": 32,
+      "netnames": [
+        "SKBJNET"
+      ],
+      "descriptions": [
+        "Beijing Sankuai Technology Co.,Ltd.",
+        "Wangjing International R\u0026D Park Phase 3,No.6 Wangjing East Road,",
+        "Chaoyang District,Beijing 100102,PRC"
+      ],
+      "maintainers": [
+        "MAINT-CNNIC-AP"
+      ],
+      "country": "CN",
+      "status": "ALLOCATED PORTABLE",
+      "matched_by": "independent_legal_entity_patterns",
+      "reason": "Most-specific APNIC registration names an independent legal entity without operator attribution",
+      "space": {
+        "cidr_count": 0,
+        "address_count": "1208925819614629174706176",
+        "slash64_equivalent": "65536.0000",
+        "percent_of_operator": "0.000003%"
+      }
+    },
+    {
+      "operator": "chinanet",
+      "category": "independent_legal_entity",
+      "registry_prefix": "2405:7040::/32",
+      "registry_prefix_length": 32,
+      "netnames": [
+        "COSCOSHIPPING"
+      ],
+      "descriptions": [
+        "CHINA COSCO SHIPPING CORPORATION LIMITED"
+      ],
+      "maintainers": [
+        "MAINT-CNNIC-AP"
+      ],
+      "country": "CN",
+      "status": "ALLOCATED PORTABLE",
+      "matched_by": "independent_legal_entity_patterns",
+      "reason": "Most-specific APNIC registration names an independent legal entity without operator attribution",
+      "space": {
+        "cidr_count": 0,
+        "address_count": "1208925819614629174706176",
+        "slash64_equivalent": "65536.0000",
+        "percent_of_operator": "0.000000%"
+      }
+    },
+    {
+      "operator": "unicom",
+      "category": "independent_legal_entity",
+      "registry_prefix": "2405:7040::/32",
+      "registry_prefix_length": 32,
+      "netnames": [
+        "COSCOSHIPPING"
+      ],
+      "descriptions": [
+        "CHINA COSCO SHIPPING CORPORATION LIMITED"
+      ],
+      "maintainers": [
+        "MAINT-CNNIC-AP"
+      ],
+      "country": "CN",
+      "status": "ALLOCATED PORTABLE",
+      "matched_by": "independent_legal_entity_patterns",
+      "reason": "Most-specific APNIC registration names an independent legal entity without operator attribution",
+      "space": {
+        "cidr_count": 0,
+        "address_count": "1208925819614629174706176",
+        "slash64_equivalent": "65536.0000",
+        "percent_of_operator": "0.000003%"
+      }
+    },
+    {
+      "operator": "unicom",
+      "category": "independent_legal_entity",
+      "registry_prefix": "2405:a900::/32",
+      "registry_prefix_length": 32,
+      "netnames": [
+        "QIHOO"
+      ],
+      "descriptions": [
+        "Beijing Qihu Technology Company Limited",
+        "112 Room, D buliding , Deshengyuan square,",
+        "No.28 xinjiekouwaiwai,Xicheng District",
+        "Beijing,China"
+      ],
+      "maintainers": [
+        "MAINT-CNNIC-AP"
+      ],
+      "country": "CN",
+      "status": "ALLOCATED PORTABLE",
+      "matched_by": "independent_legal_entity_patterns",
+      "reason": "Most-specific APNIC registration names an independent legal entity without operator attribution",
+      "space": {
+        "cidr_count": 0,
+        "address_count": "1208925819614629174706176",
+        "slash64_equivalent": "65536.0000",
+        "percent_of_operator": "0.000003%"
+      }
+    },
+    {
+      "operator": "cmcc",
+      "category": "independent_legal_entity",
+      "registry_prefix": "2407:6c40::/32",
+      "registry_prefix_length": 32,
+      "netnames": [
+        "BJ-SHOUZIXIN"
+      ],
+      "descriptions": [
+        "Beijing Shougang Automation Information Technology Co.,Ltd",
+        "Building 1, Yard 1, Shimen Road, Shijingshan, Beijing"
+      ],
+      "maintainers": [
+        "MAINT-CNNIC-AP"
+      ],
+      "country": "CN",
+      "status": "ALLOCATED PORTABLE",
+      "matched_by": "independent_legal_entity_patterns",
+      "reason": "Most-specific APNIC registration names an independent legal entity without operator attribution",
+      "space": {
+        "cidr_count": 0,
+        "address_count": "1208925819614629174706176",
+        "slash64_equivalent": "65536.0000",
+        "percent_of_operator": "0.000000%"
+      }
+    },
+    {
+      "operator": "cmcc",
+      "category": "independent_legal_entity",
+      "registry_prefix": "2407:8f40::/32",
+      "registry_prefix_length": 32,
+      "netnames": [
+        "CNIXP"
+      ],
+      "descriptions": [
+        "ShenZhen QianHai New-Type Internet Exchange Point Co.,Ltd",
+        "Group A 4F, Qianhai Shenzhen-Hong Kong Innovation Center,",
+        "Menghai Rd. 4008, Qianhai Cooperation Zone, Shenzhen"
+      ],
+      "maintainers": [
+        "MAINT-CNNIC-AP"
+      ],
+      "country": "CN",
+      "status": "ALLOCATED PORTABLE",
+      "matched_by": "independent_legal_entity_patterns",
+      "reason": "Most-specific APNIC registration names an independent legal entity without operator attribution",
+      "space": {
+        "cidr_count": 0,
+        "address_count": "1208925819614629174706176",
+        "slash64_equivalent": "65536.0000",
+        "percent_of_operator": "0.000000%"
+      }
+    },
+    {
+      "operator": "chinanet",
+      "category": "strong_non_public",
+      "registry_prefix": "2409:2000::/21",
+      "registry_prefix_length": 21,
+      "netnames": [
+        "HWCSNET"
+      ],
+      "descriptions": [
+        "Huawei Public Cloud Service (Huawei Software Technologies Ltd.Co)",
+        "No.2018 Xuegang Road,Bantian street,Longgang District,",
+        "Shenzhen,Guangdong Province, 518129 P.R.China"
+      ],
+      "organizations": [
+        "ORG-CINI1-AP"
+      ],
+      "organization_names": [
+        "China Internet Network Information Center"
+      ],
+      "maintainers": [
+        "MAINT-CNNIC-AP"
+      ],
+      "country": "CN",
+      "status": "ALLOCATED PORTABLE",
+      "matched_by": "exclude_apnic_inetnum_rules: \\bcloud[ -]?(?:service|platform|data|hosting|server)s?\\b",
+      "reason": "APNIC inetnum registration explicitly identifies a cloud-service network",
+      "space": {
+        "cidr_count": 0,
+        "address_count": "1208925819614629174706176",
+        "slash64_equivalent": "65536.0000",
+        "percent_of_operator": "0.000000%"
+      }
+    },
+    {
+      "operator": "chinanet",
+      "category": "other_or_unclassified",
+      "registry_prefix": "240a:6000::/24",
+      "registry_prefix_length": 24,
+      "netnames": [
+        "CWINET"
+      ],
+      "descriptions": [
+        "Information Center Ministry of Water Resources",
+        "No2,Lane2,Baiguang Road,Xicheng District,Beijing"
+      ],
+      "organizations": [
+        "ORG-CINI1-AP"
+      ],
+      "organization_names": [
+        "China Internet Network Information Center"
+      ],
+      "maintainers": [
+        "MAINT-CNNIC-AP"
+      ],
+      "country": "CN",
+      "status": "ALLOCATED PORTABLE",
+      "reason": "Most-specific APNIC registration has no current strong operator or non-public classification",
+      "space": {
+        "cidr_count": 0,
+        "address_count": "1208925819614629174706176",
+        "slash64_equivalent": "65536.0000",
+        "percent_of_operator": "0.000000%"
+      }
+    }
+  ],
+  "winning_prefix_length_by_category": {
+    "chinanet/independent_legal_entity": {
+      "32": 11
+    },
+    "chinanet/other_or_unclassified": {
+      "24": 1,
+      "28": 1,
+      "32": 2,
+      "33": 1,
+      "34": 1,
+      "36": 1
+    },
+    "chinanet/same_operator": {
+      "18": 327,
+      "24": 1956,
+      "31": 9,
+      "32": 2,
+      "44": 4
+    },
+    "chinanet/strong_non_public": {
+      "21": 1,
+      "24": 816,
+      "32": 8
+    },
+    "cmcc/independent_legal_entity": {
+      "21": 81,
+      "32": 4
+    },
+    "cmcc/same_operator": {
+      "20": 3888
+    },
+    "cmcc/strong_non_public": {
+      "32": 2
+    },
+    "unicom/independent_legal_entity": {
+      "32": 16
+    },
+    "unicom/other_or_unclassified": {
+      "32": 6
+    },
+    "unicom/same_operator": {
+      "20": 3314
+    }
+  }
+}
