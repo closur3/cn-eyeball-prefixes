@@ -33,11 +33,38 @@ func TestSelectPrefixesKeepsOnlyCompleteSameOperatorOriginSets(t *testing.T) {
 		"38283": {Country: "CN", Description: "China Telecom IDC"},
 		"9808": {Country: "CN", Description: "China Mobile"},
 	}
-	accepted, rejected := selectPrefixes(records, metadata, classifier)
+	allocations := map[string][]allocation{
+		"chinanet": []allocation{{Prefix: "240e::/18", parsed: netip.MustParsePrefix("240e::/18")}},
+	}
+	accepted, rejected := selectPrefixes(records, metadata, classifier, allocations)
 	if len(accepted["chinanet"]) != 1 || accepted["chinanet"][0].Prefix.String() != "240e:1::/32" {
 		t.Fatalf("unexpected accepted prefixes: %#v", accepted["chinanet"])
 	}
 	if rejected["excluded_origin"] != 1 || rejected["cross_operator_moas"] != 1 {
 		t.Fatalf("unexpected rejected reasons: %#v", rejected)
+	}
+}
+
+func TestSelectPrefixesRejectsLegacyOperatorSpace(t *testing.T) {
+	classifier, err := operatorconfig.Parse([]byte(`{
+  "operators": {
+    "chinanet": {"description_patterns": ["china telecom"], "include_asns": {}},
+    "cmcc": {"description_patterns": ["china mobile"], "include_asns": {}},
+    "unicom": {"description_patterns": ["unicom"], "include_asns": {}}
+  },
+  "exclude_description_rules": [{"pattern": "idc", "reason": "IDC"}],
+  "exclude_apnic_inetnum_rules": [{"pattern": "idc", "reason": "IDC"}],
+  "independent_legal_entity_patterns": ["limited"],
+  "exclude_asns": {}
+}`), operators)
+	if err != nil {
+		t.Fatal(err)
+	}
+	records := []riswhois6.Record{{Prefix: netip.MustParsePrefix("2001:c68::/32"), Origins: []riswhois6.Origin{{ASN: "4134", SeenPeers: 100}}}}
+	metadata := map[string]asMeta{"4134": {Country: "CN", Description: "China Telecom Backbone"}}
+	allocations := map[string][]allocation{"chinanet": []allocation{{Prefix: "240e::/18", parsed: netip.MustParsePrefix("240e::/18")}}}
+	accepted, rejected := selectPrefixes(records, metadata, classifier, allocations)
+	if len(accepted["chinanet"]) != 0 || rejected["outside_operator_240x_allocation"] != 1 {
+		t.Fatalf("legacy space was admitted: accepted=%#v rejected=%#v", accepted, rejected)
 	}
 }

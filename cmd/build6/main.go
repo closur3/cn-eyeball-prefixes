@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"io"
 	"math/big"
+	"net/netip"
 	"os"
 	"path/filepath"
 	"sort"
@@ -26,6 +27,20 @@ var operators = []string{"chinanet", "cmcc", "unicom"}
 type asMeta struct {
 	Country     string `json:"country,omitempty"`
 	Description string `json:"description,omitempty"`
+}
+
+type allocationConfig struct {
+	Operators map[string][]allocation `json:"operators"`
+}
+
+type allocation struct {
+	Prefix       string `json:"prefix"`
+	Registry     string `json:"registry"`
+	Netname      string `json:"netname"`
+	Organization string `json:"organization"`
+	Status       string `json:"status"`
+	Source       string `json:"source"`
+	parsed       netip.Prefix
 }
 
 type sourceMeta struct {
@@ -46,6 +61,7 @@ type operatorOutput struct {
 	PrefixCount       int       `json:"prefix_count"`
 	Slash64Equivalent string    `json:"unique_slash64_equivalent"`
 	OriginASNs        []asnStat `json:"origin_asns,omitempty"`
+	AdmissionBlocks   []allocation `json:"admission_blocks,omitempty"`
 }
 
 type manifest struct {
@@ -71,6 +87,7 @@ func main() {
 	risPath := flag.String("ris", "", "RIPE RISWhois IPv6 dump")
 	iptoasnPath := flag.String("iptoasn", "", "IPtoASN IPv6 TSV gzip, used only for ASN names")
 	configPath := flag.String("operator-config", "config/operators.json", "operator config")
+	allocationPath := flag.String("allocation-config", "config/ipv6_allocations.json", "official operator IPv6 allocation boundaries")
 	chinanetOutput := flag.String("chinanet-output", "data/ipv6/operators/chinanet.txt", "China Telecom exact BGP candidate prefixes")
 	manifestPath := flag.String("manifest", "data/ipv6/manifest.json", "IPv6 manifest")
 	auditJSONPath := flag.String("audit-json", "reports/ipv6/bgp-candidates.json", "BGP candidate audit JSON")
@@ -82,12 +99,14 @@ func main() {
 
 	classifier, err := operatorconfig.Load(*configPath, operators)
 	must(err)
+	allocations, err := readAllocations(*allocationPath)
+	must(err)
 	metadata, err := readASNMetadata(*iptoasnPath)
 	must(err)
 	records, risStats, err := riswhois6.ParseGzip(*risPath)
 	must(err)
 
-	accepted, rejected := selectPrefixes(records, metadata, classifier)
+	accepted, rejected := selectPrefixes(records, metadata, classifier, allocations)
 	chinanet := accepted["chinanet"]
 	must(writePrefixes(*chinanetOutput, chinanet))
 
@@ -98,6 +117,7 @@ func main() {
 		"riswhois_ipv6": *risPath,
 		"iptoasn_v6_asn_metadata_only": *iptoasnPath,
 		"operator_config": *configPath,
+		"operator_ipv6_allocations": *allocationPath,
 	} {
 		meta, err := fileMetadata(path)
 		must(err)
@@ -105,12 +125,14 @@ func main() {
 	}
 	result := manifest{
 		GeneratedAt: generatedAt,
-		Scope: "Current exact IPv6 BGP prefixes whose complete observed Origin set is attributed to one Chinese operator; BGP Origin alone does not prove terminal-user access purpose",
+		Scope: "Current exact IPv6 BGP prefixes fully contained by each operator's official APNIC 240x allocation and whose complete observed Origin set is attributed to that operator",
 		OutputKind: "exact_bgp_prefix_candidates",
 		Sources: sources,
 		Constraints: []string{
 			"No gaoyifan china6 intersection",
 			"No APNIC inet6num input",
+			"Admission boundaries are the official allocations 240e::/18, 2409:8000::/20, and 2408:8000::/20 recorded in versioned configuration",
+			"Legacy 2001:: and 2400:: operator prefixes are outside the admission boundary",
 			"Every emitted CIDR is an exact prefix present in the RIPE RISWhois IPv6 dump",
 			"No address subtraction, sibling merging, or synthetic CIDR aggregation",
 			"Prefixes with unknown, excluded, or cross-operator Origins are not emitted",
@@ -124,9 +146,10 @@ func main() {
 				PrefixCount: len(chinanet),
 				Slash64Equivalent: uniqueSlash64(chinanet),
 				OriginASNs: chinanetASNs,
+				AdmissionBlocks: publicAllocations(allocations["chinanet"]),
 			},
-			"cmcc": {Status: "pending_additional_positive_evidence", Slash64Equivalent: "0.0000"},
-			"unicom": {Status: "pending_additional_positive_evidence", Slash64Equivalent: "0.0000"},
+			"cmcc": {Status: "pending_additional_positive_evidence", Slash64Equivalent: "0.0000", AdmissionBlocks: publicAllocations(allocations["cmcc"])},
+			"unicom": {Status: "pending_additional_positive_evidence", Slash64Equivalent: "0.0000", AdmissionBlocks: publicAllocations(allocations["unicom"])},
 		},
 	}
 	auditValue := audit{
@@ -146,7 +169,7 @@ func main() {
 	must(writeFile(*auditMarkdownPath, []byte(renderMarkdown(auditValue))))
 }
 
-func selectPrefixes(records []riswhois6.Record, metadata map[string]asMeta, classifier *operatorconfig.Classifier) (map[string][]riswhois6.Record, map[string]int) {
+func selectPrefixes(records []riswhois6.Record, metadata map[string]asMeta, classifier *operatorconfig.Classifier, allocations map[string][]allocation) (map[string][]riswhois6.Record, map[string]int) {
 	accepted := map[string][]riswhois6.Record{}
 	rejected := map[string]int{}
 	for _, record := range records {
@@ -184,9 +207,72 @@ func selectPrefixes(records []riswhois6.Record, metadata map[string]asMeta, clas
 			rejected[reason]++
 			continue
 		}
+		if !insideAllocation(record.Prefix, allocations[operator]) {
+			rejected["outside_operator_240x_allocation"]++
+			continue
+		}
 		accepted[operator] = append(accepted[operator], record)
 	}
 	return accepted, rejected
+}
+
+func readAllocations(path string) (map[string][]allocation, error) {
+	b, err := os.ReadFile(path)
+	if err != nil {
+		return nil, err
+	}
+	var cfg allocationConfig
+	if err := json.Unmarshal(b, &cfg); err != nil {
+		return nil, fmt.Errorf("parse IPv6 allocation config: %w", err)
+	}
+	if len(cfg.Operators) != len(operators) {
+		return nil, fmt.Errorf("IPv6 allocation config has %d operators, want %d", len(cfg.Operators), len(operators))
+	}
+	for _, operator := range operators {
+		rows := cfg.Operators[operator]
+		if len(rows) == 0 {
+			return nil, fmt.Errorf("IPv6 allocation config has no blocks for %s", operator)
+		}
+		for i := range rows {
+			prefix, err := netip.ParsePrefix(rows[i].Prefix)
+			if err != nil || !prefix.Addr().Is6() || prefix.Addr().Is4In6() || prefix != prefix.Masked() {
+				return nil, fmt.Errorf("invalid IPv6 allocation %q for %s", rows[i].Prefix, operator)
+			}
+			if rows[i].Registry != "APNIC" || rows[i].Organization == "" || rows[i].Source == "" {
+				return nil, fmt.Errorf("IPv6 allocation %q for %s lacks APNIC evidence", rows[i].Prefix, operator)
+			}
+			rows[i].parsed = prefix
+		}
+		cfg.Operators[operator] = rows
+	}
+	return cfg.Operators, nil
+}
+
+func insideAllocation(prefix netip.Prefix, allocations []allocation) bool {
+	prefix = prefix.Masked()
+	last := lastAddress(prefix)
+	for _, allocation := range allocations {
+		if allocation.parsed.Contains(prefix.Addr()) && allocation.parsed.Contains(last) {
+			return true
+		}
+	}
+	return false
+}
+
+func lastAddress(prefix netip.Prefix) netip.Addr {
+	b := prefix.Masked().Addr().As16()
+	for bit := prefix.Bits(); bit < 128; bit++ {
+		b[bit/8] |= 1 << uint(7-bit%8)
+	}
+	return netip.AddrFrom16(b)
+}
+
+func publicAllocations(rows []allocation) []allocation {
+	out := append([]allocation(nil), rows...)
+	for i := range out {
+		out[i].parsed = netip.Prefix{}
+	}
+	return out
 }
 
 func readASNMetadata(path string) (map[string]asMeta, error) {
@@ -312,7 +398,7 @@ func renderMarkdown(r audit) string {
 	fmt.Fprintln(&b, "# 三网 IPv6 原始 BGP 前缀审计")
 	fmt.Fprintln(&b)
 	fmt.Fprintf(&b, "生成时间：`%s`\n\n", r.GeneratedAt)
-	fmt.Fprintln(&b, "本报告直接以 RIPE RISWhois 的当前原始 IPv6 宣告前缀为单位；不使用 `china6`，不读取 APNIC `inet6num`，不进行地址切除或 CIDR 再聚合。")
+	fmt.Fprintln(&b, "本报告直接以 RIPE RISWhois 的当前原始 IPv6 宣告前缀为单位；只准入完整位于电信 `240e::/18`、移动 `2409:8000::/20`、联通 `2408:8000::/20` 相应母段内的前缀。不使用 `china6`，不读取 APNIC `inet6num`，不进行地址切除或 CIDR 再聚合。")
 	fmt.Fprintln(&b)
 	fmt.Fprintln(&b, "BGP 只能证明前缀和 Origin，不能证明终端用户接入用途。因此电信输出是待继续验证的 BGP 候选，不是已经完成用途证明的正式白名单。")
 	fmt.Fprintln(&b)
