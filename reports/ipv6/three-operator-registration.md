@@ -1,6 +1,6 @@
 # 三网 IPv6 APNIC 登记颗粒度审计
 
-生成时间：`2026-07-21T18:49:45.780799294Z`
+生成时间：`2026-07-21T19:01:05.858023574Z`
 
 审计对象是 `当前三网 IPv6 Origin ∩ china6`。`inet6num` 按最具体记录解析；`route6` 只统计与当前 BGP Origin 相同的登记。报告包含首轮规则预演，但不生成正式地址列表。
 
@@ -23,6 +23,60 @@ APNIC `inet6num` 记录：**148952**；解析后最具体区间：**194099**；`
 | chinanet | 771 | 50.095024% | 2320 | 49.904976% | 18.838693% |
 | cmcc | 288 | 96.991219% | 64 | 3.008781% | 0.000000% |
 | unicom | 4136 | 99.592897% | 25 | 0.407103% | 0.000000% |
+
+## 明确用户侧正证据样本
+
+| 运营商 | APNIC 前缀 | 占运营商候选 | netname / description / org | status | 首轮处理依据 |
+| --- | --- | ---: | --- | --- | --- |
+| chinanet | `240e:b00::/24` | 6.276026% | CT-IPV6-BROADBAND-ADDRESS; Chinatelecom IPv6 address for fixed broadband | ALLOCATED NON-PORTABLE | Retain: most-specific APNIC registration is attributed to the current operator |
+| chinanet | `240e:400::/24` | 6.276011% | CT-IPV6-MOBILE-ADDRESS; Chinatelecom IPv6 address for mobile | ALLOCATED NON-PORTABLE | Retain: most-specific APNIC registration is attributed to the current operator |
+| chinanet | `240e:300::/24` | 6.269131% | CT-IPV6-BROADBAND-ADDRESS; Chinatelecom IPv6 address for fixed broadband | ALLOCATED NON-PORTABLE | Retain: most-specific APNIC registration is attributed to the current operator |
+
+## 保留但只有泛化运营商证据的样本
+
+| 运营商 | APNIC 前缀 | 占运营商候选 | netname / description / org | status | 首轮处理依据 |
+| --- | --- | ---: | --- | --- | --- |
+| cmcc | `2409:8000::/20` | 96.991219% | CMNET-V6-20110823; China Mobile Communications Corporation; Mobile Communications Network Operator in China; Internet Service Provider in China; China Mobile | ALLOCATED PORTABLE | Retain: most-specific APNIC registration is attributed to the current operator |
+| chinanet | `240e::/18` | 31.177326% | CT-IPv6-Networks; Chinatelecom networks with tens of high-end routers and switches; Including users who access to Internet through Chinatelecom's networks.; China Telecom | ALLOCATED PORTABLE | Retain: most-specific APNIC registration is attributed to the current operator |
+| unicom | `2408:8000::/20` | 99.592897% | CU-CN; China Unicom; No.21, Jin-Rong Street; Beijng 100033 | ALLOCATED PORTABLE | Retain: most-specific APNIC registration is attributed to the current operator |
+| chinanet | `240e:16::/31` | 0.047498% | CHINANET-SC-IPv6-USER-ADDRESS; CHINANET Sichuan province network; Data Communication Division; China Telecom | ALLOCATED NON-PORTABLE | Retain: most-specific APNIC registration is attributed to the current operator |
+| chinanet | `2001:c68::/32` | 0.024516% | CHINANET-20020830; China Telecom; Internet Service Provider; Beijing,China | ALLOCATED PORTABLE | Retain: most-specific APNIC registration is attributed to the current operator |
+| chinanet | `240e:ed::/32` | 0.024516% | China-Telecom-Jiangsu-province-network; China Telecom Jiangsu province network for customer | ALLOCATED NON-PORTABLE | Retain: most-specific APNIC registration is attributed to the current operator |
+
+## 首轮排除样本
+
+| 运营商 | APNIC 前缀 | 占运营商候选 | netname / description / org | status | 首轮处理依据 |
+| --- | --- | ---: | --- | --- | --- |
+| chinanet | `240e:500::/24` | 6.276026% | CT-IPV6-VOLTE-ADDRESS; Chinatelecom IPv6 address for volte | ALLOCATED NON-PORTABLE | Exclude: APNIC registration contains an explicit non-user-side purpose |
+| chinanet | `240e:a00::/24` | 6.276026% | CT-IPV6-INTERNET-CAFE-ADDRESS; Chinatelecom IPv6 address for Internet cafe leased line | ALLOCATED NON-PORTABLE | Exclude: APNIC registration contains an explicit non-user-side purpose |
+| chinanet | `240e:100::/24` | 6.275040% | CT-IPV6-NETWORK-ADDRESS; Chinatelecom IPv6 address for network | ALLOCATED NON-PORTABLE | Exclude: APNIC registration contains an explicit non-user-side purpose |
+| chinanet | `240e:200::/24` | 6.273824% | CT-IPV6-PLATFORM-ADDRESS; Chinatelecom IPv6 address for own platform | ALLOCATED NON-PORTABLE | Exclude: APNIC registration contains an explicit non-user-side purpose |
+| chinanet | `240e:800::/24` | 6.271502% | CT-IPV6-IOT-ADDRESS; Chinatelecom IPv6 address for IOT | ALLOCATED NON-PORTABLE | Exclude: APNIC registration contains an explicit non-user-side purpose |
+| chinanet | `240e:600::/24` | 6.261335% | CT-IPV6-LEASED-LINE-ADDRESS; Chinatelecom IPv6 address for LEASED LINE | ALLOCATED NON-PORTABLE | Exclude: APNIC registration contains an explicit non-user-side purpose |
+| chinanet | `240e:700::/24` | 6.229961% | CT-IPV6-LEASED-LINE-ADDRESS; Chinatelecom IPv6 address for LEASED LINE | ALLOCATED NON-PORTABLE | Exclude: APNIC registration contains an explicit non-user-side purpose |
+| chinanet | `240e:900::/24` | 5.974659% | CT-IPV6-IDC-ADDRESS; Chinatelecom IPv6 address for IDC & Cloud service | ALLOCATED NON-PORTABLE | Exclude: APNIC registration contains an explicit non-user-side purpose |
+| cmcc | `240a:4000::/21` | 2.937741% | CBN-CN; China Broadcasting Network Corporation Ltd.; No.10 Baiyun Road, Xicheng District, Beijing; China Internet Network Information Center | ALLOCATED PORTABLE | Exclude: most-specific APNIC registration names an independent legal entity |
+| chinanet | `2400:75a0::/28` | 0.024516% | DCCLGOOXNAHP-CN; Digital City Construction Leading Group Office of Xiongan New Area, Hebei Province; Digital City Construction Leading Group Office of Xiongan New Area, Hebei Province | ALLOCATED PORTABLE | Exclude: portable resource cannot be attributed to the current operator |
+| cmcc | `2401:1320::/32` | 0.023680% | YUNSILKIPCOM; Silk Road Information Port Cloud Computing Technology Co., Ltd; No. 72 Beibinhe East Road, Chengguan District, Lanzhou , Gansu | ALLOCATED PORTABLE | Exclude: APNIC registration contains an explicit non-user-side purpose |
+| unicom | `2402:18a0::/32` | 0.202218% | SAUNET; Shenyang Aerospace University; Shenyang Aerospace University, No.37 Daoyi South Avenue,; Daoyi District, Shenyang, Liaoning Province, China | ALLOCATED PORTABLE | Exclude: portable resource cannot be attributed to the current operator |
+| cmcc | `2402:9a80::/32` | 0.023680% | JSMNET; Jishi Media Co ., Ltd.; No.1027-1, Xinmin Street, Changchun | ALLOCATED PORTABLE | Exclude: most-specific APNIC registration names an independent legal entity |
+| unicom | `2402:ef40::/32` | 0.202218% | DRCSCNET; Development & Research Center of State Council Net.; No.225 Chaonei Street Dongcheng District Beijing China | ALLOCATED PORTABLE | Exclude: portable resource cannot be attributed to the current operator |
+| chinanet | `2404:1c80::/32` | 0.024516% | GDXCNET; BeiJing guangdianxinchuang communication &; technology C0.,LTD.; Room 2205,Building 2,Zhubang 2000 Business Center,; No.99 Balizhuang Xili,Chaoyang District | ALLOCATED PORTABLE | Exclude: most-specific APNIC registration names an independent legal entity |
+| cmcc | `2407:37c0::/32` | 0.023680% | JSMNET; Jishi Media Co ., Ltd.; No.1027-1, Xinmin Street, Changchun | ALLOCATED PORTABLE | Exclude: most-specific APNIC registration names an independent legal entity |
+| chinanet | `240e:83:8000::/33` | 0.012162% | BeiJing-Telecom-UserAddress-lowguaranteed; BeiJing Telecom UserAddress for low-guaranteed | ALLOCATED NON-PORTABLE | Exclude: portable resource cannot be attributed to the current operator |
+| chinanet | `240e:83::/34` | 0.004597% | BeiJing-Telecom-UserAddress-Highguaranteed; BeiJing Telecom UserAddress for High-guaranteed | ALLOCATED NON-PORTABLE | Exclude: portable resource cannot be attributed to the current operator |
+| chinanet | `240e:83::/36` | 0.000766% | BeiJing-Telecom-UserAddress-Highguaranteed; BeiJing Telecom UserAddress for High-guaranteed | ASSIGNED NON-PORTABLE | Exclude: portable resource cannot be attributed to the current operator |
+| unicom | `2406:cac0::/32` | 0.001580% | DFM; Dongfeng Communication Technology Co.,Ltd. | ALLOCATED PORTABLE | Exclude: most-specific APNIC registration names an independent legal entity |
+| unicom | `2407:6c40::/32` | 0.000793% | BJ-SHOUZIXIN; Beijing Shougang Automation Information Technology Co.,Ltd; Building 1, Yard 1, Shimen Road, Shijingshan, Beijing | ALLOCATED PORTABLE | Exclude: most-specific APNIC registration names an independent legal entity |
+| chinanet | `2402:f8c0::/32` | 0.000024% | Digital-Guangdong; Digital Guangdong Network Construction Co, Ltd | ALLOCATED PORTABLE | Exclude: most-specific APNIC registration names an independent legal entity |
+| unicom | `2400:cb80::/32` | 0.000105% | BMW-SF-CN; BMW Automotive Finance (China) Co., Ltd.; 22nd Floor, Tower B, Gateway Plaza; No. 18 Xia Guang Li North Road, East Third Ring; Chaoyang District, Beijing 100027, PR China | ALLOCATED PORTABLE | Exclude: most-specific APNIC registration names an independent legal entity |
+| unicom | `2402:dfc0::/32` | 0.000099% | JD-finance-network; Beijing JD Finance Technology Holding Co., Ltd. | ALLOCATED PORTABLE | Exclude: most-specific APNIC registration names an independent legal entity |
+| chinanet | `2406:d440::/32` | 0.000006% | VOLCANO-ENGINE; Beijing Volcano Engine Technology Co., Ltd.; 1309, 13/F, Building 4, Zijin Digital Park, Haidian District, Beijing | ALLOCATED PORTABLE | Exclude: APNIC registration contains an explicit non-user-side purpose |
+| unicom | `2400:89c0::/32` | 0.000049% | SINA; 15F,Ideal Plaza No.58 Bei Si Huan Xi Road Haidian District; Beijing,China,100080 | ALLOCATED PORTABLE | Exclude: portable resource cannot be attributed to the current operator |
+| chinanet | `2400:9380::/31` | 0.000001% | CTGI-AS-AP; China Telecom Global Limited; 38/F DAH SING Financial Center; 108 Gloucester Road Wan Chai; China Telecom Global Limited | ALLOCATED PORTABLE | Exclude: most-specific APNIC registration is outside mainland China |
+| chinanet | `2401:1d40::/32` | 0.000001% | BJKSCNET; Beijing Kingsoft Cloud Internet Technology Co., Ltd.; Kingsoft Tower,No.33 Xiao Ying West Road,Haidian District,Beijing,China | ALLOCATED PORTABLE | Exclude: APNIC registration contains an explicit non-user-side purpose |
+| unicom | `2402:f140::/32` | 0.000009% | AIPO-CN; AIPO Cloud (Guizhou) Technology Co., Ltd. | ALLOCATED PORTABLE | Exclude: most-specific APNIC registration names an independent legal entity |
+| chinanet | `2400:9380:8000::/44` | 0.000001% | CTGI-AS-AP; Chinatelecom global limit 38/F., DAH SING Financial Center, 108 Gloucester Road, Wan Chai, Hong Kong | ALLOCATED NON-PORTABLE | Exclude: most-specific APNIC registration is outside mainland China |
 
 ## 最具体 inet6num 分类
 

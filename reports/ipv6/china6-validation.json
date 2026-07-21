@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-21T18:49:36.267217287Z",
+  "generated_at": "2026-07-21T19:00:56.205007352Z",
   "scope": "Factual validation of gaoyifan/china-operator-ip china6.txt against current IPtoASN IPv6 origins, RIPE RISWhois IPv6 visibility, APNIC delegated country registration, and the repository's three-operator ASN policy; no address is admitted or excluded by this audit",
   "sources": {
     "apnic_delegated": {
@@ -25,7 +25,7 @@
     "iptoasn_v6": {
       "path": "/home/runner/work/cn-eyeball-prefixes/cn-eyeball-prefixes/.tmp/cn-eyeball-ipv6-sources/ip2asn-v6.tsv.gz",
       "bytes": 1974689,
-      "sha256": "83661628ea665d7cc2005678f8c9492231d17171baacb4b718592ec9e118b4eb"
+      "sha256": "816bd185c5a950b8dc8a5cf2d97606d28f7ed4c3e5f6e7fa698ca738d0af3269"
     },
     "operator_config": {
       "path": "config/operators.json",

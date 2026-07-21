@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-21T18:49:45.780799294Z",
+  "generated_at": "2026-07-21T19:01:05.858023574Z",
   "scope": "Read-only audit and first-pass policy preview of the most-specific APNIC inet6num and same-origin route6 evidence covering current mainland China Telecom, China Mobile, and China Unicom IPv6 origins inside gaoyifan china6.txt; no formal prefix list is emitted",
   "inet6num_record_count": 148952,
   "inet6num_segment_count": 194099,
@@ -338,6 +338,8 @@
       "status": "ALLOCATED PORTABLE",
       "matched_by": "description_patterns: china mobile",
       "reason": "Most-specific APNIC registration is attributed to the current BGP operator",
+      "first_pass_decision": "retain",
+      "first_pass_reason": "Retain: most-specific APNIC registration is attributed to the current operator",
       "space": {
         "cidr_count": 0,
         "address_count": "324517405178898092885440049709056",
@@ -370,6 +372,8 @@
       "status": "ALLOCATED PORTABLE",
       "matched_by": "description_patterns: china ?telecom",
       "reason": "Most-specific APNIC registration is attributed to the current BGP operator",
+      "first_pass_decision": "retain",
+      "first_pass_reason": "Retain: most-specific APNIC registration is attributed to the current operator",
       "space": {
         "cidr_count": 0,
         "address_count": "100756633720857559371186001936384",
@@ -397,6 +401,8 @@
       "status": "ALLOCATED PORTABLE",
       "matched_by": "description_patterns: unicom",
       "reason": "Most-specific APNIC registration is attributed to the current BGP operator",
+      "first_pass_decision": "retain",
+      "first_pass_reason": "Retain: most-specific APNIC registration is attributed to the current operator",
       "space": {
         "cidr_count": 0,
         "address_count": "39019994557634606571625390276608",
@@ -422,6 +428,8 @@
       "status": "ALLOCATED NON-PORTABLE",
       "matched_by": "ipv6_explicit_service: volte",
       "reason": "APNIC inet6num explicitly identifies a VoLTE service address pool rather than ordinary Internet access",
+      "first_pass_decision": "exclude",
+      "first_pass_reason": "Exclude: APNIC registration contains an explicit non-user-side purpose",
       "space": {
         "cidr_count": 0,
         "address_count": "20282409603651670423947251286016",
@@ -447,6 +455,8 @@
       "status": "ALLOCATED NON-PORTABLE",
       "matched_by": "exclude_apnic_inetnum_rules: \\b(?:leased|dedicated|private|special)[ -]?(?:line|circuit)s?\\b",
       "reason": "APNIC inetnum registration explicitly identifies a dedicated line or circuit",
+      "first_pass_decision": "exclude",
+      "first_pass_reason": "Exclude: APNIC registration contains an explicit non-user-side purpose",
       "space": {
         "cidr_count": 0,
         "address_count": "20282409603651670423947251286016",
@@ -472,6 +482,9 @@
       "status": "ALLOCATED NON-PORTABLE",
       "matched_by": "description_patterns: china ?telecom",
       "reason": "Most-specific APNIC registration is attributed to the current BGP operator",
+      "first_pass_decision": "retain",
+      "first_pass_reason": "Retain: most-specific APNIC registration is attributed to the current operator",
+      "explicit_user_purpose": true,
       "space": {
         "cidr_count": 0,
         "address_count": "20282409603651670423947251286016",
@@ -497,6 +510,9 @@
       "status": "ALLOCATED NON-PORTABLE",
       "matched_by": "description_patterns: china ?telecom",
       "reason": "Most-specific APNIC registration is attributed to the current BGP operator",
+      "first_pass_decision": "retain",
+      "first_pass_reason": "Retain: most-specific APNIC registration is attributed to the current operator",
+      "explicit_user_purpose": true,
       "space": {
         "cidr_count": 0,
         "address_count": "20282358828767246609521913626624",
@@ -522,6 +538,8 @@
       "status": "ALLOCATED NON-PORTABLE",
       "matched_by": "ipv6_explicit_service: network",
       "reason": "APNIC inet6num explicitly identifies a generic network address pool without end-user purpose",
+      "first_pass_decision": "exclude",
+      "first_pass_reason": "Exclude: APNIC registration contains an explicit non-user-side purpose",
       "space": {
         "cidr_count": 0,
         "address_count": "20279222875191166261442725806080",
@@ -547,6 +565,8 @@
       "status": "ALLOCATED NON-PORTABLE",
       "matched_by": "ipv6_explicit_service: own platform",
       "reason": "APNIC inet6num explicitly identifies the operator's own platform address pool",
+      "first_pass_decision": "exclude",
+      "first_pass_reason": "Exclude: APNIC registration contains an explicit non-user-side purpose",
       "space": {
         "cidr_count": 0,
         "address_count": "20275291448425779487366581321728",
@@ -572,6 +592,8 @@
       "status": "ALLOCATED NON-PORTABLE",
       "matched_by": "exclude_apnic_inetnum_rules: (?:^|[^a-z0-9])(?:iot|m2m)(?:[^a-z0-9]|$)|\\binternet of things\\b",
       "reason": "APNIC inetnum registration explicitly identifies an IoT or M2M network",
+      "first_pass_decision": "exclude",
+      "first_pass_reason": "Exclude: APNIC registration contains an explicit non-user-side purpose",
       "space": {
         "cidr_count": 0,
         "address_count": "20267786436937611869450005381120",
@@ -597,6 +619,9 @@
       "status": "ALLOCATED NON-PORTABLE",
       "matched_by": "description_patterns: china ?telecom",
       "reason": "Most-specific APNIC registration is attributed to the current BGP operator",
+      "first_pass_decision": "retain",
+      "first_pass_reason": "Retain: most-specific APNIC registration is attributed to the current operator",
+      "explicit_user_purpose": true,
       "space": {
         "cidr_count": 0,
         "address_count": "20260126682944533578999067049984",
@@ -622,6 +647,8 @@
       "status": "ALLOCATED NON-PORTABLE",
       "matched_by": "exclude_apnic_inetnum_rules: \\b(?:leased|dedicated|private|special)[ -]?(?:line|circuit)s?\\b",
       "reason": "APNIC inetnum registration explicitly identifies a dedicated line or circuit",
+      "first_pass_decision": "exclude",
+      "first_pass_reason": "Exclude: APNIC registration contains an explicit non-user-side purpose",
       "space": {
         "cidr_count": 0,
         "address_count": "20234930251012125477739840929792",
@@ -647,6 +674,8 @@
       "status": "ALLOCATED NON-PORTABLE",
       "matched_by": "exclude_apnic_inetnum_rules: \\b(?:leased|dedicated|private|special)[ -]?(?:line|circuit)s?\\b",
       "reason": "APNIC inetnum registration explicitly identifies a dedicated line or circuit",
+      "first_pass_decision": "exclude",
+      "first_pass_reason": "Exclude: APNIC registration contains an explicit non-user-side purpose",
       "space": {
         "cidr_count": 0,
         "address_count": "20133538851446866143486408654848",
@@ -672,6 +701,8 @@
       "status": "ALLOCATED NON-PORTABLE",
       "matched_by": "exclude_apnic_inetnum_rules: idc(?:[^a-z0-9]|$)|\\binternet data cent(?:er|re)\\b",
       "reason": "APNIC inetnum registration explicitly identifies an IDC network",
+      "first_pass_decision": "exclude",
+      "first_pass_reason": "Exclude: APNIC registration contains an explicit non-user-side purpose",
       "space": {
         "cidr_count": 0,
         "address_count": "19308472367002093638962112364544",
@@ -704,6 +735,8 @@
       "status": "ALLOCATED PORTABLE",
       "matched_by": "independent_legal_entity_patterns",
       "reason": "Most-specific APNIC registration names an independent legal entity without operator attribution",
+      "first_pass_decision": "exclude",
+      "first_pass_reason": "Exclude: most-specific APNIC registration names an independent legal entity",
       "space": {
         "cidr_count": 0,
         "address_count": "9829222151261166319373901627392",
@@ -731,6 +764,8 @@
       "status": "ALLOCATED NON-PORTABLE",
       "matched_by": "description_patterns: china ?telecom",
       "reason": "Most-specific APNIC registration is attributed to the current BGP operator",
+      "first_pass_decision": "retain",
+      "first_pass_reason": "Retain: most-specific APNIC registration is attributed to the current operator",
       "space": {
         "cidr_count": 0,
         "address_count": "153502147019747924829141991424",
@@ -758,6 +793,8 @@
       "status": "ALLOCATED PORTABLE",
       "matched_by": "description_patterns: china ?telecom",
       "reason": "Most-specific APNIC registration is attributed to the current BGP operator",
+      "first_pass_decision": "retain",
+      "first_pass_reason": "Retain: most-specific APNIC registration is attributed to the current operator",
       "space": {
         "cidr_count": 0,
         "address_count": "79228162514264337593543950336",
@@ -788,6 +825,8 @@
       "country": "CN",
       "status": "ALLOCATED PORTABLE",
       "reason": "Most-specific APNIC registration has no current strong operator or non-public classification",
+      "first_pass_decision": "exclude",
+      "first_pass_reason": "Exclude: portable resource cannot be attributed to the current operator",
       "space": {
         "cidr_count": 0,
         "address_count": "79228162514264337593543950336",
@@ -814,6 +853,8 @@
       "status": "ALLOCATED PORTABLE",
       "matched_by": "exclude_apnic_inetnum_rules: \\bcloud computing\\b",
       "reason": "APNIC inetnum registration explicitly identifies a cloud-computing network",
+      "first_pass_decision": "exclude",
+      "first_pass_reason": "Exclude: APNIC registration contains an explicit non-user-side purpose",
       "space": {
         "cidr_count": 0,
         "address_count": "79228162514264337593543950336",
@@ -840,6 +881,8 @@
       "country": "CN",
       "status": "ALLOCATED PORTABLE",
       "reason": "Most-specific APNIC registration has no current strong operator or non-public classification",
+      "first_pass_decision": "exclude",
+      "first_pass_reason": "Exclude: portable resource cannot be attributed to the current operator",
       "space": {
         "cidr_count": 0,
         "address_count": "79228162514264337593543950336",
@@ -866,6 +909,8 @@
       "status": "ALLOCATED PORTABLE",
       "matched_by": "independent_legal_entity_patterns",
       "reason": "Most-specific APNIC registration names an independent legal entity without operator attribution",
+      "first_pass_decision": "exclude",
+      "first_pass_reason": "Exclude: most-specific APNIC registration names an independent legal entity",
       "space": {
         "cidr_count": 0,
         "address_count": "79228162514264337593543950336",
@@ -891,6 +936,8 @@
       "country": "CN",
       "status": "ALLOCATED PORTABLE",
       "reason": "Most-specific APNIC registration has no current strong operator or non-public classification",
+      "first_pass_decision": "exclude",
+      "first_pass_reason": "Exclude: portable resource cannot be attributed to the current operator",
       "space": {
         "cidr_count": 0,
         "address_count": "79228162514264337593543950336",
@@ -919,6 +966,8 @@
       "status": "ALLOCATED PORTABLE",
       "matched_by": "independent_legal_entity_patterns",
       "reason": "Most-specific APNIC registration names an independent legal entity without operator attribution",
+      "first_pass_decision": "exclude",
+      "first_pass_reason": "Exclude: most-specific APNIC registration names an independent legal entity",
       "space": {
         "cidr_count": 0,
         "address_count": "79228162514264337593543950336",
@@ -945,6 +994,8 @@
       "status": "ALLOCATED PORTABLE",
       "matched_by": "independent_legal_entity_patterns",
       "reason": "Most-specific APNIC registration names an independent legal entity without operator attribution",
+      "first_pass_decision": "exclude",
+      "first_pass_reason": "Exclude: most-specific APNIC registration names an independent legal entity",
       "space": {
         "cidr_count": 0,
         "address_count": "79228162514264337593543950336",
@@ -970,6 +1021,8 @@
       "status": "ALLOCATED NON-PORTABLE",
       "matched_by": "description_patterns: china ?telecom",
       "reason": "Most-specific APNIC registration is attributed to the current BGP operator",
+      "first_pass_decision": "retain",
+      "first_pass_reason": "Retain: most-specific APNIC registration is attributed to the current operator",
       "space": {
         "cidr_count": 0,
         "address_count": "79228162514264337593543950336",
@@ -994,6 +1047,9 @@
       "country": "CN",
       "status": "ALLOCATED NON-PORTABLE",
       "reason": "Most-specific APNIC registration has no current strong operator or non-public classification",
+      "first_pass_decision": "exclude",
+      "first_pass_reason": "Exclude: portable resource cannot be attributed to the current operator",
+      "explicit_user_purpose": true,
       "space": {
         "cidr_count": 0,
         "address_count": "39304596247310823728047194112",
@@ -1018,6 +1074,9 @@
       "country": "CN",
       "status": "ALLOCATED NON-PORTABLE",
       "reason": "Most-specific APNIC registration has no current strong operator or non-public classification",
+      "first_pass_decision": "exclude",
+      "first_pass_reason": "Exclude: portable resource cannot be attributed to the current operator",
+      "explicit_user_purpose": true,
       "space": {
         "cidr_count": 0,
         "address_count": "14855280471424563298789490688",
@@ -1042,6 +1101,9 @@
       "country": "CN",
       "status": "ASSIGNED NON-PORTABLE",
       "reason": "Most-specific APNIC registration has no current strong operator or non-public classification",
+      "first_pass_decision": "exclude",
+      "first_pass_reason": "Exclude: portable resource cannot be attributed to the current operator",
+      "explicit_user_purpose": true,
       "space": {
         "cidr_count": 0,
         "address_count": "2475880078570760549798248448",
@@ -1067,6 +1129,8 @@
       "status": "ALLOCATED PORTABLE",
       "matched_by": "independent_legal_entity_patterns",
       "reason": "Most-specific APNIC registration names an independent legal entity without operator attribution",
+      "first_pass_decision": "exclude",
+      "first_pass_reason": "Exclude: most-specific APNIC registration names an independent legal entity",
       "space": {
         "cidr_count": 0,
         "address_count": "618970019642690137449562112",
@@ -1093,6 +1157,8 @@
       "status": "ALLOCATED PORTABLE",
       "matched_by": "independent_legal_entity_patterns",
       "reason": "Most-specific APNIC registration names an independent legal entity without operator attribution",
+      "first_pass_decision": "exclude",
+      "first_pass_reason": "Exclude: most-specific APNIC registration names an independent legal entity",
       "space": {
         "cidr_count": 0,
         "address_count": "310693935640959697899487232",
@@ -1118,6 +1184,8 @@
       "status": "ALLOCATED PORTABLE",
       "matched_by": "independent_legal_entity_patterns",
       "reason": "Most-specific APNIC registration names an independent legal entity without operator attribution",
+      "first_pass_decision": "exclude",
+      "first_pass_reason": "Exclude: most-specific APNIC registration names an independent legal entity",
       "space": {
         "cidr_count": 0,
         "address_count": "76162326635721638006489088",
@@ -1146,6 +1214,8 @@
       "status": "ALLOCATED PORTABLE",
       "matched_by": "independent_legal_entity_patterns",
       "reason": "Most-specific APNIC registration names an independent legal entity without operator attribution",
+      "first_pass_decision": "exclude",
+      "first_pass_reason": "Exclude: most-specific APNIC registration names an independent legal entity",
       "space": {
         "cidr_count": 0,
         "address_count": "41103477866897391940009984",
@@ -1171,6 +1241,8 @@
       "status": "ALLOCATED PORTABLE",
       "matched_by": "independent_legal_entity_patterns",
       "reason": "Most-specific APNIC registration names an independent legal entity without operator attribution",
+      "first_pass_decision": "exclude",
+      "first_pass_reason": "Exclude: most-specific APNIC registration names an independent legal entity",
       "space": {
         "cidr_count": 0,
         "address_count": "38685626227668133590597632",
@@ -1197,6 +1269,8 @@
       "status": "ALLOCATED PORTABLE",
       "matched_by": "exclude_apnic_inetnum_rules: (?:^|[^a-z0-9])(?:aliyun|qcloud|ucloud|ksyun|jdcloud|ctyun|qingcloud|volcengine|cloudflare|akamai|wangsu|chinanetcenter|baishancloud|sinnet|westclouddata|nwcd)(?:[^a-z0-9]|$)|\\bbeijing guanghuan xinwang(?:[ |.,-]+digital technology)?\\b|\\b(?:alibaba|huawei|tencent|baidu|kingsoft|jingdong|jd|tianyi|china telecom|china unicom|china mobile|google|oracle|ibm)[ -]?(?:ai[ -]?)?cloud\\b|\\bamazon web services\\b|\\bmicrosoft azure\\b|\\bvolcano engine\\b",
       "reason": "APNIC inetnum registration explicitly identifies a known cloud or CDN brand",
+      "first_pass_decision": "exclude",
+      "first_pass_reason": "Exclude: APNIC registration contains an explicit non-user-side purpose",
       "space": {
         "cidr_count": 0,
         "address_count": "20551738933448695970004992",
@@ -1222,6 +1296,8 @@
       "country": "CN",
       "status": "ALLOCATED PORTABLE",
       "reason": "Most-specific APNIC registration has no current strong operator or non-public classification",
+      "first_pass_decision": "exclude",
+      "first_pass_reason": "Exclude: portable resource cannot be attributed to the current operator",
       "space": {
         "cidr_count": 0,
         "address_count": "19342813113834066795298816",
@@ -1255,6 +1331,8 @@
       "status": "ALLOCATED PORTABLE",
       "matched_by": "description_patterns: china ?telecom",
       "reason": "Most-specific APNIC registration is attributed to the current BGP operator",
+      "first_pass_decision": "exclude",
+      "first_pass_reason": "Exclude: most-specific APNIC registration is outside mainland China",
       "space": {
         "cidr_count": 0,
         "address_count": "3626777458843887524118528",
@@ -1281,6 +1359,8 @@
       "status": "ALLOCATED PORTABLE",
       "matched_by": "exclude_apnic_inetnum_rules: (?:^|[^a-z0-9])(?:aliyun|qcloud|ucloud|ksyun|jdcloud|ctyun|qingcloud|volcengine|cloudflare|akamai|wangsu|chinanetcenter|baishancloud|sinnet|westclouddata|nwcd)(?:[^a-z0-9]|$)|\\bbeijing guanghuan xinwang(?:[ |.,-]+digital technology)?\\b|\\b(?:alibaba|huawei|tencent|baidu|kingsoft|jingdong|jd|tianyi|china telecom|china unicom|china mobile|google|oracle|ibm)[ -]?(?:ai[ -]?)?cloud\\b|\\bamazon web services\\b|\\bmicrosoft azure\\b|\\bvolcano engine\\b",
       "reason": "APNIC inetnum registration explicitly identifies a known cloud or CDN brand",
+      "first_pass_decision": "exclude",
+      "first_pass_reason": "Exclude: APNIC registration contains an explicit non-user-side purpose",
       "space": {
         "cidr_count": 0,
         "address_count": "3626777458843887524118528",
@@ -1306,6 +1386,8 @@
       "status": "ALLOCATED PORTABLE",
       "matched_by": "independent_legal_entity_patterns",
       "reason": "Most-specific APNIC registration names an independent legal entity without operator attribution",
+      "first_pass_decision": "exclude",
+      "first_pass_reason": "Exclude: most-specific APNIC registration names an independent legal entity",
       "space": {
         "cidr_count": 0,
         "address_count": "3626777458843887524118528",
@@ -1331,6 +1413,8 @@
       "status": "ALLOCATED NON-PORTABLE",
       "matched_by": "description_patterns: china ?telecom",
       "reason": "Most-specific APNIC registration is attributed to the current BGP operator",
+      "first_pass_decision": "exclude",
+      "first_pass_reason": "Exclude: most-specific APNIC registration is outside mainland China",
       "space": {
         "cidr_count": 0,
         "address_count": "2417851639229258349412352",
@@ -1356,6 +1440,8 @@
       "country": "CN",
       "status": "ALLOCATED PORTABLE",
       "reason": "Most-specific APNIC registration has no current strong operator or non-public classification",
+      "first_pass_decision": "exclude",
+      "first_pass_reason": "Exclude: portable resource cannot be attributed to the current operator",
       "space": {
         "cidr_count": 0,
         "address_count": "2417851639229258349412352",
@@ -1380,6 +1466,8 @@
       "country": "CN",
       "status": "ALLOCATED PORTABLE",
       "reason": "Most-specific APNIC registration has no current strong operator or non-public classification",
+      "first_pass_decision": "exclude",
+      "first_pass_reason": "Exclude: portable resource cannot be attributed to the current operator",
       "space": {
         "cidr_count": 0,
         "address_count": "1208925819614629174706176",
@@ -1405,6 +1493,8 @@
       "status": "ALLOCATED NON-PORTABLE",
       "matched_by": "description_patterns: china ?telecom",
       "reason": "Most-specific APNIC registration is attributed to the current BGP operator",
+      "first_pass_decision": "exclude",
+      "first_pass_reason": "Exclude: most-specific APNIC registration is outside mainland China",
       "space": {
         "cidr_count": 0,
         "address_count": "1208925819614629174706176",
@@ -1430,6 +1520,8 @@
       "status": "ALLOCATED NON-PORTABLE",
       "matched_by": "description_patterns: china ?telecom",
       "reason": "Most-specific APNIC registration is attributed to the current BGP operator",
+      "first_pass_decision": "exclude",
+      "first_pass_reason": "Exclude: most-specific APNIC registration is outside mainland China",
       "space": {
         "cidr_count": 0,
         "address_count": "1208925819614629174706176",
@@ -1457,6 +1549,8 @@
       "status": "ALLOCATED PORTABLE",
       "matched_by": "independent_legal_entity_patterns",
       "reason": "Most-specific APNIC registration names an independent legal entity without operator attribution",
+      "first_pass_decision": "exclude",
+      "first_pass_reason": "Exclude: most-specific APNIC registration names an independent legal entity",
       "space": {
         "cidr_count": 0,
         "address_count": "1208925819614629174706176",
@@ -1484,6 +1578,8 @@
       "status": "ALLOCATED PORTABLE",
       "matched_by": "independent_legal_entity_patterns",
       "reason": "Most-specific APNIC registration names an independent legal entity without operator attribution",
+      "first_pass_decision": "exclude",
+      "first_pass_reason": "Exclude: most-specific APNIC registration names an independent legal entity",
       "space": {
         "cidr_count": 0,
         "address_count": "1208925819614629174706176",
@@ -1509,6 +1605,8 @@
       "status": "ALLOCATED PORTABLE",
       "matched_by": "exclude_apnic_inetnum_rules: (?:^|[^a-z0-9])(?:aliyun|qcloud|ucloud|ksyun|jdcloud|ctyun|qingcloud|volcengine|cloudflare|akamai|wangsu|chinanetcenter|baishancloud|sinnet|westclouddata|nwcd)(?:[^a-z0-9]|$)|\\bbeijing guanghuan xinwang(?:[ |.,-]+digital technology)?\\b|\\b(?:alibaba|huawei|tencent|baidu|kingsoft|jingdong|jd|tianyi|china telecom|china unicom|china mobile|google|oracle|ibm)[ -]?(?:ai[ -]?)?cloud\\b|\\bamazon web services\\b|\\bmicrosoft azure\\b|\\bvolcano engine\\b",
       "reason": "APNIC inetnum registration explicitly identifies a known cloud or CDN brand",
+      "first_pass_decision": "exclude",
+      "first_pass_reason": "Exclude: APNIC registration contains an explicit non-user-side purpose",
       "space": {
         "cidr_count": 0,
         "address_count": "1208925819614629174706176",
@@ -1536,6 +1634,8 @@
       "status": "ALLOCATED PORTABLE",
       "matched_by": "exclude_apnic_inetnum_rules: \\bcloud computing\\b",
       "reason": "APNIC inetnum registration explicitly identifies a cloud-computing network",
+      "first_pass_decision": "exclude",
+      "first_pass_reason": "Exclude: APNIC registration contains an explicit non-user-side purpose",
       "space": {
         "cidr_count": 0,
         "address_count": "1208925819614629174706176",
@@ -1563,6 +1663,8 @@
       "status": "ALLOCATED PORTABLE",
       "matched_by": "independent_legal_entity_patterns",
       "reason": "Most-specific APNIC registration names an independent legal entity without operator attribution",
+      "first_pass_decision": "exclude",
+      "first_pass_reason": "Exclude: most-specific APNIC registration names an independent legal entity",
       "space": {
         "cidr_count": 0,
         "address_count": "1208925819614629174706176",
@@ -1590,6 +1692,8 @@
       "status": "ALLOCATED PORTABLE",
       "matched_by": "exclude_apnic_inetnum_rules: \\bcloud computing\\b",
       "reason": "APNIC inetnum registration explicitly identifies a cloud-computing network",
+      "first_pass_decision": "exclude",
+      "first_pass_reason": "Exclude: APNIC registration contains an explicit non-user-side purpose",
       "space": {
         "cidr_count": 0,
         "address_count": "1208925819614629174706176",
@@ -1615,6 +1719,8 @@
       "status": "ALLOCATED PORTABLE",
       "matched_by": "independent_legal_entity_patterns",
       "reason": "Most-specific APNIC registration names an independent legal entity without operator attribution",
+      "first_pass_decision": "exclude",
+      "first_pass_reason": "Exclude: most-specific APNIC registration names an independent legal entity",
       "space": {
         "cidr_count": 0,
         "address_count": "1208925819614629174706176",
@@ -1640,6 +1746,8 @@
       "status": "ALLOCATED PORTABLE",
       "matched_by": "independent_legal_entity_patterns",
       "reason": "Most-specific APNIC registration names an independent legal entity without operator attribution",
+      "first_pass_decision": "exclude",
+      "first_pass_reason": "Exclude: most-specific APNIC registration names an independent legal entity",
       "space": {
         "cidr_count": 0,
         "address_count": "1208925819614629174706176",
@@ -1666,6 +1774,8 @@
       "country": "CN",
       "status": "ALLOCATED PORTABLE",
       "reason": "Most-specific APNIC registration has no current strong operator or non-public classification",
+      "first_pass_decision": "exclude",
+      "first_pass_reason": "Exclude: portable resource cannot be attributed to the current operator",
       "space": {
         "cidr_count": 0,
         "address_count": "1208925819614629174706176",
@@ -1691,6 +1801,8 @@
       "status": "ALLOCATED PORTABLE",
       "matched_by": "independent_legal_entity_patterns",
       "reason": "Most-specific APNIC registration names an independent legal entity without operator attribution",
+      "first_pass_decision": "exclude",
+      "first_pass_reason": "Exclude: most-specific APNIC registration names an independent legal entity",
       "space": {
         "cidr_count": 0,
         "address_count": "1208925819614629174706176",
@@ -1717,6 +1829,8 @@
       "status": "ALLOCATED PORTABLE",
       "matched_by": "independent_legal_entity_patterns",
       "reason": "Most-specific APNIC registration names an independent legal entity without operator attribution",
+      "first_pass_decision": "exclude",
+      "first_pass_reason": "Exclude: most-specific APNIC registration names an independent legal entity",
       "space": {
         "cidr_count": 0,
         "address_count": "1208925819614629174706176",
@@ -1744,6 +1858,8 @@
       "status": "ALLOCATED PORTABLE",
       "matched_by": "exclude_apnic_inetnum_rules: (?:^|[^a-z0-9])(?:21vianet|cnisp)(?:[^a-z0-9]|$)",
       "reason": "APNIC inetnum registration explicitly identifies 21Vianet or CNISP",
+      "first_pass_decision": "exclude",
+      "first_pass_reason": "Exclude: APNIC registration contains an explicit non-user-side purpose",
       "space": {
         "cidr_count": 0,
         "address_count": "1208925819614629174706176",
@@ -1769,6 +1885,8 @@
       "status": "ALLOCATED PORTABLE",
       "matched_by": "independent_legal_entity_patterns",
       "reason": "Most-specific APNIC registration names an independent legal entity without operator attribution",
+      "first_pass_decision": "exclude",
+      "first_pass_reason": "Exclude: most-specific APNIC registration names an independent legal entity",
       "space": {
         "cidr_count": 0,
         "address_count": "1208925819614629174706176",
@@ -1794,6 +1912,8 @@
       "country": "CN",
       "status": "ALLOCATED PORTABLE",
       "reason": "Most-specific APNIC registration has no current strong operator or non-public classification",
+      "first_pass_decision": "exclude",
+      "first_pass_reason": "Exclude: portable resource cannot be attributed to the current operator",
       "space": {
         "cidr_count": 0,
         "address_count": "1208925819614629174706176",
@@ -1820,6 +1940,8 @@
       "status": "ALLOCATED PORTABLE",
       "matched_by": "independent_legal_entity_patterns",
       "reason": "Most-specific APNIC registration names an independent legal entity without operator attribution",
+      "first_pass_decision": "exclude",
+      "first_pass_reason": "Exclude: most-specific APNIC registration names an independent legal entity",
       "space": {
         "cidr_count": 0,
         "address_count": "1208925819614629174706176",
@@ -1846,6 +1968,8 @@
       "status": "ALLOCATED PORTABLE",
       "matched_by": "independent_legal_entity_patterns",
       "reason": "Most-specific APNIC registration names an independent legal entity without operator attribution",
+      "first_pass_decision": "exclude",
+      "first_pass_reason": "Exclude: most-specific APNIC registration names an independent legal entity",
       "space": {
         "cidr_count": 0,
         "address_count": "1208925819614629174706176",
@@ -1873,6 +1997,8 @@
       "status": "ALLOCATED PORTABLE",
       "matched_by": "independent_legal_entity_patterns",
       "reason": "Most-specific APNIC registration names an independent legal entity without operator attribution",
+      "first_pass_decision": "exclude",
+      "first_pass_reason": "Exclude: most-specific APNIC registration names an independent legal entity",
       "space": {
         "cidr_count": 0,
         "address_count": "1208925819614629174706176",
@@ -1900,6 +2026,8 @@
       "status": "ALLOCATED PORTABLE",
       "matched_by": "independent_legal_entity_patterns",
       "reason": "Most-specific APNIC registration names an independent legal entity without operator attribution",
+      "first_pass_decision": "exclude",
+      "first_pass_reason": "Exclude: most-specific APNIC registration names an independent legal entity",
       "space": {
         "cidr_count": 0,
         "address_count": "1208925819614629174706176",
@@ -1925,6 +2053,8 @@
       "status": "ALLOCATED PORTABLE",
       "matched_by": "independent_legal_entity_patterns",
       "reason": "Most-specific APNIC registration names an independent legal entity without operator attribution",
+      "first_pass_decision": "exclude",
+      "first_pass_reason": "Exclude: most-specific APNIC registration names an independent legal entity",
       "space": {
         "cidr_count": 0,
         "address_count": "1208925819614629174706176",
@@ -1950,6 +2080,8 @@
       "status": "ALLOCATED PORTABLE",
       "matched_by": "independent_legal_entity_patterns",
       "reason": "Most-specific APNIC registration names an independent legal entity without operator attribution",
+      "first_pass_decision": "exclude",
+      "first_pass_reason": "Exclude: most-specific APNIC registration names an independent legal entity",
       "space": {
         "cidr_count": 0,
         "address_count": "1208925819614629174706176",
@@ -1978,6 +2110,8 @@
       "status": "ALLOCATED PORTABLE",
       "matched_by": "independent_legal_entity_patterns",
       "reason": "Most-specific APNIC registration names an independent legal entity without operator attribution",
+      "first_pass_decision": "exclude",
+      "first_pass_reason": "Exclude: most-specific APNIC registration names an independent legal entity",
       "space": {
         "cidr_count": 0,
         "address_count": "1208925819614629174706176",
@@ -2004,6 +2138,8 @@
       "status": "ALLOCATED PORTABLE",
       "matched_by": "independent_legal_entity_patterns",
       "reason": "Most-specific APNIC registration names an independent legal entity without operator attribution",
+      "first_pass_decision": "exclude",
+      "first_pass_reason": "Exclude: most-specific APNIC registration names an independent legal entity",
       "space": {
         "cidr_count": 0,
         "address_count": "1208925819614629174706176",
@@ -2031,6 +2167,8 @@
       "status": "ALLOCATED PORTABLE",
       "matched_by": "independent_legal_entity_patterns",
       "reason": "Most-specific APNIC registration names an independent legal entity without operator attribution",
+      "first_pass_decision": "exclude",
+      "first_pass_reason": "Exclude: most-specific APNIC registration names an independent legal entity",
       "space": {
         "cidr_count": 0,
         "address_count": "1208925819614629174706176",
@@ -2064,6 +2202,8 @@
       "status": "ALLOCATED PORTABLE",
       "matched_by": "exclude_apnic_inetnum_rules: \\bcloud[ -]?(?:service|platform|data|hosting|server)s?\\b",
       "reason": "APNIC inetnum registration explicitly identifies a cloud-service network",
+      "first_pass_decision": "exclude",
+      "first_pass_reason": "Exclude: APNIC registration contains an explicit non-user-side purpose",
       "space": {
         "cidr_count": 0,
         "address_count": "1208925819614629174706176",
@@ -2095,6 +2235,8 @@
       "country": "CN",
       "status": "ALLOCATED PORTABLE",
       "reason": "Most-specific APNIC registration has no current strong operator or non-public classification",
+      "first_pass_decision": "exclude",
+      "first_pass_reason": "Exclude: portable resource cannot be attributed to the current operator",
       "space": {
         "cidr_count": 0,
         "address_count": "1208925819614629174706176",
