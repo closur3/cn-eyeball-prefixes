@@ -4,6 +4,8 @@ import (
 	"testing"
 
 	"github.com/closur3/cn-operator-allowlist/internal/apnicinetnum"
+	"github.com/closur3/cn-operator-allowlist/internal/operatorconfig"
+	"github.com/closur3/cn-operator-allowlist/internal/riswhois"
 )
 
 func TestOverlapsSorted(t *testing.T) {
@@ -24,10 +26,105 @@ func TestOverlapsSorted(t *testing.T) {
 	}
 }
 
+func TestParentOperatorRegistrationAdmitsMoreSpecificCustomerRecord(t *testing.T) {
+	classifier, err := operatorconfig.Load("../../config/operators.json", operators)
+	if err != nil {
+		t.Fatal(err)
+	}
+	records := []apnicinetnum.Record{
+		{Lo: 0, Hi: 255, Descriptions: []string{"CHINANET Zhejiang province network"}},
+		{Lo: 64, Hi: 127, Descriptions: []string{"Example customer assignment"}},
+	}
+	admitted := apnicOperatorAdmissionRanges(records, classifier)["chinanet"]
+	if len(admitted) != 1 || admitted[0] != (span{0, 255}) {
+		t.Fatalf("unexpected parent admission ranges: %#v", admitted)
+	}
+	segments := apnicinetnum.ResolveAll(records, func(apnicinetnum.Record) apnicinetnum.Match { return apnicinetnum.Match{} })
+	conflicts := apnicOperatorConflictRanges(segments, classifier)
+	if len(conflicts["chinanet"]) != 0 {
+		t.Fatalf("independent customer label unexpectedly became an operator conflict: %#v", conflicts["chinanet"])
+	}
+}
+
 func TestRelevantAPNICRecords(t *testing.T) {
 	records := []apnicinetnum.Record{{Lo: 0, Hi: 9}, {Lo: 10, Hi: 19}, {Lo: 20, Hi: 29}}
 	got := relevantAPNICRecords(records, []span{{12, 15}, {25, 25}})
 	if len(got) != 2 || got[0].Lo != 10 || got[1].Lo != 20 {
 		t.Fatalf("unexpected relevant records: %#v", got)
+	}
+}
+
+func TestBGPPrefixAdmissionTrialsKeepTheRouteUnitAtomic(t *testing.T) {
+	segments := []riswhois.Segment{{
+		Lo: 0, Hi: 255,
+		Record: riswhois.Record{Lo: 0, Hi: 255, Prefix: "0.0.0.0/24", Origins: []riswhois.Origin{{ASN: "4134", SeenPeers: 100}}},
+	}}
+	trials := bgpPrefixAdmissionTrials(
+		segments,
+		map[string]string{"4134": "chinanet"},
+		map[string][]span{"chinanet": {{0, 255}}},
+		map[string][]span{"chinanet": {{0, 127}, {144, 255}}},
+		map[string][]span{"chinanet": {{0, 127}, {144, 255}}},
+		map[string][]span{"chinanet": {{0, 255}}},
+		map[string][]span{"chinanet": {{0, 63}}},
+		map[string][]span{"chinanet": nil},
+	)
+	if got := trials["any"]; len(got) != 2 || got[0] != (span{0, 127}) || got[1] != (span{144, 255}) {
+		t.Fatalf("any-evidence trial split on APNIC evidence instead of retaining the route unit after strong exclusions: %#v", got)
+	}
+	if len(trials["majority"]) != 0 || len(trials["full"]) != 0 {
+		t.Fatalf("stricter policies unexpectedly admitted a unit with only 25%% positive coverage: %#v", trials)
+	}
+	if got := trials["covering"]; len(got) != 2 || got[0] != (span{0, 127}) || got[1] != (span{144, 255}) {
+		t.Fatalf("covering-parent policy did not retain the BGP unit after strong exclusions: %#v", got)
+	}
+	if got := trials["relaxed"]; len(got) != 2 || got[0] != (span{0, 127}) || got[1] != (span{144, 255}) {
+		t.Fatalf("relaxed policy did not retain the BGP unit after strong exclusions: %#v", got)
+	}
+}
+
+func TestRelaxedBGPPrefixAdmissionDoesNotRequireAPNICParent(t *testing.T) {
+	segments := []riswhois.Segment{{
+		Lo: 0, Hi: 255,
+		Record: riswhois.Record{Lo: 0, Hi: 255, Prefix: "0.0.0.0/24", Origins: []riswhois.Origin{{ASN: "4134", SeenPeers: 100}}},
+	}}
+	trials := bgpPrefixAdmissionTrials(
+		segments,
+		map[string]string{"4134": "chinanet"},
+		map[string][]span{"chinanet": {{0, 255}}},
+		map[string][]span{"chinanet": {{0, 255}}},
+		map[string][]span{"chinanet": nil},
+		map[string][]span{"chinanet": nil},
+		map[string][]span{"chinanet": nil},
+		map[string][]span{"chinanet": nil},
+	)
+	if got := trials["relaxed"]; len(got) != 1 || got[0] != (span{0, 255}) {
+		t.Fatalf("relaxed policy still depended on APNIC positive admission: %#v", got)
+	}
+	if len(trials["covering_relaxed"]) != 0 {
+		t.Fatalf("covering-relaxed control unexpectedly admitted a route without an APNIC operator parent: %#v", trials["covering_relaxed"])
+	}
+}
+
+func TestHybridAdmissionHealsOnlyEligibleOperatorRanges(t *testing.T) {
+	hierarchical := map[string][]span{
+		"chinanet": {{0, 63}},
+		"cmcc":     {{128, 191}},
+		"unicom":   nil,
+	}
+	eligible := map[string][]span{
+		"chinanet": {{0, 127}},
+		"cmcc":     {{128, 255}},
+		"unicom":   nil,
+	}
+	got := hybridAdmissionByOperator(hierarchical, []span{{64, 223}}, eligible)
+	if len(got["chinanet"]) != 1 || got["chinanet"][0] != (span{0, 127}) {
+		t.Fatalf("chinanet hybrid admission did not heal its eligible conflict hole: %#v", got["chinanet"])
+	}
+	if len(got["cmcc"]) != 1 || got["cmcc"][0] != (span{128, 223}) {
+		t.Fatalf("cmcc hybrid admission escaped its BGP-covered eligible range: %#v", got["cmcc"])
+	}
+	if len(got["unicom"]) != 0 {
+		t.Fatalf("hybrid admission invented an ineligible operator range: %#v", got["unicom"])
 	}
 }

@@ -1,12 +1,12 @@
 {
-  "generated_at": "2026-07-21T10:33:23.315789174Z",
-  "scope": "Best-effort ACL list; IPv4; mainland China; candidates for IPv4 addresses presented on the public Internet by ordinary Internet access users of China Telecom, China Mobile, or China Unicom, only when also present in china-operator-ip's origin-only China list; does not classify or protect addresses by household, individual, enterprise, or institutional customer type; explicitly subtracts dedicated premium backbone ASNs, cloud-provider CIDRs, strong APNIC registrations outside ordinary user access scope, portable and non-portable registrations linked through APNIC aut-num to a currently active independent ASN, registrations supported by both an independent legal-entity name and an exact APNIC aut-num link, origin-validated APNIC route objects, strongly linked independent APNIC route origins, and conservative RIPE RIS multi-observer MOAS evidence; unclear mixed-use, historical and MOAS space remains included",
+  "generated_at": "2026-07-21T09:15:00.28315102Z",
+  "scope": "IPv4; mainland China; current China Telecom, China Mobile, or China Unicom BGP origin plus a covering same-operator APNIC registration; current three-operator BGP units heal internal operator-registration conflict holes after all strong exclusions; small ambiguous customer-use fragments are accepted as best-effort error to keep the ACL deployably compact; dedicated premium backbone ASNs, cloud-provider CIDRs, strong APNIC registrations outside ordinary user access scope, independent holders and route origins, and strong RIPE RIS MOAS evidence are excluded",
   "sources": [
     {
       "name": "operator_config",
       "path": "config/operators.json",
-      "bytes": 7566,
-      "sha256": "a9ebae3d2f8e8da74e7857cfa1198ae5c0ed2108b47a39ac1b53c40aed065888"
+      "bytes": 9754,
+      "sha256": "f7c8028a3ab9a3f4d0b6a372eae1b182ab53d0432d410bab30fe272f2b82d049"
     },
     {
       "name": "china",
@@ -47,8 +47,8 @@
     {
       "name": "riswhois_ipv4",
       "url": "https://www.ris.ripe.net/dumps/riswhoisdump.IPv4.gz",
-      "bytes": 5373228,
-      "sha256": "400351e8a987e0f555f0b5a43061ac1906e84346ea720e43992a1e144dfb74b7"
+      "bytes": 5360818,
+      "sha256": "b01268a47bc453d33dc35de9bbd2829da52fb55dfb27ccf5f9dbc394457cb060"
     },
     {
       "name": "ip2region_ipv4_source",
@@ -117,13 +117,13 @@
     },
     {
       "name": "effective_apnic_prefix_exclusions",
-      "cidr_count": 2014,
-      "address_count": 822531
+      "cidr_count": 2117,
+      "address_count": 856522
     },
     {
       "name": "effective_apnic_portable_holder_exclusions",
-      "cidr_count": 934,
-      "address_count": 1577746
+      "cidr_count": 932,
+      "address_count": 1576978
     },
     {
       "name": "effective_apnic_delegated_holder_exclusions",
@@ -151,16 +151,236 @@
       "address_count": 0
     },
     {
+      "name": "pre_operator_parent_registration_admission",
+      "cidr_count": 15804,
+      "address_count": 223546502
+    },
+    {
+      "name": "operator_parent_registration_admissions",
+      "cidr_count": 14960,
+      "address_count": 221009074
+    },
+    {
+      "name": "hybrid_bgp_conflict_healed_additions",
+      "cidr_count": 146,
+      "address_count": 7519
+    },
+    {
+      "name": "hybrid_bgp_conflict_healing_admissions",
+      "cidr_count": 14075,
+      "address_count": 221016593
+    },
+    {
+      "name": "hybrid_admission_denials",
+      "cidr_count": 1777,
+      "address_count": 2529909
+    },
+    {
+      "name": "trial_bgp_prefix_observed_operator_origin",
+      "cidr_count": 16070,
+      "address_count": 222893699
+    },
+    {
+      "name": "trial_bgp_prefix_no_operator_origin",
+      "cidr_count": 178,
+      "address_count": 652803
+    },
+    {
+      "name": "trial_bgp_prefix_operator_conflict_denial",
+      "cidr_count": 2262,
+      "address_count": 5558478
+    },
+    {
+      "name": "trial_bgp_prefix_no_covering_parent_denial",
+      "cidr_count": 1765,
+      "address_count": 2532041
+    },
+    {
+      "name": "trial_bgp_prefix_covering_parent_admission",
+      "cidr_count": 12382,
+      "address_count": 214803180
+    },
+    {
+      "name": "trial_bgp_prefix_covering_parent_with_exact_conflict_carving",
+      "cidr_count": 15206,
+      "address_count": 220353883
+    },
+    {
+      "name": "trial_bgp_prefix_covering_parent_relaxed_conflicts",
+      "cidr_count": 14077,
+      "address_count": 220986641
+    },
+    {
+      "name": "trial_bgp_prefix_covering_parent_relaxed_added_vs_current",
+      "cidr_count": 0,
+      "address_count": 0
+    },
+    {
+      "name": "trial_bgp_prefix_covering_parent_relaxed_removed_vs_current",
+      "cidr_count": 5,
+      "address_count": 29952
+    },
+    {
+      "name": "trial_bgp_prefix_hybrid_conflict_healing",
+      "cidr_count": 14075,
+      "address_count": 221016593
+    },
+    {
+      "name": "trial_bgp_prefix_hybrid_added_vs_hierarchical",
+      "cidr_count": 146,
+      "address_count": 7519
+    },
+    {
+      "name": "trial_bgp_prefix_hybrid_removed_vs_hierarchical",
+      "cidr_count": 0,
+      "address_count": 0
+    },
+    {
+      "name": "trial_bgp_prefix_relaxed_admission",
+      "cidr_count": 15825,
+      "address_count": 223518938
+    },
+    {
+      "name": "trial_bgp_prefix_relaxed_added_vs_current",
+      "cidr_count": 1761,
+      "address_count": 2502345
+    },
+    {
+      "name": "trial_bgp_prefix_relaxed_removed_vs_current",
+      "cidr_count": 0,
+      "address_count": 0
+    },
+    {
+      "name": "trial_bgp_prefix_any_leaf_admission",
+      "cidr_count": 12837,
+      "address_count": 212881628
+    },
+    {
+      "name": "trial_bgp_prefix_majority_leaf_admission",
+      "cidr_count": 11825,
+      "address_count": 208102642
+    },
+    {
+      "name": "trial_bgp_prefix_full_leaf_admission",
+      "cidr_count": 7356,
+      "address_count": 164286230
+    },
+    {
+      "name": "trial_zhejiang_bgp_prefix_observed_operator_origin",
+      "cidr_count": 2474,
+      "address_count": 15980783
+    },
+    {
+      "name": "trial_zhejiang_bgp_prefix_no_operator_origin",
+      "cidr_count": 0,
+      "address_count": 0
+    },
+    {
+      "name": "trial_zhejiang_bgp_prefix_operator_conflict_denial",
+      "cidr_count": 1138,
+      "address_count": 2021608
+    },
+    {
+      "name": "trial_zhejiang_bgp_prefix_no_covering_parent_denial",
+      "cidr_count": 18,
+      "address_count": 28416
+    },
+    {
+      "name": "trial_zhejiang_bgp_prefix_covering_parent_admission",
+      "cidr_count": 1331,
+      "address_count": 13930759
+    },
+    {
+      "name": "trial_zhejiang_bgp_prefix_covering_parent_with_exact_conflict_carving",
+      "cidr_count": 2565,
+      "address_count": 15952151
+    },
+    {
+      "name": "trial_zhejiang_bgp_prefix_covering_parent_relaxed_conflicts",
+      "cidr_count": 2456,
+      "address_count": 15952367
+    },
+    {
+      "name": "trial_zhejiang_bgp_prefix_covering_parent_relaxed_added_vs_current",
+      "cidr_count": 0,
+      "address_count": 0
+    },
+    {
+      "name": "trial_zhejiang_bgp_prefix_covering_parent_relaxed_removed_vs_current",
+      "cidr_count": 0,
+      "address_count": 0
+    },
+    {
+      "name": "trial_zhejiang_bgp_prefix_hybrid_conflict_healing",
+      "cidr_count": 2456,
+      "address_count": 15952367
+    },
+    {
+      "name": "trial_zhejiang_bgp_prefix_hybrid_added_vs_hierarchical",
+      "cidr_count": 19,
+      "address_count": 216
+    },
+    {
+      "name": "trial_zhejiang_bgp_prefix_hybrid_removed_vs_hierarchical",
+      "cidr_count": 0,
+      "address_count": 0
+    },
+    {
+      "name": "trial_zhejiang_bgp_prefix_relaxed_admission",
+      "cidr_count": 2474,
+      "address_count": 15980783
+    },
+    {
+      "name": "trial_zhejiang_bgp_prefix_relaxed_added_vs_current",
+      "cidr_count": 18,
+      "address_count": 28416
+    },
+    {
+      "name": "trial_zhejiang_bgp_prefix_relaxed_removed_vs_current",
+      "cidr_count": 0,
+      "address_count": 0
+    },
+    {
+      "name": "trial_zhejiang_bgp_prefix_any_leaf_admission",
+      "cidr_count": 1334,
+      "address_count": 13929735
+    },
+    {
+      "name": "trial_zhejiang_bgp_prefix_majority_leaf_admission",
+      "cidr_count": 1185,
+      "address_count": 13833531
+    },
+    {
+      "name": "trial_zhejiang_bgp_prefix_full_leaf_admission",
+      "cidr_count": 578,
+      "address_count": 9683030
+    },
+    {
       "name": "final_output",
-      "cidr_count": 15617,
-      "address_count": 223579725
+      "cidr_count": 14075,
+      "address_count": 221016593
     },
     {
       "name": "province_attributed_output",
-      "cidr_count": 16991,
-      "address_count": 218735335
+      "cidr_count": 15480,
+      "address_count": 216189867
     }
   ],
+  "operator_registration_admission": {
+    "mode": "hybrid_bgp_conflict_healing_with_strong_exclusions",
+    "pre_cidr_count": 15804,
+    "denied_cidr_count": 1777,
+    "hierarchical_cidr_count": 14960,
+    "conflict_healed_cidr_count": 146,
+    "conflict_healed_address_count": 7519,
+    "final_cidr_count": 14075,
+    "cidr_expansion_ratio": 0.8905973171349025,
+    "maximum_cidr_expansion_ratio": 2,
+    "hybrid_cidr_ratio": 0.9408422459893048,
+    "maximum_hybrid_cidr_ratio": 1.1,
+    "hybrid_added_address_ratio": 0.000034021227562810384,
+    "maximum_hybrid_added_address_ratio": 0.001
+  },
   "cloud_sources": [
     {
       "source": "ipdata_aliyun",
@@ -222,15 +442,15 @@
   "apnic_inetnum": {
     "record_count": 1256753,
     "relevant_record_count": 448027,
-    "matched_winning_segment_count": 1655,
-    "effective_cidr_count": 2014,
-    "effective_address_count": 822531
+    "matched_winning_segment_count": 1740,
+    "effective_cidr_count": 2117,
+    "effective_address_count": 856522
   },
   "apnic_portable_holders": {
     "autnum_record_count": 25883,
-    "matched_winning_segment_count": 597,
-    "effective_cidr_count": 934,
-    "effective_address_count": 1577746
+    "matched_winning_segment_count": 596,
+    "effective_cidr_count": 932,
+    "effective_address_count": 1576978
   },
   "apnic_delegated_holders": {
     "matched_winning_segment_count": 51,
@@ -609,13 +829,13 @@
     ]
   },
   "ris_whois": {
-    "row_count": 1245753,
-    "prefix_count": 1223880,
-    "relevant_prefix_count": 46385,
-    "winning_segment_count": 56412,
-    "candidate_moas_segment_count": 201,
+    "row_count": 1241656,
+    "prefix_count": 1219739,
+    "relevant_prefix_count": 46384,
+    "winning_segment_count": 56411,
+    "candidate_moas_segment_count": 202,
     "strong_evidence_segment_count": 0,
-    "retained_ambiguous_moas_segment_count": 201,
+    "retained_ambiguous_moas_segment_count": 202,
     "effective_cidr_count": 0,
     "effective_address_count": 0
   },
@@ -2541,6 +2761,50 @@
     {
       "source": "apnic_inetnum",
       "category": "apnic_inetnum",
+      "cidr": "60.190.56.0/24",
+      "address_count": 256,
+      "asn": "4134",
+      "operator": "chinanet",
+      "asn_description": "CHINANET-BACKBONE No.31,Jin-rong Street",
+      "registry_netnames": [
+        "NINGBO-PEOPLE-GOV"
+      ],
+      "registry_descriptions": [
+        "Ningbo Municipal People's Government"
+      ],
+      "registry_maintainers": [
+        "MAINT-CN-CHINANET-ZJ-NB"
+      ],
+      "registry_status": "ASSIGNED NON-PORTABLE",
+      "registry_last_modified": "2021-06-24T07:39:07Z",
+      "matched_by": "exclude_apnic_inetnum_rules: (?:^|[^a-z0-9])(?:zhejiang-provincial-bureau-of-data|ningbo-people-gov|cangnan-dianzhizhenwu-co|yongkang-electronic-gov|fuyang-network-center-gov)(?:[^a-z0-9]|$)|\\belectronic government network\\b|\\bhangzhou city people(?:'|’)s government of the electronic government affairs office\\b",
+      "reason": "APNIC inetnum registration explicitly identifies an electronic-government or government data network"
+    },
+    {
+      "source": "apnic_inetnum",
+      "category": "apnic_inetnum",
+      "cidr": "60.190.57.0/24",
+      "address_count": 256,
+      "asn": "4134",
+      "operator": "chinanet",
+      "asn_description": "CHINANET-BACKBONE No.31,Jin-rong Street",
+      "registry_netnames": [
+        "NINGBO-PEOPLE-GOV"
+      ],
+      "registry_descriptions": [
+        "Ningbo Municipal People's Government"
+      ],
+      "registry_maintainers": [
+        "MAINT-CN-CHINANET-ZJ-NB"
+      ],
+      "registry_status": "ASSIGNED NON-PORTABLE",
+      "registry_last_modified": "2008-09-04T07:11:50Z",
+      "matched_by": "exclude_apnic_inetnum_rules: (?:^|[^a-z0-9])(?:zhejiang-provincial-bureau-of-data|ningbo-people-gov|cangnan-dianzhizhenwu-co|yongkang-electronic-gov|fuyang-network-center-gov)(?:[^a-z0-9]|$)|\\belectronic government network\\b|\\bhangzhou city people(?:'|’)s government of the electronic government affairs office\\b",
+      "reason": "APNIC inetnum registration explicitly identifies an electronic-government or government data network"
+    },
+    {
+      "source": "apnic_inetnum",
+      "category": "apnic_inetnum",
       "cidr": "60.190.64.64/26",
       "address_count": 64,
       "asn": "4134",
@@ -3091,6 +3355,28 @@
     {
       "source": "apnic_inetnum",
       "category": "apnic_inetnum",
+      "cidr": "60.191.71.32/28",
+      "address_count": 16,
+      "asn": "4134",
+      "operator": "chinanet",
+      "asn_description": "CHINANET-BACKBONE No.31,Jin-rong Street",
+      "registry_netnames": [
+        "Zhejiang-Provincial-Bureau-of-Data"
+      ],
+      "registry_descriptions": [
+        "Zhejiang Provincial Bureau of Data"
+      ],
+      "registry_maintainers": [
+        "MAINT-CN-CHINANET-ZJ-HZ"
+      ],
+      "registry_status": "ASSIGNED NON-PORTABLE",
+      "registry_last_modified": "2026-01-09T01:11:35Z",
+      "matched_by": "exclude_apnic_inetnum_rules: (?:^|[^a-z0-9])(?:zhejiang-provincial-bureau-of-data|ningbo-people-gov|cangnan-dianzhizhenwu-co|yongkang-electronic-gov|fuyang-network-center-gov)(?:[^a-z0-9]|$)|\\belectronic government network\\b|\\bhangzhou city people(?:'|’)s government of the electronic government affairs office\\b",
+      "reason": "APNIC inetnum registration explicitly identifies an electronic-government or government data network"
+    },
+    {
+      "source": "apnic_inetnum",
+      "category": "apnic_inetnum",
       "cidr": "60.191.93.16/28",
       "address_count": 16,
       "asn": "4134",
@@ -3109,6 +3395,28 @@
       "registry_last_modified": "2021-06-24T08:11:57Z",
       "matched_by": "exclude_apnic_inetnum_rules: \\bcloud[ -]?(?:service|platform|data|hosting|server)s?\\b",
       "reason": "APNIC inetnum registration explicitly identifies a cloud-service network"
+    },
+    {
+      "source": "apnic_inetnum",
+      "category": "apnic_inetnum",
+      "cidr": "60.191.93.160/28",
+      "address_count": 16,
+      "asn": "4134",
+      "operator": "chinanet",
+      "asn_description": "CHINANET-BACKBONE No.31,Jin-rong Street",
+      "registry_netnames": [
+        "HANGZHOU-YOUPAIYUN-LTD"
+      ],
+      "registry_descriptions": [
+        "Hangzhou beat cloud Technology Co. Ltd."
+      ],
+      "registry_maintainers": [
+        "MAINT-CN-CHINANET-ZJ-HZ"
+      ],
+      "registry_status": "ASSIGNED NON-PORTABLE",
+      "registry_last_modified": "2021-06-24T07:49:42Z",
+      "matched_by": "exclude_apnic_inetnum_rules: (?:^|[^a-z0-9])(?:chinatell?ecom-cloud-company|cloud-interface-address|zhejiangzhiyun|hangzhou-youpaiyun-ltd)(?:[^a-z0-9]|$)|\\bbeijing jinshan cloud network technology co(?:mpany)?[., ]+(?:ltd|limited)\\b|\\bzhejiang zhi cloud information technology co(?:mpany)?[., ]+(?:ltd|limited)\\b|\\bhangzhou beat cloud technology co(?:mpany)?[., ]+(?:ltd|limited)\\b",
+      "reason": "APNIC inetnum registration explicitly identifies a cloud-company or cloud-service address range"
     },
     {
       "source": "apnic_inetnum",
@@ -3135,6 +3443,28 @@
     {
       "source": "apnic_inetnum",
       "category": "apnic_inetnum",
+      "cidr": "60.191.100.96/28",
+      "address_count": 16,
+      "asn": "4134",
+      "operator": "chinanet",
+      "asn_description": "CHINANET-BACKBONE No.31,Jin-rong Street",
+      "registry_netnames": [
+        "HANGZHOU-YOUPAIYUN-LTD"
+      ],
+      "registry_descriptions": [
+        "Hangzhou beat cloud Technology Co. Ltd."
+      ],
+      "registry_maintainers": [
+        "MAINT-CN-CHINANET-ZJ-HZ"
+      ],
+      "registry_status": "ASSIGNED NON-PORTABLE",
+      "registry_last_modified": "2021-06-24T08:08:04Z",
+      "matched_by": "exclude_apnic_inetnum_rules: (?:^|[^a-z0-9])(?:chinatell?ecom-cloud-company|cloud-interface-address|zhejiangzhiyun|hangzhou-youpaiyun-ltd)(?:[^a-z0-9]|$)|\\bbeijing jinshan cloud network technology co(?:mpany)?[., ]+(?:ltd|limited)\\b|\\bzhejiang zhi cloud information technology co(?:mpany)?[., ]+(?:ltd|limited)\\b|\\bhangzhou beat cloud technology co(?:mpany)?[., ]+(?:ltd|limited)\\b",
+      "reason": "APNIC inetnum registration explicitly identifies a cloud-company or cloud-service address range"
+    },
+    {
+      "source": "apnic_inetnum",
+      "category": "apnic_inetnum",
       "cidr": "60.191.100.152/30",
       "address_count": 4,
       "asn": "4134",
@@ -3153,6 +3483,28 @@
       "registry_last_modified": "2021-06-24T07:39:47Z",
       "matched_by": "exclude_apnic_inetnum_rules: idc(?:[^a-z0-9]|$)|\\binternet data cent(?:er|re)\\b",
       "reason": "APNIC inetnum registration explicitly identifies an IDC network"
+    },
+    {
+      "source": "apnic_inetnum",
+      "category": "apnic_inetnum",
+      "cidr": "60.191.101.160/27",
+      "address_count": 32,
+      "asn": "4134",
+      "operator": "chinanet",
+      "asn_description": "CHINANET-BACKBONE No.31,Jin-rong Street",
+      "registry_netnames": [
+        "HANGZHOU-YOUPAIYUN-LTD"
+      ],
+      "registry_descriptions": [
+        "Hangzhou beat cloud Technology Co. Ltd."
+      ],
+      "registry_maintainers": [
+        "MAINT-CN-CHINANET-ZJ-HZ"
+      ],
+      "registry_status": "ASSIGNED NON-PORTABLE",
+      "registry_last_modified": "2021-06-24T07:47:57Z",
+      "matched_by": "exclude_apnic_inetnum_rules: (?:^|[^a-z0-9])(?:chinatell?ecom-cloud-company|cloud-interface-address|zhejiangzhiyun|hangzhou-youpaiyun-ltd)(?:[^a-z0-9]|$)|\\bbeijing jinshan cloud network technology co(?:mpany)?[., ]+(?:ltd|limited)\\b|\\bzhejiang zhi cloud information technology co(?:mpany)?[., ]+(?:ltd|limited)\\b|\\bhangzhou beat cloud technology co(?:mpany)?[., ]+(?:ltd|limited)\\b",
+      "reason": "APNIC inetnum registration explicitly identifies a cloud-company or cloud-service address range"
     },
     {
       "source": "apnic_inetnum",
@@ -3263,6 +3615,28 @@
       "registry_last_modified": "2009-08-19T12:21:32Z",
       "matched_by": "exclude_apnic_inetnum_rules: idc(?:[^a-z0-9]|$)|\\binternet data cent(?:er|re)\\b",
       "reason": "APNIC inetnum registration explicitly identifies an IDC network"
+    },
+    {
+      "source": "apnic_inetnum",
+      "category": "apnic_inetnum",
+      "cidr": "60.191.144.16/28",
+      "address_count": 16,
+      "asn": "4134",
+      "operator": "chinanet",
+      "asn_description": "CHINANET-BACKBONE No.31,Jin-rong Street",
+      "registry_netnames": [
+        "CABINET-RETAIL"
+      ],
+      "registry_descriptions": [
+        "IDC2-C5 Cabinet retail"
+      ],
+      "registry_maintainers": [
+        "MAINT-CN-CHINANET-ZJ-TZ"
+      ],
+      "registry_status": "ASSIGNED NON-PORTABLE",
+      "registry_last_modified": "2021-06-24T07:44:14Z",
+      "matched_by": "exclude_apnic_inetnum_rules: (?:^|[^a-z0-9])(?:idcbeiyongjh|liantongidcyouxifuwuqihz|idcdi2pigongxiangjierufuwuqidi|xiaoshanidcchuangyehuliankejih?|wangluoyingpanhezuoidcziyuanhz|yuyaoidcyewudizhiduanvlan511(?:chinaunicomningbochina)?|cabinet-retail)(?:[^a-z0-9]|$)",
+      "reason": "APNIC inetnum registration explicitly identifies a dedicated IDC resource or service range"
     },
     {
       "source": "apnic_inetnum",
@@ -3395,6 +3769,28 @@
       "registry_last_modified": "2021-06-24T07:30:34Z",
       "matched_by": "exclude_apnic_inetnum_rules: idc(?:[^a-z0-9]|$)|\\binternet data cent(?:er|re)\\b",
       "reason": "APNIC inetnum registration explicitly identifies an IDC network"
+    },
+    {
+      "source": "apnic_inetnum",
+      "category": "apnic_inetnum",
+      "cidr": "61.130.97.160/29",
+      "address_count": 8,
+      "asn": "4134",
+      "operator": "chinanet",
+      "asn_description": "CHINANET-BACKBONE No.31,Jin-rong Street",
+      "registry_netnames": [
+        "NINGBO-HANGZHOU-WANGYINHULIAN"
+      ],
+      "registry_descriptions": [
+        "HangZhou Netbank Interlink Technolgies CO.,LTD"
+      ],
+      "registry_maintainers": [
+        "MAINT-CN-CHINANET-ZJ-NB"
+      ],
+      "registry_status": "ASSIGNED NON-PORTABLE",
+      "registry_last_modified": "2021-06-24T07:47:31Z",
+      "matched_by": "exclude_apnic_inetnum_rules: (?:^|[^a-z0-9])[a-z0-9]*wangyinhulian[a-z0-9]*(?:[^a-z0-9]|$)|\\bhangzhou netbank interlink technol(?:og(?:y|ies)|gies) co(?:mpany)?[., ]+(?:ltd|limited)\\b",
+      "reason": "APNIC inetnum registration explicitly identifies a Wangyin Hulian or Netbank Interlink corporate network"
     },
     {
       "source": "apnic_inetnum",
@@ -5787,6 +6183,28 @@
     {
       "source": "apnic_inetnum",
       "category": "apnic_inetnum",
+      "cidr": "115.231.51.192/27",
+      "address_count": 32,
+      "asn": "4134",
+      "operator": "chinanet",
+      "asn_description": "CHINANET-BACKBONE No.31,Jin-rong Street",
+      "registry_netnames": [
+        "NINGBO-PEOPLE-GOV"
+      ],
+      "registry_descriptions": [
+        "Ningbo Municipal People's Government"
+      ],
+      "registry_maintainers": [
+        "MAINT-CN-CHINANET-ZJ-NB"
+      ],
+      "registry_status": "ASSIGNED NON-PORTABLE",
+      "registry_last_modified": "2021-06-24T07:55:45Z",
+      "matched_by": "exclude_apnic_inetnum_rules: (?:^|[^a-z0-9])(?:zhejiang-provincial-bureau-of-data|ningbo-people-gov|cangnan-dianzhizhenwu-co|yongkang-electronic-gov|fuyang-network-center-gov)(?:[^a-z0-9]|$)|\\belectronic government network\\b|\\bhangzhou city people(?:'|’)s government of the electronic government affairs office\\b",
+      "reason": "APNIC inetnum registration explicitly identifies an electronic-government or government data network"
+    },
+    {
+      "source": "apnic_inetnum",
+      "category": "apnic_inetnum",
       "cidr": "115.231.64.192/28",
       "address_count": 16,
       "asn": "4134",
@@ -5919,6 +6337,28 @@
     {
       "source": "apnic_inetnum",
       "category": "apnic_inetnum",
+      "cidr": "115.233.209.128/25",
+      "address_count": 128,
+      "asn": "4134",
+      "operator": "chinanet",
+      "asn_description": "CHINANET-BACKBONE No.31,Jin-rong Street",
+      "registry_netnames": [
+        "HANGZHOU-CITY"
+      ],
+      "registry_descriptions": [
+        "Hangzhou city people's government of the electronic government affairs office"
+      ],
+      "registry_maintainers": [
+        "MAINT-CN-CHINANET-ZJ-HZ"
+      ],
+      "registry_status": "ASSIGNED NON-PORTABLE",
+      "registry_last_modified": "2021-06-24T07:30:39Z",
+      "matched_by": "exclude_apnic_inetnum_rules: (?:^|[^a-z0-9])(?:zhejiang-provincial-bureau-of-data|ningbo-people-gov|cangnan-dianzhizhenwu-co|yongkang-electronic-gov|fuyang-network-center-gov)(?:[^a-z0-9]|$)|\\belectronic government network\\b|\\bhangzhou city people(?:'|’)s government of the electronic government affairs office\\b",
+      "reason": "APNIC inetnum registration explicitly identifies an electronic-government or government data network"
+    },
+    {
+      "source": "apnic_inetnum",
+      "category": "apnic_inetnum",
       "cidr": "115.236.5.176/30",
       "address_count": 4,
       "asn": "4134",
@@ -5937,6 +6377,50 @@
       "registry_last_modified": "2021-06-24T07:44:10Z",
       "matched_by": "exclude_apnic_inetnum_rules: \\bdata[ -]?cent(?:er|re)\\b",
       "reason": "APNIC inetnum registration explicitly identifies a data-center network"
+    },
+    {
+      "source": "apnic_inetnum",
+      "category": "apnic_inetnum",
+      "cidr": "115.236.71.40/29",
+      "address_count": 8,
+      "asn": "4134",
+      "operator": "chinanet",
+      "asn_description": "CHINANET-BACKBONE No.31,Jin-rong Street",
+      "registry_netnames": [
+        "HANGZHOU-OFFICE"
+      ],
+      "registry_descriptions": [
+        "Hangzhou city people's government of the electronic government affairs office"
+      ],
+      "registry_maintainers": [
+        "MAINT-CN-CHINANET-ZJ-HZ"
+      ],
+      "registry_status": "ASSIGNED NON-PORTABLE",
+      "registry_last_modified": "2021-06-24T07:48:52Z",
+      "matched_by": "exclude_apnic_inetnum_rules: (?:^|[^a-z0-9])(?:zhejiang-provincial-bureau-of-data|ningbo-people-gov|cangnan-dianzhizhenwu-co|yongkang-electronic-gov|fuyang-network-center-gov)(?:[^a-z0-9]|$)|\\belectronic government network\\b|\\bhangzhou city people(?:'|’)s government of the electronic government affairs office\\b",
+      "reason": "APNIC inetnum registration explicitly identifies an electronic-government or government data network"
+    },
+    {
+      "source": "apnic_inetnum",
+      "category": "apnic_inetnum",
+      "cidr": "115.236.81.188/30",
+      "address_count": 4,
+      "asn": "4134",
+      "operator": "chinanet",
+      "asn_description": "CHINANET-BACKBONE No.31,Jin-rong Street",
+      "registry_netnames": [
+        "FUYANG-NETWORK-CENTER-GOV"
+      ],
+      "registry_descriptions": [
+        "Fuyang Government Network Information Center"
+      ],
+      "registry_maintainers": [
+        "MAINT-CN-CHINANET-ZJ-HZ"
+      ],
+      "registry_status": "ASSIGNED NON-PORTABLE",
+      "registry_last_modified": "2021-06-24T08:01:33Z",
+      "matched_by": "exclude_apnic_inetnum_rules: (?:^|[^a-z0-9])(?:zhejiang-provincial-bureau-of-data|ningbo-people-gov|cangnan-dianzhizhenwu-co|yongkang-electronic-gov|fuyang-network-center-gov)(?:[^a-z0-9]|$)|\\belectronic government network\\b|\\bhangzhou city people(?:'|’)s government of the electronic government affairs office\\b",
+      "reason": "APNIC inetnum registration explicitly identifies an electronic-government or government data network"
     },
     {
       "source": "apnic_inetnum",
@@ -6003,6 +6487,28 @@
       "registry_last_modified": "2010-01-29T09:29:55Z",
       "matched_by": "exclude_apnic_inetnum_rules: \\b(?:leased|dedicated|private|special)[ -]?(?:line|circuit)s?\\b",
       "reason": "APNIC inetnum registration explicitly identifies a dedicated line or circuit"
+    },
+    {
+      "source": "apnic_inetnum",
+      "category": "apnic_inetnum",
+      "cidr": "115.238.143.112/28",
+      "address_count": 16,
+      "asn": "4134",
+      "operator": "chinanet",
+      "asn_description": "CHINANET-BACKBONE No.31,Jin-rong Street",
+      "registry_netnames": [
+        "NINGBO-PEOPLE-GOV"
+      ],
+      "registry_descriptions": [
+        "Ningbo Municipal People's Government"
+      ],
+      "registry_maintainers": [
+        "MAINT-CN-CHINANET-ZJ-NB"
+      ],
+      "registry_status": "ASSIGNED NON-PORTABLE",
+      "registry_last_modified": "2021-06-24T07:40:52Z",
+      "matched_by": "exclude_apnic_inetnum_rules: (?:^|[^a-z0-9])(?:zhejiang-provincial-bureau-of-data|ningbo-people-gov|cangnan-dianzhizhenwu-co|yongkang-electronic-gov|fuyang-network-center-gov)(?:[^a-z0-9]|$)|\\belectronic government network\\b|\\bhangzhou city people(?:'|’)s government of the electronic government affairs office\\b",
+      "reason": "APNIC inetnum registration explicitly identifies an electronic-government or government data network"
     },
     {
       "source": "apnic_inetnum",
@@ -6345,6 +6851,50 @@
       "registry_last_modified": "2009-11-10T01:44:00Z",
       "matched_by": "exclude_apnic_inetnum_rules: \\b(?:leased|dedicated|private|special)[ -]?(?:line|circuit)s?\\b",
       "reason": "APNIC inetnum registration explicitly identifies a dedicated line or circuit"
+    },
+    {
+      "source": "apnic_inetnum",
+      "category": "apnic_inetnum",
+      "cidr": "118.215.192.0/20",
+      "address_count": 4096,
+      "asn": "4134",
+      "operator": "chinanet",
+      "asn_description": "CHINANET-BACKBONE No.31,Jin-rong Street",
+      "registry_netnames": [
+        "CHINATELLECOM-CLOUD-COMPANY"
+      ],
+      "registry_descriptions": [
+        "CHINATELLECOM CLOUD COMPANY"
+      ],
+      "registry_maintainers": [
+        "MAINT-CN-CHINANETCLOUD"
+      ],
+      "registry_status": "ALLOCATED NON-PORTABLE",
+      "registry_last_modified": "2022-01-12T13:27:25Z",
+      "matched_by": "exclude_apnic_inetnum_rules: (?:^|[^a-z0-9])(?:chinatell?ecom-cloud-company|cloud-interface-address|zhejiangzhiyun|hangzhou-youpaiyun-ltd)(?:[^a-z0-9]|$)|\\bbeijing jinshan cloud network technology co(?:mpany)?[., ]+(?:ltd|limited)\\b|\\bzhejiang zhi cloud information technology co(?:mpany)?[., ]+(?:ltd|limited)\\b|\\bhangzhou beat cloud technology co(?:mpany)?[., ]+(?:ltd|limited)\\b",
+      "reason": "APNIC inetnum registration explicitly identifies a cloud-company or cloud-service address range"
+    },
+    {
+      "source": "apnic_inetnum",
+      "category": "apnic_inetnum",
+      "cidr": "118.215.208.0/20",
+      "address_count": 4096,
+      "asn": "4134",
+      "operator": "chinanet",
+      "asn_description": "CHINANET-BACKBONE No.31,Jin-rong Street",
+      "registry_netnames": [
+        "CHINATELLECOM-CLOUD-COMPANY"
+      ],
+      "registry_descriptions": [
+        "CHINATELLECOM CLOUD COMPANY"
+      ],
+      "registry_maintainers": [
+        "MAINT-CN-CHINANETCLOUD"
+      ],
+      "registry_status": "ALLOCATED NON-PORTABLE",
+      "registry_last_modified": "2022-01-12T13:27:26Z",
+      "matched_by": "exclude_apnic_inetnum_rules: (?:^|[^a-z0-9])(?:chinatell?ecom-cloud-company|cloud-interface-address|zhejiangzhiyun|hangzhou-youpaiyun-ltd)(?:[^a-z0-9]|$)|\\bbeijing jinshan cloud network technology co(?:mpany)?[., ]+(?:ltd|limited)\\b|\\bzhejiang zhi cloud information technology co(?:mpany)?[., ]+(?:ltd|limited)\\b|\\bhangzhou beat cloud technology co(?:mpany)?[., ]+(?:ltd|limited)\\b",
+      "reason": "APNIC inetnum registration explicitly identifies a cloud-company or cloud-service address range"
     },
     {
       "source": "apnic_inetnum",
@@ -7868,6 +8418,50 @@
     {
       "source": "apnic_inetnum",
       "category": "apnic_inetnum",
+      "cidr": "122.224.223.64/28",
+      "address_count": 16,
+      "asn": "4134",
+      "operator": "chinanet",
+      "asn_description": "CHINANET-BACKBONE No.31,Jin-rong Street",
+      "registry_netnames": [
+        "HANGZHOU-YOUPAIYUN-LTD"
+      ],
+      "registry_descriptions": [
+        "Hangzhou beat cloud Technology Co. Ltd."
+      ],
+      "registry_maintainers": [
+        "MAINT-CN-CHINANET-ZJ-HZ"
+      ],
+      "registry_status": "ASSIGNED NON-PORTABLE",
+      "registry_last_modified": "2021-06-24T07:52:20Z",
+      "matched_by": "exclude_apnic_inetnum_rules: (?:^|[^a-z0-9])(?:chinatell?ecom-cloud-company|cloud-interface-address|zhejiangzhiyun|hangzhou-youpaiyun-ltd)(?:[^a-z0-9]|$)|\\bbeijing jinshan cloud network technology co(?:mpany)?[., ]+(?:ltd|limited)\\b|\\bzhejiang zhi cloud information technology co(?:mpany)?[., ]+(?:ltd|limited)\\b|\\bhangzhou beat cloud technology co(?:mpany)?[., ]+(?:ltd|limited)\\b",
+      "reason": "APNIC inetnum registration explicitly identifies a cloud-company or cloud-service address range"
+    },
+    {
+      "source": "apnic_inetnum",
+      "category": "apnic_inetnum",
+      "cidr": "122.224.224.0/23",
+      "address_count": 512,
+      "asn": "4134",
+      "operator": "chinanet",
+      "asn_description": "CHINANET-BACKBONE No.31,Jin-rong Street",
+      "registry_netnames": [
+        "GUANGZHOU-WANGYI-LTD"
+      ],
+      "registry_descriptions": [
+        "Guangzhou Wangyi Computer Systems Co.,Ltd."
+      ],
+      "registry_maintainers": [
+        "MAINT-CN-CHINANET-ZJ-HZ"
+      ],
+      "registry_status": "ASSIGNED NON-PORTABLE",
+      "registry_last_modified": "2021-06-24T07:33:30Z",
+      "matched_by": "exclude_apnic_inetnum_rules: (?:^|[^a-z0-9])(?:guangzhouwangyihz|shanghaiwangyihz|guangzhou-wangyi-ltd)(?:[^a-z0-9]|$)|\\bguangzhou (?:wangyi|netease) computer systems? co(?:mpany)?[., ]+(?:ltd|limited)\\b",
+      "reason": "APNIC inetnum registration explicitly identifies a NetEase corporate or service network"
+    },
+    {
+      "source": "apnic_inetnum",
+      "category": "apnic_inetnum",
       "cidr": "122.225.19.68/30",
       "address_count": 4,
       "asn": "4134",
@@ -7952,6 +8546,94 @@
       "registry_last_modified": "2021-06-24T07:42:29Z",
       "matched_by": "exclude_apnic_inetnum_rules: (?:^|[^a-z0-9])(?:iot|m2m)(?:[^a-z0-9]|$)|\\binternet of things\\b",
       "reason": "APNIC inetnum registration explicitly identifies an IoT or M2M network"
+    },
+    {
+      "source": "apnic_inetnum",
+      "category": "apnic_inetnum",
+      "cidr": "122.225.218.48/30",
+      "address_count": 4,
+      "asn": "4134",
+      "operator": "chinanet",
+      "asn_description": "CHINANET-BACKBONE No.31,Jin-rong Street",
+      "registry_netnames": [
+        "HANGZHOU-XIAOSHAN"
+      ],
+      "registry_descriptions": [
+        "Beijing Jinshan cloud Network Technology Co., Ltd."
+      ],
+      "registry_maintainers": [
+        "MAINT-CN-CHINANET-ZJ-HZ"
+      ],
+      "registry_status": "ASSIGNED NON-PORTABLE",
+      "registry_last_modified": "2021-06-24T07:31:39Z",
+      "matched_by": "exclude_apnic_inetnum_rules: (?:^|[^a-z0-9])(?:chinatell?ecom-cloud-company|cloud-interface-address|zhejiangzhiyun|hangzhou-youpaiyun-ltd)(?:[^a-z0-9]|$)|\\bbeijing jinshan cloud network technology co(?:mpany)?[., ]+(?:ltd|limited)\\b|\\bzhejiang zhi cloud information technology co(?:mpany)?[., ]+(?:ltd|limited)\\b|\\bhangzhou beat cloud technology co(?:mpany)?[., ]+(?:ltd|limited)\\b",
+      "reason": "APNIC inetnum registration explicitly identifies a cloud-company or cloud-service address range"
+    },
+    {
+      "source": "apnic_inetnum",
+      "category": "apnic_inetnum",
+      "cidr": "122.225.218.184/30",
+      "address_count": 4,
+      "asn": "4134",
+      "operator": "chinanet",
+      "asn_description": "CHINANET-BACKBONE No.31,Jin-rong Street",
+      "registry_netnames": [
+        "HANGZHOU-XIAOSHAN"
+      ],
+      "registry_descriptions": [
+        "Beijing Jinshan cloud Network Technology Co., Ltd."
+      ],
+      "registry_maintainers": [
+        "MAINT-CN-CHINANET-ZJ-HZ"
+      ],
+      "registry_status": "ASSIGNED NON-PORTABLE",
+      "registry_last_modified": "2021-06-24T07:40:12Z",
+      "matched_by": "exclude_apnic_inetnum_rules: (?:^|[^a-z0-9])(?:chinatell?ecom-cloud-company|cloud-interface-address|zhejiangzhiyun|hangzhou-youpaiyun-ltd)(?:[^a-z0-9]|$)|\\bbeijing jinshan cloud network technology co(?:mpany)?[., ]+(?:ltd|limited)\\b|\\bzhejiang zhi cloud information technology co(?:mpany)?[., ]+(?:ltd|limited)\\b|\\bhangzhou beat cloud technology co(?:mpany)?[., ]+(?:ltd|limited)\\b",
+      "reason": "APNIC inetnum registration explicitly identifies a cloud-company or cloud-service address range"
+    },
+    {
+      "source": "apnic_inetnum",
+      "category": "apnic_inetnum",
+      "cidr": "122.225.218.232/30",
+      "address_count": 4,
+      "asn": "4134",
+      "operator": "chinanet",
+      "asn_description": "CHINANET-BACKBONE No.31,Jin-rong Street",
+      "registry_netnames": [
+        "HANGZHOU-XIAOSHAN"
+      ],
+      "registry_descriptions": [
+        "Beijing Jinshan cloud Network Technology Co., Ltd."
+      ],
+      "registry_maintainers": [
+        "MAINT-CN-CHINANET-ZJ-HZ"
+      ],
+      "registry_status": "ASSIGNED NON-PORTABLE",
+      "registry_last_modified": "2021-06-24T07:28:56Z",
+      "matched_by": "exclude_apnic_inetnum_rules: (?:^|[^a-z0-9])(?:chinatell?ecom-cloud-company|cloud-interface-address|zhejiangzhiyun|hangzhou-youpaiyun-ltd)(?:[^a-z0-9]|$)|\\bbeijing jinshan cloud network technology co(?:mpany)?[., ]+(?:ltd|limited)\\b|\\bzhejiang zhi cloud information technology co(?:mpany)?[., ]+(?:ltd|limited)\\b|\\bhangzhou beat cloud technology co(?:mpany)?[., ]+(?:ltd|limited)\\b",
+      "reason": "APNIC inetnum registration explicitly identifies a cloud-company or cloud-service address range"
+    },
+    {
+      "source": "apnic_inetnum",
+      "category": "apnic_inetnum",
+      "cidr": "122.225.219.176/30",
+      "address_count": 4,
+      "asn": "4134",
+      "operator": "chinanet",
+      "asn_description": "CHINANET-BACKBONE No.31,Jin-rong Street",
+      "registry_netnames": [
+        "HANGZHOU-XIAOSHAN"
+      ],
+      "registry_descriptions": [
+        "Beijing Jinshan cloud Network Technology Co., Ltd."
+      ],
+      "registry_maintainers": [
+        "MAINT-CN-CHINANET-ZJ-HZ"
+      ],
+      "registry_status": "ASSIGNED NON-PORTABLE",
+      "registry_last_modified": "2021-06-24T07:53:02Z",
+      "matched_by": "exclude_apnic_inetnum_rules: (?:^|[^a-z0-9])(?:chinatell?ecom-cloud-company|cloud-interface-address|zhejiangzhiyun|hangzhou-youpaiyun-ltd)(?:[^a-z0-9]|$)|\\bbeijing jinshan cloud network technology co(?:mpany)?[., ]+(?:ltd|limited)\\b|\\bzhejiang zhi cloud information technology co(?:mpany)?[., ]+(?:ltd|limited)\\b|\\bhangzhou beat cloud technology co(?:mpany)?[., ]+(?:ltd|limited)\\b",
+      "reason": "APNIC inetnum registration explicitly identifies a cloud-company or cloud-service address range"
     },
     {
       "source": "apnic_inetnum",
@@ -8084,6 +8766,28 @@
       "registry_last_modified": "2008-11-07T18:20:50Z",
       "matched_by": "exclude_apnic_inetnum_rules: \\bhuawei[ -]?(?:(?:3com|symantec)[ -]?(?:tech|technology)|software[ -]?technology|(?:technologies|technology|technique)[ -]?(?:co(?:mpany)?|inc))(?:[., ]+(?:ltd|limited))?\\b|\\bbeijing[ -]?baidu[ -]?(?:network information technology|netcom science and technology)[ -]?co(?:mpany)?(?:[., ]+(?:ltd|limited))?\\b|\\bbaidu online network technology\\b|\\bbaidu[ -]?co(?:mpany)?[., ]+(?:ltd|limited)\\b|\\balibaba(?:\\.com|[ -]com)?[ -]?(?:\\(china\\)|china)[ -]?(?:(?:network|networking|net|web)[ -]?)?(?:technology[ -]?)?(?:co(?:mpany)?(?:[., ]+(?:ltd|limited))?|ltd[.]com)\\b",
       "reason": "APNIC inetnum registration explicitly identifies a qualified Huawei, Baidu, or Alibaba corporate network"
+    },
+    {
+      "source": "apnic_inetnum",
+      "category": "apnic_inetnum",
+      "cidr": "122.227.48.0/29",
+      "address_count": 8,
+      "asn": "4134",
+      "operator": "chinanet",
+      "asn_description": "CHINANET-BACKBONE No.31,Jin-rong Street",
+      "registry_netnames": [
+        "YONGKANG-ELECTRONIC-GOV"
+      ],
+      "registry_descriptions": [
+        "Yongkang electronic government affairs office"
+      ],
+      "registry_maintainers": [
+        "MAINT-CN-CHINANET-ZJ-JH"
+      ],
+      "registry_status": "ASSIGNED NON-PORTABLE",
+      "registry_last_modified": "2021-06-24T07:52:37Z",
+      "matched_by": "exclude_apnic_inetnum_rules: (?:^|[^a-z0-9])(?:zhejiang-provincial-bureau-of-data|ningbo-people-gov|cangnan-dianzhizhenwu-co|yongkang-electronic-gov|fuyang-network-center-gov)(?:[^a-z0-9]|$)|\\belectronic government network\\b|\\bhangzhou city people(?:'|’)s government of the electronic government affairs office\\b",
+      "reason": "APNIC inetnum registration explicitly identifies an electronic-government or government data network"
     },
     {
       "source": "apnic_inetnum",
@@ -8282,6 +8986,28 @@
       "registry_last_modified": "2021-06-24T07:29:35Z",
       "matched_by": "exclude_apnic_inetnum_rules: \\bhuawei[ -]?(?:(?:3com|symantec)[ -]?(?:tech|technology)|software[ -]?technology|(?:technologies|technology|technique)[ -]?(?:co(?:mpany)?|inc))(?:[., ]+(?:ltd|limited))?\\b|\\bbeijing[ -]?baidu[ -]?(?:network information technology|netcom science and technology)[ -]?co(?:mpany)?(?:[., ]+(?:ltd|limited))?\\b|\\bbaidu online network technology\\b|\\bbaidu[ -]?co(?:mpany)?[., ]+(?:ltd|limited)\\b|\\balibaba(?:\\.com|[ -]com)?[ -]?(?:\\(china\\)|china)[ -]?(?:(?:network|networking|net|web)[ -]?)?(?:technology[ -]?)?(?:co(?:mpany)?(?:[., ]+(?:ltd|limited))?|ltd[.]com)\\b",
       "reason": "APNIC inetnum registration explicitly identifies a qualified Huawei, Baidu, or Alibaba corporate network"
+    },
+    {
+      "source": "apnic_inetnum",
+      "category": "apnic_inetnum",
+      "cidr": "122.228.139.32/27",
+      "address_count": 32,
+      "asn": "4134",
+      "operator": "chinanet",
+      "asn_description": "CHINANET-BACKBONE No.31,Jin-rong Street",
+      "registry_netnames": [
+        "CANGNAN-DIANZHIZHENWU-CO"
+      ],
+      "registry_descriptions": [
+        "Cangnan County electronic government affairs center"
+      ],
+      "registry_maintainers": [
+        "MAINT-CN-CHINANET-ZJ-WZ"
+      ],
+      "registry_status": "ASSIGNED NON-PORTABLE",
+      "registry_last_modified": "2021-06-24T07:55:55Z",
+      "matched_by": "exclude_apnic_inetnum_rules: (?:^|[^a-z0-9])(?:zhejiang-provincial-bureau-of-data|ningbo-people-gov|cangnan-dianzhizhenwu-co|yongkang-electronic-gov|fuyang-network-center-gov)(?:[^a-z0-9]|$)|\\belectronic government network\\b|\\bhangzhou city people(?:'|’)s government of the electronic government affairs office\\b",
+      "reason": "APNIC inetnum registration explicitly identifies an electronic-government or government data network"
     },
     {
       "source": "apnic_inetnum",
@@ -8640,6 +9366,314 @@
       "registry_last_modified": "2021-06-24T07:47:52Z",
       "matched_by": "exclude_apnic_inetnum_rules: \\bdata[ -]?cent(?:er|re)\\b",
       "reason": "APNIC inetnum registration explicitly identifies a data-center network"
+    },
+    {
+      "source": "apnic_inetnum",
+      "category": "apnic_inetnum",
+      "cidr": "183.131.21.0/24",
+      "address_count": 256,
+      "asn": "4134",
+      "operator": "chinanet",
+      "asn_description": "CHINANET-BACKBONE No.31,Jin-rong Street",
+      "registry_netnames": [
+        "HANGZHOU-XIAOSHAN"
+      ],
+      "registry_descriptions": [
+        "Beijing Jinshan cloud Network Technology Co., Ltd."
+      ],
+      "registry_maintainers": [
+        "MAINT-CN-CHINANET-ZJ-HZ"
+      ],
+      "registry_status": "ASSIGNED NON-PORTABLE",
+      "registry_last_modified": "2021-06-24T07:42:10Z",
+      "matched_by": "exclude_apnic_inetnum_rules: (?:^|[^a-z0-9])(?:chinatell?ecom-cloud-company|cloud-interface-address|zhejiangzhiyun|hangzhou-youpaiyun-ltd)(?:[^a-z0-9]|$)|\\bbeijing jinshan cloud network technology co(?:mpany)?[., ]+(?:ltd|limited)\\b|\\bzhejiang zhi cloud information technology co(?:mpany)?[., ]+(?:ltd|limited)\\b|\\bhangzhou beat cloud technology co(?:mpany)?[., ]+(?:ltd|limited)\\b",
+      "reason": "APNIC inetnum registration explicitly identifies a cloud-company or cloud-service address range"
+    },
+    {
+      "source": "apnic_inetnum",
+      "category": "apnic_inetnum",
+      "cidr": "183.131.30.0/24",
+      "address_count": 256,
+      "asn": "4134",
+      "operator": "chinanet",
+      "asn_description": "CHINANET-BACKBONE No.31,Jin-rong Street",
+      "registry_netnames": [
+        "HANGZHOU-XIAOSHAN"
+      ],
+      "registry_descriptions": [
+        "Beijing Jinshan cloud Network Technology Co., Ltd."
+      ],
+      "registry_maintainers": [
+        "MAINT-CN-CHINANET-ZJ-HZ"
+      ],
+      "registry_status": "ASSIGNED NON-PORTABLE",
+      "registry_last_modified": "2021-06-24T08:07:04Z",
+      "matched_by": "exclude_apnic_inetnum_rules: (?:^|[^a-z0-9])(?:chinatell?ecom-cloud-company|cloud-interface-address|zhejiangzhiyun|hangzhou-youpaiyun-ltd)(?:[^a-z0-9]|$)|\\bbeijing jinshan cloud network technology co(?:mpany)?[., ]+(?:ltd|limited)\\b|\\bzhejiang zhi cloud information technology co(?:mpany)?[., ]+(?:ltd|limited)\\b|\\bhangzhou beat cloud technology co(?:mpany)?[., ]+(?:ltd|limited)\\b",
+      "reason": "APNIC inetnum registration explicitly identifies a cloud-company or cloud-service address range"
+    },
+    {
+      "source": "apnic_inetnum",
+      "category": "apnic_inetnum",
+      "cidr": "183.131.125.0/30",
+      "address_count": 4,
+      "asn": "4134",
+      "operator": "chinanet",
+      "asn_description": "CHINANET-BACKBONE No.31,Jin-rong Street",
+      "registry_netnames": [
+        "CLOUD-INTERFACE-ADDRESS"
+      ],
+      "registry_descriptions": [
+        "Cloud interface address"
+      ],
+      "registry_maintainers": [
+        "MAINT-CN-CHINANET-ZJ-TZ"
+      ],
+      "registry_status": "ASSIGNED NON-PORTABLE",
+      "registry_last_modified": "2021-06-24T07:45:02Z",
+      "matched_by": "exclude_apnic_inetnum_rules: (?:^|[^a-z0-9])(?:chinatell?ecom-cloud-company|cloud-interface-address|zhejiangzhiyun|hangzhou-youpaiyun-ltd)(?:[^a-z0-9]|$)|\\bbeijing jinshan cloud network technology co(?:mpany)?[., ]+(?:ltd|limited)\\b|\\bzhejiang zhi cloud information technology co(?:mpany)?[., ]+(?:ltd|limited)\\b|\\bhangzhou beat cloud technology co(?:mpany)?[., ]+(?:ltd|limited)\\b",
+      "reason": "APNIC inetnum registration explicitly identifies a cloud-company or cloud-service address range"
+    },
+    {
+      "source": "apnic_inetnum",
+      "category": "apnic_inetnum",
+      "cidr": "183.131.125.4/30",
+      "address_count": 4,
+      "asn": "4134",
+      "operator": "chinanet",
+      "asn_description": "CHINANET-BACKBONE No.31,Jin-rong Street",
+      "registry_netnames": [
+        "CLOUD-INTERFACE-ADDRESS"
+      ],
+      "registry_descriptions": [
+        "Cloud interface address"
+      ],
+      "registry_maintainers": [
+        "MAINT-CN-CHINANET-ZJ-TZ"
+      ],
+      "registry_status": "ASSIGNED NON-PORTABLE",
+      "registry_last_modified": "2021-06-24T07:29:09Z",
+      "matched_by": "exclude_apnic_inetnum_rules: (?:^|[^a-z0-9])(?:chinatell?ecom-cloud-company|cloud-interface-address|zhejiangzhiyun|hangzhou-youpaiyun-ltd)(?:[^a-z0-9]|$)|\\bbeijing jinshan cloud network technology co(?:mpany)?[., ]+(?:ltd|limited)\\b|\\bzhejiang zhi cloud information technology co(?:mpany)?[., ]+(?:ltd|limited)\\b|\\bhangzhou beat cloud technology co(?:mpany)?[., ]+(?:ltd|limited)\\b",
+      "reason": "APNIC inetnum registration explicitly identifies a cloud-company or cloud-service address range"
+    },
+    {
+      "source": "apnic_inetnum",
+      "category": "apnic_inetnum",
+      "cidr": "183.131.125.8/30",
+      "address_count": 4,
+      "asn": "4134",
+      "operator": "chinanet",
+      "asn_description": "CHINANET-BACKBONE No.31,Jin-rong Street",
+      "registry_netnames": [
+        "CLOUD-INTERFACE-ADDRESS"
+      ],
+      "registry_descriptions": [
+        "Cloud interface address"
+      ],
+      "registry_maintainers": [
+        "MAINT-CN-CHINANET-ZJ-TZ"
+      ],
+      "registry_status": "ASSIGNED NON-PORTABLE",
+      "registry_last_modified": "2021-06-24T07:39:30Z",
+      "matched_by": "exclude_apnic_inetnum_rules: (?:^|[^a-z0-9])(?:chinatell?ecom-cloud-company|cloud-interface-address|zhejiangzhiyun|hangzhou-youpaiyun-ltd)(?:[^a-z0-9]|$)|\\bbeijing jinshan cloud network technology co(?:mpany)?[., ]+(?:ltd|limited)\\b|\\bzhejiang zhi cloud information technology co(?:mpany)?[., ]+(?:ltd|limited)\\b|\\bhangzhou beat cloud technology co(?:mpany)?[., ]+(?:ltd|limited)\\b",
+      "reason": "APNIC inetnum registration explicitly identifies a cloud-company or cloud-service address range"
+    },
+    {
+      "source": "apnic_inetnum",
+      "category": "apnic_inetnum",
+      "cidr": "183.131.125.16/28",
+      "address_count": 16,
+      "asn": "4134",
+      "operator": "chinanet",
+      "asn_description": "CHINANET-BACKBONE No.31,Jin-rong Street",
+      "registry_netnames": [
+        "CLOUD-INTERFACE-ADDRESS"
+      ],
+      "registry_descriptions": [
+        "Cloud interface address"
+      ],
+      "registry_maintainers": [
+        "MAINT-CN-CHINANET-ZJ-TZ"
+      ],
+      "registry_status": "ASSIGNED NON-PORTABLE",
+      "registry_last_modified": "2021-06-24T07:27:07Z",
+      "matched_by": "exclude_apnic_inetnum_rules: (?:^|[^a-z0-9])(?:chinatell?ecom-cloud-company|cloud-interface-address|zhejiangzhiyun|hangzhou-youpaiyun-ltd)(?:[^a-z0-9]|$)|\\bbeijing jinshan cloud network technology co(?:mpany)?[., ]+(?:ltd|limited)\\b|\\bzhejiang zhi cloud information technology co(?:mpany)?[., ]+(?:ltd|limited)\\b|\\bhangzhou beat cloud technology co(?:mpany)?[., ]+(?:ltd|limited)\\b",
+      "reason": "APNIC inetnum registration explicitly identifies a cloud-company or cloud-service address range"
+    },
+    {
+      "source": "apnic_inetnum",
+      "category": "apnic_inetnum",
+      "cidr": "183.131.125.64/27",
+      "address_count": 32,
+      "asn": "4134",
+      "operator": "chinanet",
+      "asn_description": "CHINANET-BACKBONE No.31,Jin-rong Street",
+      "registry_netnames": [
+        "CLOUD-INTERFACE-ADDRESS"
+      ],
+      "registry_descriptions": [
+        "Cloud interface address"
+      ],
+      "registry_maintainers": [
+        "MAINT-CN-CHINANET-ZJ-TZ"
+      ],
+      "registry_status": "ASSIGNED NON-PORTABLE",
+      "registry_last_modified": "2021-06-24T07:36:49Z",
+      "matched_by": "exclude_apnic_inetnum_rules: (?:^|[^a-z0-9])(?:chinatell?ecom-cloud-company|cloud-interface-address|zhejiangzhiyun|hangzhou-youpaiyun-ltd)(?:[^a-z0-9]|$)|\\bbeijing jinshan cloud network technology co(?:mpany)?[., ]+(?:ltd|limited)\\b|\\bzhejiang zhi cloud information technology co(?:mpany)?[., ]+(?:ltd|limited)\\b|\\bhangzhou beat cloud technology co(?:mpany)?[., ]+(?:ltd|limited)\\b",
+      "reason": "APNIC inetnum registration explicitly identifies a cloud-company or cloud-service address range"
+    },
+    {
+      "source": "apnic_inetnum",
+      "category": "apnic_inetnum",
+      "cidr": "183.131.125.96/27",
+      "address_count": 32,
+      "asn": "4134",
+      "operator": "chinanet",
+      "asn_description": "CHINANET-BACKBONE No.31,Jin-rong Street",
+      "registry_netnames": [
+        "CLOUD-INTERFACE-ADDRESS"
+      ],
+      "registry_descriptions": [
+        "Cloud interface address"
+      ],
+      "registry_maintainers": [
+        "MAINT-CN-CHINANET-ZJ-TZ"
+      ],
+      "registry_status": "ASSIGNED NON-PORTABLE",
+      "registry_last_modified": "2021-06-24T07:41:37Z",
+      "matched_by": "exclude_apnic_inetnum_rules: (?:^|[^a-z0-9])(?:chinatell?ecom-cloud-company|cloud-interface-address|zhejiangzhiyun|hangzhou-youpaiyun-ltd)(?:[^a-z0-9]|$)|\\bbeijing jinshan cloud network technology co(?:mpany)?[., ]+(?:ltd|limited)\\b|\\bzhejiang zhi cloud information technology co(?:mpany)?[., ]+(?:ltd|limited)\\b|\\bhangzhou beat cloud technology co(?:mpany)?[., ]+(?:ltd|limited)\\b",
+      "reason": "APNIC inetnum registration explicitly identifies a cloud-company or cloud-service address range"
+    },
+    {
+      "source": "apnic_inetnum",
+      "category": "apnic_inetnum",
+      "cidr": "183.131.125.160/27",
+      "address_count": 32,
+      "asn": "4134",
+      "operator": "chinanet",
+      "asn_description": "CHINANET-BACKBONE No.31,Jin-rong Street",
+      "registry_netnames": [
+        "CLOUD-INTERFACE-ADDRESS"
+      ],
+      "registry_descriptions": [
+        "Cloud interface address"
+      ],
+      "registry_maintainers": [
+        "MAINT-CN-CHINANET-ZJ-TZ"
+      ],
+      "registry_status": "ASSIGNED NON-PORTABLE",
+      "registry_last_modified": "2021-06-24T07:34:30Z",
+      "matched_by": "exclude_apnic_inetnum_rules: (?:^|[^a-z0-9])(?:chinatell?ecom-cloud-company|cloud-interface-address|zhejiangzhiyun|hangzhou-youpaiyun-ltd)(?:[^a-z0-9]|$)|\\bbeijing jinshan cloud network technology co(?:mpany)?[., ]+(?:ltd|limited)\\b|\\bzhejiang zhi cloud information technology co(?:mpany)?[., ]+(?:ltd|limited)\\b|\\bhangzhou beat cloud technology co(?:mpany)?[., ]+(?:ltd|limited)\\b",
+      "reason": "APNIC inetnum registration explicitly identifies a cloud-company or cloud-service address range"
+    },
+    {
+      "source": "apnic_inetnum",
+      "category": "apnic_inetnum",
+      "cidr": "183.131.125.192/27",
+      "address_count": 32,
+      "asn": "4134",
+      "operator": "chinanet",
+      "asn_description": "CHINANET-BACKBONE No.31,Jin-rong Street",
+      "registry_netnames": [
+        "CLOUD-INTERFACE-ADDRESS"
+      ],
+      "registry_descriptions": [
+        "Cloud interface address"
+      ],
+      "registry_maintainers": [
+        "MAINT-CN-CHINANET-ZJ-TZ"
+      ],
+      "registry_status": "ASSIGNED NON-PORTABLE",
+      "registry_last_modified": "2021-06-24T07:52:05Z",
+      "matched_by": "exclude_apnic_inetnum_rules: (?:^|[^a-z0-9])(?:chinatell?ecom-cloud-company|cloud-interface-address|zhejiangzhiyun|hangzhou-youpaiyun-ltd)(?:[^a-z0-9]|$)|\\bbeijing jinshan cloud network technology co(?:mpany)?[., ]+(?:ltd|limited)\\b|\\bzhejiang zhi cloud information technology co(?:mpany)?[., ]+(?:ltd|limited)\\b|\\bhangzhou beat cloud technology co(?:mpany)?[., ]+(?:ltd|limited)\\b",
+      "reason": "APNIC inetnum registration explicitly identifies a cloud-company or cloud-service address range"
+    },
+    {
+      "source": "apnic_inetnum",
+      "category": "apnic_inetnum",
+      "cidr": "183.131.126.32/27",
+      "address_count": 32,
+      "asn": "4134",
+      "operator": "chinanet",
+      "asn_description": "CHINANET-BACKBONE No.31,Jin-rong Street",
+      "registry_netnames": [
+        "CLOUD-INTERFACE-ADDRESS"
+      ],
+      "registry_descriptions": [
+        "Cloud interface address"
+      ],
+      "registry_maintainers": [
+        "MAINT-CN-CHINANET-ZJ-TZ"
+      ],
+      "registry_status": "ASSIGNED NON-PORTABLE",
+      "registry_last_modified": "2021-06-24T07:37:50Z",
+      "matched_by": "exclude_apnic_inetnum_rules: (?:^|[^a-z0-9])(?:chinatell?ecom-cloud-company|cloud-interface-address|zhejiangzhiyun|hangzhou-youpaiyun-ltd)(?:[^a-z0-9]|$)|\\bbeijing jinshan cloud network technology co(?:mpany)?[., ]+(?:ltd|limited)\\b|\\bzhejiang zhi cloud information technology co(?:mpany)?[., ]+(?:ltd|limited)\\b|\\bhangzhou beat cloud technology co(?:mpany)?[., ]+(?:ltd|limited)\\b",
+      "reason": "APNIC inetnum registration explicitly identifies a cloud-company or cloud-service address range"
+    },
+    {
+      "source": "apnic_inetnum",
+      "category": "apnic_inetnum",
+      "cidr": "183.131.126.96/27",
+      "address_count": 32,
+      "asn": "4134",
+      "operator": "chinanet",
+      "asn_description": "CHINANET-BACKBONE No.31,Jin-rong Street",
+      "registry_netnames": [
+        "CLOUD-INTERFACE-ADDRESS"
+      ],
+      "registry_descriptions": [
+        "Cloud interface address"
+      ],
+      "registry_maintainers": [
+        "MAINT-CN-CHINANET-ZJ-TZ"
+      ],
+      "registry_status": "ASSIGNED NON-PORTABLE",
+      "registry_last_modified": "2021-06-24T07:35:22Z",
+      "matched_by": "exclude_apnic_inetnum_rules: (?:^|[^a-z0-9])(?:chinatell?ecom-cloud-company|cloud-interface-address|zhejiangzhiyun|hangzhou-youpaiyun-ltd)(?:[^a-z0-9]|$)|\\bbeijing jinshan cloud network technology co(?:mpany)?[., ]+(?:ltd|limited)\\b|\\bzhejiang zhi cloud information technology co(?:mpany)?[., ]+(?:ltd|limited)\\b|\\bhangzhou beat cloud technology co(?:mpany)?[., ]+(?:ltd|limited)\\b",
+      "reason": "APNIC inetnum registration explicitly identifies a cloud-company or cloud-service address range"
+    },
+    {
+      "source": "apnic_inetnum",
+      "category": "apnic_inetnum",
+      "cidr": "183.131.126.192/27",
+      "address_count": 32,
+      "asn": "4134",
+      "operator": "chinanet",
+      "asn_description": "CHINANET-BACKBONE No.31,Jin-rong Street",
+      "registry_netnames": [
+        "CLOUD-INTERFACE-ADDRESS"
+      ],
+      "registry_descriptions": [
+        "Cloud interface address"
+      ],
+      "registry_maintainers": [
+        "MAINT-CN-CHINANET-ZJ-TZ"
+      ],
+      "registry_status": "ASSIGNED NON-PORTABLE",
+      "registry_last_modified": "2021-06-24T07:42:46Z",
+      "matched_by": "exclude_apnic_inetnum_rules: (?:^|[^a-z0-9])(?:chinatell?ecom-cloud-company|cloud-interface-address|zhejiangzhiyun|hangzhou-youpaiyun-ltd)(?:[^a-z0-9]|$)|\\bbeijing jinshan cloud network technology co(?:mpany)?[., ]+(?:ltd|limited)\\b|\\bzhejiang zhi cloud information technology co(?:mpany)?[., ]+(?:ltd|limited)\\b|\\bhangzhou beat cloud technology co(?:mpany)?[., ]+(?:ltd|limited)\\b",
+      "reason": "APNIC inetnum registration explicitly identifies a cloud-company or cloud-service address range"
+    },
+    {
+      "source": "apnic_inetnum",
+      "category": "apnic_inetnum",
+      "cidr": "183.131.126.224/27",
+      "address_count": 32,
+      "asn": "4134",
+      "operator": "chinanet",
+      "asn_description": "CHINANET-BACKBONE No.31,Jin-rong Street",
+      "registry_netnames": [
+        "CLOUD-INTERFACE-ADDRESS"
+      ],
+      "registry_descriptions": [
+        "Cloud interface address"
+      ],
+      "registry_maintainers": [
+        "MAINT-CN-CHINANET-ZJ-TZ"
+      ],
+      "registry_status": "ASSIGNED NON-PORTABLE",
+      "registry_last_modified": "2021-06-24T07:47:21Z",
+      "matched_by": "exclude_apnic_inetnum_rules: (?:^|[^a-z0-9])(?:chinatell?ecom-cloud-company|cloud-interface-address|zhejiangzhiyun|hangzhou-youpaiyun-ltd)(?:[^a-z0-9]|$)|\\bbeijing jinshan cloud network technology co(?:mpany)?[., ]+(?:ltd|limited)\\b|\\bzhejiang zhi cloud information technology co(?:mpany)?[., ]+(?:ltd|limited)\\b|\\bhangzhou beat cloud technology co(?:mpany)?[., ]+(?:ltd|limited)\\b",
+      "reason": "APNIC inetnum registration explicitly identifies a cloud-company or cloud-service address range"
     },
     {
       "source": "apnic_inetnum",
@@ -12347,6 +13381,314 @@
       "registry_last_modified": "2008-09-04T07:02:09Z",
       "matched_by": "exclude_apnic_inetnum_rules: idc(?:[^a-z0-9]|$)|\\binternet data cent(?:er|re)\\b",
       "reason": "APNIC inetnum registration explicitly identifies an IDC network"
+    },
+    {
+      "source": "apnic_inetnum",
+      "category": "apnic_inetnum",
+      "cidr": "220.191.202.0/23",
+      "address_count": 512,
+      "asn": "4134",
+      "operator": "chinanet",
+      "asn_description": "CHINANET-BACKBONE No.31,Jin-rong Street",
+      "registry_netnames": [
+        "ZHOUSHAN-GOVERNMENT-NETWORK"
+      ],
+      "registry_descriptions": [
+        "Zhoushan Electronic Government Network"
+      ],
+      "registry_maintainers": [
+        "MAINT-CN-CHINANET-ZJ-HZ"
+      ],
+      "registry_status": "ASSIGNED NON-PORTABLE",
+      "registry_last_modified": "2008-09-04T07:01:10Z",
+      "matched_by": "exclude_apnic_inetnum_rules: (?:^|[^a-z0-9])(?:zhejiang-provincial-bureau-of-data|ningbo-people-gov|cangnan-dianzhizhenwu-co|yongkang-electronic-gov|fuyang-network-center-gov)(?:[^a-z0-9]|$)|\\belectronic government network\\b|\\bhangzhou city people(?:'|’)s government of the electronic government affairs office\\b",
+      "reason": "APNIC inetnum registration explicitly identifies an electronic-government or government data network"
+    },
+    {
+      "source": "apnic_inetnum",
+      "category": "apnic_inetnum",
+      "cidr": "220.191.204.0/22",
+      "address_count": 1024,
+      "asn": "4134",
+      "operator": "chinanet",
+      "asn_description": "CHINANET-BACKBONE No.31,Jin-rong Street",
+      "registry_netnames": [
+        "WENZHOU-ELECGOV-NETWORK"
+      ],
+      "registry_descriptions": [
+        "Wenzhou Electronic Government Network"
+      ],
+      "registry_maintainers": [
+        "MAINT-CN-CHINANET-ZJ-HZ"
+      ],
+      "registry_status": "ASSIGNED NON-PORTABLE",
+      "registry_last_modified": "2021-06-24T08:12:56Z",
+      "matched_by": "exclude_apnic_inetnum_rules: (?:^|[^a-z0-9])(?:zhejiang-provincial-bureau-of-data|ningbo-people-gov|cangnan-dianzhizhenwu-co|yongkang-electronic-gov|fuyang-network-center-gov)(?:[^a-z0-9]|$)|\\belectronic government network\\b|\\bhangzhou city people(?:'|’)s government of the electronic government affairs office\\b",
+      "reason": "APNIC inetnum registration explicitly identifies an electronic-government or government data network"
+    },
+    {
+      "source": "apnic_inetnum",
+      "category": "apnic_inetnum",
+      "cidr": "220.191.208.0/22",
+      "address_count": 1024,
+      "asn": "4134",
+      "operator": "chinanet",
+      "asn_description": "CHINANET-BACKBONE No.31,Jin-rong Street",
+      "registry_netnames": [
+        "HANGZHOU-GOVERNMENT-NETWORK"
+      ],
+      "registry_descriptions": [
+        "Hangzhou Electronic Government Network"
+      ],
+      "registry_maintainers": [
+        "MAINT-CN-CHINANET-ZJ-HZ"
+      ],
+      "registry_status": "ASSIGNED NON-PORTABLE",
+      "registry_last_modified": "2008-09-04T06:55:59Z",
+      "matched_by": "exclude_apnic_inetnum_rules: (?:^|[^a-z0-9])(?:zhejiang-provincial-bureau-of-data|ningbo-people-gov|cangnan-dianzhizhenwu-co|yongkang-electronic-gov|fuyang-network-center-gov)(?:[^a-z0-9]|$)|\\belectronic government network\\b|\\bhangzhou city people(?:'|’)s government of the electronic government affairs office\\b",
+      "reason": "APNIC inetnum registration explicitly identifies an electronic-government or government data network"
+    },
+    {
+      "source": "apnic_inetnum",
+      "category": "apnic_inetnum",
+      "cidr": "220.191.212.0/22",
+      "address_count": 1024,
+      "asn": "4134",
+      "operator": "chinanet",
+      "asn_description": "CHINANET-BACKBONE No.31,Jin-rong Street",
+      "registry_netnames": [
+        "NINGBO-GOVERNMENT-NETWORK"
+      ],
+      "registry_descriptions": [
+        "Ningbo Electronic Government Network"
+      ],
+      "registry_maintainers": [
+        "MAINT-CN-CHINANET-ZJ-HZ"
+      ],
+      "registry_status": "ASSIGNED NON-PORTABLE",
+      "registry_last_modified": "2008-09-04T06:55:59Z",
+      "matched_by": "exclude_apnic_inetnum_rules: (?:^|[^a-z0-9])(?:zhejiang-provincial-bureau-of-data|ningbo-people-gov|cangnan-dianzhizhenwu-co|yongkang-electronic-gov|fuyang-network-center-gov)(?:[^a-z0-9]|$)|\\belectronic government network\\b|\\bhangzhou city people(?:'|’)s government of the electronic government affairs office\\b",
+      "reason": "APNIC inetnum registration explicitly identifies an electronic-government or government data network"
+    },
+    {
+      "source": "apnic_inetnum",
+      "category": "apnic_inetnum",
+      "cidr": "220.191.216.0/22",
+      "address_count": 1024,
+      "asn": "4134",
+      "operator": "chinanet",
+      "asn_description": "CHINANET-BACKBONE No.31,Jin-rong Street",
+      "registry_netnames": [
+        "HUZHOU-GOVERNMENT-NETWORK"
+      ],
+      "registry_descriptions": [
+        "Huzhou Electronic Government Network"
+      ],
+      "registry_maintainers": [
+        "MAINT-CN-CHINANET-ZJ-HZ"
+      ],
+      "registry_status": "ASSIGNED NON-PORTABLE",
+      "registry_last_modified": "2021-06-24T07:33:48Z",
+      "matched_by": "exclude_apnic_inetnum_rules: (?:^|[^a-z0-9])(?:zhejiang-provincial-bureau-of-data|ningbo-people-gov|cangnan-dianzhizhenwu-co|yongkang-electronic-gov|fuyang-network-center-gov)(?:[^a-z0-9]|$)|\\belectronic government network\\b|\\bhangzhou city people(?:'|’)s government of the electronic government affairs office\\b",
+      "reason": "APNIC inetnum registration explicitly identifies an electronic-government or government data network"
+    },
+    {
+      "source": "apnic_inetnum",
+      "category": "apnic_inetnum",
+      "cidr": "220.191.220.0/22",
+      "address_count": 1024,
+      "asn": "4134",
+      "operator": "chinanet",
+      "asn_description": "CHINANET-BACKBONE No.31,Jin-rong Street",
+      "registry_netnames": [
+        "JIAXING-GOVERNMENT-NETWORK"
+      ],
+      "registry_descriptions": [
+        "Jiaxing Electronic Government Network"
+      ],
+      "registry_maintainers": [
+        "MAINT-CN-CHINANET-ZJ-HZ"
+      ],
+      "registry_status": "ASSIGNED NON-PORTABLE",
+      "registry_last_modified": "2008-09-04T06:55:59Z",
+      "matched_by": "exclude_apnic_inetnum_rules: (?:^|[^a-z0-9])(?:zhejiang-provincial-bureau-of-data|ningbo-people-gov|cangnan-dianzhizhenwu-co|yongkang-electronic-gov|fuyang-network-center-gov)(?:[^a-z0-9]|$)|\\belectronic government network\\b|\\bhangzhou city people(?:'|’)s government of the electronic government affairs office\\b",
+      "reason": "APNIC inetnum registration explicitly identifies an electronic-government or government data network"
+    },
+    {
+      "source": "apnic_inetnum",
+      "category": "apnic_inetnum",
+      "cidr": "220.191.224.0/22",
+      "address_count": 1024,
+      "asn": "4134",
+      "operator": "chinanet",
+      "asn_description": "CHINANET-BACKBONE No.31,Jin-rong Street",
+      "registry_netnames": [
+        "SHAOXING-GOVERNMENT-NETWORK"
+      ],
+      "registry_descriptions": [
+        "Shaoxing Electronic Government Network"
+      ],
+      "registry_maintainers": [
+        "MAINT-CN-CHINANET-ZJ-HZ"
+      ],
+      "registry_status": "ASSIGNED NON-PORTABLE",
+      "registry_last_modified": "2008-09-04T07:01:10Z",
+      "matched_by": "exclude_apnic_inetnum_rules: (?:^|[^a-z0-9])(?:zhejiang-provincial-bureau-of-data|ningbo-people-gov|cangnan-dianzhizhenwu-co|yongkang-electronic-gov|fuyang-network-center-gov)(?:[^a-z0-9]|$)|\\belectronic government network\\b|\\bhangzhou city people(?:'|’)s government of the electronic government affairs office\\b",
+      "reason": "APNIC inetnum registration explicitly identifies an electronic-government or government data network"
+    },
+    {
+      "source": "apnic_inetnum",
+      "category": "apnic_inetnum",
+      "cidr": "220.191.228.0/22",
+      "address_count": 1024,
+      "asn": "4134",
+      "operator": "chinanet",
+      "asn_description": "CHINANET-BACKBONE No.31,Jin-rong Street",
+      "registry_netnames": [
+        "JINHUA-GOVERNMENT-NETWORK"
+      ],
+      "registry_descriptions": [
+        "Jinhua Electronic Government Network"
+      ],
+      "registry_maintainers": [
+        "MAINT-CN-CHINANET-ZJ-HZ"
+      ],
+      "registry_status": "ASSIGNED NON-PORTABLE",
+      "registry_last_modified": "2008-09-04T07:01:10Z",
+      "matched_by": "exclude_apnic_inetnum_rules: (?:^|[^a-z0-9])(?:zhejiang-provincial-bureau-of-data|ningbo-people-gov|cangnan-dianzhizhenwu-co|yongkang-electronic-gov|fuyang-network-center-gov)(?:[^a-z0-9]|$)|\\belectronic government network\\b|\\bhangzhou city people(?:'|’)s government of the electronic government affairs office\\b",
+      "reason": "APNIC inetnum registration explicitly identifies an electronic-government or government data network"
+    },
+    {
+      "source": "apnic_inetnum",
+      "category": "apnic_inetnum",
+      "cidr": "220.191.232.0/22",
+      "address_count": 1024,
+      "asn": "4134",
+      "operator": "chinanet",
+      "asn_description": "CHINANET-BACKBONE No.31,Jin-rong Street",
+      "registry_netnames": [
+        "TAIZHOU-GOVERNMENT-NETWORK"
+      ],
+      "registry_descriptions": [
+        "Taizhou Electronic Government Network"
+      ],
+      "registry_maintainers": [
+        "MAINT-CN-CHINANET-ZJ-HZ"
+      ],
+      "registry_status": "ASSIGNED NON-PORTABLE",
+      "registry_last_modified": "2008-09-04T07:01:10Z",
+      "matched_by": "exclude_apnic_inetnum_rules: (?:^|[^a-z0-9])(?:zhejiang-provincial-bureau-of-data|ningbo-people-gov|cangnan-dianzhizhenwu-co|yongkang-electronic-gov|fuyang-network-center-gov)(?:[^a-z0-9]|$)|\\belectronic government network\\b|\\bhangzhou city people(?:'|’)s government of the electronic government affairs office\\b",
+      "reason": "APNIC inetnum registration explicitly identifies an electronic-government or government data network"
+    },
+    {
+      "source": "apnic_inetnum",
+      "category": "apnic_inetnum",
+      "cidr": "220.191.236.0/22",
+      "address_count": 1024,
+      "asn": "4134",
+      "operator": "chinanet",
+      "asn_description": "CHINANET-BACKBONE No.31,Jin-rong Street",
+      "registry_netnames": [
+        "QUZHOU-ELECGOV-NETWORK"
+      ],
+      "registry_descriptions": [
+        "Quzhou Electronic Government Network"
+      ],
+      "registry_maintainers": [
+        "MAINT-CN-CHINANET-ZJ-HZ"
+      ],
+      "registry_status": "ASSIGNED NON-PORTABLE",
+      "registry_last_modified": "2008-09-04T07:01:10Z",
+      "matched_by": "exclude_apnic_inetnum_rules: (?:^|[^a-z0-9])(?:zhejiang-provincial-bureau-of-data|ningbo-people-gov|cangnan-dianzhizhenwu-co|yongkang-electronic-gov|fuyang-network-center-gov)(?:[^a-z0-9]|$)|\\belectronic government network\\b|\\bhangzhou city people(?:'|’)s government of the electronic government affairs office\\b",
+      "reason": "APNIC inetnum registration explicitly identifies an electronic-government or government data network"
+    },
+    {
+      "source": "apnic_inetnum",
+      "category": "apnic_inetnum",
+      "cidr": "220.191.240.0/21",
+      "address_count": 2048,
+      "asn": "4134",
+      "operator": "chinanet",
+      "asn_description": "CHINANET-BACKBONE No.31,Jin-rong Street",
+      "registry_netnames": [
+        "Zhejiang-Provincial-Bureau-of-Data"
+      ],
+      "registry_descriptions": [
+        "Zhejiang Provincial Bureau of Data"
+      ],
+      "registry_maintainers": [
+        "MAINT-CN-CHINANET-ZJ-HZ"
+      ],
+      "registry_status": "ASSIGNED NON-PORTABLE",
+      "registry_last_modified": "2026-01-07T01:42:24Z",
+      "matched_by": "exclude_apnic_inetnum_rules: (?:^|[^a-z0-9])(?:zhejiang-provincial-bureau-of-data|ningbo-people-gov|cangnan-dianzhizhenwu-co|yongkang-electronic-gov|fuyang-network-center-gov)(?:[^a-z0-9]|$)|\\belectronic government network\\b|\\bhangzhou city people(?:'|’)s government of the electronic government affairs office\\b",
+      "reason": "APNIC inetnum registration explicitly identifies an electronic-government or government data network"
+    },
+    {
+      "source": "apnic_inetnum",
+      "category": "apnic_inetnum",
+      "cidr": "220.191.248.0/23",
+      "address_count": 512,
+      "asn": "4134",
+      "operator": "chinanet",
+      "asn_description": "CHINANET-BACKBONE No.31,Jin-rong Street",
+      "registry_netnames": [
+        "Zhejiang-Provincial-Bureau-of-Data"
+      ],
+      "registry_descriptions": [
+        "Zhejiang Provincial Bureau of Data"
+      ],
+      "registry_maintainers": [
+        "MAINT-CN-CHINANET-ZJ-HZ"
+      ],
+      "registry_status": "ASSIGNED NON-PORTABLE",
+      "registry_last_modified": "2026-01-19T07:22:46Z",
+      "matched_by": "exclude_apnic_inetnum_rules: (?:^|[^a-z0-9])(?:zhejiang-provincial-bureau-of-data|ningbo-people-gov|cangnan-dianzhizhenwu-co|yongkang-electronic-gov|fuyang-network-center-gov)(?:[^a-z0-9]|$)|\\belectronic government network\\b|\\bhangzhou city people(?:'|’)s government of the electronic government affairs office\\b",
+      "reason": "APNIC inetnum registration explicitly identifies an electronic-government or government data network"
+    },
+    {
+      "source": "apnic_inetnum",
+      "category": "apnic_inetnum",
+      "cidr": "220.191.250.0/23",
+      "address_count": 512,
+      "asn": "4134",
+      "operator": "chinanet",
+      "asn_description": "CHINANET-BACKBONE No.31,Jin-rong Street",
+      "registry_netnames": [
+        "Zhejiang-Provincial-Bureau-of-Data"
+      ],
+      "registry_descriptions": [
+        "Zhejiang Provincial Bureau of Data"
+      ],
+      "registry_maintainers": [
+        "MAINT-CN-CHINANET-ZJ-HZ"
+      ],
+      "registry_status": "ASSIGNED NON-PORTABLE",
+      "registry_last_modified": "2026-01-19T07:23:02Z",
+      "matched_by": "exclude_apnic_inetnum_rules: (?:^|[^a-z0-9])(?:zhejiang-provincial-bureau-of-data|ningbo-people-gov|cangnan-dianzhizhenwu-co|yongkang-electronic-gov|fuyang-network-center-gov)(?:[^a-z0-9]|$)|\\belectronic government network\\b|\\bhangzhou city people(?:'|’)s government of the electronic government affairs office\\b",
+      "reason": "APNIC inetnum registration explicitly identifies an electronic-government or government data network"
+    },
+    {
+      "source": "apnic_inetnum",
+      "category": "apnic_inetnum",
+      "cidr": "220.191.252.0/22",
+      "address_count": 1024,
+      "asn": "4134",
+      "operator": "chinanet",
+      "asn_description": "CHINANET-BACKBONE No.31,Jin-rong Street",
+      "registry_netnames": [
+        "Zhejiang-Provincial-Bureau-of-Data"
+      ],
+      "registry_descriptions": [
+        "Zhejiang Provincial Bureau of Data"
+      ],
+      "registry_maintainers": [
+        "MAINT-CN-CHINANET-ZJ-HZ"
+      ],
+      "registry_status": "ASSIGNED NON-PORTABLE",
+      "registry_last_modified": "2026-01-19T07:24:32Z",
+      "matched_by": "exclude_apnic_inetnum_rules: (?:^|[^a-z0-9])(?:zhejiang-provincial-bureau-of-data|ningbo-people-gov|cangnan-dianzhizhenwu-co|yongkang-electronic-gov|fuyang-network-center-gov)(?:[^a-z0-9]|$)|\\belectronic government network\\b|\\bhangzhou city people(?:'|’)s government of the electronic government affairs office\\b",
+      "reason": "APNIC inetnum registration explicitly identifies an electronic-government or government data network"
     },
     {
       "source": "apnic_inetnum",
@@ -21517,6 +22859,28 @@
     {
       "source": "apnic_inetnum",
       "category": "apnic_inetnum",
+      "cidr": "43.240.72.0/23",
+      "address_count": 512,
+      "asn": "56041",
+      "operator": "cmcc",
+      "asn_description": "CMNET-ZHEJIANG-AP China Mobile communications corporation",
+      "registry_netnames": [
+        "ZHEJIANGZHIYUN"
+      ],
+      "registry_descriptions": [
+        "Zhejiang zhi cloud information technology co., LTD"
+      ],
+      "registry_maintainers": [
+        "MAINT-CNNIC-AP"
+      ],
+      "registry_status": "ALLOCATED PORTABLE",
+      "registry_last_modified": "2023-11-28T00:57:59Z",
+      "matched_by": "exclude_apnic_inetnum_rules: (?:^|[^a-z0-9])(?:chinatell?ecom-cloud-company|cloud-interface-address|zhejiangzhiyun|hangzhou-youpaiyun-ltd)(?:[^a-z0-9]|$)|\\bbeijing jinshan cloud network technology co(?:mpany)?[., ]+(?:ltd|limited)\\b|\\bzhejiang zhi cloud information technology co(?:mpany)?[., ]+(?:ltd|limited)\\b|\\bhangzhou beat cloud technology co(?:mpany)?[., ]+(?:ltd|limited)\\b",
+      "reason": "APNIC inetnum registration explicitly identifies a cloud-company or cloud-service address range"
+    },
+    {
+      "source": "apnic_inetnum",
+      "category": "apnic_inetnum",
       "cidr": "43.241.49.0/24",
       "address_count": 256,
       "asn": "56046",
@@ -27348,6 +28712,66 @@
     {
       "source": "apnic_inetnum",
       "category": "apnic_inetnum",
+      "cidr": "45.254.48.0/23",
+      "address_count": 512,
+      "asn": "4837",
+      "operator": "unicom",
+      "asn_description": "CHINA169-BACKBONE CHINA UNICOM China169 Backbone",
+      "registry_netnames": [
+        "Netease-Network"
+      ],
+      "registry_descriptions": [
+        "Guangzhou NetEase Computer System Co., Ltd"
+      ],
+      "registry_maintainers": [
+        "MAINT-CNNIC-AP"
+      ],
+      "registry_status": "ALLOCATED PORTABLE",
+      "registry_last_modified": "2023-11-28T00:58:15Z",
+      "matched_by": "exclude_apnic_inetnum_rules: (?:^|[^a-z0-9])(?:guangzhouwangyihz|shanghaiwangyihz|guangzhou-wangyi-ltd)(?:[^a-z0-9]|$)|\\bguangzhou (?:wangyi|netease) computer systems? co(?:mpany)?[., ]+(?:ltd|limited)\\b",
+      "reason": "APNIC inetnum registration explicitly identifies a NetEase corporate or service network",
+      "linked_asns": [
+        {
+          "asn": "45062",
+          "description": "NETEASE-NETWORK NetEase Building No.16 Ke Yun Road",
+          "as_name": "Netease-Network",
+          "via": "netname_as_name"
+        }
+      ]
+    },
+    {
+      "source": "apnic_inetnum",
+      "category": "apnic_inetnum",
+      "cidr": "45.254.50.0/24",
+      "address_count": 256,
+      "asn": "4837",
+      "operator": "unicom",
+      "asn_description": "CHINA169-BACKBONE CHINA UNICOM China169 Backbone",
+      "registry_netnames": [
+        "Netease-Network"
+      ],
+      "registry_descriptions": [
+        "Guangzhou NetEase Computer System Co., Ltd"
+      ],
+      "registry_maintainers": [
+        "MAINT-CNNIC-AP"
+      ],
+      "registry_status": "ALLOCATED PORTABLE",
+      "registry_last_modified": "2023-11-28T00:58:15Z",
+      "matched_by": "exclude_apnic_inetnum_rules: (?:^|[^a-z0-9])(?:guangzhouwangyihz|shanghaiwangyihz|guangzhou-wangyi-ltd)(?:[^a-z0-9]|$)|\\bguangzhou (?:wangyi|netease) computer systems? co(?:mpany)?[., ]+(?:ltd|limited)\\b",
+      "reason": "APNIC inetnum registration explicitly identifies a NetEase corporate or service network",
+      "linked_asns": [
+        {
+          "asn": "45062",
+          "description": "NETEASE-NETWORK NetEase Building No.16 Ke Yun Road",
+          "as_name": "Netease-Network",
+          "via": "netname_as_name"
+        }
+      ]
+    },
+    {
+      "source": "apnic_inetnum",
+      "category": "apnic_inetnum",
       "cidr": "58.19.127.128/28",
       "address_count": 16,
       "asn": "4837",
@@ -30237,6 +31661,50 @@
     {
       "source": "apnic_inetnum",
       "category": "apnic_inetnum",
+      "cidr": "60.12.7.224/27",
+      "address_count": 32,
+      "asn": "4837",
+      "operator": "unicom",
+      "asn_description": "CHINA169-BACKBONE CHINA UNICOM China169 Backbone",
+      "registry_netnames": [
+        "IDCDI2PIGONGXIANGJIERUFUWUQIDI"
+      ],
+      "registry_descriptions": [
+        "IDCDI2PIGONGXIANGJIERUFUWUQIDIZHIDUAN,HANGZHOU,ZHEJIANG"
+      ],
+      "registry_maintainers": [
+        "MAINT-CNCGROUP-ZJ"
+      ],
+      "registry_status": "ASSIGNED NON-PORTABLE",
+      "registry_last_modified": "2010-09-08T14:44:11Z",
+      "matched_by": "exclude_apnic_inetnum_rules: (?:^|[^a-z0-9])(?:idcbeiyongjh|liantongidcyouxifuwuqihz|idcdi2pigongxiangjierufuwuqidi|xiaoshanidcchuangyehuliankejih?|wangluoyingpanhezuoidcziyuanhz|yuyaoidcyewudizhiduanvlan511(?:chinaunicomningbochina)?|cabinet-retail)(?:[^a-z0-9]|$)",
+      "reason": "APNIC inetnum registration explicitly identifies a dedicated IDC resource or service range"
+    },
+    {
+      "source": "apnic_inetnum",
+      "category": "apnic_inetnum",
+      "cidr": "60.12.9.144/28",
+      "address_count": 16,
+      "asn": "4837",
+      "operator": "unicom",
+      "asn_description": "CHINA169-BACKBONE CHINA UNICOM China169 Backbone",
+      "registry_netnames": [
+        "WANGYINHULIANKEJIYOUXIANGONGSI"
+      ],
+      "registry_descriptions": [
+        "WANGYINHULIANKEJIYOUXIANGONGSI,HANGZHOU,ZHEJIANG"
+      ],
+      "registry_maintainers": [
+        "MAINT-CNCGROUP-ZJ"
+      ],
+      "registry_status": "ASSIGNED NON-PORTABLE",
+      "registry_last_modified": "2010-09-08T14:44:13Z",
+      "matched_by": "exclude_apnic_inetnum_rules: (?:^|[^a-z0-9])[a-z0-9]*wangyinhulian[a-z0-9]*(?:[^a-z0-9]|$)|\\bhangzhou netbank interlink technol(?:og(?:y|ies)|gies) co(?:mpany)?[., ]+(?:ltd|limited)\\b",
+      "reason": "APNIC inetnum registration explicitly identifies a Wangyin Hulian or Netbank Interlink corporate network"
+    },
+    {
+      "source": "apnic_inetnum",
+      "category": "apnic_inetnum",
       "cidr": "60.12.17.120/29",
       "address_count": 8,
       "asn": "4837",
@@ -30299,6 +31767,28 @@
       "registry_last_modified": "2010-09-08T16:11:06Z",
       "matched_by": "exclude_apnic_inetnum_rules: idc(?:[^a-z0-9]|$)|\\binternet data cent(?:er|re)\\b",
       "reason": "APNIC inetnum registration explicitly identifies an IDC network"
+    },
+    {
+      "source": "apnic_inetnum",
+      "category": "apnic_inetnum",
+      "cidr": "60.12.148.0/22",
+      "address_count": 1024,
+      "asn": "4837",
+      "operator": "unicom",
+      "asn_description": "CHINA169-BACKBONE CHINA UNICOM China169 Backbone",
+      "registry_netnames": [
+        "IDCBEIYONGJH"
+      ],
+      "registry_descriptions": [
+        "IDCBEIYONG,JINHUA,ZHEJIANG"
+      ],
+      "registry_maintainers": [
+        "MAINT-CNCGROUP-ZJ"
+      ],
+      "registry_status": "ASSIGNED NON-PORTABLE",
+      "registry_last_modified": "2010-09-08T16:11:54Z",
+      "matched_by": "exclude_apnic_inetnum_rules: (?:^|[^a-z0-9])(?:idcbeiyongjh|liantongidcyouxifuwuqihz|idcdi2pigongxiangjierufuwuqidi|xiaoshanidcchuangyehuliankejih?|wangluoyingpanhezuoidcziyuanhz|yuyaoidcyewudizhiduanvlan511(?:chinaunicomningbochina)?|cabinet-retail)(?:[^a-z0-9]|$)",
+      "reason": "APNIC inetnum registration explicitly identifies a dedicated IDC resource or service range"
     },
     {
       "source": "apnic_inetnum",
@@ -31773,6 +33263,50 @@
       "registry_last_modified": "2010-09-08T14:45:46Z",
       "matched_by": "exclude_apnic_inetnum_rules: idc(?:[^a-z0-9]|$)|\\binternet data cent(?:er|re)\\b",
       "reason": "APNIC inetnum registration explicitly identifies an IDC network"
+    },
+    {
+      "source": "apnic_inetnum",
+      "category": "apnic_inetnum",
+      "cidr": "60.12.227.0/24",
+      "address_count": 256,
+      "asn": "4837",
+      "operator": "unicom",
+      "asn_description": "CHINA169-BACKBONE CHINA UNICOM China169 Backbone",
+      "registry_netnames": [
+        "SHANGHAIWANGYIHZ"
+      ],
+      "registry_descriptions": [
+        "SHANGHAIWANGYI,HANGZHOU,ZHEJIANG"
+      ],
+      "registry_maintainers": [
+        "MAINT-CNCGROUP-ZJ"
+      ],
+      "registry_status": "ASSIGNED NON-PORTABLE",
+      "registry_last_modified": "2010-09-08T16:12:38Z",
+      "matched_by": "exclude_apnic_inetnum_rules: (?:^|[^a-z0-9])(?:guangzhouwangyihz|shanghaiwangyihz|guangzhou-wangyi-ltd)(?:[^a-z0-9]|$)|\\bguangzhou (?:wangyi|netease) computer systems? co(?:mpany)?[., ]+(?:ltd|limited)\\b",
+      "reason": "APNIC inetnum registration explicitly identifies a NetEase corporate or service network"
+    },
+    {
+      "source": "apnic_inetnum",
+      "category": "apnic_inetnum",
+      "cidr": "60.12.230.224/29",
+      "address_count": 8,
+      "asn": "4837",
+      "operator": "unicom",
+      "asn_description": "CHINA169-BACKBONE CHINA UNICOM China169 Backbone",
+      "registry_netnames": [
+        "WANGLUOYINGPANHEZUOIDCZIYUANHZ"
+      ],
+      "registry_descriptions": [
+        "WANGLUOYINGPANHEZUOIDCZIYUAN,HANGZHOU,ZHEJIANG"
+      ],
+      "registry_maintainers": [
+        "MAINT-CNCGROUP-ZJ"
+      ],
+      "registry_status": "ASSIGNED NON-PORTABLE",
+      "registry_last_modified": "2010-09-08T16:12:38Z",
+      "matched_by": "exclude_apnic_inetnum_rules: (?:^|[^a-z0-9])(?:idcbeiyongjh|liantongidcyouxifuwuqihz|idcdi2pigongxiangjierufuwuqidi|xiaoshanidcchuangyehuliankejih?|wangluoyingpanhezuoidcziyuanhz|yuyaoidcyewudizhiduanvlan511(?:chinaunicomningbochina)?|cabinet-retail)(?:[^a-z0-9]|$)",
+      "reason": "APNIC inetnum registration explicitly identifies a dedicated IDC resource or service range"
     },
     {
       "source": "apnic_inetnum",
@@ -38301,6 +39835,72 @@
     {
       "source": "apnic_inetnum",
       "category": "apnic_inetnum",
+      "cidr": "123.157.19.0/24",
+      "address_count": 256,
+      "asn": "4837",
+      "operator": "unicom",
+      "asn_description": "CHINA169-BACKBONE CHINA UNICOM China169 Backbone",
+      "registry_netnames": [
+        "ZHUANXIANDIZHIBEIYONGJH"
+      ],
+      "registry_descriptions": [
+        "ZHUANXIANDIZHIBEIYONG,JINHUA,ZHEJIANG"
+      ],
+      "registry_maintainers": [
+        "MAINT-CNCGROUP-ZJ"
+      ],
+      "registry_status": "ASSIGNED NON-PORTABLE",
+      "registry_last_modified": "2010-09-08T16:12:52Z",
+      "matched_by": "exclude_apnic_inetnum_rules: (?:^|[^a-z0-9])zhuanxiandizhibeiyongjh(?:[^a-z0-9]|$)",
+      "reason": "APNIC inetnum registration explicitly identifies a backup dedicated-line address range"
+    },
+    {
+      "source": "apnic_inetnum",
+      "category": "apnic_inetnum",
+      "cidr": "123.157.20.0/22",
+      "address_count": 1024,
+      "asn": "4837",
+      "operator": "unicom",
+      "asn_description": "CHINA169-BACKBONE CHINA UNICOM China169 Backbone",
+      "registry_netnames": [
+        "ZHUANXIANDIZHIBEIYONGJH"
+      ],
+      "registry_descriptions": [
+        "ZHUANXIANDIZHIBEIYONG,JINHUA,ZHEJIANG"
+      ],
+      "registry_maintainers": [
+        "MAINT-CNCGROUP-ZJ"
+      ],
+      "registry_status": "ASSIGNED NON-PORTABLE",
+      "registry_last_modified": "2010-09-08T16:12:52Z",
+      "matched_by": "exclude_apnic_inetnum_rules: (?:^|[^a-z0-9])zhuanxiandizhibeiyongjh(?:[^a-z0-9]|$)",
+      "reason": "APNIC inetnum registration explicitly identifies a backup dedicated-line address range"
+    },
+    {
+      "source": "apnic_inetnum",
+      "category": "apnic_inetnum",
+      "cidr": "123.157.24.0/21",
+      "address_count": 2048,
+      "asn": "4837",
+      "operator": "unicom",
+      "asn_description": "CHINA169-BACKBONE CHINA UNICOM China169 Backbone",
+      "registry_netnames": [
+        "ZHUANXIANDIZHIBEIYONGJH"
+      ],
+      "registry_descriptions": [
+        "ZHUANXIANDIZHIBEIYONG,JINHUA,ZHEJIANG"
+      ],
+      "registry_maintainers": [
+        "MAINT-CNCGROUP-ZJ"
+      ],
+      "registry_status": "ASSIGNED NON-PORTABLE",
+      "registry_last_modified": "2010-09-08T16:12:52Z",
+      "matched_by": "exclude_apnic_inetnum_rules: (?:^|[^a-z0-9])zhuanxiandizhibeiyongjh(?:[^a-z0-9]|$)",
+      "reason": "APNIC inetnum registration explicitly identifies a backup dedicated-line address range"
+    },
+    {
+      "source": "apnic_inetnum",
+      "category": "apnic_inetnum",
       "cidr": "124.89.0.56/30",
       "address_count": 4,
       "asn": "4837",
@@ -38587,6 +40187,952 @@
     {
       "source": "apnic_inetnum",
       "category": "apnic_inetnum",
+      "cidr": "124.160.20.0/25",
+      "address_count": 128,
+      "asn": "4837",
+      "operator": "unicom",
+      "asn_description": "CHINA169-BACKBONE CHINA UNICOM China169 Backbone",
+      "registry_netnames": [
+        "GUANGZHOUWANGYIHZ"
+      ],
+      "registry_descriptions": [
+        "GUANGZHOUWANGYI,HANGZHOU,ZHEJIANG"
+      ],
+      "registry_maintainers": [
+        "MAINT-CNCGROUP-ZJ"
+      ],
+      "registry_status": "ASSIGNED NON-PORTABLE",
+      "registry_last_modified": "2010-09-08T16:13:39Z",
+      "matched_by": "exclude_apnic_inetnum_rules: (?:^|[^a-z0-9])(?:guangzhouwangyihz|shanghaiwangyihz|guangzhou-wangyi-ltd)(?:[^a-z0-9]|$)|\\bguangzhou (?:wangyi|netease) computer systems? co(?:mpany)?[., ]+(?:ltd|limited)\\b",
+      "reason": "APNIC inetnum registration explicitly identifies a NetEase corporate or service network"
+    },
+    {
+      "source": "apnic_inetnum",
+      "category": "apnic_inetnum",
+      "cidr": "124.160.20.128/26",
+      "address_count": 64,
+      "asn": "4837",
+      "operator": "unicom",
+      "asn_description": "CHINA169-BACKBONE CHINA UNICOM China169 Backbone",
+      "registry_netnames": [
+        "GUANGZHOUWANGYIHZ"
+      ],
+      "registry_descriptions": [
+        "GUANGZHOUWANGYI,HANGZHOU,ZHEJIANG"
+      ],
+      "registry_maintainers": [
+        "MAINT-CNCGROUP-ZJ"
+      ],
+      "registry_status": "ASSIGNED NON-PORTABLE",
+      "registry_last_modified": "2010-09-08T16:13:39Z",
+      "matched_by": "exclude_apnic_inetnum_rules: (?:^|[^a-z0-9])(?:guangzhouwangyihz|shanghaiwangyihz|guangzhou-wangyi-ltd)(?:[^a-z0-9]|$)|\\bguangzhou (?:wangyi|netease) computer systems? co(?:mpany)?[., ]+(?:ltd|limited)\\b",
+      "reason": "APNIC inetnum registration explicitly identifies a NetEase corporate or service network"
+    },
+    {
+      "source": "apnic_inetnum",
+      "category": "apnic_inetnum",
+      "cidr": "124.160.20.192/27",
+      "address_count": 32,
+      "asn": "4837",
+      "operator": "unicom",
+      "asn_description": "CHINA169-BACKBONE CHINA UNICOM China169 Backbone",
+      "registry_netnames": [
+        "GUANGZHOUWANGYIHZ"
+      ],
+      "registry_descriptions": [
+        "GUANGZHOUWANGYI,HANGZHOU,ZHEJIANG"
+      ],
+      "registry_maintainers": [
+        "MAINT-CNCGROUP-ZJ"
+      ],
+      "registry_status": "ASSIGNED NON-PORTABLE",
+      "registry_last_modified": "2010-09-08T16:13:39Z",
+      "matched_by": "exclude_apnic_inetnum_rules: (?:^|[^a-z0-9])(?:guangzhouwangyihz|shanghaiwangyihz|guangzhou-wangyi-ltd)(?:[^a-z0-9]|$)|\\bguangzhou (?:wangyi|netease) computer systems? co(?:mpany)?[., ]+(?:ltd|limited)\\b",
+      "reason": "APNIC inetnum registration explicitly identifies a NetEase corporate or service network"
+    },
+    {
+      "source": "apnic_inetnum",
+      "category": "apnic_inetnum",
+      "cidr": "124.160.20.224/28",
+      "address_count": 16,
+      "asn": "4837",
+      "operator": "unicom",
+      "asn_description": "CHINA169-BACKBONE CHINA UNICOM China169 Backbone",
+      "registry_netnames": [
+        "GUANGZHOUWANGYIHZ"
+      ],
+      "registry_descriptions": [
+        "GUANGZHOUWANGYI,HANGZHOU,ZHEJIANG"
+      ],
+      "registry_maintainers": [
+        "MAINT-CNCGROUP-ZJ"
+      ],
+      "registry_status": "ASSIGNED NON-PORTABLE",
+      "registry_last_modified": "2010-09-08T16:13:39Z",
+      "matched_by": "exclude_apnic_inetnum_rules: (?:^|[^a-z0-9])(?:guangzhouwangyihz|shanghaiwangyihz|guangzhou-wangyi-ltd)(?:[^a-z0-9]|$)|\\bguangzhou (?:wangyi|netease) computer systems? co(?:mpany)?[., ]+(?:ltd|limited)\\b",
+      "reason": "APNIC inetnum registration explicitly identifies a NetEase corporate or service network"
+    },
+    {
+      "source": "apnic_inetnum",
+      "category": "apnic_inetnum",
+      "cidr": "124.160.20.240/29",
+      "address_count": 8,
+      "asn": "4837",
+      "operator": "unicom",
+      "asn_description": "CHINA169-BACKBONE CHINA UNICOM China169 Backbone",
+      "registry_netnames": [
+        "GUANGZHOUWANGYIHZ"
+      ],
+      "registry_descriptions": [
+        "GUANGZHOUWANGYI,HANGZHOU,ZHEJIANG"
+      ],
+      "registry_maintainers": [
+        "MAINT-CNCGROUP-ZJ"
+      ],
+      "registry_status": "ASSIGNED NON-PORTABLE",
+      "registry_last_modified": "2010-09-08T16:13:39Z",
+      "matched_by": "exclude_apnic_inetnum_rules: (?:^|[^a-z0-9])(?:guangzhouwangyihz|shanghaiwangyihz|guangzhou-wangyi-ltd)(?:[^a-z0-9]|$)|\\bguangzhou (?:wangyi|netease) computer systems? co(?:mpany)?[., ]+(?:ltd|limited)\\b",
+      "reason": "APNIC inetnum registration explicitly identifies a NetEase corporate or service network"
+    },
+    {
+      "source": "apnic_inetnum",
+      "category": "apnic_inetnum",
+      "cidr": "124.160.20.248/30",
+      "address_count": 4,
+      "asn": "4837",
+      "operator": "unicom",
+      "asn_description": "CHINA169-BACKBONE CHINA UNICOM China169 Backbone",
+      "registry_netnames": [
+        "GUANGZHOUWANGYIHZ"
+      ],
+      "registry_descriptions": [
+        "GUANGZHOUWANGYI,HANGZHOU,ZHEJIANG"
+      ],
+      "registry_maintainers": [
+        "MAINT-CNCGROUP-ZJ"
+      ],
+      "registry_status": "ASSIGNED NON-PORTABLE",
+      "registry_last_modified": "2010-09-08T16:13:39Z",
+      "matched_by": "exclude_apnic_inetnum_rules: (?:^|[^a-z0-9])(?:guangzhouwangyihz|shanghaiwangyihz|guangzhou-wangyi-ltd)(?:[^a-z0-9]|$)|\\bguangzhou (?:wangyi|netease) computer systems? co(?:mpany)?[., ]+(?:ltd|limited)\\b",
+      "reason": "APNIC inetnum registration explicitly identifies a NetEase corporate or service network"
+    },
+    {
+      "source": "apnic_inetnum",
+      "category": "apnic_inetnum",
+      "cidr": "124.160.20.252/31",
+      "address_count": 2,
+      "asn": "4837",
+      "operator": "unicom",
+      "asn_description": "CHINA169-BACKBONE CHINA UNICOM China169 Backbone",
+      "registry_netnames": [
+        "GUANGZHOUWANGYIHZ"
+      ],
+      "registry_descriptions": [
+        "GUANGZHOUWANGYI,HANGZHOU,ZHEJIANG"
+      ],
+      "registry_maintainers": [
+        "MAINT-CNCGROUP-ZJ"
+      ],
+      "registry_status": "ASSIGNED NON-PORTABLE",
+      "registry_last_modified": "2010-09-08T16:13:39Z",
+      "matched_by": "exclude_apnic_inetnum_rules: (?:^|[^a-z0-9])(?:guangzhouwangyihz|shanghaiwangyihz|guangzhou-wangyi-ltd)(?:[^a-z0-9]|$)|\\bguangzhou (?:wangyi|netease) computer systems? co(?:mpany)?[., ]+(?:ltd|limited)\\b",
+      "reason": "APNIC inetnum registration explicitly identifies a NetEase corporate or service network"
+    },
+    {
+      "source": "apnic_inetnum",
+      "category": "apnic_inetnum",
+      "cidr": "124.160.20.254/32",
+      "address_count": 1,
+      "asn": "4837",
+      "operator": "unicom",
+      "asn_description": "CHINA169-BACKBONE CHINA UNICOM China169 Backbone",
+      "registry_netnames": [
+        "GUANGZHOUWANGYIHZ"
+      ],
+      "registry_descriptions": [
+        "GUANGZHOUWANGYI,HANGZHOU,ZHEJIANG"
+      ],
+      "registry_maintainers": [
+        "MAINT-CNCGROUP-ZJ"
+      ],
+      "registry_status": "ASSIGNED NON-PORTABLE",
+      "registry_last_modified": "2010-09-08T16:13:39Z",
+      "matched_by": "exclude_apnic_inetnum_rules: (?:^|[^a-z0-9])(?:guangzhouwangyihz|shanghaiwangyihz|guangzhou-wangyi-ltd)(?:[^a-z0-9]|$)|\\bguangzhou (?:wangyi|netease) computer systems? co(?:mpany)?[., ]+(?:ltd|limited)\\b",
+      "reason": "APNIC inetnum registration explicitly identifies a NetEase corporate or service network"
+    },
+    {
+      "source": "apnic_inetnum",
+      "category": "apnic_inetnum",
+      "cidr": "124.160.21.0/25",
+      "address_count": 128,
+      "asn": "4837",
+      "operator": "unicom",
+      "asn_description": "CHINA169-BACKBONE CHINA UNICOM China169 Backbone",
+      "registry_netnames": [
+        "GUANGZHOUWANGYIHZ"
+      ],
+      "registry_descriptions": [
+        "GUANGZHOUWANGYI,HANGZHOU,ZHEJIANG"
+      ],
+      "registry_maintainers": [
+        "MAINT-CNCGROUP-ZJ"
+      ],
+      "registry_status": "ASSIGNED NON-PORTABLE",
+      "registry_last_modified": "2010-09-08T16:13:39Z",
+      "matched_by": "exclude_apnic_inetnum_rules: (?:^|[^a-z0-9])(?:guangzhouwangyihz|shanghaiwangyihz|guangzhou-wangyi-ltd)(?:[^a-z0-9]|$)|\\bguangzhou (?:wangyi|netease) computer systems? co(?:mpany)?[., ]+(?:ltd|limited)\\b",
+      "reason": "APNIC inetnum registration explicitly identifies a NetEase corporate or service network"
+    },
+    {
+      "source": "apnic_inetnum",
+      "category": "apnic_inetnum",
+      "cidr": "124.160.21.128/26",
+      "address_count": 64,
+      "asn": "4837",
+      "operator": "unicom",
+      "asn_description": "CHINA169-BACKBONE CHINA UNICOM China169 Backbone",
+      "registry_netnames": [
+        "GUANGZHOUWANGYIHZ"
+      ],
+      "registry_descriptions": [
+        "GUANGZHOUWANGYI,HANGZHOU,ZHEJIANG"
+      ],
+      "registry_maintainers": [
+        "MAINT-CNCGROUP-ZJ"
+      ],
+      "registry_status": "ASSIGNED NON-PORTABLE",
+      "registry_last_modified": "2010-09-08T16:13:39Z",
+      "matched_by": "exclude_apnic_inetnum_rules: (?:^|[^a-z0-9])(?:guangzhouwangyihz|shanghaiwangyihz|guangzhou-wangyi-ltd)(?:[^a-z0-9]|$)|\\bguangzhou (?:wangyi|netease) computer systems? co(?:mpany)?[., ]+(?:ltd|limited)\\b",
+      "reason": "APNIC inetnum registration explicitly identifies a NetEase corporate or service network"
+    },
+    {
+      "source": "apnic_inetnum",
+      "category": "apnic_inetnum",
+      "cidr": "124.160.21.192/27",
+      "address_count": 32,
+      "asn": "4837",
+      "operator": "unicom",
+      "asn_description": "CHINA169-BACKBONE CHINA UNICOM China169 Backbone",
+      "registry_netnames": [
+        "GUANGZHOUWANGYIHZ"
+      ],
+      "registry_descriptions": [
+        "GUANGZHOUWANGYI,HANGZHOU,ZHEJIANG"
+      ],
+      "registry_maintainers": [
+        "MAINT-CNCGROUP-ZJ"
+      ],
+      "registry_status": "ASSIGNED NON-PORTABLE",
+      "registry_last_modified": "2010-09-08T16:13:39Z",
+      "matched_by": "exclude_apnic_inetnum_rules: (?:^|[^a-z0-9])(?:guangzhouwangyihz|shanghaiwangyihz|guangzhou-wangyi-ltd)(?:[^a-z0-9]|$)|\\bguangzhou (?:wangyi|netease) computer systems? co(?:mpany)?[., ]+(?:ltd|limited)\\b",
+      "reason": "APNIC inetnum registration explicitly identifies a NetEase corporate or service network"
+    },
+    {
+      "source": "apnic_inetnum",
+      "category": "apnic_inetnum",
+      "cidr": "124.160.21.224/28",
+      "address_count": 16,
+      "asn": "4837",
+      "operator": "unicom",
+      "asn_description": "CHINA169-BACKBONE CHINA UNICOM China169 Backbone",
+      "registry_netnames": [
+        "GUANGZHOUWANGYIHZ"
+      ],
+      "registry_descriptions": [
+        "GUANGZHOUWANGYI,HANGZHOU,ZHEJIANG"
+      ],
+      "registry_maintainers": [
+        "MAINT-CNCGROUP-ZJ"
+      ],
+      "registry_status": "ASSIGNED NON-PORTABLE",
+      "registry_last_modified": "2010-09-08T16:13:39Z",
+      "matched_by": "exclude_apnic_inetnum_rules: (?:^|[^a-z0-9])(?:guangzhouwangyihz|shanghaiwangyihz|guangzhou-wangyi-ltd)(?:[^a-z0-9]|$)|\\bguangzhou (?:wangyi|netease) computer systems? co(?:mpany)?[., ]+(?:ltd|limited)\\b",
+      "reason": "APNIC inetnum registration explicitly identifies a NetEase corporate or service network"
+    },
+    {
+      "source": "apnic_inetnum",
+      "category": "apnic_inetnum",
+      "cidr": "124.160.21.240/29",
+      "address_count": 8,
+      "asn": "4837",
+      "operator": "unicom",
+      "asn_description": "CHINA169-BACKBONE CHINA UNICOM China169 Backbone",
+      "registry_netnames": [
+        "GUANGZHOUWANGYIHZ"
+      ],
+      "registry_descriptions": [
+        "GUANGZHOUWANGYI,HANGZHOU,ZHEJIANG"
+      ],
+      "registry_maintainers": [
+        "MAINT-CNCGROUP-ZJ"
+      ],
+      "registry_status": "ASSIGNED NON-PORTABLE",
+      "registry_last_modified": "2010-09-08T16:13:39Z",
+      "matched_by": "exclude_apnic_inetnum_rules: (?:^|[^a-z0-9])(?:guangzhouwangyihz|shanghaiwangyihz|guangzhou-wangyi-ltd)(?:[^a-z0-9]|$)|\\bguangzhou (?:wangyi|netease) computer systems? co(?:mpany)?[., ]+(?:ltd|limited)\\b",
+      "reason": "APNIC inetnum registration explicitly identifies a NetEase corporate or service network"
+    },
+    {
+      "source": "apnic_inetnum",
+      "category": "apnic_inetnum",
+      "cidr": "124.160.21.248/30",
+      "address_count": 4,
+      "asn": "4837",
+      "operator": "unicom",
+      "asn_description": "CHINA169-BACKBONE CHINA UNICOM China169 Backbone",
+      "registry_netnames": [
+        "GUANGZHOUWANGYIHZ"
+      ],
+      "registry_descriptions": [
+        "GUANGZHOUWANGYI,HANGZHOU,ZHEJIANG"
+      ],
+      "registry_maintainers": [
+        "MAINT-CNCGROUP-ZJ"
+      ],
+      "registry_status": "ASSIGNED NON-PORTABLE",
+      "registry_last_modified": "2010-09-08T16:13:39Z",
+      "matched_by": "exclude_apnic_inetnum_rules: (?:^|[^a-z0-9])(?:guangzhouwangyihz|shanghaiwangyihz|guangzhou-wangyi-ltd)(?:[^a-z0-9]|$)|\\bguangzhou (?:wangyi|netease) computer systems? co(?:mpany)?[., ]+(?:ltd|limited)\\b",
+      "reason": "APNIC inetnum registration explicitly identifies a NetEase corporate or service network"
+    },
+    {
+      "source": "apnic_inetnum",
+      "category": "apnic_inetnum",
+      "cidr": "124.160.21.252/31",
+      "address_count": 2,
+      "asn": "4837",
+      "operator": "unicom",
+      "asn_description": "CHINA169-BACKBONE CHINA UNICOM China169 Backbone",
+      "registry_netnames": [
+        "GUANGZHOUWANGYIHZ"
+      ],
+      "registry_descriptions": [
+        "GUANGZHOUWANGYI,HANGZHOU,ZHEJIANG"
+      ],
+      "registry_maintainers": [
+        "MAINT-CNCGROUP-ZJ"
+      ],
+      "registry_status": "ASSIGNED NON-PORTABLE",
+      "registry_last_modified": "2010-09-08T16:13:39Z",
+      "matched_by": "exclude_apnic_inetnum_rules: (?:^|[^a-z0-9])(?:guangzhouwangyihz|shanghaiwangyihz|guangzhou-wangyi-ltd)(?:[^a-z0-9]|$)|\\bguangzhou (?:wangyi|netease) computer systems? co(?:mpany)?[., ]+(?:ltd|limited)\\b",
+      "reason": "APNIC inetnum registration explicitly identifies a NetEase corporate or service network"
+    },
+    {
+      "source": "apnic_inetnum",
+      "category": "apnic_inetnum",
+      "cidr": "124.160.21.254/32",
+      "address_count": 1,
+      "asn": "4837",
+      "operator": "unicom",
+      "asn_description": "CHINA169-BACKBONE CHINA UNICOM China169 Backbone",
+      "registry_netnames": [
+        "GUANGZHOUWANGYIHZ"
+      ],
+      "registry_descriptions": [
+        "GUANGZHOUWANGYI,HANGZHOU,ZHEJIANG"
+      ],
+      "registry_maintainers": [
+        "MAINT-CNCGROUP-ZJ"
+      ],
+      "registry_status": "ASSIGNED NON-PORTABLE",
+      "registry_last_modified": "2010-09-08T16:13:39Z",
+      "matched_by": "exclude_apnic_inetnum_rules: (?:^|[^a-z0-9])(?:guangzhouwangyihz|shanghaiwangyihz|guangzhou-wangyi-ltd)(?:[^a-z0-9]|$)|\\bguangzhou (?:wangyi|netease) computer systems? co(?:mpany)?[., ]+(?:ltd|limited)\\b",
+      "reason": "APNIC inetnum registration explicitly identifies a NetEase corporate or service network"
+    },
+    {
+      "source": "apnic_inetnum",
+      "category": "apnic_inetnum",
+      "cidr": "124.160.22.0/25",
+      "address_count": 128,
+      "asn": "4837",
+      "operator": "unicom",
+      "asn_description": "CHINA169-BACKBONE CHINA UNICOM China169 Backbone",
+      "registry_netnames": [
+        "GUANGZHOUWANGYIHZ"
+      ],
+      "registry_descriptions": [
+        "GUANGZHOUWANGYI,HANGZHOU,ZHEJIANG"
+      ],
+      "registry_maintainers": [
+        "MAINT-CNCGROUP-ZJ"
+      ],
+      "registry_status": "ASSIGNED NON-PORTABLE",
+      "registry_last_modified": "2010-09-08T16:13:39Z",
+      "matched_by": "exclude_apnic_inetnum_rules: (?:^|[^a-z0-9])(?:guangzhouwangyihz|shanghaiwangyihz|guangzhou-wangyi-ltd)(?:[^a-z0-9]|$)|\\bguangzhou (?:wangyi|netease) computer systems? co(?:mpany)?[., ]+(?:ltd|limited)\\b",
+      "reason": "APNIC inetnum registration explicitly identifies a NetEase corporate or service network"
+    },
+    {
+      "source": "apnic_inetnum",
+      "category": "apnic_inetnum",
+      "cidr": "124.160.22.128/26",
+      "address_count": 64,
+      "asn": "4837",
+      "operator": "unicom",
+      "asn_description": "CHINA169-BACKBONE CHINA UNICOM China169 Backbone",
+      "registry_netnames": [
+        "GUANGZHOUWANGYIHZ"
+      ],
+      "registry_descriptions": [
+        "GUANGZHOUWANGYI,HANGZHOU,ZHEJIANG"
+      ],
+      "registry_maintainers": [
+        "MAINT-CNCGROUP-ZJ"
+      ],
+      "registry_status": "ASSIGNED NON-PORTABLE",
+      "registry_last_modified": "2010-09-08T16:13:39Z",
+      "matched_by": "exclude_apnic_inetnum_rules: (?:^|[^a-z0-9])(?:guangzhouwangyihz|shanghaiwangyihz|guangzhou-wangyi-ltd)(?:[^a-z0-9]|$)|\\bguangzhou (?:wangyi|netease) computer systems? co(?:mpany)?[., ]+(?:ltd|limited)\\b",
+      "reason": "APNIC inetnum registration explicitly identifies a NetEase corporate or service network"
+    },
+    {
+      "source": "apnic_inetnum",
+      "category": "apnic_inetnum",
+      "cidr": "124.160.22.192/27",
+      "address_count": 32,
+      "asn": "4837",
+      "operator": "unicom",
+      "asn_description": "CHINA169-BACKBONE CHINA UNICOM China169 Backbone",
+      "registry_netnames": [
+        "GUANGZHOUWANGYIHZ"
+      ],
+      "registry_descriptions": [
+        "GUANGZHOUWANGYI,HANGZHOU,ZHEJIANG"
+      ],
+      "registry_maintainers": [
+        "MAINT-CNCGROUP-ZJ"
+      ],
+      "registry_status": "ASSIGNED NON-PORTABLE",
+      "registry_last_modified": "2010-09-08T16:13:39Z",
+      "matched_by": "exclude_apnic_inetnum_rules: (?:^|[^a-z0-9])(?:guangzhouwangyihz|shanghaiwangyihz|guangzhou-wangyi-ltd)(?:[^a-z0-9]|$)|\\bguangzhou (?:wangyi|netease) computer systems? co(?:mpany)?[., ]+(?:ltd|limited)\\b",
+      "reason": "APNIC inetnum registration explicitly identifies a NetEase corporate or service network"
+    },
+    {
+      "source": "apnic_inetnum",
+      "category": "apnic_inetnum",
+      "cidr": "124.160.22.224/28",
+      "address_count": 16,
+      "asn": "4837",
+      "operator": "unicom",
+      "asn_description": "CHINA169-BACKBONE CHINA UNICOM China169 Backbone",
+      "registry_netnames": [
+        "GUANGZHOUWANGYIHZ"
+      ],
+      "registry_descriptions": [
+        "GUANGZHOUWANGYI,HANGZHOU,ZHEJIANG"
+      ],
+      "registry_maintainers": [
+        "MAINT-CNCGROUP-ZJ"
+      ],
+      "registry_status": "ASSIGNED NON-PORTABLE",
+      "registry_last_modified": "2010-09-08T16:13:39Z",
+      "matched_by": "exclude_apnic_inetnum_rules: (?:^|[^a-z0-9])(?:guangzhouwangyihz|shanghaiwangyihz|guangzhou-wangyi-ltd)(?:[^a-z0-9]|$)|\\bguangzhou (?:wangyi|netease) computer systems? co(?:mpany)?[., ]+(?:ltd|limited)\\b",
+      "reason": "APNIC inetnum registration explicitly identifies a NetEase corporate or service network"
+    },
+    {
+      "source": "apnic_inetnum",
+      "category": "apnic_inetnum",
+      "cidr": "124.160.22.240/29",
+      "address_count": 8,
+      "asn": "4837",
+      "operator": "unicom",
+      "asn_description": "CHINA169-BACKBONE CHINA UNICOM China169 Backbone",
+      "registry_netnames": [
+        "GUANGZHOUWANGYIHZ"
+      ],
+      "registry_descriptions": [
+        "GUANGZHOUWANGYI,HANGZHOU,ZHEJIANG"
+      ],
+      "registry_maintainers": [
+        "MAINT-CNCGROUP-ZJ"
+      ],
+      "registry_status": "ASSIGNED NON-PORTABLE",
+      "registry_last_modified": "2010-09-08T16:13:39Z",
+      "matched_by": "exclude_apnic_inetnum_rules: (?:^|[^a-z0-9])(?:guangzhouwangyihz|shanghaiwangyihz|guangzhou-wangyi-ltd)(?:[^a-z0-9]|$)|\\bguangzhou (?:wangyi|netease) computer systems? co(?:mpany)?[., ]+(?:ltd|limited)\\b",
+      "reason": "APNIC inetnum registration explicitly identifies a NetEase corporate or service network"
+    },
+    {
+      "source": "apnic_inetnum",
+      "category": "apnic_inetnum",
+      "cidr": "124.160.22.248/30",
+      "address_count": 4,
+      "asn": "4837",
+      "operator": "unicom",
+      "asn_description": "CHINA169-BACKBONE CHINA UNICOM China169 Backbone",
+      "registry_netnames": [
+        "GUANGZHOUWANGYIHZ"
+      ],
+      "registry_descriptions": [
+        "GUANGZHOUWANGYI,HANGZHOU,ZHEJIANG"
+      ],
+      "registry_maintainers": [
+        "MAINT-CNCGROUP-ZJ"
+      ],
+      "registry_status": "ASSIGNED NON-PORTABLE",
+      "registry_last_modified": "2010-09-08T16:13:39Z",
+      "matched_by": "exclude_apnic_inetnum_rules: (?:^|[^a-z0-9])(?:guangzhouwangyihz|shanghaiwangyihz|guangzhou-wangyi-ltd)(?:[^a-z0-9]|$)|\\bguangzhou (?:wangyi|netease) computer systems? co(?:mpany)?[., ]+(?:ltd|limited)\\b",
+      "reason": "APNIC inetnum registration explicitly identifies a NetEase corporate or service network"
+    },
+    {
+      "source": "apnic_inetnum",
+      "category": "apnic_inetnum",
+      "cidr": "124.160.22.252/31",
+      "address_count": 2,
+      "asn": "4837",
+      "operator": "unicom",
+      "asn_description": "CHINA169-BACKBONE CHINA UNICOM China169 Backbone",
+      "registry_netnames": [
+        "GUANGZHOUWANGYIHZ"
+      ],
+      "registry_descriptions": [
+        "GUANGZHOUWANGYI,HANGZHOU,ZHEJIANG"
+      ],
+      "registry_maintainers": [
+        "MAINT-CNCGROUP-ZJ"
+      ],
+      "registry_status": "ASSIGNED NON-PORTABLE",
+      "registry_last_modified": "2010-09-08T16:13:39Z",
+      "matched_by": "exclude_apnic_inetnum_rules: (?:^|[^a-z0-9])(?:guangzhouwangyihz|shanghaiwangyihz|guangzhou-wangyi-ltd)(?:[^a-z0-9]|$)|\\bguangzhou (?:wangyi|netease) computer systems? co(?:mpany)?[., ]+(?:ltd|limited)\\b",
+      "reason": "APNIC inetnum registration explicitly identifies a NetEase corporate or service network"
+    },
+    {
+      "source": "apnic_inetnum",
+      "category": "apnic_inetnum",
+      "cidr": "124.160.22.254/32",
+      "address_count": 1,
+      "asn": "4837",
+      "operator": "unicom",
+      "asn_description": "CHINA169-BACKBONE CHINA UNICOM China169 Backbone",
+      "registry_netnames": [
+        "GUANGZHOUWANGYIHZ"
+      ],
+      "registry_descriptions": [
+        "GUANGZHOUWANGYI,HANGZHOU,ZHEJIANG"
+      ],
+      "registry_maintainers": [
+        "MAINT-CNCGROUP-ZJ"
+      ],
+      "registry_status": "ASSIGNED NON-PORTABLE",
+      "registry_last_modified": "2010-09-08T16:13:39Z",
+      "matched_by": "exclude_apnic_inetnum_rules: (?:^|[^a-z0-9])(?:guangzhouwangyihz|shanghaiwangyihz|guangzhou-wangyi-ltd)(?:[^a-z0-9]|$)|\\bguangzhou (?:wangyi|netease) computer systems? co(?:mpany)?[., ]+(?:ltd|limited)\\b",
+      "reason": "APNIC inetnum registration explicitly identifies a NetEase corporate or service network"
+    },
+    {
+      "source": "apnic_inetnum",
+      "category": "apnic_inetnum",
+      "cidr": "124.160.23.0/25",
+      "address_count": 128,
+      "asn": "4837",
+      "operator": "unicom",
+      "asn_description": "CHINA169-BACKBONE CHINA UNICOM China169 Backbone",
+      "registry_netnames": [
+        "GUANGZHOUWANGYIHZ"
+      ],
+      "registry_descriptions": [
+        "GUANGZHOUWANGYI,HANGZHOU,ZHEJIANG"
+      ],
+      "registry_maintainers": [
+        "MAINT-CNCGROUP-ZJ"
+      ],
+      "registry_status": "ASSIGNED NON-PORTABLE",
+      "registry_last_modified": "2010-09-08T16:13:39Z",
+      "matched_by": "exclude_apnic_inetnum_rules: (?:^|[^a-z0-9])(?:guangzhouwangyihz|shanghaiwangyihz|guangzhou-wangyi-ltd)(?:[^a-z0-9]|$)|\\bguangzhou (?:wangyi|netease) computer systems? co(?:mpany)?[., ]+(?:ltd|limited)\\b",
+      "reason": "APNIC inetnum registration explicitly identifies a NetEase corporate or service network"
+    },
+    {
+      "source": "apnic_inetnum",
+      "category": "apnic_inetnum",
+      "cidr": "124.160.23.128/26",
+      "address_count": 64,
+      "asn": "4837",
+      "operator": "unicom",
+      "asn_description": "CHINA169-BACKBONE CHINA UNICOM China169 Backbone",
+      "registry_netnames": [
+        "GUANGZHOUWANGYIHZ"
+      ],
+      "registry_descriptions": [
+        "GUANGZHOUWANGYI,HANGZHOU,ZHEJIANG"
+      ],
+      "registry_maintainers": [
+        "MAINT-CNCGROUP-ZJ"
+      ],
+      "registry_status": "ASSIGNED NON-PORTABLE",
+      "registry_last_modified": "2010-09-08T16:13:39Z",
+      "matched_by": "exclude_apnic_inetnum_rules: (?:^|[^a-z0-9])(?:guangzhouwangyihz|shanghaiwangyihz|guangzhou-wangyi-ltd)(?:[^a-z0-9]|$)|\\bguangzhou (?:wangyi|netease) computer systems? co(?:mpany)?[., ]+(?:ltd|limited)\\b",
+      "reason": "APNIC inetnum registration explicitly identifies a NetEase corporate or service network"
+    },
+    {
+      "source": "apnic_inetnum",
+      "category": "apnic_inetnum",
+      "cidr": "124.160.23.192/27",
+      "address_count": 32,
+      "asn": "4837",
+      "operator": "unicom",
+      "asn_description": "CHINA169-BACKBONE CHINA UNICOM China169 Backbone",
+      "registry_netnames": [
+        "GUANGZHOUWANGYIHZ"
+      ],
+      "registry_descriptions": [
+        "GUANGZHOUWANGYI,HANGZHOU,ZHEJIANG"
+      ],
+      "registry_maintainers": [
+        "MAINT-CNCGROUP-ZJ"
+      ],
+      "registry_status": "ASSIGNED NON-PORTABLE",
+      "registry_last_modified": "2010-09-08T16:13:39Z",
+      "matched_by": "exclude_apnic_inetnum_rules: (?:^|[^a-z0-9])(?:guangzhouwangyihz|shanghaiwangyihz|guangzhou-wangyi-ltd)(?:[^a-z0-9]|$)|\\bguangzhou (?:wangyi|netease) computer systems? co(?:mpany)?[., ]+(?:ltd|limited)\\b",
+      "reason": "APNIC inetnum registration explicitly identifies a NetEase corporate or service network"
+    },
+    {
+      "source": "apnic_inetnum",
+      "category": "apnic_inetnum",
+      "cidr": "124.160.23.224/28",
+      "address_count": 16,
+      "asn": "4837",
+      "operator": "unicom",
+      "asn_description": "CHINA169-BACKBONE CHINA UNICOM China169 Backbone",
+      "registry_netnames": [
+        "GUANGZHOUWANGYIHZ"
+      ],
+      "registry_descriptions": [
+        "GUANGZHOUWANGYI,HANGZHOU,ZHEJIANG"
+      ],
+      "registry_maintainers": [
+        "MAINT-CNCGROUP-ZJ"
+      ],
+      "registry_status": "ASSIGNED NON-PORTABLE",
+      "registry_last_modified": "2010-09-08T16:13:39Z",
+      "matched_by": "exclude_apnic_inetnum_rules: (?:^|[^a-z0-9])(?:guangzhouwangyihz|shanghaiwangyihz|guangzhou-wangyi-ltd)(?:[^a-z0-9]|$)|\\bguangzhou (?:wangyi|netease) computer systems? co(?:mpany)?[., ]+(?:ltd|limited)\\b",
+      "reason": "APNIC inetnum registration explicitly identifies a NetEase corporate or service network"
+    },
+    {
+      "source": "apnic_inetnum",
+      "category": "apnic_inetnum",
+      "cidr": "124.160.23.240/29",
+      "address_count": 8,
+      "asn": "4837",
+      "operator": "unicom",
+      "asn_description": "CHINA169-BACKBONE CHINA UNICOM China169 Backbone",
+      "registry_netnames": [
+        "GUANGZHOUWANGYIHZ"
+      ],
+      "registry_descriptions": [
+        "GUANGZHOUWANGYI,HANGZHOU,ZHEJIANG"
+      ],
+      "registry_maintainers": [
+        "MAINT-CNCGROUP-ZJ"
+      ],
+      "registry_status": "ASSIGNED NON-PORTABLE",
+      "registry_last_modified": "2010-09-08T16:13:39Z",
+      "matched_by": "exclude_apnic_inetnum_rules: (?:^|[^a-z0-9])(?:guangzhouwangyihz|shanghaiwangyihz|guangzhou-wangyi-ltd)(?:[^a-z0-9]|$)|\\bguangzhou (?:wangyi|netease) computer systems? co(?:mpany)?[., ]+(?:ltd|limited)\\b",
+      "reason": "APNIC inetnum registration explicitly identifies a NetEase corporate or service network"
+    },
+    {
+      "source": "apnic_inetnum",
+      "category": "apnic_inetnum",
+      "cidr": "124.160.23.248/30",
+      "address_count": 4,
+      "asn": "4837",
+      "operator": "unicom",
+      "asn_description": "CHINA169-BACKBONE CHINA UNICOM China169 Backbone",
+      "registry_netnames": [
+        "GUANGZHOUWANGYIHZ"
+      ],
+      "registry_descriptions": [
+        "GUANGZHOUWANGYI,HANGZHOU,ZHEJIANG"
+      ],
+      "registry_maintainers": [
+        "MAINT-CNCGROUP-ZJ"
+      ],
+      "registry_status": "ASSIGNED NON-PORTABLE",
+      "registry_last_modified": "2010-09-08T16:13:39Z",
+      "matched_by": "exclude_apnic_inetnum_rules: (?:^|[^a-z0-9])(?:guangzhouwangyihz|shanghaiwangyihz|guangzhou-wangyi-ltd)(?:[^a-z0-9]|$)|\\bguangzhou (?:wangyi|netease) computer systems? co(?:mpany)?[., ]+(?:ltd|limited)\\b",
+      "reason": "APNIC inetnum registration explicitly identifies a NetEase corporate or service network"
+    },
+    {
+      "source": "apnic_inetnum",
+      "category": "apnic_inetnum",
+      "cidr": "124.160.23.252/31",
+      "address_count": 2,
+      "asn": "4837",
+      "operator": "unicom",
+      "asn_description": "CHINA169-BACKBONE CHINA UNICOM China169 Backbone",
+      "registry_netnames": [
+        "GUANGZHOUWANGYIHZ"
+      ],
+      "registry_descriptions": [
+        "GUANGZHOUWANGYI,HANGZHOU,ZHEJIANG"
+      ],
+      "registry_maintainers": [
+        "MAINT-CNCGROUP-ZJ"
+      ],
+      "registry_status": "ASSIGNED NON-PORTABLE",
+      "registry_last_modified": "2010-09-08T16:13:39Z",
+      "matched_by": "exclude_apnic_inetnum_rules: (?:^|[^a-z0-9])(?:guangzhouwangyihz|shanghaiwangyihz|guangzhou-wangyi-ltd)(?:[^a-z0-9]|$)|\\bguangzhou (?:wangyi|netease) computer systems? co(?:mpany)?[., ]+(?:ltd|limited)\\b",
+      "reason": "APNIC inetnum registration explicitly identifies a NetEase corporate or service network"
+    },
+    {
+      "source": "apnic_inetnum",
+      "category": "apnic_inetnum",
+      "cidr": "124.160.23.254/32",
+      "address_count": 1,
+      "asn": "4837",
+      "operator": "unicom",
+      "asn_description": "CHINA169-BACKBONE CHINA UNICOM China169 Backbone",
+      "registry_netnames": [
+        "GUANGZHOUWANGYIHZ"
+      ],
+      "registry_descriptions": [
+        "GUANGZHOUWANGYI,HANGZHOU,ZHEJIANG"
+      ],
+      "registry_maintainers": [
+        "MAINT-CNCGROUP-ZJ"
+      ],
+      "registry_status": "ASSIGNED NON-PORTABLE",
+      "registry_last_modified": "2010-09-08T16:13:39Z",
+      "matched_by": "exclude_apnic_inetnum_rules: (?:^|[^a-z0-9])(?:guangzhouwangyihz|shanghaiwangyihz|guangzhou-wangyi-ltd)(?:[^a-z0-9]|$)|\\bguangzhou (?:wangyi|netease) computer systems? co(?:mpany)?[., ]+(?:ltd|limited)\\b",
+      "reason": "APNIC inetnum registration explicitly identifies a NetEase corporate or service network"
+    },
+    {
+      "source": "apnic_inetnum",
+      "category": "apnic_inetnum",
+      "cidr": "124.160.24.64/27",
+      "address_count": 32,
+      "asn": "4837",
+      "operator": "unicom",
+      "asn_description": "CHINA169-BACKBONE CHINA UNICOM China169 Backbone",
+      "registry_netnames": [
+        "XIAOSHANIDCCHUANGYEHULIANKEJIH"
+      ],
+      "registry_descriptions": [
+        "XIAOSHANIDCCHUANGYEHULIANKEJI,HANGZHOU,ZHEJIANG"
+      ],
+      "registry_maintainers": [
+        "MAINT-CNCGROUP-ZJ"
+      ],
+      "registry_status": "ASSIGNED NON-PORTABLE",
+      "registry_last_modified": "2010-09-08T16:13:40Z",
+      "matched_by": "exclude_apnic_inetnum_rules: (?:^|[^a-z0-9])(?:idcbeiyongjh|liantongidcyouxifuwuqihz|idcdi2pigongxiangjierufuwuqidi|xiaoshanidcchuangyehuliankejih?|wangluoyingpanhezuoidcziyuanhz|yuyaoidcyewudizhiduanvlan511(?:chinaunicomningbochina)?|cabinet-retail)(?:[^a-z0-9]|$)",
+      "reason": "APNIC inetnum registration explicitly identifies a dedicated IDC resource or service range"
+    },
+    {
+      "source": "apnic_inetnum",
+      "category": "apnic_inetnum",
+      "cidr": "124.160.26.0/25",
+      "address_count": 128,
+      "asn": "4837",
+      "operator": "unicom",
+      "asn_description": "CHINA169-BACKBONE CHINA UNICOM China169 Backbone",
+      "registry_netnames": [
+        "WANGYINHULIANHZ"
+      ],
+      "registry_descriptions": [
+        "WANGYINHULIAN,HANGZHOU,ZHEJIANG"
+      ],
+      "registry_maintainers": [
+        "MAINT-CNCGROUP-ZJ"
+      ],
+      "registry_status": "ASSIGNED NON-PORTABLE",
+      "registry_last_modified": "2010-09-08T16:13:41Z",
+      "matched_by": "exclude_apnic_inetnum_rules: (?:^|[^a-z0-9])[a-z0-9]*wangyinhulian[a-z0-9]*(?:[^a-z0-9]|$)|\\bhangzhou netbank interlink technol(?:og(?:y|ies)|gies) co(?:mpany)?[., ]+(?:ltd|limited)\\b",
+      "reason": "APNIC inetnum registration explicitly identifies a Wangyin Hulian or Netbank Interlink corporate network"
+    },
+    {
+      "source": "apnic_inetnum",
+      "category": "apnic_inetnum",
+      "cidr": "124.160.26.128/27",
+      "address_count": 32,
+      "asn": "4837",
+      "operator": "unicom",
+      "asn_description": "CHINA169-BACKBONE CHINA UNICOM China169 Backbone",
+      "registry_netnames": [
+        "WANGYINHULIANHZ"
+      ],
+      "registry_descriptions": [
+        "WANGYINHULIAN,HANGZHOU,ZHEJIANG"
+      ],
+      "registry_maintainers": [
+        "MAINT-CNCGROUP-ZJ"
+      ],
+      "registry_status": "ASSIGNED NON-PORTABLE",
+      "registry_last_modified": "2010-09-09T02:23:11Z",
+      "matched_by": "exclude_apnic_inetnum_rules: (?:^|[^a-z0-9])[a-z0-9]*wangyinhulian[a-z0-9]*(?:[^a-z0-9]|$)|\\bhangzhou netbank interlink technol(?:og(?:y|ies)|gies) co(?:mpany)?[., ]+(?:ltd|limited)\\b",
+      "reason": "APNIC inetnum registration explicitly identifies a Wangyin Hulian or Netbank Interlink corporate network"
+    },
+    {
+      "source": "apnic_inetnum",
+      "category": "apnic_inetnum",
+      "cidr": "124.160.70.0/25",
+      "address_count": 128,
+      "asn": "4837",
+      "operator": "unicom",
+      "asn_description": "CHINA169-BACKBONE CHINA UNICOM China169 Backbone",
+      "registry_netnames": [
+        "SHIJIYITENGWANGYINHULIANHZ"
+      ],
+      "registry_descriptions": [
+        "SHIJIYITENGWANGYINHULIAN,HANGZHOU,ZHEJIANG"
+      ],
+      "registry_maintainers": [
+        "MAINT-CNCGROUP-ZJ"
+      ],
+      "registry_status": "ASSIGNED NON-PORTABLE",
+      "registry_last_modified": "2010-09-08T16:14:17Z",
+      "matched_by": "exclude_apnic_inetnum_rules: (?:^|[^a-z0-9])[a-z0-9]*wangyinhulian[a-z0-9]*(?:[^a-z0-9]|$)|\\bhangzhou netbank interlink technol(?:og(?:y|ies)|gies) co(?:mpany)?[., ]+(?:ltd|limited)\\b",
+      "reason": "APNIC inetnum registration explicitly identifies a Wangyin Hulian or Netbank Interlink corporate network"
+    },
+    {
+      "source": "apnic_inetnum",
+      "category": "apnic_inetnum",
+      "cidr": "124.160.70.128/26",
+      "address_count": 64,
+      "asn": "4837",
+      "operator": "unicom",
+      "asn_description": "CHINA169-BACKBONE CHINA UNICOM China169 Backbone",
+      "registry_netnames": [
+        "SHIJIYITENGWANGYINHULIANHZ"
+      ],
+      "registry_descriptions": [
+        "SHIJIYITENGWANGYINHULIAN,HANGZHOU,ZHEJIANG"
+      ],
+      "registry_maintainers": [
+        "MAINT-CNCGROUP-ZJ"
+      ],
+      "registry_status": "ASSIGNED NON-PORTABLE",
+      "registry_last_modified": "2010-09-08T16:14:17Z",
+      "matched_by": "exclude_apnic_inetnum_rules: (?:^|[^a-z0-9])[a-z0-9]*wangyinhulian[a-z0-9]*(?:[^a-z0-9]|$)|\\bhangzhou netbank interlink technol(?:og(?:y|ies)|gies) co(?:mpany)?[., ]+(?:ltd|limited)\\b",
+      "reason": "APNIC inetnum registration explicitly identifies a Wangyin Hulian or Netbank Interlink corporate network"
+    },
+    {
+      "source": "apnic_inetnum",
+      "category": "apnic_inetnum",
+      "cidr": "124.160.70.192/27",
+      "address_count": 32,
+      "asn": "4837",
+      "operator": "unicom",
+      "asn_description": "CHINA169-BACKBONE CHINA UNICOM China169 Backbone",
+      "registry_netnames": [
+        "SHIJIYITENGWANGYINHULIANHZ"
+      ],
+      "registry_descriptions": [
+        "SHIJIYITENGWANGYINHULIAN,HANGZHOU,ZHEJIANG"
+      ],
+      "registry_maintainers": [
+        "MAINT-CNCGROUP-ZJ"
+      ],
+      "registry_status": "ASSIGNED NON-PORTABLE",
+      "registry_last_modified": "2010-09-08T16:14:17Z",
+      "matched_by": "exclude_apnic_inetnum_rules: (?:^|[^a-z0-9])[a-z0-9]*wangyinhulian[a-z0-9]*(?:[^a-z0-9]|$)|\\bhangzhou netbank interlink technol(?:og(?:y|ies)|gies) co(?:mpany)?[., ]+(?:ltd|limited)\\b",
+      "reason": "APNIC inetnum registration explicitly identifies a Wangyin Hulian or Netbank Interlink corporate network"
+    },
+    {
+      "source": "apnic_inetnum",
+      "category": "apnic_inetnum",
+      "cidr": "124.160.70.224/28",
+      "address_count": 16,
+      "asn": "4837",
+      "operator": "unicom",
+      "asn_description": "CHINA169-BACKBONE CHINA UNICOM China169 Backbone",
+      "registry_netnames": [
+        "SHIJIYITENGWANGYINHULIANHZ"
+      ],
+      "registry_descriptions": [
+        "SHIJIYITENGWANGYINHULIAN,HANGZHOU,ZHEJIANG"
+      ],
+      "registry_maintainers": [
+        "MAINT-CNCGROUP-ZJ"
+      ],
+      "registry_status": "ASSIGNED NON-PORTABLE",
+      "registry_last_modified": "2010-09-08T16:14:17Z",
+      "matched_by": "exclude_apnic_inetnum_rules: (?:^|[^a-z0-9])[a-z0-9]*wangyinhulian[a-z0-9]*(?:[^a-z0-9]|$)|\\bhangzhou netbank interlink technol(?:og(?:y|ies)|gies) co(?:mpany)?[., ]+(?:ltd|limited)\\b",
+      "reason": "APNIC inetnum registration explicitly identifies a Wangyin Hulian or Netbank Interlink corporate network"
+    },
+    {
+      "source": "apnic_inetnum",
+      "category": "apnic_inetnum",
+      "cidr": "124.160.70.240/29",
+      "address_count": 8,
+      "asn": "4837",
+      "operator": "unicom",
+      "asn_description": "CHINA169-BACKBONE CHINA UNICOM China169 Backbone",
+      "registry_netnames": [
+        "SHIJIYITENGWANGYINHULIANHZ"
+      ],
+      "registry_descriptions": [
+        "SHIJIYITENGWANGYINHULIAN,HANGZHOU,ZHEJIANG"
+      ],
+      "registry_maintainers": [
+        "MAINT-CNCGROUP-ZJ"
+      ],
+      "registry_status": "ASSIGNED NON-PORTABLE",
+      "registry_last_modified": "2010-09-08T16:14:17Z",
+      "matched_by": "exclude_apnic_inetnum_rules: (?:^|[^a-z0-9])[a-z0-9]*wangyinhulian[a-z0-9]*(?:[^a-z0-9]|$)|\\bhangzhou netbank interlink technol(?:og(?:y|ies)|gies) co(?:mpany)?[., ]+(?:ltd|limited)\\b",
+      "reason": "APNIC inetnum registration explicitly identifies a Wangyin Hulian or Netbank Interlink corporate network"
+    },
+    {
+      "source": "apnic_inetnum",
+      "category": "apnic_inetnum",
+      "cidr": "124.160.70.248/30",
+      "address_count": 4,
+      "asn": "4837",
+      "operator": "unicom",
+      "asn_description": "CHINA169-BACKBONE CHINA UNICOM China169 Backbone",
+      "registry_netnames": [
+        "SHIJIYITENGWANGYINHULIANHZ"
+      ],
+      "registry_descriptions": [
+        "SHIJIYITENGWANGYINHULIAN,HANGZHOU,ZHEJIANG"
+      ],
+      "registry_maintainers": [
+        "MAINT-CNCGROUP-ZJ"
+      ],
+      "registry_status": "ASSIGNED NON-PORTABLE",
+      "registry_last_modified": "2010-09-08T16:14:17Z",
+      "matched_by": "exclude_apnic_inetnum_rules: (?:^|[^a-z0-9])[a-z0-9]*wangyinhulian[a-z0-9]*(?:[^a-z0-9]|$)|\\bhangzhou netbank interlink technol(?:og(?:y|ies)|gies) co(?:mpany)?[., ]+(?:ltd|limited)\\b",
+      "reason": "APNIC inetnum registration explicitly identifies a Wangyin Hulian or Netbank Interlink corporate network"
+    },
+    {
+      "source": "apnic_inetnum",
+      "category": "apnic_inetnum",
+      "cidr": "124.160.70.252/31",
+      "address_count": 2,
+      "asn": "4837",
+      "operator": "unicom",
+      "asn_description": "CHINA169-BACKBONE CHINA UNICOM China169 Backbone",
+      "registry_netnames": [
+        "SHIJIYITENGWANGYINHULIANHZ"
+      ],
+      "registry_descriptions": [
+        "SHIJIYITENGWANGYINHULIAN,HANGZHOU,ZHEJIANG"
+      ],
+      "registry_maintainers": [
+        "MAINT-CNCGROUP-ZJ"
+      ],
+      "registry_status": "ASSIGNED NON-PORTABLE",
+      "registry_last_modified": "2010-09-08T16:14:17Z",
+      "matched_by": "exclude_apnic_inetnum_rules: (?:^|[^a-z0-9])[a-z0-9]*wangyinhulian[a-z0-9]*(?:[^a-z0-9]|$)|\\bhangzhou netbank interlink technol(?:og(?:y|ies)|gies) co(?:mpany)?[., ]+(?:ltd|limited)\\b",
+      "reason": "APNIC inetnum registration explicitly identifies a Wangyin Hulian or Netbank Interlink corporate network"
+    },
+    {
+      "source": "apnic_inetnum",
+      "category": "apnic_inetnum",
+      "cidr": "124.160.70.254/32",
+      "address_count": 1,
+      "asn": "4837",
+      "operator": "unicom",
+      "asn_description": "CHINA169-BACKBONE CHINA UNICOM China169 Backbone",
+      "registry_netnames": [
+        "SHIJIYITENGWANGYINHULIANHZ"
+      ],
+      "registry_descriptions": [
+        "SHIJIYITENGWANGYINHULIAN,HANGZHOU,ZHEJIANG"
+      ],
+      "registry_maintainers": [
+        "MAINT-CNCGROUP-ZJ"
+      ],
+      "registry_status": "ASSIGNED NON-PORTABLE",
+      "registry_last_modified": "2010-09-08T16:14:17Z",
+      "matched_by": "exclude_apnic_inetnum_rules: (?:^|[^a-z0-9])[a-z0-9]*wangyinhulian[a-z0-9]*(?:[^a-z0-9]|$)|\\bhangzhou netbank interlink technol(?:og(?:y|ies)|gies) co(?:mpany)?[., ]+(?:ltd|limited)\\b",
+      "reason": "APNIC inetnum registration explicitly identifies a Wangyin Hulian or Netbank Interlink corporate network"
+    },
+    {
+      "source": "apnic_inetnum",
+      "category": "apnic_inetnum",
       "cidr": "124.160.74.168/30",
       "address_count": 4,
       "asn": "4837",
@@ -38605,6 +41151,182 @@
       "registry_last_modified": "2010-09-08T16:14:20Z",
       "matched_by": "exclude_apnic_inetnum_rules: (?:^|[^a-z0-9])(?:mpls|ip[ -]?vpn|vpn)(?:[^a-z0-9]|$)",
       "reason": "APNIC inetnum registration explicitly identifies an MPLS or VPN network"
+    },
+    {
+      "source": "apnic_inetnum",
+      "category": "apnic_inetnum",
+      "cidr": "124.160.92.72/30",
+      "address_count": 4,
+      "asn": "4837",
+      "operator": "unicom",
+      "asn_description": "CHINA169-BACKBONE CHINA UNICOM China169 Backbone",
+      "registry_netnames": [
+        "WANGYINHULIANHZ"
+      ],
+      "registry_descriptions": [
+        "WANGYINHULIAN,HANGZHOU,ZHEJIANG"
+      ],
+      "registry_maintainers": [
+        "MAINT-CNCGROUP-ZJ"
+      ],
+      "registry_status": "ASSIGNED NON-PORTABLE",
+      "registry_last_modified": "2010-09-08T16:14:31Z",
+      "matched_by": "exclude_apnic_inetnum_rules: (?:^|[^a-z0-9])[a-z0-9]*wangyinhulian[a-z0-9]*(?:[^a-z0-9]|$)|\\bhangzhou netbank interlink technol(?:og(?:y|ies)|gies) co(?:mpany)?[., ]+(?:ltd|limited)\\b",
+      "reason": "APNIC inetnum registration explicitly identifies a Wangyin Hulian or Netbank Interlink corporate network"
+    },
+    {
+      "source": "apnic_inetnum",
+      "category": "apnic_inetnum",
+      "cidr": "124.160.93.0/24",
+      "address_count": 256,
+      "asn": "4837",
+      "operator": "unicom",
+      "asn_description": "CHINA169-BACKBONE CHINA UNICOM China169 Backbone",
+      "registry_netnames": [
+        "WANGYINHULIANHZ"
+      ],
+      "registry_descriptions": [
+        "WANGYINHULIAN,HANGZHOU,ZHEJIANG"
+      ],
+      "registry_maintainers": [
+        "MAINT-CNCGROUP-ZJ"
+      ],
+      "registry_status": "ASSIGNED NON-PORTABLE",
+      "registry_last_modified": "2010-09-08T16:14:32Z",
+      "matched_by": "exclude_apnic_inetnum_rules: (?:^|[^a-z0-9])[a-z0-9]*wangyinhulian[a-z0-9]*(?:[^a-z0-9]|$)|\\bhangzhou netbank interlink technol(?:og(?:y|ies)|gies) co(?:mpany)?[., ]+(?:ltd|limited)\\b",
+      "reason": "APNIC inetnum registration explicitly identifies a Wangyin Hulian or Netbank Interlink corporate network"
+    },
+    {
+      "source": "apnic_inetnum",
+      "category": "apnic_inetnum",
+      "cidr": "124.160.110.0/27",
+      "address_count": 32,
+      "asn": "4837",
+      "operator": "unicom",
+      "asn_description": "CHINA169-BACKBONE CHINA UNICOM China169 Backbone",
+      "registry_netnames": [
+        "WANGYINHULIANLANYUEKEJIHZ"
+      ],
+      "registry_descriptions": [
+        "WANGYINHULIANLANYUEKEJI,HANGZHOU,ZHEJIANG"
+      ],
+      "registry_maintainers": [
+        "MAINT-CNCGROUP-ZJ"
+      ],
+      "registry_status": "ASSIGNED NON-PORTABLE",
+      "registry_last_modified": "2010-09-08T16:14:39Z",
+      "matched_by": "exclude_apnic_inetnum_rules: (?:^|[^a-z0-9])[a-z0-9]*wangyinhulian[a-z0-9]*(?:[^a-z0-9]|$)|\\bhangzhou netbank interlink technol(?:og(?:y|ies)|gies) co(?:mpany)?[., ]+(?:ltd|limited)\\b",
+      "reason": "APNIC inetnum registration explicitly identifies a Wangyin Hulian or Netbank Interlink corporate network"
+    },
+    {
+      "source": "apnic_inetnum",
+      "category": "apnic_inetnum",
+      "cidr": "124.160.112.0/24",
+      "address_count": 256,
+      "asn": "4837",
+      "operator": "unicom",
+      "asn_description": "CHINA169-BACKBONE CHINA UNICOM China169 Backbone",
+      "registry_netnames": [
+        "GUANGZHOUWANGYIHZ"
+      ],
+      "registry_descriptions": [
+        "GUANGZHOUWANGYI,HANGZHOU,ZHEJIANG"
+      ],
+      "registry_maintainers": [
+        "MAINT-CNCGROUP-ZJ"
+      ],
+      "registry_status": "ASSIGNED NON-PORTABLE",
+      "registry_last_modified": "2010-09-08T16:14:41Z",
+      "matched_by": "exclude_apnic_inetnum_rules: (?:^|[^a-z0-9])(?:guangzhouwangyihz|shanghaiwangyihz|guangzhou-wangyi-ltd)(?:[^a-z0-9]|$)|\\bguangzhou (?:wangyi|netease) computer systems? co(?:mpany)?[., ]+(?:ltd|limited)\\b",
+      "reason": "APNIC inetnum registration explicitly identifies a NetEase corporate or service network"
+    },
+    {
+      "source": "apnic_inetnum",
+      "category": "apnic_inetnum",
+      "cidr": "124.160.113.0/24",
+      "address_count": 256,
+      "asn": "4837",
+      "operator": "unicom",
+      "asn_description": "CHINA169-BACKBONE CHINA UNICOM China169 Backbone",
+      "registry_netnames": [
+        "GUANGZHOUWANGYIHZ"
+      ],
+      "registry_descriptions": [
+        "GUANGZHOUWANGYI,HANGZHOU,ZHEJIANG"
+      ],
+      "registry_maintainers": [
+        "MAINT-CNCGROUP-ZJ"
+      ],
+      "registry_status": "ASSIGNED NON-PORTABLE",
+      "registry_last_modified": "2010-09-08T16:14:41Z",
+      "matched_by": "exclude_apnic_inetnum_rules: (?:^|[^a-z0-9])(?:guangzhouwangyihz|shanghaiwangyihz|guangzhou-wangyi-ltd)(?:[^a-z0-9]|$)|\\bguangzhou (?:wangyi|netease) computer systems? co(?:mpany)?[., ]+(?:ltd|limited)\\b",
+      "reason": "APNIC inetnum registration explicitly identifies a NetEase corporate or service network"
+    },
+    {
+      "source": "apnic_inetnum",
+      "category": "apnic_inetnum",
+      "cidr": "124.160.120.0/24",
+      "address_count": 256,
+      "asn": "4837",
+      "operator": "unicom",
+      "asn_description": "CHINA169-BACKBONE CHINA UNICOM China169 Backbone",
+      "registry_netnames": [
+        "WANGYINHULIANZHEJIANGHENGHUAHZ"
+      ],
+      "registry_descriptions": [
+        "WANGYINHULIANZHEJIANGHENGHUA,HANGZHOU,ZHEJIANG"
+      ],
+      "registry_maintainers": [
+        "MAINT-CNCGROUP-ZJ"
+      ],
+      "registry_status": "ASSIGNED NON-PORTABLE",
+      "registry_last_modified": "2010-09-08T16:14:41Z",
+      "matched_by": "exclude_apnic_inetnum_rules: (?:^|[^a-z0-9])[a-z0-9]*wangyinhulian[a-z0-9]*(?:[^a-z0-9]|$)|\\bhangzhou netbank interlink technol(?:og(?:y|ies)|gies) co(?:mpany)?[., ]+(?:ltd|limited)\\b",
+      "reason": "APNIC inetnum registration explicitly identifies a Wangyin Hulian or Netbank Interlink corporate network"
+    },
+    {
+      "source": "apnic_inetnum",
+      "category": "apnic_inetnum",
+      "cidr": "124.160.123.0/24",
+      "address_count": 256,
+      "asn": "4837",
+      "operator": "unicom",
+      "asn_description": "CHINA169-BACKBONE CHINA UNICOM China169 Backbone",
+      "registry_netnames": [
+        "WANGYINHULIANZHEJIANGHENGHUAHZ"
+      ],
+      "registry_descriptions": [
+        "WANGYINHULIANZHEJIANGHENGHUA,HANGZHOU,ZHEJIANG"
+      ],
+      "registry_maintainers": [
+        "MAINT-CNCGROUP-ZJ"
+      ],
+      "registry_status": "ASSIGNED NON-PORTABLE",
+      "registry_last_modified": "2010-09-08T16:14:41Z",
+      "matched_by": "exclude_apnic_inetnum_rules: (?:^|[^a-z0-9])[a-z0-9]*wangyinhulian[a-z0-9]*(?:[^a-z0-9]|$)|\\bhangzhou netbank interlink technol(?:og(?:y|ies)|gies) co(?:mpany)?[., ]+(?:ltd|limited)\\b",
+      "reason": "APNIC inetnum registration explicitly identifies a Wangyin Hulian or Netbank Interlink corporate network"
+    },
+    {
+      "source": "apnic_inetnum",
+      "category": "apnic_inetnum",
+      "cidr": "124.160.128.0/24",
+      "address_count": 256,
+      "asn": "4837",
+      "operator": "unicom",
+      "asn_description": "CHINA169-BACKBONE CHINA UNICOM China169 Backbone",
+      "registry_netnames": [
+        "WANGYINHULIANHZ"
+      ],
+      "registry_descriptions": [
+        "WANGYINHULIAN,HANGZHOU,ZHEJIANG"
+      ],
+      "registry_maintainers": [
+        "MAINT-CNCGROUP-ZJ"
+      ],
+      "registry_status": "ASSIGNED NON-PORTABLE",
+      "registry_last_modified": "2010-09-08T16:14:41Z",
+      "matched_by": "exclude_apnic_inetnum_rules: (?:^|[^a-z0-9])[a-z0-9]*wangyinhulian[a-z0-9]*(?:[^a-z0-9]|$)|\\bhangzhou netbank interlink technol(?:og(?:y|ies)|gies) co(?:mpany)?[., ]+(?:ltd|limited)\\b",
+      "reason": "APNIC inetnum registration explicitly identifies a Wangyin Hulian or Netbank Interlink corporate network"
     },
     {
       "source": "apnic_inetnum",
@@ -40771,6 +43493,102 @@
     {
       "source": "apnic_inetnum",
       "category": "apnic_inetnum",
+      "cidr": "220.197.30.0/27",
+      "address_count": 32,
+      "asn": "4837",
+      "operator": "unicom",
+      "asn_description": "CHINA169-BACKBONE CHINA UNICOM China169 Backbone",
+      "registry_netnames": [
+        "NetEase-SA"
+      ],
+      "registry_descriptions": [
+        "Guangzhou NetEase Computer System Co.,Ltd",
+        "No.599 Wangshang Road, Binjiang District. CN,",
+        "Zhejiang,Hangzhou 310052 ,CN"
+      ],
+      "registry_maintainers": [
+        "MAINT-CNNIC-AP"
+      ],
+      "registry_status": "ASSIGNED NON-PORTABLE",
+      "registry_last_modified": "2024-07-30T12:51:55Z",
+      "matched_by": "exclude_apnic_inetnum_rules: (?:^|[^a-z0-9])(?:guangzhouwangyihz|shanghaiwangyihz|guangzhou-wangyi-ltd)(?:[^a-z0-9]|$)|\\bguangzhou (?:wangyi|netease) computer systems? co(?:mpany)?[., ]+(?:ltd|limited)\\b",
+      "reason": "APNIC inetnum registration explicitly identifies a NetEase corporate or service network"
+    },
+    {
+      "source": "apnic_inetnum",
+      "category": "apnic_inetnum",
+      "cidr": "220.197.30.192/26",
+      "address_count": 64,
+      "asn": "4837",
+      "operator": "unicom",
+      "asn_description": "CHINA169-BACKBONE CHINA UNICOM China169 Backbone",
+      "registry_netnames": [
+        "NetEase-SA"
+      ],
+      "registry_descriptions": [
+        "Guangzhou NetEase Computer System Co.,Ltd",
+        "No.599 Wangshang Road, Binjiang District. CN,",
+        "Zhejiang,Hangzhou 310052 ,CN"
+      ],
+      "registry_maintainers": [
+        "MAINT-CNNIC-AP"
+      ],
+      "registry_status": "ASSIGNED NON-PORTABLE",
+      "registry_last_modified": "2024-07-30T12:51:57Z",
+      "matched_by": "exclude_apnic_inetnum_rules: (?:^|[^a-z0-9])(?:guangzhouwangyihz|shanghaiwangyihz|guangzhou-wangyi-ltd)(?:[^a-z0-9]|$)|\\bguangzhou (?:wangyi|netease) computer systems? co(?:mpany)?[., ]+(?:ltd|limited)\\b",
+      "reason": "APNIC inetnum registration explicitly identifies a NetEase corporate or service network"
+    },
+    {
+      "source": "apnic_inetnum",
+      "category": "apnic_inetnum",
+      "cidr": "220.197.31.0/27",
+      "address_count": 32,
+      "asn": "4837",
+      "operator": "unicom",
+      "asn_description": "CHINA169-BACKBONE CHINA UNICOM China169 Backbone",
+      "registry_netnames": [
+        "NetEase-SA"
+      ],
+      "registry_descriptions": [
+        "Guangzhou NetEase Computer System Co.,Ltd",
+        "No.599 Wangshang Road, Binjiang District. CN,",
+        "Zhejiang,Hangzhou 310052 ,CN"
+      ],
+      "registry_maintainers": [
+        "MAINT-CNNIC-AP"
+      ],
+      "registry_status": "ASSIGNED NON-PORTABLE",
+      "registry_last_modified": "2024-07-30T12:51:59Z",
+      "matched_by": "exclude_apnic_inetnum_rules: (?:^|[^a-z0-9])(?:guangzhouwangyihz|shanghaiwangyihz|guangzhou-wangyi-ltd)(?:[^a-z0-9]|$)|\\bguangzhou (?:wangyi|netease) computer systems? co(?:mpany)?[., ]+(?:ltd|limited)\\b",
+      "reason": "APNIC inetnum registration explicitly identifies a NetEase corporate or service network"
+    },
+    {
+      "source": "apnic_inetnum",
+      "category": "apnic_inetnum",
+      "cidr": "220.197.32.0/27",
+      "address_count": 32,
+      "asn": "4837",
+      "operator": "unicom",
+      "asn_description": "CHINA169-BACKBONE CHINA UNICOM China169 Backbone",
+      "registry_netnames": [
+        "NetEase-SA"
+      ],
+      "registry_descriptions": [
+        "Guangzhou NetEase Computer System Co.,Ltd",
+        "No.599 Wangshang Road, Binjiang District. CN,",
+        "Zhejiang,Hangzhou 310052 ,CN"
+      ],
+      "registry_maintainers": [
+        "MAINT-CNNIC-AP"
+      ],
+      "registry_status": "ASSIGNED NON-PORTABLE",
+      "registry_last_modified": "2024-07-30T12:52:01Z",
+      "matched_by": "exclude_apnic_inetnum_rules: (?:^|[^a-z0-9])(?:guangzhouwangyihz|shanghaiwangyihz|guangzhou-wangyi-ltd)(?:[^a-z0-9]|$)|\\bguangzhou (?:wangyi|netease) computer systems? co(?:mpany)?[., ]+(?:ltd|limited)\\b",
+      "reason": "APNIC inetnum registration explicitly identifies a NetEase corporate or service network"
+    },
+    {
+      "source": "apnic_inetnum",
+      "category": "apnic_inetnum",
       "cidr": "221.6.5.224/27",
       "address_count": 32,
       "asn": "4837",
@@ -41695,6 +44513,28 @@
     {
       "source": "apnic_inetnum",
       "category": "apnic_inetnum",
+      "cidr": "221.12.15.0/24",
+      "address_count": 256,
+      "asn": "4837",
+      "operator": "unicom",
+      "asn_description": "CHINA169-BACKBONE CHINA UNICOM China169 Backbone",
+      "registry_netnames": [
+        "LIANTONGIDCYOUXIFUWUQIHZ"
+      ],
+      "registry_descriptions": [
+        "LIANTONGIDCYOUXIFUWUQI,HANGZHOU,ZHEJIANG"
+      ],
+      "registry_maintainers": [
+        "MAINT-CNCGROUP-ZJ"
+      ],
+      "registry_status": "ASSIGNED NON-PORTABLE",
+      "registry_last_modified": "2010-09-08T16:14:56Z",
+      "matched_by": "exclude_apnic_inetnum_rules: (?:^|[^a-z0-9])(?:idcbeiyongjh|liantongidcyouxifuwuqihz|idcdi2pigongxiangjierufuwuqidi|xiaoshanidcchuangyehuliankejih?|wangluoyingpanhezuoidcziyuanhz|yuyaoidcyewudizhiduanvlan511(?:chinaunicomningbochina)?|cabinet-retail)(?:[^a-z0-9]|$)",
+      "reason": "APNIC inetnum registration explicitly identifies a dedicated IDC resource or service range"
+    },
+    {
+      "source": "apnic_inetnum",
+      "category": "apnic_inetnum",
       "cidr": "221.12.38.80/29",
       "address_count": 8,
       "asn": "4837",
@@ -41845,6 +44685,28 @@
       "registry_last_modified": "2010-09-08T14:47:10Z",
       "matched_by": "exclude_apnic_inetnum_rules: idc(?:[^a-z0-9]|$)|\\binternet data cent(?:er|re)\\b",
       "reason": "APNIC inetnum registration explicitly identifies an IDC network"
+    },
+    {
+      "source": "apnic_inetnum",
+      "category": "apnic_inetnum",
+      "cidr": "221.12.41.128/29",
+      "address_count": 8,
+      "asn": "4837",
+      "operator": "unicom",
+      "asn_description": "CHINA169-BACKBONE CHINA UNICOM China169 Backbone",
+      "registry_netnames": [
+        "YuYaoIDCYeWuDiZhiDuanVLAN511"
+      ],
+      "registry_descriptions": [
+        "YuYaoIDCYeWuDiZhiDuanVLAN511ChinaunicomNingboChina"
+      ],
+      "registry_maintainers": [
+        "MAINT-CNCGROUP-ZJ"
+      ],
+      "registry_status": "ASSIGNED NON-PORTABLE",
+      "registry_last_modified": "2010-09-08T14:47:10Z",
+      "matched_by": "exclude_apnic_inetnum_rules: (?:^|[^a-z0-9])(?:idcbeiyongjh|liantongidcyouxifuwuqihz|idcdi2pigongxiangjierufuwuqidi|xiaoshanidcchuangyehuliankejih?|wangluoyingpanhezuoidcziyuanhz|yuyaoidcyewudizhiduanvlan511(?:chinaunicomningbochina)?|cabinet-retail)(?:[^a-z0-9]|$)",
+      "reason": "APNIC inetnum registration explicitly identifies a dedicated IDC resource or service range"
     },
     {
       "source": "apnic_inetnum",
@@ -42065,6 +44927,50 @@
       "registry_last_modified": "2010-09-08T16:16:28Z",
       "matched_by": "exclude_apnic_inetnum_rules: (?:^|[^a-z0-9])(?:mpls|ip[ -]?vpn|vpn)(?:[^a-z0-9]|$)",
       "reason": "APNIC inetnum registration explicitly identifies an MPLS or VPN network"
+    },
+    {
+      "source": "apnic_inetnum",
+      "category": "apnic_inetnum",
+      "cidr": "221.12.162.128/25",
+      "address_count": 128,
+      "asn": "4837",
+      "operator": "unicom",
+      "asn_description": "CHINA169-BACKBONE CHINA UNICOM China169 Backbone",
+      "registry_netnames": [
+        "IDCBEIYONGJH"
+      ],
+      "registry_descriptions": [
+        "IDCBEIYONG,JINHUA,ZHEJIANG"
+      ],
+      "registry_maintainers": [
+        "MAINT-CNCGROUP-ZJ"
+      ],
+      "registry_status": "ASSIGNED NON-PORTABLE",
+      "registry_last_modified": "2010-09-08T16:16:55Z",
+      "matched_by": "exclude_apnic_inetnum_rules: (?:^|[^a-z0-9])(?:idcbeiyongjh|liantongidcyouxifuwuqihz|idcdi2pigongxiangjierufuwuqidi|xiaoshanidcchuangyehuliankejih?|wangluoyingpanhezuoidcziyuanhz|yuyaoidcyewudizhiduanvlan511(?:chinaunicomningbochina)?|cabinet-retail)(?:[^a-z0-9]|$)",
+      "reason": "APNIC inetnum registration explicitly identifies a dedicated IDC resource or service range"
+    },
+    {
+      "source": "apnic_inetnum",
+      "category": "apnic_inetnum",
+      "cidr": "221.12.163.0/24",
+      "address_count": 256,
+      "asn": "4837",
+      "operator": "unicom",
+      "asn_description": "CHINA169-BACKBONE CHINA UNICOM China169 Backbone",
+      "registry_netnames": [
+        "IDCBEIYONGJH"
+      ],
+      "registry_descriptions": [
+        "IDCBEIYONG,JINHUA,ZHEJIANG"
+      ],
+      "registry_maintainers": [
+        "MAINT-CNCGROUP-ZJ"
+      ],
+      "registry_status": "ASSIGNED NON-PORTABLE",
+      "registry_last_modified": "2010-09-08T16:16:55Z",
+      "matched_by": "exclude_apnic_inetnum_rules: (?:^|[^a-z0-9])(?:idcbeiyongjh|liantongidcyouxifuwuqihz|idcdi2pigongxiangjierufuwuqidi|xiaoshanidcchuangyehuliankejih?|wangluoyingpanhezuoidcziyuanhz|yuyaoidcyewudizhiduanvlan511(?:chinaunicomningbochina)?|cabinet-retail)(?:[^a-z0-9]|$)",
+      "reason": "APNIC inetnum registration explicitly identifies a dedicated IDC resource or service range"
     },
     {
       "source": "apnic_inetnum",
@@ -100099,66 +103005,6 @@
     {
       "source": "apnic_autnum",
       "category": "apnic_portable_holder",
-      "cidr": "45.254.48.0/23",
-      "address_count": 512,
-      "asn": "4837",
-      "operator": "unicom",
-      "asn_description": "CHINA169-BACKBONE CHINA UNICOM China169 Backbone",
-      "registry_netnames": [
-        "Netease-Network"
-      ],
-      "registry_descriptions": [
-        "Guangzhou NetEase Computer System Co., Ltd"
-      ],
-      "registry_maintainers": [
-        "MAINT-CNNIC-AP"
-      ],
-      "registry_status": "ALLOCATED PORTABLE",
-      "registry_last_modified": "2023-11-28T00:58:15Z",
-      "matched_by": "APNIC portable holder linked through aut-num",
-      "reason": "Most-specific APNIC portable registration is linked to a currently active independent ASN",
-      "linked_asns": [
-        {
-          "asn": "45062",
-          "description": "NETEASE-NETWORK NetEase Building No.16 Ke Yun Road",
-          "as_name": "Netease-Network",
-          "via": "netname_as_name"
-        }
-      ]
-    },
-    {
-      "source": "apnic_autnum",
-      "category": "apnic_portable_holder",
-      "cidr": "45.254.50.0/24",
-      "address_count": 256,
-      "asn": "4837",
-      "operator": "unicom",
-      "asn_description": "CHINA169-BACKBONE CHINA UNICOM China169 Backbone",
-      "registry_netnames": [
-        "Netease-Network"
-      ],
-      "registry_descriptions": [
-        "Guangzhou NetEase Computer System Co., Ltd"
-      ],
-      "registry_maintainers": [
-        "MAINT-CNNIC-AP"
-      ],
-      "registry_status": "ALLOCATED PORTABLE",
-      "registry_last_modified": "2023-11-28T00:58:15Z",
-      "matched_by": "APNIC portable holder linked through aut-num",
-      "reason": "Most-specific APNIC portable registration is linked to a currently active independent ASN",
-      "linked_asns": [
-        {
-          "asn": "45062",
-          "description": "NETEASE-NETWORK NetEase Building No.16 Ke Yun Road",
-          "as_name": "Netease-Network",
-          "via": "netname_as_name"
-        }
-      ]
-    },
-    {
-      "source": "apnic_autnum",
-      "category": "apnic_portable_holder",
       "cidr": "101.198.197.0/24",
       "address_count": 256,
       "asn": "4837",
@@ -104250,8 +107096,8 @@
   "operator_summary": [
     {
       "operator": "chinanet",
-      "asn_count": 55,
-      "retained_address_count": 116801742,
+      "asn_count": 54,
+      "retained_address_count": 115758883,
       "asns": [
         {
           "asn": "4134",
@@ -104332,10 +107178,6 @@
         {
           "asn": "134767",
           "description": "CHINANET-SICHUAN-CHENGDU-MAN CHINANET Sichuan province Chengdu MAN network"
-        },
-        {
-          "asn": "134772",
-          "description": "CHINANET-GUANGDONG-DONGGUAN-MAN CHINANET Guangdong province Dongguan MAN network"
         },
         {
           "asn": "134773",
@@ -104478,7 +107320,7 @@
     {
       "operator": "cmcc",
       "asn_count": 20,
-      "retained_address_count": 39572556,
+      "retained_address_count": 39070284,
       "asns": [
         {
           "asn": "9394",
@@ -104565,7 +107407,7 @@
     {
       "operator": "unicom",
       "asn_count": 8,
-      "retained_address_count": 67205427,
+      "retained_address_count": 66187426,
       "asns": [
         {
           "asn": "4808",
@@ -104609,7 +107451,7 @@
       "description": "CHINANET-BACKBONE No.31,Jin-rong Street",
       "matched_by": "description_patterns: chinanet",
       "origin_address_count": 99916032,
-      "retained_address_count": 99822092
+      "retained_address_count": 99763587
     },
     {
       "asn": "4811",
@@ -104617,7 +107459,7 @@
       "description": "CHINANET-SHANGHAI-MAN China Telecom Group",
       "matched_by": "description_patterns: china ?telecom",
       "origin_address_count": 866560,
-      "retained_address_count": 628635
+      "retained_address_count": 602779
     },
     {
       "asn": "4812",
@@ -104625,7 +107467,7 @@
       "description": "CHINANET-SH-AP China Telecom Group",
       "matched_by": "description_patterns: china ?telecom",
       "origin_address_count": 7875584,
-      "retained_address_count": 7793672
+      "retained_address_count": 7694248
     },
     {
       "asn": "4813",
@@ -104641,7 +107483,7 @@
       "description": "CNIX-AP China Networks Inter-Exchange",
       "matched_by": "include_asns: China Telecom Beijing provincial network; public description is China Networks Inter-Exchange",
       "origin_address_count": 3549440,
-      "retained_address_count": 1447458
+      "retained_address_count": 704672
     },
     {
       "asn": "17633",
@@ -104657,7 +107499,7 @@
       "description": "CHINATELECOM-TJ-AS-AP ASN for TIANJIN Provincial Net of CT",
       "matched_by": "description_patterns: china ?telecom",
       "origin_address_count": 603392,
-      "retained_address_count": 603392
+      "retained_address_count": 597760
     },
     {
       "asn": "17799",
@@ -104697,7 +107539,7 @@
       "description": "CHINATELECOM-TIANJIN Tianjij,300000",
       "matched_by": "description_patterns: china ?telecom",
       "origin_address_count": 108544,
-      "retained_address_count": 107776
+      "retained_address_count": 105728
     },
     {
       "asn": "58571",
@@ -104721,7 +107563,7 @@
       "description": "CHINATELECOM-JIANGSU-NANTONG-MAN CHINATELECOM JIANGSU province NANTONG MAN network",
       "matched_by": "description_patterns: china ?telecom",
       "origin_address_count": 19456,
-      "retained_address_count": 19456
+      "retained_address_count": 17920
     },
     {
       "asn": "132225",
@@ -104737,7 +107579,7 @@
       "description": "CHINANET-TIANJIN-MAN-NEW China Telecom",
       "matched_by": "description_patterns: china ?telecom",
       "origin_address_count": 5888,
-      "retained_address_count": 5632
+      "retained_address_count": 5376
     },
     {
       "asn": "134419",
@@ -104753,7 +107595,7 @@
       "description": "CHINANET-LIAONING-DALIAN-MAN CHINANET Liaoning province Dalian MAN network",
       "matched_by": "description_patterns: chinanet",
       "origin_address_count": 195072,
-      "retained_address_count": 176093
+      "retained_address_count": 167901
     },
     {
       "asn": "134767",
@@ -104764,20 +107606,12 @@
       "retained_address_count": 5376
     },
     {
-      "asn": "134772",
-      "operator": "chinanet",
-      "description": "CHINANET-GUANGDONG-DONGGUAN-MAN CHINANET Guangdong province Dongguan MAN network",
-      "matched_by": "description_patterns: chinanet",
-      "origin_address_count": 16384,
-      "retained_address_count": 16384
-    },
-    {
       "asn": "134773",
       "operator": "chinanet",
       "description": "CHINANET-GUANGDONG-GUANGZHOU-MAN CHINANET Guangdong province Guangzhou MAN network",
       "matched_by": "description_patterns: chinanet",
       "origin_address_count": 143360,
-      "retained_address_count": 22336
+      "retained_address_count": 1536
     },
     {
       "asn": "134774",
@@ -104785,7 +107619,7 @@
       "description": "CHINANET-GUANGDONG-SHENZHEN-MAN CHINANET Guangdong province Shenzhen MAN network",
       "matched_by": "description_patterns: chinanet",
       "origin_address_count": 213248,
-      "retained_address_count": 211712
+      "retained_address_count": 153856
     },
     {
       "asn": "136197",
@@ -104793,7 +107627,7 @@
       "description": "CHINATELECOM-HEBEI-XIONGAN Xiongan, Hebei Province, P.R.China.",
       "matched_by": "description_patterns: china ?telecom",
       "origin_address_count": 36864,
-      "retained_address_count": 36864
+      "retained_address_count": 36352
     },
     {
       "asn": "136198",
@@ -104801,7 +107635,7 @@
       "description": "CHINANET-GUANGDONG-YUEXI-MAN CHINANET Guangdong province Yuexi MAN network",
       "matched_by": "description_patterns: chinanet",
       "origin_address_count": 1280,
-      "retained_address_count": 1280
+      "retained_address_count": 512
     },
     {
       "asn": "136199",
@@ -104873,7 +107707,7 @@
       "description": "CHINATELECOM-JIANGSU-SUZHOU-5G-NETWORK CHINATELECOM Jiangsu province Suzhou 5G network",
       "matched_by": "description_patterns: china ?telecom",
       "origin_address_count": 1130496,
-      "retained_address_count": 1087744
+      "retained_address_count": 1085440
     },
     {
       "asn": "140293",
@@ -105049,7 +107883,7 @@
       "description": "CTTNET China TieTong Telecommunications Corporation",
       "matched_by": "description_patterns: tietong",
       "origin_address_count": 2663168,
-      "retained_address_count": 2663040
+      "retained_address_count": 2597248
     },
     {
       "asn": "9808",
@@ -105057,7 +107891,7 @@
       "description": "CHINAMOBILE-CN China Mobile Communications Group Co., Ltd.",
       "matched_by": "description_patterns: china mobile",
       "origin_address_count": 17488896,
-      "retained_address_count": 17040616
+      "retained_address_count": 16913896
     },
     {
       "asn": "24138",
@@ -105065,7 +107899,7 @@
       "description": "CTTNET China TieTong Telecommunications Corporation",
       "matched_by": "description_patterns: tietong",
       "origin_address_count": 558080,
-      "retained_address_count": 552960
+      "retained_address_count": 482304
     },
     {
       "asn": "24400",
@@ -105105,7 +107939,7 @@
       "description": "CMNET-V4TIANJIN-AS-AP tianjin Mobile Communication Company Limited",
       "matched_by": "description_patterns: cmnet",
       "origin_address_count": 284160,
-      "retained_address_count": 283136
+      "retained_address_count": 251904
     },
     {
       "asn": "45057",
@@ -105121,7 +107955,7 @@
       "description": "CMNET-GUANGDONG-AP China Mobile communications corporation",
       "matched_by": "description_patterns: china mobile",
       "origin_address_count": 844288,
-      "retained_address_count": 833528
+      "retained_address_count": 832248
     },
     {
       "asn": "56041",
@@ -105129,7 +107963,7 @@
       "description": "CMNET-ZHEJIANG-AP China Mobile communications corporation",
       "matched_by": "description_patterns: china mobile",
       "origin_address_count": 2963968,
-      "retained_address_count": 2954240
+      "retained_address_count": 2949376
     },
     {
       "asn": "56042",
@@ -105161,7 +107995,7 @@
       "description": "CMNET-JIANGSU-AP China Mobile communications corporation",
       "matched_by": "description_patterns: china mobile",
       "origin_address_count": 3715584,
-      "retained_address_count": 3670272
+      "retained_address_count": 3656448
     },
     {
       "asn": "56047",
@@ -105177,7 +108011,7 @@
       "description": "CMNET-BEIJING-AP China Mobile Communicaitons Corporation",
       "matched_by": "description_patterns: china mobile",
       "origin_address_count": 1647872,
-      "retained_address_count": 1315584
+      "retained_address_count": 1127680
     },
     {
       "asn": "132525",
@@ -105209,7 +108043,7 @@
       "description": "CHINA169-BJ China Unicom Beijing Province Network",
       "matched_by": "description_patterns: unicom",
       "origin_address_count": 7176704,
-      "retained_address_count": 5691186
+      "retained_address_count": 5198216
     },
     {
       "asn": "4837",
@@ -105217,7 +108051,7 @@
       "description": "CHINA169-BACKBONE CHINA UNICOM China169 Backbone",
       "matched_by": "description_patterns: unicom",
       "origin_address_count": 57247488,
-      "retained_address_count": 57048865
+      "retained_address_count": 56568634
     },
     {
       "asn": "17621",
@@ -105225,7 +108059,7 @@
       "description": "CNCGROUP-SH China Unicom Shanghai network",
       "matched_by": "description_patterns: unicom",
       "origin_address_count": 806144,
-      "retained_address_count": 781244
+      "retained_address_count": 773308
     },
     {
       "asn": "17622",
@@ -105233,7 +108067,7 @@
       "description": "CNCGROUP-GZ China Unicom Guangzhou network",
       "matched_by": "description_patterns: unicom",
       "origin_address_count": 676864,
-      "retained_address_count": 489728
+      "retained_address_count": 488704
     },
     {
       "asn": "17623",
@@ -105241,7 +108075,7 @@
       "description": "CNCGROUP-SZ China Unicom Shenzen network",
       "matched_by": "description_patterns: unicom",
       "origin_address_count": 455168,
-      "retained_address_count": 435900
+      "retained_address_count": 420284
     },
     {
       "asn": "17816",
@@ -105249,13 +108083,13 @@
       "description": "CHINA169-GZ China Unicom IP network China169 Guangdong province",
       "matched_by": "description_patterns: unicom",
       "origin_address_count": 2657536,
-      "retained_address_count": 2612328
+      "retained_address_count": 2593384
     },
     {
       "asn": "23851",
       "operator": "unicom",
       "description": "CNNIC-CQCNC-AP CHONGQING CNC BROADBAND NETWORKS CO.,LTD",
-      "matched_by": "description_patterns: cnc",
+      "matched_by": "description_patterns: (?:^|[^a-z0-9])cnc(?:group)?(?:[^a-z0-9]|$)",
       "origin_address_count": 256,
       "retained_address_count": 256
     },
@@ -105265,7 +108099,7 @@
       "description": "UNICOM-HEFEI-MAN UNICOM AnHui province network",
       "matched_by": "description_patterns: unicom",
       "origin_address_count": 146944,
-      "retained_address_count": 145920
+      "retained_address_count": 144640
     }
   ],
   "excluded_asns": [
@@ -106119,7 +108953,7 @@
       "asn": "17789",
       "operator": "unicom",
       "description": "CNCGROUP-SH-IDC CNCGROUP IP network of ShangHai IDC",
-      "matched_by": "description_patterns: cnc",
+      "matched_by": "description_patterns: (?:^|[^a-z0-9])cnc(?:group)?(?:[^a-z0-9]|$)",
       "exclusion_source": "description_rule",
       "reason": "ASN description explicitly identifies a dedicated IDC network",
       "origin_address_count": 65280
@@ -106282,163 +109116,163 @@
     {
       "name": "chinanet",
       "path": "operators/chinanet.txt",
-      "cidr_count": 9089,
-      "address_count": 116801742,
-      "sha256": "37a0436775d96c65713f776ad5e3c65e591bb95ce04563532fda5c400a39e00f"
+      "cidr_count": 8850,
+      "address_count": 115758883,
+      "sha256": "30691023cd85660b62dfddda6b7afcc8d7ebf9d88d77d3ab7c1248eac133e5f6"
     },
     {
       "name": "cmcc",
       "path": "operators/cmcc.txt",
-      "cidr_count": 805,
-      "address_count": 39572556,
-      "sha256": "71cc33660bec3b5eeb2e1c1d8202f04cd0e891c59f7a0d09580ea0a47c976f5d"
+      "cidr_count": 677,
+      "address_count": 39070284,
+      "sha256": "e81ae233e323ff455d85a67d44f38a75442b839ee3fabbd44027425f7cdd8c07"
     },
     {
       "name": "unicom",
       "path": "operators/unicom.txt",
-      "cidr_count": 5861,
-      "address_count": 67205427,
-      "sha256": "c88cbc0ab3e1fb217efee31648c54ac5e3262e90559a467a1240eab821dc4d94"
+      "cidr_count": 4564,
+      "address_count": 66187426,
+      "sha256": "11a432b8a2a4cbbace246333a2c23994dc398456715a5beb148ee1f83c7cd367"
     },
     {
       "name": "CN",
       "path": "cn.txt",
-      "cidr_count": 15617,
-      "address_count": 223579725,
-      "sha256": "f3e5a14222d6c29592edb6c2495e48e581f79a172c5a51cb7173e2aba30ea035"
+      "cidr_count": 14075,
+      "address_count": 221016593,
+      "sha256": "cab9f28cf82465f1ab1e2b0cc89acbb569668b6b1ed1df6299c765d9527b3551"
     },
     {
       "name": "北京市",
       "path": "provinces/beijing.txt",
-      "cidr_count": 4283,
-      "address_count": 11791575,
-      "sha256": "fcb59e6cb150d48071bedff0b0368bce87efaf02342703145aeb246f43bf4869"
+      "cidr_count": 2785,
+      "address_count": 10344154,
+      "sha256": "a925dc91884d8287280af9797d0521301ddaf0d760614355c077973a94782f3c"
     },
     {
       "name": "天津市",
       "path": "provinces/tianjin.txt",
-      "cidr_count": 544,
-      "address_count": 3467988,
-      "sha256": "ed4eea97fcb179821644735904321670507b730898f3396913799e706d2e47be"
+      "cidr_count": 519,
+      "address_count": 3438292,
+      "sha256": "fa720492886f50538e2f036a6cc3ece01121d4ff4a04b7dd92d68237ae5d64a5"
     },
     {
       "name": "河北省",
       "path": "provinces/hebei.txt",
-      "cidr_count": 470,
-      "address_count": 9343123,
-      "sha256": "bfd2f4f45e3729db60e9ccdcebf862f8a0335e30407d0d0cc10baa9f271d64ab"
+      "cidr_count": 464,
+      "address_count": 9297043,
+      "sha256": "aa6a63af6a228d927476b76afad45e2540ac2c17a0810730ad5d58c7204a8e1f"
     },
     {
       "name": "山西省",
       "path": "provinces/shanxi.txt",
-      "cidr_count": 372,
-      "address_count": 5322795,
-      "sha256": "331b5c05375eb13d7dbebc46ef164a1e1055980e1dab78c673c24f8558151acd"
+      "cidr_count": 370,
+      "address_count": 5320747,
+      "sha256": "8d08dadc19f9f54512d748219e47f177c505ba0723fb91893e223eb01e0fa235"
     },
     {
       "name": "内蒙古自治区",
       "path": "provinces/neimenggu.txt",
-      "cidr_count": 431,
-      "address_count": 3217931,
-      "sha256": "854b0636298dff342895e46a6f705244b5636007fc9e8aa5ac871c366bff36a2"
+      "cidr_count": 429,
+      "address_count": 3215883,
+      "sha256": "68b7d65248364543580f218784b32a0b4422ab6c702747cdbefa2c7192d1fd82"
     },
     {
       "name": "辽宁省",
       "path": "provinces/liaoning.txt",
-      "cidr_count": 533,
-      "address_count": 10579187,
-      "sha256": "5d51b647a5e9a4fb3abebf59a214acfa9d8702fc7423256df72bf231313c91ca"
+      "cidr_count": 526,
+      "address_count": 10565083,
+      "sha256": "1108250868bd725c2aaa007e5a2ad3464441b129a41133e5cb50c76b9e1d2b88"
     },
     {
       "name": "吉林省",
       "path": "provinces/jilin.txt",
-      "cidr_count": 231,
-      "address_count": 4202439,
-      "sha256": "82c249681f0d542654edff0dfd914ff6c8299c16c15bef6785f25d9223d737c5"
+      "cidr_count": 223,
+      "address_count": 4116399,
+      "sha256": "f88e822cfb578f95d90664111b4e4f2a05fd6064ba83143a7a55399ae3ec9575"
     },
     {
       "name": "黑龙江省",
       "path": "provinces/heilongjiang.txt",
-      "cidr_count": 351,
-      "address_count": 4739744,
-      "sha256": "6b6e44cbf927adab53c214f3c815f2fec8ae3060fc1e5ea6aed78987ba37bef7"
+      "cidr_count": 360,
+      "address_count": 4729503,
+      "sha256": "a259d5b00311d008fd18ac6167a351864b437acbb296db8f3282d3f43d84ed19"
     },
     {
       "name": "上海市",
       "path": "provinces/shanghai.txt",
-      "cidr_count": 1751,
-      "address_count": 10133427,
-      "sha256": "75f64cee32d52dee7cd50123519acef9065a8952b1cf02790b7ec5131dcc2da2"
+      "cidr_count": 1698,
+      "address_count": 9998675,
+      "sha256": "28ccd10f990307128c2038e8d36129313a84577e54cce4ce6c09ec60daa6ee93"
     },
     {
       "name": "江苏省",
       "path": "provinces/jiangsu.txt",
-      "cidr_count": 2640,
-      "address_count": 16525900,
-      "sha256": "33cc69edab3f42d46f41e08051cd741c571a4dd7ac54fc83658acaa422713627"
+      "cidr_count": 2610,
+      "address_count": 16494924,
+      "sha256": "0a9dbbe27881c23a246a403dc9f87a3d5f92d15d3a684780026fa50936d77615"
     },
     {
       "name": "浙江省",
       "path": "provinces/zhejiang.txt",
-      "cidr_count": 2307,
-      "address_count": 16006934,
-      "sha256": "dc84024a8029c1792e54fd4ee26fde398d46d0b27d908d9c72893b84b2e51e8c"
+      "cidr_count": 2456,
+      "address_count": 15952367,
+      "sha256": "0be0090303f2af93c078d8689137f0eed0b60b415742f79209a87e038b9f64fe"
     },
     {
       "name": "安徽省",
       "path": "provinces/anhui.txt",
-      "cidr_count": 416,
-      "address_count": 6486226,
-      "sha256": "4406a9624747d96f86ff43327ca6421db82ddbf58f25e02a09029bfdec628e08"
+      "cidr_count": 406,
+      "address_count": 6405842,
+      "sha256": "a2c97ef5e69ee600a83ff320509946dd77c058a4ef7e182737764b8f582ab072"
     },
     {
       "name": "福建省",
       "path": "provinces/fujian.txt",
-      "cidr_count": 879,
-      "address_count": 6298298,
-      "sha256": "bbd98d5047e92699eef83ee0890d4202b0b4ff4de81837bec1a5cb232ac5c978"
+      "cidr_count": 870,
+      "address_count": 6254010,
+      "sha256": "855862a81e69bb0e268678cf5dbdc68f6af626ff443dea06fff9a5f54695ad89"
     },
     {
       "name": "江西省",
       "path": "provinces/jiangxi.txt",
-      "cidr_count": 475,
-      "address_count": 6772453,
-      "sha256": "d54380c7b9412277069df33c358d4a95b83eb89714d7f98360c7b27d60f69aa4"
+      "cidr_count": 474,
+      "address_count": 6771941,
+      "sha256": "e87febde5acd27e3f4f441775df93320c3c7497c8ccaf22928757abdfb10680f"
     },
     {
       "name": "山东省",
       "path": "provinces/shandong.txt",
-      "cidr_count": 921,
-      "address_count": 16284705,
-      "sha256": "a707bf6a72728d1f46e3f2962298f50829e553c61a09372f6363433f25d8302f"
+      "cidr_count": 916,
+      "address_count": 16282145,
+      "sha256": "56a3df62a3dd444085d0a6d9251ef715017d9b97f97ea1029ab217ce11355971"
     },
     {
       "name": "河南省",
       "path": "provinces/henan.txt",
-      "cidr_count": 615,
-      "address_count": 10355315,
-      "sha256": "6801be49f7edde076b11369145f58e810c188e45a28d69ee6844e3a4a2cb9e79"
+      "cidr_count": 611,
+      "address_count": 10236531,
+      "sha256": "71bf9b67f79c159e130688fab1417fad0f5ef27edb8bab1da00c85a8ea5970fd"
     },
     {
       "name": "湖北省",
       "path": "provinces/hubei.txt",
-      "cidr_count": 823,
-      "address_count": 6940313,
-      "sha256": "d2c32d11d2d57353c2163d3f16bfac1b4bb260c82d9c24e9acb9b6a88860d69e"
+      "cidr_count": 839,
+      "address_count": 6938097,
+      "sha256": "87e04fa27bd9df32f6a0c7217078b7ca47e120c9e573eb452335ab6173e5b3f7"
     },
     {
       "name": "湖南省",
       "path": "provinces/hunan.txt",
-      "cidr_count": 415,
-      "address_count": 6658935,
-      "sha256": "91f384017856a9b7c07b41a054ccd08fbcd3887db4b66514d752ce9567ffaa9a"
+      "cidr_count": 413,
+      "address_count": 6656887,
+      "sha256": "e1b61d14ea4ad1ebb90898ca6090738741c7ca02d66996f6ae0d0cda4de8dd9d"
     },
     {
       "name": "广东省",
       "path": "provinces/guangdong.txt",
-      "cidr_count": 3315,
-      "address_count": 25577981,
-      "sha256": "2f15beb1d8d6c882e172f9dcb775ff97c926bff416f3179082cb2619d9610f2d"
+      "cidr_count": 3206,
+      "address_count": 25207998,
+      "sha256": "830682a9297e38ea1b2856e950edac6ab38f534308744774b758c47d1af25fb3"
     },
     {
       "name": "广西壮族自治区",
@@ -106464,16 +109298,16 @@
     {
       "name": "四川省",
       "path": "provinces/sichuan.txt",
-      "cidr_count": 1353,
-      "address_count": 9103983,
-      "sha256": "cd28bd042ed1f38731594de618135305295905631670fa8bd6aff6104331466e"
+      "cidr_count": 1352,
+      "address_count": 9038447,
+      "sha256": "50e14c966bf106d986e1682370dd46a5add84b1d44c32614b34209cf13c6468f"
     },
     {
       "name": "贵州省",
       "path": "provinces/guizhou.txt",
-      "cidr_count": 292,
-      "address_count": 2179084,
-      "sha256": "b9414cc889396034e0d392ac254f817283c4326f8a34cbc4ce53e4119ba27f17"
+      "cidr_count": 310,
+      "address_count": 2178924,
+      "sha256": "27c2d6e70454c0ebb114c72ef4f9cae07ae45ae8cad90c45a5e7d36e92e06fbe"
     },
     {
       "name": "云南省",
@@ -106492,9 +109326,9 @@
     {
       "name": "陕西省",
       "path": "provinces/shaanxi.txt",
-      "cidr_count": 720,
-      "address_count": 3753244,
-      "sha256": "76552eb5337f240e0e17923acdb23ae7344a49512ebcc571d6767da8426639b4"
+      "cidr_count": 718,
+      "address_count": 3752220,
+      "sha256": "a4c3c9a88da51de3444b4236076130d35a3476bbbf5140c85dafbd7f86ebe14a"
     },
     {
       "name": "甘肃省",
@@ -106523,6 +109357,284 @@
       "cidr_count": 237,
       "address_count": 3750734,
       "sha256": "4b7ccef2e4cdd1f702b3c498cbc6bdc32eb86b6af990db04fe8b25f9f21f103e"
+    },
+    {
+      "name": "BGP prefix admission trial (nationwide, observed)",
+      "path": "experiments/bgp-prefix-admission/nationwide-observed.txt",
+      "cidr_count": 16070,
+      "address_count": 222893699,
+      "sha256": "080542e2526afd77160cd88ee459a4ad090b5fcf3f67f3a5d04bafb81078f746"
+    },
+    {
+      "name": "BGP prefix admission trial (Zhejiang, observed)",
+      "path": "experiments/bgp-prefix-admission/zhejiang-observed.txt",
+      "cidr_count": 2474,
+      "address_count": 15980783,
+      "sha256": "f319742bd28cb1b8f7061a3a1383b011abdb26a910aea474ba9da59132f2483b"
+    },
+    {
+      "name": "BGP prefix admission trial (nationwide, no_ris)",
+      "path": "experiments/bgp-prefix-admission/nationwide-no_ris.txt",
+      "cidr_count": 178,
+      "address_count": 652803,
+      "sha256": "1f8e63e48c1689a26e96f8d5634ab17496f0ff9dab00de11de302187c748474b"
+    },
+    {
+      "name": "BGP prefix admission trial (Zhejiang, no_ris)",
+      "path": "experiments/bgp-prefix-admission/zhejiang-no_ris.txt",
+      "cidr_count": 0,
+      "address_count": 0,
+      "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+    },
+    {
+      "name": "BGP prefix admission trial (nationwide, conflict)",
+      "path": "experiments/bgp-prefix-admission/nationwide-conflict.txt",
+      "cidr_count": 2262,
+      "address_count": 5558478,
+      "sha256": "3e21128f4cc89f7f809a6f9c7d0e90088d27c97728ac3ae6adb110cff7e86928"
+    },
+    {
+      "name": "BGP prefix admission trial (Zhejiang, conflict)",
+      "path": "experiments/bgp-prefix-admission/zhejiang-conflict.txt",
+      "cidr_count": 1138,
+      "address_count": 2021608,
+      "sha256": "29740412f56e2c01c39b80b2361c624a553895423c0009171983961595c683df"
+    },
+    {
+      "name": "BGP prefix admission trial (nationwide, no_parent)",
+      "path": "experiments/bgp-prefix-admission/nationwide-no_parent.txt",
+      "cidr_count": 1765,
+      "address_count": 2532041,
+      "sha256": "4382db9b076efd8daa52d78d111bff7d1b8ec190577d69310fb292a9b84a1ad3"
+    },
+    {
+      "name": "BGP prefix admission trial (Zhejiang, no_parent)",
+      "path": "experiments/bgp-prefix-admission/zhejiang-no_parent.txt",
+      "cidr_count": 18,
+      "address_count": 28416,
+      "sha256": "1fd4713b7c817960ccc90841ba1de29d9f1dc4449f1b7dbfbd7238bbd0f27df1"
+    },
+    {
+      "name": "BGP prefix admission trial (nationwide, covering)",
+      "path": "experiments/bgp-prefix-admission/nationwide-covering.txt",
+      "cidr_count": 12382,
+      "address_count": 214803180,
+      "sha256": "e663e8f1a61bc851303a89ad6f9c26d2a0742ab828de729ebc30b24ce75e6e4f"
+    },
+    {
+      "name": "BGP prefix admission trial (Zhejiang, covering)",
+      "path": "experiments/bgp-prefix-admission/zhejiang-covering.txt",
+      "cidr_count": 1331,
+      "address_count": 13930759,
+      "sha256": "0273f81b877c703dd5e85a92421a6b0bd037a9942c8a3aaa6c34a33a0f62f9b5"
+    },
+    {
+      "name": "BGP prefix admission trial (nationwide, covering_carved)",
+      "path": "experiments/bgp-prefix-admission/nationwide-covering_carved.txt",
+      "cidr_count": 15206,
+      "address_count": 220353883,
+      "sha256": "6067c4b6ea4efe9070a9a271a53e903cfc4f430e828253e7fcaafa82a7f4695c"
+    },
+    {
+      "name": "BGP prefix admission trial (Zhejiang, covering_carved)",
+      "path": "experiments/bgp-prefix-admission/zhejiang-covering_carved.txt",
+      "cidr_count": 2565,
+      "address_count": 15952151,
+      "sha256": "9845104f66500c3a03113bf269a917bdefe8b0c5eb86ced593c5a51911782d7e"
+    },
+    {
+      "name": "BGP prefix admission trial (nationwide, covering_relaxed)",
+      "path": "experiments/bgp-prefix-admission/nationwide-covering_relaxed.txt",
+      "cidr_count": 14077,
+      "address_count": 220986641,
+      "sha256": "9c3eac2c78b5bd8383b06891a082c7ba06a87b6768509652add455f13e5d539f"
+    },
+    {
+      "name": "BGP prefix admission trial (Zhejiang, covering_relaxed)",
+      "path": "experiments/bgp-prefix-admission/zhejiang-covering_relaxed.txt",
+      "cidr_count": 2456,
+      "address_count": 15952367,
+      "sha256": "0be0090303f2af93c078d8689137f0eed0b60b415742f79209a87e038b9f64fe"
+    },
+    {
+      "name": "BGP prefix admission trial (nationwide, hybrid)",
+      "path": "experiments/bgp-prefix-admission/nationwide-hybrid.txt",
+      "cidr_count": 14075,
+      "address_count": 221016593,
+      "sha256": "cab9f28cf82465f1ab1e2b0cc89acbb569668b6b1ed1df6299c765d9527b3551"
+    },
+    {
+      "name": "BGP prefix admission trial (Zhejiang, hybrid)",
+      "path": "experiments/bgp-prefix-admission/zhejiang-hybrid.txt",
+      "cidr_count": 2456,
+      "address_count": 15952367,
+      "sha256": "0be0090303f2af93c078d8689137f0eed0b60b415742f79209a87e038b9f64fe"
+    },
+    {
+      "name": "BGP prefix admission trial (nationwide, relaxed)",
+      "path": "experiments/bgp-prefix-admission/nationwide-relaxed.txt",
+      "cidr_count": 15825,
+      "address_count": 223518938,
+      "sha256": "443c89b5ecf8bbc48dee5f953ff21179650ddacd04e911b4f2e7e6f5989edcc7"
+    },
+    {
+      "name": "BGP prefix admission trial (Zhejiang, relaxed)",
+      "path": "experiments/bgp-prefix-admission/zhejiang-relaxed.txt",
+      "cidr_count": 2474,
+      "address_count": 15980783,
+      "sha256": "f319742bd28cb1b8f7061a3a1383b011abdb26a910aea474ba9da59132f2483b"
+    },
+    {
+      "name": "BGP prefix admission trial (nationwide, any)",
+      "path": "experiments/bgp-prefix-admission/nationwide-any.txt",
+      "cidr_count": 12837,
+      "address_count": 212881628,
+      "sha256": "7cd04c72699ab40c888ee5b29612d4112e59f519d5feb381653b94abf390b442"
+    },
+    {
+      "name": "BGP prefix admission trial (Zhejiang, any)",
+      "path": "experiments/bgp-prefix-admission/zhejiang-any.txt",
+      "cidr_count": 1334,
+      "address_count": 13929735,
+      "sha256": "155f53a1469646abdf560be3e1f0e6e51284c82acd2acabd9249c667f2c7db51"
+    },
+    {
+      "name": "BGP prefix admission trial (nationwide, majority)",
+      "path": "experiments/bgp-prefix-admission/nationwide-majority.txt",
+      "cidr_count": 11825,
+      "address_count": 208102642,
+      "sha256": "91351307fcad9aeb1efea23d71ae6ddf2c4d2d0053d387160e31c0dfcfe96448"
+    },
+    {
+      "name": "BGP prefix admission trial (Zhejiang, majority)",
+      "path": "experiments/bgp-prefix-admission/zhejiang-majority.txt",
+      "cidr_count": 1185,
+      "address_count": 13833531,
+      "sha256": "a15591ae89344311b78d351bb3eee2c01fff1e26468e86dc08acf0fe5dc024e4"
+    },
+    {
+      "name": "BGP prefix admission trial (nationwide, full)",
+      "path": "experiments/bgp-prefix-admission/nationwide-full.txt",
+      "cidr_count": 7356,
+      "address_count": 164286230,
+      "sha256": "3ec42e61a8bf428e2e408612a7fbe400d71f569f6e2686770a33248c4c50b74d"
+    },
+    {
+      "name": "BGP prefix admission trial (Zhejiang, full)",
+      "path": "experiments/bgp-prefix-admission/zhejiang-full.txt",
+      "cidr_count": 578,
+      "address_count": 9683030,
+      "sha256": "102e6d72070453ee32d0e8fe6834066d4b39a8b98be481bdc6f84770c47a6544"
+    },
+    {
+      "name": "BGP relaxed admission delta (nationwide, added versus current dev)",
+      "path": "experiments/bgp-prefix-admission/nationwide-relaxed-added.txt",
+      "cidr_count": 1761,
+      "address_count": 2502345,
+      "sha256": "377eb90c8b200ddd0f69d091b0d72471147ad6494169240c79ec0b72160d4910"
+    },
+    {
+      "name": "BGP relaxed admission delta (nationwide, removed versus current dev)",
+      "path": "experiments/bgp-prefix-admission/nationwide-relaxed-removed.txt",
+      "cidr_count": 0,
+      "address_count": 0,
+      "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+    },
+    {
+      "name": "BGP relaxed admission delta (Zhejiang, added versus current dev)",
+      "path": "experiments/bgp-prefix-admission/zhejiang-relaxed-added.txt",
+      "cidr_count": 18,
+      "address_count": 28416,
+      "sha256": "1fd4713b7c817960ccc90841ba1de29d9f1dc4449f1b7dbfbd7238bbd0f27df1"
+    },
+    {
+      "name": "BGP relaxed admission delta (Zhejiang, removed versus current dev)",
+      "path": "experiments/bgp-prefix-admission/zhejiang-relaxed-removed.txt",
+      "cidr_count": 0,
+      "address_count": 0,
+      "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+    },
+    {
+      "name": "BGP covering-relaxed delta (nationwide, added versus current dev)",
+      "path": "experiments/bgp-prefix-admission/nationwide-covering_relaxed-added.txt",
+      "cidr_count": 0,
+      "address_count": 0,
+      "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+    },
+    {
+      "name": "BGP covering-relaxed delta (nationwide, removed versus current dev)",
+      "path": "experiments/bgp-prefix-admission/nationwide-covering_relaxed-removed.txt",
+      "cidr_count": 5,
+      "address_count": 29952,
+      "sha256": "3f663c9a29992a88abdf3ed829f29a5b6ec5f2ebfca3ca7fedbc376a3d8088d3"
+    },
+    {
+      "name": "BGP covering-relaxed delta (Zhejiang, added versus current dev)",
+      "path": "experiments/bgp-prefix-admission/zhejiang-covering_relaxed-added.txt",
+      "cidr_count": 0,
+      "address_count": 0,
+      "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+    },
+    {
+      "name": "BGP covering-relaxed delta (Zhejiang, removed versus current dev)",
+      "path": "experiments/bgp-prefix-admission/zhejiang-covering_relaxed-removed.txt",
+      "cidr_count": 0,
+      "address_count": 0,
+      "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+    },
+    {
+      "name": "BGP hybrid conflict-healing delta (nationwide, added versus hierarchical baseline)",
+      "path": "experiments/bgp-prefix-admission/nationwide-hybrid-added.txt",
+      "cidr_count": 146,
+      "address_count": 7519,
+      "sha256": "2f7e3311877606bd217e5ca517f8265db972ca2edadb1e529597b5593f762c78"
+    },
+    {
+      "name": "BGP hybrid conflict-healing delta (nationwide, removed versus hierarchical baseline)",
+      "path": "experiments/bgp-prefix-admission/nationwide-hybrid-removed.txt",
+      "cidr_count": 0,
+      "address_count": 0,
+      "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+    },
+    {
+      "name": "BGP hybrid conflict-healing delta (Zhejiang, added versus hierarchical baseline)",
+      "path": "experiments/bgp-prefix-admission/zhejiang-hybrid-added.txt",
+      "cidr_count": 19,
+      "address_count": 216,
+      "sha256": "a5bdcda7a0f2491c29fbf958142e652b45f8b490d326a0260b2ae4383d68de80"
+    },
+    {
+      "name": "BGP hybrid conflict-healing delta (Zhejiang, removed versus hierarchical baseline)",
+      "path": "experiments/bgp-prefix-admission/zhejiang-hybrid-removed.txt",
+      "cidr_count": 0,
+      "address_count": 0,
+      "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+    }
+  ],
+  "audits": [
+    {
+      "name": "zhejiang_apnic_registration",
+      "path": "audits/zhejiang-apnic.json.gz",
+      "human_path": "audits/zhejiang-apnic.md",
+      "cidr_count": 2456,
+      "fact_count": 116726,
+      "address_count": 15952367,
+      "registry_covered_address_count": 15952367,
+      "strong_non_public_signal_address_count": 0,
+      "sha256": "f3cddb08bd14f69d3eb3c99e8420bf7ba7216957f8629780da1f0916f0fc4f71",
+      "human_sha256": "0bb54de2231dc1193043d42627f73e9214f2651f0822c3d0efba0849ab47f431"
+    },
+    {
+      "name": "bgp_relaxed_added_apnic_registration",
+      "path": "audits/bgp-relaxed-added-apnic.json.gz",
+      "human_path": "audits/bgp-relaxed-added-apnic.md",
+      "cidr_count": 1761,
+      "fact_count": 5966,
+      "address_count": 2502345,
+      "registry_covered_address_count": 2502345,
+      "strong_non_public_signal_address_count": 0,
+      "sha256": "81299cada50a458346e590fcdfd0dda32e3d6b4d740bc5c9a8476e034084f33d",
+      "human_sha256": "43b5d562c4a930d4ad718a28c190ddb62db5c1bac8610592a4cd88d52ee1b0d8"
     }
   ]
 }

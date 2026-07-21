@@ -17,6 +17,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/closur3/cn-operator-allowlist/internal/apnicaudit"
 	"github.com/closur3/cn-operator-allowlist/internal/apnicautnum"
 	"github.com/closur3/cn-operator-allowlist/internal/apnicinetnum"
 	"github.com/closur3/cn-operator-allowlist/internal/apnicorg"
@@ -31,6 +32,10 @@ var cloudSources = []string{
 	"ipdata_aliyun", "ipdata_tencent", "ipdata_huawei", "ipdata_ucloud", "ipdata_ksyun", "ipdata_baidu", "ipdata_jdcloud",
 }
 var operators = []string{"chinanet", "cmcc", "unicom"}
+
+const maxAdmissionCIDRExpansionRatio = 2.0
+const maxHybridCIDRRatio = 1.10
+const maxHybridAddedAddressRatio = 0.001
 
 type listMeta struct {
 	Path         string `json:"path"`
@@ -50,6 +55,35 @@ type stageMeta struct {
 	Name         string `json:"name"`
 	CIDRCount    int    `json:"cidr_count"`
 	AddressCount uint64 `json:"address_count"`
+}
+
+type operatorAdmissionMeta struct {
+	Mode                      string  `json:"mode"`
+	PreCIDRCount              int     `json:"pre_cidr_count"`
+	DeniedCIDRCount           int     `json:"denied_cidr_count"`
+	HierarchicalCIDRCount     int     `json:"hierarchical_cidr_count"`
+	ConflictHealedCIDRCount   int     `json:"conflict_healed_cidr_count"`
+	ConflictHealedAddressCount uint64 `json:"conflict_healed_address_count"`
+	FinalCIDRCount            int     `json:"final_cidr_count"`
+	CIDRExpansionRatio        float64 `json:"cidr_expansion_ratio"`
+	MaximumCIDRExpansionRatio float64 `json:"maximum_cidr_expansion_ratio"`
+	HybridCIDRRatio           float64 `json:"hybrid_cidr_ratio"`
+	MaximumHybridCIDRRatio    float64 `json:"maximum_hybrid_cidr_ratio"`
+	HybridAddedAddressRatio   float64 `json:"hybrid_added_address_ratio"`
+	MaximumHybridAddedAddressRatio float64 `json:"maximum_hybrid_added_address_ratio"`
+}
+
+type auditMeta struct {
+	Name                              string `json:"name"`
+	Path                              string `json:"path"`
+	HumanPath                         string `json:"human_path"`
+	CIDRCount                         int    `json:"cidr_count"`
+	FactCount                         int    `json:"fact_count"`
+	AddressCount                      uint64 `json:"address_count"`
+	RegistryCoveredAddressCount       uint64 `json:"registry_covered_address_count"`
+	StrongNonPublicSignalAddressCount uint64 `json:"strong_non_public_signal_address_count"`
+	SHA256                            string `json:"sha256"`
+	HumanSHA256                       string `json:"human_sha256"`
 }
 
 type cloudSourceMeta struct {
@@ -182,6 +216,7 @@ type prefixExclusionMeta struct {
 type manifest struct {
 	Sources                       []sourceMeta          `json:"sources"`
 	Stages                        []stageMeta           `json:"stages"`
+	OperatorAdmission             operatorAdmissionMeta `json:"operator_registration_admission"`
 	CloudSources                  []cloudSourceMeta     `json:"cloud_sources"`
 	APNICInetnum                  apnicSourceMeta       `json:"apnic_inetnum"`
 	APNICPortableHolders          portableHolderMeta    `json:"apnic_portable_holders"`
@@ -192,6 +227,7 @@ type manifest struct {
 	RISWhois                      risSourceMeta         `json:"ris_whois"`
 	ExcludedPrefixes              []prefixExclusionMeta `json:"excluded_prefixes"`
 	Lists                         []listMeta            `json:"lists"`
+	Audits                        []auditMeta           `json:"audits"`
 }
 
 type allowedASNRecord struct {
@@ -372,6 +408,279 @@ func addressCount(rows []span) uint64 {
 		count += uint64(row.hi) - uint64(row.lo) + 1
 	}
 	return count
+}
+
+func zhejiangProvinceRanges(path string) []span {
+	b, err := os.ReadFile(path)
+	if err != nil {
+		panic(err)
+	}
+	var out []span
+	for _, line := range strings.Split(strings.TrimSpace(string(b)), "\n") {
+		fields := strings.Split(strings.TrimSpace(line), "|")
+		if len(fields) != 7 || fields[2] != "中国" || (fields[3] != "浙江" && fields[3] != "浙江省") {
+			continue
+		}
+		lo, loErr := netip.ParseAddr(fields[0])
+		hi, hiErr := netip.ParseAddr(fields[1])
+		if loErr != nil || hiErr != nil || !lo.Is4() || !hi.Is4() {
+			panic("invalid Zhejiang range in ip2region source")
+		}
+		out = append(out, span{n(lo), n(hi)})
+	}
+	return merge(out)
+}
+
+func exclusionRegistrant(entry prefixExclusionMeta) string {
+	for _, values := range [][]string{entry.RegistryOrganizationNames, entry.RegistryDescriptions, entry.RegistryNetnames, entry.RegistryOrganizations} {
+		for _, value := range values {
+			if value = strings.TrimSpace(value); value != "" {
+				return value
+			}
+		}
+	}
+	if entry.Provider != "" {
+		return entry.Provider
+	}
+	return entry.ASNDescription
+}
+
+func provinceExclusionEvidence(entries []prefixExclusionMeta, candidatesByOperator map[string][]span) []apnicaudit.Exclusion {
+	var out []apnicaudit.Exclusion
+	for _, entry := range entries {
+		prefix, err := netip.ParsePrefix(entry.CIDR)
+		if err != nil || !prefix.Addr().Is4() {
+			panic("invalid exclusion CIDR while verifying province audit: " + entry.CIDR)
+		}
+		lo := n(prefix.Addr())
+		hi := uint32(uint64(lo) + (uint64(1) << uint(32-prefix.Bits())) - 1)
+		for _, cidr := range spanCIDRs(intersect(candidatesByOperator[entry.Operator], []span{{lo, hi}})) {
+			p := netip.MustParsePrefix(cidr)
+			out = append(out, apnicaudit.Exclusion{
+				CIDR: cidr, AddressCount: uint64(1) << uint(32-p.Bits()), Source: entry.Source,
+				Category: entry.Category, Operator: entry.Operator, ASN: entry.ASN,
+				Registrant: exclusionRegistrant(entry), Reason: entry.Reason,
+			})
+		}
+	}
+	sort.Slice(out, func(i, j int) bool {
+		a, b := netip.MustParsePrefix(out[i].CIDR), netip.MustParsePrefix(out[j].CIDR)
+		if n(a.Addr()) != n(b.Addr()) {
+			return n(a.Addr()) < n(b.Addr())
+		}
+		if a.Bits() != b.Bits() {
+			return a.Bits() < b.Bits()
+		}
+		if out[i].Category != out[j].Category {
+			return out[i].Category < out[j].Category
+		}
+		return out[i].Reason < out[j].Reason
+	})
+	return out
+}
+
+func apnicOperatorAdmissionRanges(records []apnicinetnum.Record, classifier *operatorconfig.Classifier) map[string][]span {
+	out := map[string][]span{}
+	for _, record := range records {
+		result := classifier.ClassifyAPNICRegistrant(apnicinetnum.SearchText(record))
+		if result.Operator != "" {
+			out[result.Operator] = append(out[result.Operator], span{record.Lo, record.Hi})
+		}
+	}
+	for _, operator := range operators {
+		out[operator] = merge(out[operator])
+	}
+	return out
+}
+
+func apnicOperatorConflictRanges(segments []apnicinetnum.Segment, classifier *operatorconfig.Classifier) map[string][]span {
+	out := map[string][]span{}
+	for _, segment := range segments {
+		result := classifier.ClassifyAPNICRegistrant(apnicinetnum.SearchText(segment.Record))
+		if result.Operator == "" {
+			continue
+		}
+		for _, operator := range operators {
+			if operator != result.Operator {
+				out[operator] = append(out[operator], span{segment.Lo, segment.Hi})
+			}
+		}
+	}
+	for _, operator := range operators {
+		out[operator] = merge(out[operator])
+	}
+	return out
+}
+
+func apnicOperatorLeafAdmissionRanges(segments []apnicinetnum.Segment, classifier *operatorconfig.Classifier) map[string][]span {
+	out := map[string][]span{}
+	for _, segment := range segments {
+		result := classifier.ClassifyAPNICRegistrant(apnicinetnum.SearchText(segment.Record))
+		if result.Operator != "" {
+			out[result.Operator] = append(out[result.Operator], span{segment.Lo, segment.Hi})
+		}
+	}
+	for _, operator := range operators {
+		out[operator] = merge(out[operator])
+	}
+	return out
+}
+
+func intersectSortedSpan(rows []span, lo, hi uint32) []span {
+	i := sort.Search(len(rows), func(i int) bool { return rows[i].hi >= lo })
+	var out []span
+	for ; i < len(rows) && rows[i].lo <= hi; i++ {
+		out = append(out, span{max32(lo, rows[i].lo), min32(hi, rows[i].hi)})
+	}
+	return out
+}
+
+func overlapAddressCountSorted(rows []span, lo, hi uint32) uint64 {
+	var count uint64
+	for _, hit := range intersectSortedSpan(rows, lo, hi) {
+		count += uint64(hit.hi) - uint64(hit.lo) + 1
+	}
+	return count
+}
+
+func bgpPrefixAdmissionTrials(segments []riswhois.Segment, asnOperators map[string]string, originByOperator, retainedByOperator, fallbackByOperator, parentAdmission, leafAdmission, operatorConflicts map[string][]span) map[string][]span {
+	out := map[string][]span{"observed": {}, "no_ris": {}, "conflict": {}, "no_parent": {}, "covering": {}, "covering_carved": {}, "covering_relaxed": {}, "relaxed": {}, "any": {}, "majority": {}, "full": {}}
+	observedByOperator := map[string][]span{}
+	for _, segment := range segments {
+		seenOperators := map[string]bool{}
+		for _, origin := range segment.Record.Origins {
+			operator := asnOperators[origin.ASN]
+			if operator == "" || seenOperators[operator] {
+				continue
+			}
+			seenOperators[operator] = true
+			unit := intersectSortedSpan(originByOperator[operator], segment.Lo, segment.Hi)
+			if len(unit) == 0 {
+				continue
+			}
+			var retained []span
+			for _, part := range unit {
+				retained = append(retained, intersectSortedSpan(retainedByOperator[operator], part.lo, part.hi)...)
+			}
+			if len(retained) == 0 {
+				continue
+			}
+			out["observed"] = append(out["observed"], retained...)
+			out["relaxed"] = append(out["relaxed"], retained...)
+			observedByOperator[operator] = append(observedByOperator[operator], retained...)
+			conflict := false
+			for _, part := range unit {
+				if overlapsSorted(operatorConflicts[operator], part.lo, part.hi) {
+					conflict = true
+					break
+				}
+			}
+			if conflict {
+				out["conflict"] = append(out["conflict"], retained...)
+			}
+			var positive, parentPositive, total uint64
+			for _, part := range unit {
+				positive += overlapAddressCountSorted(leafAdmission[operator], part.lo, part.hi)
+				parentPositive += overlapAddressCountSorted(parentAdmission[operator], part.lo, part.hi)
+				total += uint64(part.hi) - uint64(part.lo) + 1
+			}
+			if total == 0 {
+				continue
+			}
+			if parentPositive == total {
+				out["covering_relaxed"] = append(out["covering_relaxed"], retained...)
+				for _, part := range retained {
+					localConflicts := intersectSortedSpan(operatorConflicts[operator], part.lo, part.hi)
+					out["covering_carved"] = append(out["covering_carved"], subtract([]span{part}, localConflicts)...)
+				}
+				if !conflict {
+					out["covering"] = append(out["covering"], retained...)
+				}
+			} else if !conflict {
+				out["no_parent"] = append(out["no_parent"], retained...)
+			}
+			if conflict {
+				continue
+			}
+			if positive == 0 {
+				continue
+			}
+			out["any"] = append(out["any"], retained...)
+			if positive*2 >= total {
+				out["majority"] = append(out["majority"], retained...)
+			}
+			if positive == total {
+				out["full"] = append(out["full"], retained...)
+			}
+		}
+	}
+	for _, operator := range operators {
+		unobserved := subtract(retainedByOperator[operator], merge(observedByOperator[operator]))
+		out["no_ris"] = append(out["no_ris"], unobserved...)
+		fallback := intersect(unobserved, fallbackByOperator[operator])
+		out["covering_relaxed"] = append(out["covering_relaxed"], fallback...)
+		out["relaxed"] = append(out["relaxed"], fallback...)
+	}
+	for policy := range out {
+		out[policy] = merge(out[policy])
+	}
+	return out
+}
+
+func hybridAdmissionByOperator(hierarchicalByOperator map[string][]span, coveringRelaxed []span, eligibleByOperator map[string][]span) map[string][]span {
+	out := map[string][]span{}
+	for _, operator := range operators {
+		healed := intersect(coveringRelaxed, eligibleByOperator[operator])
+		out[operator] = merge(append(append([]span{}, hierarchicalByOperator[operator]...), healed...))
+	}
+	return out
+}
+
+func auditRegistrant(registry *apnicaudit.Registry) string {
+	if registry == nil {
+		return "(no APNIC registration)"
+	}
+	for _, values := range [][]string{registry.OrganizationNames, registry.Descriptions, registry.Netnames, registry.Organizations} {
+		for _, value := range values {
+			if value = strings.TrimSpace(value); value != "" {
+				return value
+			}
+		}
+	}
+	return "(unnamed APNIC registration)"
+}
+
+func admissionExclusionEvidence(report apnicaudit.Report, deniedByOperator map[string][]span) []apnicaudit.Exclusion {
+	var out []apnicaudit.Exclusion
+	for _, record := range report.CIDRs {
+		for _, fact := range record.Facts {
+			lo := n(netip.MustParseAddr(fact.Start))
+			hi := n(netip.MustParseAddr(fact.End))
+			denied := intersect([]span{{lo, hi}}, deniedByOperator[fact.Operator])
+			for _, cidr := range spanCIDRs(denied) {
+				prefix := netip.MustParsePrefix(cidr)
+				out = append(out, apnicaudit.Exclusion{
+					CIDR: cidr, AddressCount: uint64(1) << uint(32-prefix.Bits()), Source: "apnic_inetnum",
+					Category: "apnic_operator_admission_" + fact.Classification, Operator: fact.Operator,
+					Registrant: auditRegistrant(fact.Registry), Reason: fact.Reason,
+				})
+			}
+		}
+	}
+	return out
+}
+
+func buildRelaxedAddedAudit(cidrs []string, operatorRanges map[string][]apnicaudit.Range, segments []apnicinetnum.Segment, classifier *operatorconfig.Classifier) (apnicaudit.Report, error) {
+	report, err := apnicaudit.Build("Nationwide relaxed-BGP additions versus current dev", cidrs, operatorRanges, segments, classifier)
+	if err != nil {
+		return apnicaudit.Report{}, err
+	}
+	report.Notes = []string{
+		"Every added address has a current China Telecom, China Mobile, or China Unicom RIS origin and has already passed all enforced cloud, APNIC-purpose, independent-holder, route-origin, and strong MOAS exclusions.",
+		"These addresses are absent from the current hybrid dev output because APNIC does not provide a covering positive registration for the same operator; internal three-operator registration conflicts with such a parent are already healed by the formal hybrid policy.",
+		"The report maps every added address to the most-specific APNIC inetnum object so the cost of removing APNIC positive admission can be reviewed as data rather than inferred from CIDR counts.",
+	}
+	return report, nil
 }
 
 func cidrCount(rows []span) int {
@@ -659,7 +968,14 @@ func main() {
 	if len(operatorFiles) != len(operators) {
 		panic("expected exactly three per-operator lists")
 	}
-	files := append(append(append([]string{}, provinceFiles...), operatorFiles...), filepath.Join(*data, "cn.txt"))
+	trialFiles, e := filepath.Glob(filepath.Join(*data, "experiments", "bgp-prefix-admission", "*.txt"))
+	if e != nil {
+		panic(e)
+	}
+	if len(trialFiles) != 36 {
+		panic("expected exactly thirty-six BGP-prefix admission trial, delta, and diagnostic lists")
+	}
+	files := append(append(append(append([]string{}, provinceFiles...), operatorFiles...), trialFiles...), filepath.Join(*data, "cn.txt"))
 
 	for _, f := range files {
 		readCIDRs(f, true)
@@ -832,13 +1148,81 @@ func main() {
 	excludedRanges := merge(append(append([]span{}, preRISExcluded...), risRanges...))
 	logPhase("RIPE RISWhois")
 	assertNoOverlap(cnRanges, excludedRanges, "cn.txt overlaps an explicit cloud, APNIC, independent route-origin, or strong RIS MOAS exclusion")
-	expectedCN := subtract(preCloudCandidates, excludedRanges)
+	operatorAdmissionRanges := apnicOperatorAdmissionRanges(apnicRecords, classifier)
+	operatorConflictRanges := apnicOperatorConflictRanges(apnicAllSegments, classifier)
+	preAdmissionByOperator := map[string][]span{}
+	hierarchicalByOperator := map[string][]span{}
+	admissionDeniedByOperator := map[string][]span{}
+	expectedByOperator := map[string][]span{}
+	var preAdmissionRanges, hierarchicalRanges []span
+	for _, operator := range operators {
+		preAdmissionByOperator[operator] = subtract(intersect(allowedByOperator[operator], chinaRanges), excludedRanges)
+		parentAdmitted := intersect(preAdmissionByOperator[operator], operatorAdmissionRanges[operator])
+		hierarchicalByOperator[operator] = subtract(parentAdmitted, operatorConflictRanges[operator])
+		preAdmissionRanges = append(preAdmissionRanges, preAdmissionByOperator[operator]...)
+		hierarchicalRanges = append(hierarchicalRanges, hierarchicalByOperator[operator]...)
+	}
+	preAdmissionRanges = merge(preAdmissionRanges)
+	hierarchicalRanges = merge(hierarchicalRanges)
+	asnOperators := map[string]string{}
+	for asn, record := range allowedByASN {
+		asnOperators[asn] = record.operator
+	}
+	originByOperator := map[string][]span{}
+	for _, operator := range operators {
+		originByOperator[operator] = intersect(allowedByOperator[operator], chinaRanges)
+	}
+	leafAdmissionRanges := apnicOperatorLeafAdmissionRanges(apnicAllSegments, classifier)
+	bgpAdmissionTrials := bgpPrefixAdmissionTrials(risSegments, asnOperators, originByOperator, preAdmissionByOperator, hierarchicalByOperator, operatorAdmissionRanges, leafAdmissionRanges, operatorConflictRanges)
+	expectedByOperator = hybridAdmissionByOperator(hierarchicalByOperator, bgpAdmissionTrials["covering_relaxed"], preAdmissionByOperator)
+	var admissionDeniedRanges, expectedCN, assignedRanges []span
+	for _, operator := range operators {
+		assertNoOverlap(expectedByOperator[operator], merge(assignedRanges), "hybrid per-operator address sets overlap")
+		assignedRanges = append(assignedRanges, expectedByOperator[operator]...)
+		expectedCN = append(expectedCN, expectedByOperator[operator]...)
+		admissionDeniedByOperator[operator] = subtract(preAdmissionByOperator[operator], expectedByOperator[operator])
+		admissionDeniedRanges = append(admissionDeniedRanges, admissionDeniedByOperator[operator]...)
+	}
+	expectedCN = merge(expectedCN)
+	admissionDeniedRanges = merge(admissionDeniedRanges)
+	bgpAdmissionTrials["hybrid"] = expectedCN
+	bgpHybridAdded := subtract(expectedCN, hierarchicalRanges)
+	bgpHybridRemoved := subtract(hierarchicalRanges, expectedCN)
+	if len(bgpHybridRemoved) != 0 {
+		panic("hybrid admission removes addresses from the hierarchical baseline")
+	}
+	assertContained(bgpHybridAdded, preAdmissionRanges)
+	assertContained(bgpHybridAdded, bgpAdmissionTrials["observed"])
+	assertContained(bgpHybridAdded, bgpAdmissionTrials["covering_relaxed"])
+	var allOperatorConflicts []span
+	for _, operator := range operators {
+		allOperatorConflicts = append(allOperatorConflicts, operatorConflictRanges[operator]...)
+	}
+	assertContained(bgpHybridAdded, merge(allOperatorConflicts))
+	assertNoOverlap(expectedCN, excludedRanges, "hybrid admission overlaps an enforced strong exclusion")
+	preAdmissionCIDRCount := cidrCount(preAdmissionRanges)
+	hierarchicalCIDRCount := cidrCount(hierarchicalRanges)
+	finalCIDRCount := cidrCount(expectedCN)
+	if finalCIDRCount > preAdmissionCIDRCount*2 {
+		panic("operator parent-registration admission exceeds the 2.0x CIDR expansion limit")
+	}
+	admissionExpansionRatio := float64(finalCIDRCount) / float64(preAdmissionCIDRCount)
+	hybridCIDRRatio := float64(finalCIDRCount) / float64(hierarchicalCIDRCount)
+	hybridAddedAddressRatio := float64(addressCount(bgpHybridAdded)) / float64(addressCount(hierarchicalRanges))
+	if hybridCIDRRatio > maxHybridCIDRRatio {
+		panic("hybrid admission exceeds the 1.10x CIDR expansion limit")
+	}
+	if hybridAddedAddressRatio > maxHybridAddedAddressRatio {
+		panic("hybrid admission exceeds the 0.1% added-address limit")
+	}
 	assertEqual(cnRanges, expectedCN, "cn.txt address set does not equal the recomputed final output")
 	var generatedOperators []span
+	generatedByOperator := map[string][]span{}
 	for _, operator := range operators {
 		path := filepath.Join(*data, "operators", operator+".txt")
 		ranges := readCIDRs(path, true)
-		expected := subtract(intersect(allowedByOperator[operator], chinaRanges), excludedRanges)
+		generatedByOperator[operator] = ranges
+		expected := expectedByOperator[operator]
 		assertEqual(ranges, expected, "operator address set does not recompute: "+operator)
 		assertContained(ranges, cnRanges)
 		assertContained(ranges, allowedByOperator[operator])
@@ -846,6 +1230,68 @@ func main() {
 		generatedOperators = append(generatedOperators, ranges...)
 	}
 	assertEqual(generatedOperators, cnRanges, "the union of per-operator lists does not equal cn.txt")
+	zhejiangProvince := zhejiangProvinceRanges(filepath.Join(*sources, "ip2region_ipv4_source.txt"))
+	zhejiangPreAdmissionByOperator := map[string][]span{}
+	zhejiangPreAdmissionOperatorRanges := map[string][]apnicaudit.Range{}
+	var zhejiangPreAdmissionRows, zhejiangHierarchicalRows, expectedZhejiangRows []span
+	for _, operator := range operators {
+		zhejiangPreAdmissionByOperator[operator] = intersect(preAdmissionByOperator[operator], zhejiangProvince)
+		for _, row := range zhejiangPreAdmissionByOperator[operator] {
+			zhejiangPreAdmissionOperatorRanges[operator] = append(zhejiangPreAdmissionOperatorRanges[operator], apnicaudit.Range{Lo: row.lo, Hi: row.hi})
+		}
+		zhejiangPreAdmissionRows = append(zhejiangPreAdmissionRows, zhejiangPreAdmissionByOperator[operator]...)
+		zhejiangHierarchicalRows = append(zhejiangHierarchicalRows, intersect(hierarchicalByOperator[operator], zhejiangProvince)...)
+		expectedZhejiangRows = append(expectedZhejiangRows, intersect(generatedByOperator[operator], zhejiangProvince)...)
+	}
+	zhejiangPreAdmissionRows = merge(zhejiangPreAdmissionRows)
+	zhejiangHierarchicalRows = merge(zhejiangHierarchicalRows)
+	expectedZhejiangRows = merge(expectedZhejiangRows)
+	zhejiangBGPAdmissionTrials := map[string][]span{}
+	for _, policy := range []string{"observed", "no_ris", "conflict", "no_parent", "covering", "covering_carved", "covering_relaxed", "hybrid", "relaxed", "any", "majority", "full"} {
+		zhejiangBGPAdmissionTrials[policy] = intersect(bgpAdmissionTrials[policy], zhejiangProvince)
+		assertEqual(
+			readCIDRs(filepath.Join(*data, "experiments", "bgp-prefix-admission", "nationwide-"+policy+".txt"), true),
+			bgpAdmissionTrials[policy],
+			"nationwide BGP-prefix admission trial does not recompute: "+policy,
+		)
+		assertEqual(
+			readCIDRs(filepath.Join(*data, "experiments", "bgp-prefix-admission", "zhejiang-"+policy+".txt"), true),
+			zhejiangBGPAdmissionTrials[policy],
+			"Zhejiang BGP-prefix admission trial does not recompute: "+policy,
+		)
+	}
+	bgpRelaxedAdded := subtract(bgpAdmissionTrials["relaxed"], cnRanges)
+	bgpRelaxedRemoved := subtract(cnRanges, bgpAdmissionTrials["relaxed"])
+	bgpCoveringRelaxedAdded := subtract(bgpAdmissionTrials["covering_relaxed"], cnRanges)
+	bgpCoveringRelaxedRemoved := subtract(cnRanges, bgpAdmissionTrials["covering_relaxed"])
+	zhejiangBGPRelaxedAdded := subtract(zhejiangBGPAdmissionTrials["relaxed"], expectedZhejiangRows)
+	zhejiangBGPRelaxedRemoved := subtract(expectedZhejiangRows, zhejiangBGPAdmissionTrials["relaxed"])
+	zhejiangBGPCoveringRelaxedAdded := subtract(zhejiangBGPAdmissionTrials["covering_relaxed"], expectedZhejiangRows)
+	zhejiangBGPCoveringRelaxedRemoved := subtract(expectedZhejiangRows, zhejiangBGPAdmissionTrials["covering_relaxed"])
+	zhejiangBGPHybridAdded := subtract(zhejiangBGPAdmissionTrials["hybrid"], zhejiangHierarchicalRows)
+	zhejiangBGPHybridRemoved := subtract(zhejiangHierarchicalRows, zhejiangBGPAdmissionTrials["hybrid"])
+	for _, delta := range []struct {
+		path string
+		rows []span
+	}{
+		{filepath.Join("experiments", "bgp-prefix-admission", "nationwide-relaxed-added.txt"), bgpRelaxedAdded},
+		{filepath.Join("experiments", "bgp-prefix-admission", "nationwide-relaxed-removed.txt"), bgpRelaxedRemoved},
+		{filepath.Join("experiments", "bgp-prefix-admission", "zhejiang-relaxed-added.txt"), zhejiangBGPRelaxedAdded},
+		{filepath.Join("experiments", "bgp-prefix-admission", "zhejiang-relaxed-removed.txt"), zhejiangBGPRelaxedRemoved},
+		{filepath.Join("experiments", "bgp-prefix-admission", "nationwide-covering_relaxed-added.txt"), bgpCoveringRelaxedAdded},
+		{filepath.Join("experiments", "bgp-prefix-admission", "nationwide-covering_relaxed-removed.txt"), bgpCoveringRelaxedRemoved},
+		{filepath.Join("experiments", "bgp-prefix-admission", "zhejiang-covering_relaxed-added.txt"), zhejiangBGPCoveringRelaxedAdded},
+		{filepath.Join("experiments", "bgp-prefix-admission", "zhejiang-covering_relaxed-removed.txt"), zhejiangBGPCoveringRelaxedRemoved},
+		{filepath.Join("experiments", "bgp-prefix-admission", "nationwide-hybrid-added.txt"), bgpHybridAdded},
+		{filepath.Join("experiments", "bgp-prefix-admission", "nationwide-hybrid-removed.txt"), bgpHybridRemoved},
+		{filepath.Join("experiments", "bgp-prefix-admission", "zhejiang-hybrid-added.txt"), zhejiangBGPHybridAdded},
+		{filepath.Join("experiments", "bgp-prefix-admission", "zhejiang-hybrid-removed.txt"), zhejiangBGPHybridRemoved},
+	} {
+		assertEqual(readCIDRs(filepath.Join(*data, delta.path), true), delta.rows, "BGP relaxed-admission delta does not recompute: "+delta.path)
+	}
+	zhejiangPath := filepath.Join(*data, "provinces", "zhejiang.txt")
+	zhejiangRanges := readCIDRs(zhejiangPath, true)
+	assertEqual(zhejiangRanges, expectedZhejiangRows, "Zhejiang list does not equal the nationwide-admitted output intersected with Zhejiang")
 	var provincialRanges []span
 	for _, f := range provinceFiles {
 		ranges := readCIDRs(f, true)
@@ -861,6 +1307,9 @@ func main() {
 	var m manifest
 	if e := json.Unmarshal(b, &m); e != nil {
 		panic(e)
+	}
+	if m.OperatorAdmission.Mode != "hybrid_bgp_conflict_healing_with_strong_exclusions" || m.OperatorAdmission.PreCIDRCount != preAdmissionCIDRCount || m.OperatorAdmission.DeniedCIDRCount != cidrCount(admissionDeniedRanges) || m.OperatorAdmission.HierarchicalCIDRCount != hierarchicalCIDRCount || m.OperatorAdmission.ConflictHealedCIDRCount != cidrCount(bgpHybridAdded) || m.OperatorAdmission.ConflictHealedAddressCount != addressCount(bgpHybridAdded) || m.OperatorAdmission.FinalCIDRCount != finalCIDRCount || m.OperatorAdmission.CIDRExpansionRatio != admissionExpansionRatio || m.OperatorAdmission.MaximumCIDRExpansionRatio != maxAdmissionCIDRExpansionRatio || m.OperatorAdmission.HybridCIDRRatio != hybridCIDRRatio || m.OperatorAdmission.MaximumHybridCIDRRatio != maxHybridCIDRRatio || m.OperatorAdmission.HybridAddedAddressRatio != hybridAddedAddressRatio || m.OperatorAdmission.MaximumHybridAddedAddressRatio != maxHybridAddedAddressRatio {
+		panic("manifest hybrid admission metadata mismatch")
 	}
 	expectedSourceNames := append([]string{"china", "iptoasn_ipv4", "apnic_organisation", "apnic_inetnum", "apnic_autnum", "apnic_route", "riswhois_ipv4", "ip2region_ipv4_source"}, cloudSources...)
 	if len(m.Sources) != len(expectedSourceNames)+1 {
@@ -902,6 +1351,47 @@ func main() {
 		{"effective_apnic_route_exclusions", routeRanges},
 		{"effective_apnic_independent_route_origin_exclusions", routeOriginCandidateRanges},
 		{"effective_ris_moas_exclusions", risRanges},
+		{"pre_operator_parent_registration_admission", preAdmissionRanges},
+		{"operator_parent_registration_admissions", hierarchicalRanges},
+		{"hybrid_bgp_conflict_healed_additions", bgpHybridAdded},
+		{"hybrid_bgp_conflict_healing_admissions", cnRanges},
+		{"hybrid_admission_denials", admissionDeniedRanges},
+		{"trial_bgp_prefix_observed_operator_origin", bgpAdmissionTrials["observed"]},
+		{"trial_bgp_prefix_no_operator_origin", bgpAdmissionTrials["no_ris"]},
+		{"trial_bgp_prefix_operator_conflict_denial", bgpAdmissionTrials["conflict"]},
+		{"trial_bgp_prefix_no_covering_parent_denial", bgpAdmissionTrials["no_parent"]},
+		{"trial_bgp_prefix_covering_parent_admission", bgpAdmissionTrials["covering"]},
+		{"trial_bgp_prefix_covering_parent_with_exact_conflict_carving", bgpAdmissionTrials["covering_carved"]},
+		{"trial_bgp_prefix_covering_parent_relaxed_conflicts", bgpAdmissionTrials["covering_relaxed"]},
+		{"trial_bgp_prefix_covering_parent_relaxed_added_vs_current", bgpCoveringRelaxedAdded},
+		{"trial_bgp_prefix_covering_parent_relaxed_removed_vs_current", bgpCoveringRelaxedRemoved},
+		{"trial_bgp_prefix_hybrid_conflict_healing", bgpAdmissionTrials["hybrid"]},
+		{"trial_bgp_prefix_hybrid_added_vs_hierarchical", bgpHybridAdded},
+		{"trial_bgp_prefix_hybrid_removed_vs_hierarchical", bgpHybridRemoved},
+		{"trial_bgp_prefix_relaxed_admission", bgpAdmissionTrials["relaxed"]},
+		{"trial_bgp_prefix_relaxed_added_vs_current", bgpRelaxedAdded},
+		{"trial_bgp_prefix_relaxed_removed_vs_current", bgpRelaxedRemoved},
+		{"trial_bgp_prefix_any_leaf_admission", bgpAdmissionTrials["any"]},
+		{"trial_bgp_prefix_majority_leaf_admission", bgpAdmissionTrials["majority"]},
+		{"trial_bgp_prefix_full_leaf_admission", bgpAdmissionTrials["full"]},
+		{"trial_zhejiang_bgp_prefix_observed_operator_origin", zhejiangBGPAdmissionTrials["observed"]},
+		{"trial_zhejiang_bgp_prefix_no_operator_origin", zhejiangBGPAdmissionTrials["no_ris"]},
+		{"trial_zhejiang_bgp_prefix_operator_conflict_denial", zhejiangBGPAdmissionTrials["conflict"]},
+		{"trial_zhejiang_bgp_prefix_no_covering_parent_denial", zhejiangBGPAdmissionTrials["no_parent"]},
+		{"trial_zhejiang_bgp_prefix_covering_parent_admission", zhejiangBGPAdmissionTrials["covering"]},
+		{"trial_zhejiang_bgp_prefix_covering_parent_with_exact_conflict_carving", zhejiangBGPAdmissionTrials["covering_carved"]},
+		{"trial_zhejiang_bgp_prefix_covering_parent_relaxed_conflicts", zhejiangBGPAdmissionTrials["covering_relaxed"]},
+		{"trial_zhejiang_bgp_prefix_covering_parent_relaxed_added_vs_current", zhejiangBGPCoveringRelaxedAdded},
+		{"trial_zhejiang_bgp_prefix_covering_parent_relaxed_removed_vs_current", zhejiangBGPCoveringRelaxedRemoved},
+		{"trial_zhejiang_bgp_prefix_hybrid_conflict_healing", zhejiangBGPAdmissionTrials["hybrid"]},
+		{"trial_zhejiang_bgp_prefix_hybrid_added_vs_hierarchical", zhejiangBGPHybridAdded},
+		{"trial_zhejiang_bgp_prefix_hybrid_removed_vs_hierarchical", zhejiangBGPHybridRemoved},
+		{"trial_zhejiang_bgp_prefix_relaxed_admission", zhejiangBGPAdmissionTrials["relaxed"]},
+		{"trial_zhejiang_bgp_prefix_relaxed_added_vs_current", zhejiangBGPRelaxedAdded},
+		{"trial_zhejiang_bgp_prefix_relaxed_removed_vs_current", zhejiangBGPRelaxedRemoved},
+		{"trial_zhejiang_bgp_prefix_any_leaf_admission", zhejiangBGPAdmissionTrials["any"]},
+		{"trial_zhejiang_bgp_prefix_majority_leaf_admission", zhejiangBGPAdmissionTrials["majority"]},
+		{"trial_zhejiang_bgp_prefix_full_leaf_admission", zhejiangBGPAdmissionTrials["full"]},
 		{"final_output", cnRanges},
 		{"province_attributed_output", provincialRanges},
 	}
@@ -1088,6 +1578,100 @@ func main() {
 		manifestExcludedRanges = append(manifestExcludedRanges, row)
 	}
 	assertEqual(manifestExcludedRanges, intersect(preCloudCandidates, excludedRanges), "manifest excluded-prefix union mismatch")
+	if len(m.Audits) != 2 || m.Audits[0].Name != "zhejiang_apnic_registration" || m.Audits[0].Path != "audits/zhejiang-apnic.json.gz" || m.Audits[0].HumanPath != "audits/zhejiang-apnic.md" || m.Audits[1].Name != "bgp_relaxed_added_apnic_registration" || m.Audits[1].Path != "audits/bgp-relaxed-added-apnic.json.gz" || m.Audits[1].HumanPath != "audits/bgp-relaxed-added-apnic.md" {
+		panic("manifest Zhejiang APNIC audit metadata mismatch")
+	}
+	zhejiangCIDRs := strings.Fields(string(mustRead(zhejiangPath)))
+	zhejiangOperatorRanges := map[string][]apnicaudit.Range{}
+	for _, operator := range operators {
+		operatorRows := intersect(readCIDRs(filepath.Join(*data, "operators", operator+".txt"), true), zhejiangRanges)
+		for _, row := range operatorRows {
+			zhejiangOperatorRanges[operator] = append(zhejiangOperatorRanges[operator], apnicaudit.Range{Lo: row.lo, Hi: row.hi})
+		}
+	}
+	expectedAudit, e := apnicaudit.Build("浙江省 retained IPv4 APNIC registration audit", zhejiangCIDRs, zhejiangOperatorRanges, apnicAllSegments, classifier)
+	if e != nil {
+		panic(e)
+	}
+	zhejiangCandidatesByOperator := map[string][]span{}
+	var zhejiangCandidates []span
+	for _, operator := range operators {
+		zhejiangCandidatesByOperator[operator] = intersect(intersect(allowedByOperator[operator], chinaRanges), zhejiangProvince)
+		zhejiangCandidates = append(zhejiangCandidates, zhejiangCandidatesByOperator[operator]...)
+	}
+	zhejiangCandidates = merge(zhejiangCandidates)
+	zhejiangPreAdmissionAudit, e := apnicaudit.Build("浙江省 pre-admission IPv4 APNIC registration audit", spanCIDRs(zhejiangPreAdmissionRows), zhejiangPreAdmissionOperatorRanges, apnicAllSegments, classifier)
+	if e != nil {
+		panic(e)
+	}
+	zhejiangEvidence := provinceExclusionEvidence(m.ExcludedPrefixes, zhejiangCandidatesByOperator)
+	zhejiangEvidence = append(zhejiangEvidence, admissionExclusionEvidence(zhejiangPreAdmissionAudit, admissionDeniedByOperator)...)
+	apnicaudit.AttachComparison(&expectedAudit, addressCount(zhejiangCandidates), addressCount(subtract(zhejiangCandidates, zhejiangRanges)), zhejiangEvidence)
+	auditPath := filepath.Join(*data, filepath.FromSlash(m.Audits[0].Path))
+	auditFile, e := os.Open(auditPath)
+	if e != nil {
+		panic(e)
+	}
+	auditGzip, e := gzip.NewReader(auditFile)
+	if e != nil {
+		panic(e)
+	}
+	var actualAudit apnicaudit.Report
+	decodeErr := json.NewDecoder(auditGzip).Decode(&actualAudit)
+	closeGzipErr := auditGzip.Close()
+	closeFileErr := auditFile.Close()
+	if decodeErr != nil || closeGzipErr != nil || closeFileErr != nil || !reflect.DeepEqual(actualAudit, expectedAudit) {
+		panic("Zhejiang APNIC audit does not recompute")
+	}
+	auditMeta := m.Audits[0]
+	if auditMeta.CIDRCount != actualAudit.Summary.CIDRCount || auditMeta.FactCount != actualAudit.Summary.FactCount || auditMeta.AddressCount != actualAudit.Summary.AddressCount || auditMeta.RegistryCoveredAddressCount != actualAudit.Summary.RegistryCoveredAddressCount || auditMeta.StrongNonPublicSignalAddressCount != actualAudit.Summary.StrongNonPublicSignalAddressCount || auditMeta.SHA256 != fileSHA(auditPath) {
+		panic("manifest Zhejiang APNIC audit summary mismatch")
+	}
+	if actualAudit.Summary.StrongNonPublicSignalAddressCount != 0 {
+		panic(fmt.Sprintf("Zhejiang ACL retains %d addresses that still match an enforced non-public APNIC rule", actualAudit.Summary.StrongNonPublicSignalAddressCount))
+	}
+	humanAuditPath := filepath.Join(*data, filepath.FromSlash(auditMeta.HumanPath))
+	expectedHumanAudit := apnicaudit.RenderMarkdown(expectedAudit, filepath.Base(auditPath))
+	if string(mustRead(humanAuditPath)) != expectedHumanAudit || auditMeta.HumanSHA256 != fileSHA(humanAuditPath) {
+		panic("Zhejiang human-readable APNIC audit does not recompute")
+	}
+	relaxedAddedOperatorRanges := map[string][]apnicaudit.Range{}
+	for _, operator := range operators {
+		for _, row := range intersect(bgpRelaxedAdded, preAdmissionByOperator[operator]) {
+			relaxedAddedOperatorRanges[operator] = append(relaxedAddedOperatorRanges[operator], apnicaudit.Range{Lo: row.lo, Hi: row.hi})
+		}
+	}
+	expectedRelaxedAudit, e := buildRelaxedAddedAudit(spanCIDRs(bgpRelaxedAdded), relaxedAddedOperatorRanges, apnicAllSegments, classifier)
+	if e != nil {
+		panic(e)
+	}
+	relaxedAuditMeta := m.Audits[1]
+	relaxedAuditPath := filepath.Join(*data, filepath.FromSlash(relaxedAuditMeta.Path))
+	relaxedAuditFile, e := os.Open(relaxedAuditPath)
+	if e != nil {
+		panic(e)
+	}
+	relaxedAuditGzip, e := gzip.NewReader(relaxedAuditFile)
+	if e != nil {
+		panic(e)
+	}
+	var actualRelaxedAudit apnicaudit.Report
+	decodeRelaxedErr := json.NewDecoder(relaxedAuditGzip).Decode(&actualRelaxedAudit)
+	closeRelaxedGzipErr := relaxedAuditGzip.Close()
+	closeRelaxedFileErr := relaxedAuditFile.Close()
+	if decodeRelaxedErr != nil || closeRelaxedGzipErr != nil || closeRelaxedFileErr != nil || !reflect.DeepEqual(actualRelaxedAudit, expectedRelaxedAudit) {
+		panic("relaxed BGP added-address APNIC audit does not recompute")
+	}
+	if relaxedAuditMeta.CIDRCount != actualRelaxedAudit.Summary.CIDRCount || relaxedAuditMeta.FactCount != actualRelaxedAudit.Summary.FactCount || relaxedAuditMeta.AddressCount != actualRelaxedAudit.Summary.AddressCount || relaxedAuditMeta.RegistryCoveredAddressCount != actualRelaxedAudit.Summary.RegistryCoveredAddressCount || relaxedAuditMeta.StrongNonPublicSignalAddressCount != actualRelaxedAudit.Summary.StrongNonPublicSignalAddressCount || relaxedAuditMeta.SHA256 != fileSHA(relaxedAuditPath) {
+		panic("manifest relaxed BGP added-address APNIC audit summary mismatch")
+	}
+	if actualRelaxedAudit.Summary.StrongNonPublicSignalAddressCount != 0 {
+		panic(fmt.Sprintf("relaxed BGP additions retain %d addresses that still match an enforced non-public APNIC rule", actualRelaxedAudit.Summary.StrongNonPublicSignalAddressCount))
+	}
+	relaxedHumanAuditPath := filepath.Join(*data, filepath.FromSlash(relaxedAuditMeta.HumanPath))
+	if string(mustRead(relaxedHumanAuditPath)) != apnicaudit.RenderMarkdown(expectedRelaxedAudit, filepath.Base(relaxedAuditPath)) || relaxedAuditMeta.HumanSHA256 != fileSHA(relaxedHumanAuditPath) {
+		panic("relaxed BGP added-address human-readable APNIC audit does not recompute")
+	}
 	if len(m.Lists) != len(files) {
 		panic("manifest list count does not match generated files")
 	}

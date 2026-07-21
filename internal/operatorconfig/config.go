@@ -166,6 +166,21 @@ func Parse(b []byte, order []string) (*Classifier, error) {
 	return c, nil
 }
 
+// ClassifyAPNICRegistrant positively attributes an APNIC inetnum registrant to
+// an operator. ASN-only exceptions and ASN exclusion policy deliberately do
+// not participate: this is evidence about the most-specific registration, not
+// the BGP origin.
+func (c *Classifier) ClassifyAPNICRegistrant(text string) Result {
+	for _, r := range c.rules {
+		for _, pattern := range r.patterns {
+			if pattern.pattern.MatchString(text) {
+				return Result{Operator: r.name, MatchedBy: "description_patterns: " + pattern.source}
+			}
+		}
+	}
+	return Result{}
+}
+
 func (c *Classifier) IsIndependentLegalEntity(text string) bool {
 	for _, pattern := range c.legalEntityPatterns {
 		if pattern.MatchString(text) {
