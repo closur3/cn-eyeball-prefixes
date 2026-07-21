@@ -294,12 +294,13 @@ func firstPassDecision(category string, record apnic6.InetRecord) (bool, string)
 
 func isExplicitUserPurpose(record apnic6.InetRecord) bool {
 	text := strings.ToLower(apnic6.InetSearchText(record))
-	for _, phrase := range []string{"fixed broadband", "user address", "useraddress", "ipv6 address for mobile"} {
+	for _, phrase := range []string{"fixed broadband", "user address", "ipv6 address for mobile"} {
 		if strings.Contains(text, phrase) {
 			return true
 		}
 	}
-	return false
+	compact := strings.NewReplacer("-", "", "_", "", " ", "").Replace(text)
+	return strings.Contains(compact, "useraddress")
 }
 
 func readCIDRs(path string) []ipset6.Range {
