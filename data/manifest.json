@@ -1,12 +1,12 @@
 {
-  "generated_at": "2026-07-21T12:54:27.03076165Z",
+  "generated_at": "2026-07-21T21:39:12.964191067Z",
   "scope": "IPv4; mainland China; current China Telecom, China Mobile, or China Unicom BGP origin plus a covering same-operator APNIC registration; current three-operator BGP units heal internal operator-registration conflict holes after all strong exclusions; small ambiguous customer-use fragments are accepted as best-effort error to keep the ACL deployably compact; dedicated premium backbone ASNs, cloud-provider CIDRs, strong APNIC registrations outside ordinary user access scope, independent holders and route origins, and strong RIPE RIS MOAS evidence are excluded",
   "sources": [
     {
       "name": "operator_config",
       "path": "config/operators.json",
-      "bytes": 9754,
-      "sha256": "f7c8028a3ab9a3f4d0b6a372eae1b182ab53d0432d410bab30fe272f2b82d049"
+      "bytes": 9770,
+      "sha256": "df6706e991e61331cf72f01f5452823db4d9e1b247578972c387fc1851ebc8eb"
     },
     {
       "name": "china",
@@ -17,38 +17,38 @@
     {
       "name": "iptoasn_ipv4",
       "url": "https://iptoasn.com/data/ip2asn-v4.tsv.gz",
-      "bytes": 6885301,
-      "sha256": "d481246230fc072d17bad7575d762c7166e4fbd6ad3da04d42789a23acbae5a9"
+      "bytes": 6886747,
+      "sha256": "8d55cd1c52457c3cf6686d739276e26f7d5899d26818064704d98050f6012c5a"
     },
     {
       "name": "apnic_organisation",
       "url": "https://ftp.apnic.net/apnic/whois/apnic.db.organisation.gz",
-      "bytes": 547119,
-      "sha256": "bf73977cc520234791c2d235cf6cc24a9e6efd96dcfe333fca154095accf8276"
+      "bytes": 547349,
+      "sha256": "1a0f5b954c781767b2a0e888b97bffdafcc3a378b970f41fe10b19132d2f0f07"
     },
     {
       "name": "apnic_inetnum",
       "url": "https://ftp.apnic.net/apnic/whois/apnic.db.inetnum.gz",
-      "bytes": 53549161,
-      "sha256": "09da31aea138771f44b195cdad8d4212b87b2079b2acbafbf064deab35e62839"
+      "bytes": 53554125,
+      "sha256": "6f15305f7b85f1d9d7712ecb9c3ef0cc069b4104b298c4fc103d2cad60529b7c"
     },
     {
       "name": "apnic_autnum",
       "url": "https://ftp.apnic.net/apnic/whois/apnic.db.aut-num.gz",
-      "bytes": 2091221,
-      "sha256": "38cdbfc08334dfe2cda4e87e40f224abf5e87ce1496f5d4b2f819e35e7aeea42"
+      "bytes": 2091261,
+      "sha256": "f4973c8d8e92b2feab82302711ec6fb6705c6cb00669e5b86194c204e8a843be"
     },
     {
       "name": "apnic_route",
       "url": "https://ftp.apnic.net/apnic/whois/apnic.db.route.gz",
-      "bytes": 7904103,
-      "sha256": "927713a99efd6358277a841a9c822cbf5e6da81d93b3260b85945b609125bd4c"
+      "bytes": 7903965,
+      "sha256": "e500a5798bfc316421629e19bdd29039d300162c9ed9c5947c5abf841172fa20"
     },
     {
       "name": "riswhois_ipv4",
       "url": "https://www.ris.ripe.net/dumps/riswhoisdump.IPv4.gz",
-      "bytes": 5373228,
-      "sha256": "400351e8a987e0f555f0b5a43061ac1906e84346ea720e43992a1e144dfb74b7"
+      "bytes": 5375042,
+      "sha256": "aaff82e626dcb84ea057ffbe812a896c7313686c3aa586ed3ca38687d38af43a"
     },
     {
       "name": "ip2region_ipv4_source",
@@ -260,7 +260,7 @@
     }
   ],
   "apnic_inetnum": {
-    "record_count": 1256753,
+    "record_count": 1256931,
     "relevant_record_count": 448027,
     "matched_winning_segment_count": 1740,
     "effective_cidr_count": 2117,
@@ -283,7 +283,7 @@
     "effective_address_count": 2659781
   },
   "apnic_route": {
-    "object_count": 832527,
+    "object_count": 832463,
     "relevant_object_count": 2826,
     "relevant_winning_segment_count": 2888,
     "origin_validated_match_count": 0,
@@ -649,10 +649,10 @@
     ]
   },
   "ris_whois": {
-    "row_count": 1245753,
-    "prefix_count": 1223880,
+    "row_count": 1246126,
+    "prefix_count": 1224177,
     "relevant_prefix_count": 46385,
-    "winning_segment_count": 56412,
+    "winning_segment_count": 56411,
     "candidate_moas_segment_count": 200,
     "strong_evidence_segment_count": 0,
     "retained_ambiguous_moas_segment_count": 200,
@@ -107710,8 +107710,8 @@
       "operator": "chinamobile",
       "description": "CHINAMOBILE-CN China Mobile Communications Group Co., Ltd.",
       "matched_by": "description_patterns: china mobile",
-      "origin_address_count": 17488896,
-      "retained_address_count": 16913896
+      "origin_address_count": 17488384,
+      "retained_address_count": 16913384
     },
     {
       "asn": "24138",
@@ -107750,8 +107750,8 @@
       "operator": "chinamobile",
       "description": "CMNET-V4HEBEI-AS-AP Hebei Mobile Communication Company Limited",
       "matched_by": "description_patterns: cmnet",
-      "origin_address_count": 720896,
-      "retained_address_count": 719360
+      "origin_address_count": 721664,
+      "retained_address_count": 720128
     },
     {
       "asn": "38019",
@@ -107774,8 +107774,8 @@
       "operator": "chinamobile",
       "description": "CMNET-GUANGDONG-AP China Mobile communications corporation",
       "matched_by": "description_patterns: china mobile",
-      "origin_address_count": 844288,
-      "retained_address_count": 832248
+      "origin_address_count": 844032,
+      "retained_address_count": 831992
     },
     {
       "asn": "56041",
@@ -107930,7 +107930,7 @@
       "matched_by": "description_patterns: china ?telecom",
       "exclusion_source": "explicit_policy",
       "reason": "China Telecom CN2 dedicated premium backbone; outside ordinary Internet user access scope",
-      "origin_address_count": 542464
+      "origin_address_count": 542720
     },
     {
       "asn": "4816",
@@ -108452,7 +108452,7 @@
       "matched_by": "description_patterns: china ?telecom",
       "exclusion_source": "description_rule",
       "reason": "ASN description explicitly identifies a dedicated IDC network",
-      "origin_address_count": 62976
+      "origin_address_count": 63232
     },
     {
       "asn": "138982",
@@ -108884,7 +108884,7 @@
       "matched_by": "description_patterns: unicom",
       "exclusion_source": "description_rule",
       "reason": "ASN description explicitly identifies a dedicated IDC network",
-      "origin_address_count": 33536
+      "origin_address_count": 33280
     },
     {
       "asn": "140717",
