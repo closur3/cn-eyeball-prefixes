@@ -38,19 +38,31 @@ type sourceMeta struct {
 }
 
 type outputMeta struct {
-	Path                  string         `json:"path"`
-	PrefixCount           int            `json:"prefix_count"`
-	AdmissionDescriptions []string       `json:"admission_descriptions"`
-	AdmissionMatches      map[string]int `json:"admission_matches"`
+	Path                 string         `json:"path"`
+	PrefixCount          int            `json:"prefix_count"`
+	BGPPrefixesByPurpose map[string]int `json:"bgp_prefixes_by_purpose"`
+}
+
+type registryAdmissionMeta struct {
+	Descriptions          []string       `json:"descriptions"`
+	MatchedInet6numRecords map[string]int `json:"matched_inet6num_records"`
+	EffectiveRanges        map[string]int `json:"effective_ranges"`
 }
 
 type manifest struct {
-	GeneratedAt string                `json:"generated_at"`
-	Sources     map[string]sourceMeta `json:"sources"`
-	Boundary    string                `json:"telecom_boundary"`
-	OutputUnit  string                `json:"output_unit"`
-	Outputs     map[string]outputMeta `json:"outputs"`
-	Rejected    map[string]int        `json:"rejected_bgp_prefixes"`
+	GeneratedAt       string                `json:"generated_at"`
+	Sources           map[string]sourceMeta `json:"sources"`
+	Boundary          string                `json:"telecom_boundary"`
+	OutputUnit        string                `json:"output_unit"`
+	RegistryAdmission registryAdmissionMeta `json:"registry_admission"`
+	Outputs           map[string]outputMeta `json:"outputs"`
+	Rejected          map[string]int        `json:"rejected_bgp_prefixes"`
+}
+
+type admissionRange struct {
+	Lo      netip.Addr
+	Hi      netip.Addr
+	Purpose string
 }
 
 func main() {
@@ -71,7 +83,25 @@ func main() {
 	must(err)
 	registrations, err := apnic6.Parse(*inet6numPath, boundary)
 	must(err)
-	segments := apnic6.ResolveMostSpecific(registrations)
+	resolvedRegistrations := apnic6.ResolveMostSpecific(registrations)
+	admissionRanges := buildAdmissionRanges(resolvedRegistrations)
+	matchedInet6numRecords := map[string]int{"fixed_broadband": 0, "mobile": 0}
+	for _, registration := range registrations {
+		switch registrationPurpose(registration) {
+		case "fixed":
+			matchedInet6numRecords["fixed_broadband"]++
+		case "mobile":
+			matchedInet6numRecords["mobile"]++
+		}
+	}
+	effectiveRanges := map[string]int{"fixed_broadband": 0, "mobile": 0}
+	for _, admission := range admissionRanges {
+		if admission.Purpose == "fixed" {
+			effectiveRanges["fixed_broadband"]++
+		} else {
+			effectiveRanges["mobile"]++
+		}
+	}
 
 	var admitted []netip.Prefix
 	admissionMatches := map[string]int{"fixed_broadband": 0, "mobile": 0}
@@ -84,7 +114,7 @@ func main() {
 			rejected["non_telecom_origin"]++
 			continue
 		}
-		purpose, reason := classifyPrefix(record.Prefix, segments)
+		purpose, reason := classifyPrefix(record.Prefix, admissionRanges)
 		switch purpose {
 		case "fixed":
 			admitted = append(admitted, record.Prefix)
@@ -120,12 +150,16 @@ func main() {
 		Sources: sources,
 		Boundary: telecomBlock,
 		OutputUnit: "exact_current_bgp_prefix",
+		RegistryAdmission: registryAdmissionMeta{
+			Descriptions:           []string{fixedDescription, mobileDescription},
+			MatchedInet6numRecords: matchedInet6numRecords,
+			EffectiveRanges:        effectiveRanges,
+		},
 		Outputs: map[string]outputMeta{
 			"chinatelecom": {
-				Path:                  filepath.ToSlash(*outputPath),
-				PrefixCount:           len(admitted),
-				AdmissionDescriptions: []string{fixedDescription, mobileDescription},
-				AdmissionMatches:      admissionMatches,
+				Path:                 filepath.ToSlash(*outputPath),
+				PrefixCount:          len(admitted),
+				BGPPrefixesByPurpose: admissionMatches,
 			},
 		},
 		Rejected: rejected,
@@ -133,30 +167,42 @@ func main() {
 	must(writeJSON(*manifestPath, result))
 }
 
-func classifyPrefix(prefix netip.Prefix, segments []apnic6.Segment) (string, string) {
+func buildAdmissionRanges(segments []apnic6.Segment) []admissionRange {
+	var out []admissionRange
+	for _, segment := range segments {
+		purpose := registrationPurpose(segment.Record)
+		if purpose == "" {
+			continue
+		}
+		if len(out) > 0 && out[len(out)-1].Purpose == purpose && out[len(out)-1].Hi.Next() == segment.Lo {
+			out[len(out)-1].Hi = segment.Hi
+			continue
+		}
+		out = append(out, admissionRange{Lo: segment.Lo, Hi: segment.Hi, Purpose: purpose})
+	}
+	return out
+}
+
+func classifyPrefix(prefix netip.Prefix, ranges []admissionRange) (string, string) {
 	lo, hi := prefix.Masked().Addr(), lastAddress(prefix)
-	i := sort.Search(len(segments), func(i int) bool { return segments[i].Hi.Compare(lo) >= 0 })
+	i := sort.Search(len(ranges), func(i int) bool { return ranges[i].Hi.Compare(lo) >= 0 })
 	cursor := lo
 	purpose := ""
-	for ; i < len(segments) && segments[i].Lo.Compare(hi) <= 0; i++ {
-		segment := segments[i]
-		if segment.Lo.Compare(cursor) > 0 {
-			return "", "registration_gap"
+	for ; i < len(ranges) && ranges[i].Lo.Compare(hi) <= 0; i++ {
+		admission := ranges[i]
+		if admission.Lo.Compare(cursor) > 0 {
+			return "", "outside_admitted_registry"
 		}
-		value := registrationPurpose(segment.Record)
-		if value == "" {
-			return "", "description_not_admitted"
-		}
-		if purpose != "" && purpose != value {
+		if purpose != "" && purpose != admission.Purpose {
 			return "", "mixed_access_purpose"
 		}
-		purpose = value
-		if segment.Hi.Compare(hi) >= 0 {
+		purpose = admission.Purpose
+		if admission.Hi.Compare(hi) >= 0 {
 			return purpose, ""
 		}
-		cursor = segment.Hi.Next()
+		cursor = admission.Hi.Next()
 	}
-	return "", "registration_gap"
+	return "", "outside_admitted_registry"
 }
 
 func registrationPurpose(record apnic6.Record) string {

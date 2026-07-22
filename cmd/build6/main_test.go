@@ -30,7 +30,7 @@ func TestClassifyPrefixRequiresUniformPositiveCoverage(t *testing.T) {
 	fixed := apnic6.Record{Descriptions: []string{fixedDescription}}
 	mobile := apnic6.Record{Descriptions: []string{mobileDescription}}
 	segments := []apnic6.Segment{{Lo: prefix.Addr(), Hi: lastAddress(prefix), Record: mobile}}
-	if got, reason := classifyPrefix(prefix, segments); got != "mobile" || reason != "" {
+	if got, reason := classifyPrefix(prefix, buildAdmissionRanges(segments)); got != "mobile" || reason != "" {
 		t.Fatalf("uniform mobile prefix: got=%q reason=%q", got, reason)
 	}
 	middle := netip.MustParseAddr("240e:400:8000::")
@@ -38,8 +38,22 @@ func TestClassifyPrefixRequiresUniformPositiveCoverage(t *testing.T) {
 		{Lo: prefix.Addr(), Hi: middle.Prev(), Record: mobile},
 		{Lo: middle, Hi: lastAddress(prefix), Record: fixed},
 	}
-	if got, reason := classifyPrefix(prefix, segments); got != "" || reason != "mixed_access_purpose" {
+	if got, reason := classifyPrefix(prefix, buildAdmissionRanges(segments)); got != "" || reason != "mixed_access_purpose" {
 		t.Fatalf("mixed prefix was admitted: got=%q reason=%q", got, reason)
+	}
+}
+
+func TestNonAdmittedMoreSpecificRegistrationCreatesAdmissionGap(t *testing.T) {
+	prefix := netip.MustParsePrefix("240e:300::/32")
+	middle := netip.MustParseAddr("240e:300:8000::")
+	fixed := apnic6.Record{Descriptions: []string{fixedDescription}}
+	nonAccess := apnic6.Record{Descriptions: []string{"Chinatelecom IPv6 address for IDC"}}
+	segments := []apnic6.Segment{
+		{Lo: prefix.Addr(), Hi: middle.Prev(), Record: fixed},
+		{Lo: middle, Hi: lastAddress(prefix), Record: nonAccess},
+	}
+	if got, reason := classifyPrefix(prefix, buildAdmissionRanges(segments)); got != "" || reason != "outside_admitted_registry" {
+		t.Fatalf("prefix crossing a non-access registration was admitted: got=%q reason=%q", got, reason)
 	}
 }
 
