@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-22T09:17:22.059757552Z",
+  "generated_at": "2026-07-22T11:58:59.7763378Z",
   "sources": {
     "apnic_inet6num": {
       "source": "https://ftp.apnic.net/apnic/whois/apnic.db.inet6num.gz",
@@ -8,13 +8,13 @@
     },
     "iptoasn_ipv6": {
       "source": "https://iptoasn.com/data/ip2asn-v6.tsv.gz",
-      "bytes": 1977110,
-      "sha256": "2b58580cca492b0b1bcbb07cd76f0a4ea6cfcd921b04c9096e2f31a168b01628"
+      "bytes": 1976873,
+      "sha256": "d4fb22a9413d34ee8d9b3aba5445c74bcc7283bc86773762956a20557f177c58"
     },
     "riswhois_ipv6": {
       "source": "https://www.ris.ripe.net/dumps/riswhoisdump.IPv6.gz",
-      "bytes": 1264106,
-      "sha256": "ba64d1bbfce429dc5a2cef7913eab3400ae4099971c49bf99b13a44a99e95212"
+      "bytes": 1265453,
+      "sha256": "a965d58248a1c18dd5833bb4f83242d808f8a2a7f7f97bec800668b1a3bd849e"
     }
   },
   "output_unit": "exact_current_bgp_prefix",
@@ -41,17 +41,1069 @@
       "mobile": 1
     }
   },
+  "curated_admission": {
+    "chinamobile": {
+      "fixed_broadband": [
+        "2409:8a00::/24"
+      ],
+      "mobile": [
+        "2409:8900::/24"
+      ]
+    },
+    "chinaunicom": {
+      "fixed_broadband": [
+        "2408:8200::/24",
+        "2408:8300::/24"
+      ],
+      "mobile": [
+        "2408:8400::/24"
+      ]
+    }
+  },
   "outputs": {
+    "chinamobile": {
+      "path": "data/ipv6/operators/chinamobile.txt",
+      "prefix_count": 9899,
+      "bgp_prefixes_by_purpose": {
+        "fixed_broadband": 4599,
+        "mobile": 5300
+      },
+      "origin_asns": [
+        {
+          "asn": "9808",
+          "description": "CHINAMOBILE-CN China Mobile Communications Group Co., Ltd.",
+          "prefix_count": 3410,
+          "sample_prefixes": [
+            "2409:8910:1200::/40",
+            "2409:8910:1300::/40",
+            "2409:8910:1400::/40",
+            "2409:8910:1500::/40",
+            "2409:8910:1600::/40",
+            "2409:8910:1700::/40",
+            "2409:8910:1800::/40",
+            "2409:8910:1900::/40"
+          ]
+        },
+        {
+          "asn": "24400",
+          "description": "CMNET-V4SHANGHAI-AS-AP Shanghai Mobile Communications Co.,Ltd.",
+          "prefix_count": 526,
+          "sample_prefixes": [
+            "2409:891e::/31",
+            "2409:891e::/32",
+            "2409:891e:fffe::/48",
+            "2409:891e:ffff::/48",
+            "2409:891f::/32",
+            "2409:8a1e:1008::/48",
+            "2409:8a1e:1009::/48",
+            "2409:8a1e:102::/48"
+          ]
+        },
+        {
+          "asn": "24444",
+          "description": "CMNET-V4SHANDONG-AS-AP Shandong Mobile Communication Company Limited",
+          "prefix_count": 196,
+          "sample_prefixes": [
+            "2409:893c:1000::/38",
+            "2409:893c:1400::/38",
+            "2409:893c:1800::/37",
+            "2409:893c:2000::/38",
+            "2409:893c:2400::/39",
+            "2409:893c:2800::/37",
+            "2409:893c:3000::/37",
+            "2409:893c:3800::/38"
+          ]
+        },
+        {
+          "asn": "24445",
+          "description": "CMNET-V4HENAN-AS-AP Henan Mobile Communications Co.,Ltd",
+          "prefix_count": 412,
+          "sample_prefixes": [
+            "2409:8944::/32",
+            "2409:8944:ff00::/43",
+            "2409:8944:ff20::/44",
+            "2409:8944:ff80::/43",
+            "2409:8944:ffa0::/44",
+            "2409:8944:fff0::/44",
+            "2409:8945::/32",
+            "2409:8946::/32"
+          ]
+        },
+        {
+          "asn": "24547",
+          "description": "CMNET-V4HEBEI-AS-AP Hebei Mobile Communication Company Limited",
+          "prefix_count": 1510,
+          "sample_prefixes": [
+            "2409:8904:5210::/44",
+            "2409:8904:5220::/44",
+            "2409:8904:5230::/44",
+            "2409:8904:5260::/44",
+            "2409:8904:5280::/44",
+            "2409:8904:5290::/44",
+            "2409:8904:52a0::/44",
+            "2409:8904:5310::/44"
+          ]
+        },
+        {
+          "asn": "38019",
+          "description": "CMNET-V4TIANJIN-AS-AP tianjin Mobile Communication Company Limited",
+          "prefix_count": 5,
+          "sample_prefixes": [
+            "2409:8902::/32",
+            "2409:8902:fffd::/48",
+            "2409:8902:fffe::/48",
+            "2409:8903::/32",
+            "2409:8a02::/32"
+          ]
+        },
+        {
+          "asn": "56040",
+          "description": "CMNET-GUANGDONG-AP China Mobile communications corporation",
+          "prefix_count": 25,
+          "sample_prefixes": [
+            "2409:8954::/32",
+            "2409:8955::/32",
+            "2409:8956::/32",
+            "2409:8957::/32",
+            "2409:8958::/32",
+            "2409:8959::/32",
+            "2409:895a:75f8::/46",
+            "2409:895a:75fc::/46"
+          ]
+        },
+        {
+          "asn": "56041",
+          "description": "CMNET-ZHEJIANG-AP China Mobile communications corporation",
+          "prefix_count": 1311,
+          "sample_prefixes": [
+            "2409:8928:1ff::/48",
+            "2409:8928:2ff::/48",
+            "2409:8928:3ff::/48",
+            "2409:8928::/32",
+            "2409:8928:ff::/48",
+            "2409:8929:1000::/40",
+            "2409:8929:100::/40",
+            "2409:8929:1100::/40"
+          ]
+        },
+        {
+          "asn": "56042",
+          "description": "CMNET-SHANXI-AP China Mobile communications corporation",
+          "prefix_count": 84,
+          "sample_prefixes": [
+            "2409:890c::/32",
+            "2409:890d::/32",
+            "2409:890e::/32",
+            "2409:890f::/32",
+            "2409:890f:fffc::/48",
+            "2409:890f:fffd::/48",
+            "2409:890f:fffe::/48",
+            "2409:890f:ffff::/48"
+          ]
+        },
+        {
+          "asn": "56044",
+          "description": "CMNET-AS-LIAONING China Mobile communications corporation",
+          "prefix_count": 960,
+          "sample_prefixes": [
+            "2409:8914:1000::/40",
+            "2409:8914:100::/40",
+            "2409:8914:1038::/45",
+            "2409:8914:1040::/45",
+            "2409:8914:1048::/45",
+            "2409:8914:1050::/45",
+            "2409:8914:1060::/44",
+            "2409:8914:1070::/44"
+          ]
+        },
+        {
+          "asn": "56045",
+          "description": "CMNET-JIANGXI-AP China Mobile communications corporation",
+          "prefix_count": 123,
+          "sample_prefixes": [
+            "2409:8938:1000::/40",
+            "2409:8938:1220::/46",
+            "2409:8938:1420::/46",
+            "2409:8938:1620::/46",
+            "2409:8938:1820::/46",
+            "2409:8938:1a00::/40",
+            "2409:8938:1c00::/38",
+            "2409:8938:2000::/38"
+          ]
+        },
+        {
+          "asn": "56046",
+          "description": "CMNET-JIANGSU-AP China Mobile communications corporation",
+          "prefix_count": 835,
+          "sample_prefixes": [
+            "2409:8920:1000::/40",
+            "2409:8920:100::/40",
+            "2409:8920:1100::/40",
+            "2409:8920:1200::/40",
+            "2409:8920:1300::/40",
+            "2409:8920:1400::/40",
+            "2409:8920:1600::/40",
+            "2409:8920:1700::/40"
+          ]
+        },
+        {
+          "asn": "56047",
+          "description": "CMNET-HUNAN-AP China Mobile communications corporation",
+          "prefix_count": 310,
+          "sample_prefixes": [
+            "2409:8950:1000::/40",
+            "2409:8950:200::/40",
+            "2409:8950:400::/40",
+            "2409:8950:600::/40",
+            "2409:8950:800::/40",
+            "2409:8950::/32",
+            "2409:8950::/40",
+            "2409:8950:a00::/40"
+          ]
+        },
+        {
+          "asn": "56048",
+          "description": "CMNET-BEIJING-AP China Mobile Communicaitons Corporation",
+          "prefix_count": 6,
+          "sample_prefixes": [
+            "2409:8900::/32",
+            "2409:8900:fffd::/48",
+            "2409:8900:fffe::/48",
+            "2409:8901::/32",
+            "2409:8a00::/32",
+            "2409:8a01::/32"
+          ]
+        },
+        {
+          "asn": "132525",
+          "description": "CMNET-HEILONGJIANG-CN HeiLongJiang Mobile Communication Company Limited",
+          "prefix_count": 135,
+          "sample_prefixes": [
+            "2409:891a::/32",
+            "2409:891b:1c8::/48",
+            "2409:891b:33fe::/48",
+            "2409:891b:33ff::/48",
+            "2409:891b::/32",
+            "2409:891b:c8::/48",
+            "2409:891c::/32",
+            "2409:891d::/32"
+          ]
+        },
+        {
+          "asn": "134810",
+          "description": "CMNET-JILIN-AS-AP China Mobile Group JiLin communications corporation",
+          "prefix_count": 51,
+          "sample_prefixes": [
+            "2409:8918::/32",
+            "2409:8918:c000::/45",
+            "2409:8919::/32",
+            "2409:8a18:1200::/40",
+            "2409:8a18:1500::/40",
+            "2409:8a18:1800::/40",
+            "2409:8a18:1b00::/40",
+            "2409:8a18:300::/40"
+          ]
+        }
+      ]
+    },
     "chinatelecom": {
       "path": "data/ipv6/operators/chinatelecom.txt",
-      "prefix_count": 2405,
+      "prefix_count": 2397,
       "bgp_prefixes_by_purpose": {
-        "fixed_broadband": 965,
+        "fixed_broadband": 957,
         "mobile": 1440
-      }
+      },
+      "origin_asns": [
+        {
+          "asn": "4134",
+          "description": "CHINANET-BACKBONE No.31,Jin-rong Street",
+          "prefix_count": 102,
+          "sample_prefixes": [
+            "240e:304::/30",
+            "240e:308::/30",
+            "240e:30c::/30",
+            "240e:310::/30",
+            "240e:314::/30",
+            "240e:318::/32",
+            "240e:319::/32",
+            "240e:31a::/32"
+          ]
+        },
+        {
+          "asn": "4809",
+          "description": "CHINATELECOM-CORE-WAN-CN2 China Telecom Next Generation Carrier Network",
+          "prefix_count": 28,
+          "sample_prefixes": [
+            "240e:409:9000::/48",
+            "240e:409:9001::/48",
+            "240e:410:ff00::/48",
+            "240e:411:ff00::/48",
+            "240e:414:e710::/45",
+            "240e:414:e718::/45",
+            "240e:43d:fff1::/48",
+            "240e:43d:fff3::/48"
+          ]
+        },
+        {
+          "asn": "4812",
+          "description": "CHINANET-SH-AP China Telecom Group",
+          "prefix_count": 13,
+          "sample_prefixes": [
+            "240e:388::/32",
+            "240e:389::/32",
+            "240e:38a::/32",
+            "240e:38b::/32",
+            "240e:38c::/32",
+            "240e:38d::/32",
+            "240e:38e::/32",
+            "240e:38f:2623::/48"
+          ]
+        },
+        {
+          "asn": "4847",
+          "description": "CNIX-AP China Networks Inter-Exchange",
+          "prefix_count": 4,
+          "sample_prefixes": [
+            "240e:b04::/32",
+            "240e:b05::/32",
+            "240e:b06::/32",
+            "240e:b07::/32"
+          ]
+        },
+        {
+          "asn": "17638",
+          "description": "CHINATELECOM-TJ-AS-AP ASN for TIANJIN Provincial Net of CT",
+          "prefix_count": 1,
+          "sample_prefixes": [
+            "240e:328::/32"
+          ]
+        },
+        {
+          "asn": "131285",
+          "description": "CHINATELECOM-HUBEI-SHENGJI-5G-NETWORK CHINATELECOM Hubei province Shengji 5G network",
+          "prefix_count": 6,
+          "sample_prefixes": [
+            "240e:45c:8000::/33",
+            "240e:45c::/32",
+            "240e:45c::/33",
+            "240e:45d:8000::/33",
+            "240e:45d::/33",
+            "240e:45f:fffc::/46"
+          ]
+        },
+        {
+          "asn": "132225",
+          "description": "CHINATELECOM-QINGHAI-5G-NETWORK China Telecom",
+          "prefix_count": 180,
+          "sample_prefixes": [
+            "240e:423:10::/44",
+            "240e:423:1400::/44",
+            "240e:423:1410::/44",
+            "240e:423:1420::/44",
+            "240e:423:1430::/44",
+            "240e:423:1900::/44",
+            "240e:423:1910::/44",
+            "240e:423:1920::/44"
+          ]
+        },
+        {
+          "asn": "134419",
+          "description": "CHINATELECOM-GUANGXI-BEIHAI-MAN Beihai",
+          "prefix_count": 18,
+          "sample_prefixes": [
+            "240e:350:5c00::/38",
+            "240e:350:5c03::/48",
+            "240e:350:6000::/38",
+            "240e:351:5c00::/38",
+            "240e:351:6000::/38",
+            "240e:352:5c00::/38",
+            "240e:352:5c00::/40",
+            "240e:352:6000::/38"
+          ]
+        },
+        {
+          "asn": "134762",
+          "description": "CHINANET-LIAONING-DALIAN-MAN CHINANET Liaoning province Dalian MAN network",
+          "prefix_count": 20,
+          "sample_prefixes": [
+            "240e:30c:1a00::/39",
+            "240e:30c:1c00::/38",
+            "240e:30c:2000::/37",
+            "240e:30c:2800::/38",
+            "240e:30c:2c00::/39",
+            "240e:30d:1a00::/39",
+            "240e:30d:1c00::/38",
+            "240e:30d:2000::/37"
+          ]
+        },
+        {
+          "asn": "134767",
+          "description": "CHINANET-SICHUAN-CHENGDU-MAN CHINANET Sichuan province Chengdu MAN network",
+          "prefix_count": 78,
+          "sample_prefixes": [
+            "240e:34c:510e::/48",
+            "240e:34c:510f::/48",
+            "240e:34c:51e0::/44",
+            "240e:34c:51f0::/44",
+            "240e:34c:520e::/48",
+            "240e:34c:520f::/48",
+            "240e:34c:52e0::/44",
+            "240e:34c:52f0::/44"
+          ]
+        },
+        {
+          "asn": "134772",
+          "description": "CHINANET-GUANGDONG-DONGGUAN-MAN CHINANET Guangdong province Dongguan MAN network",
+          "prefix_count": 32,
+          "sample_prefixes": [
+            "240e:3b0:d000::/37",
+            "240e:3b0:d800::/38",
+            "240e:3b1:d000::/37",
+            "240e:3b1:d800::/38",
+            "240e:3b2:d000::/37",
+            "240e:3b2:d800::/38",
+            "240e:3b3:d000::/37",
+            "240e:3b3:d800::/38"
+          ]
+        },
+        {
+          "asn": "134774",
+          "description": "CHINANET-GUANGDONG-SHENZHEN-MAN CHINANET Guangdong province Shenzhen MAN network",
+          "prefix_count": 749,
+          "sample_prefixes": [
+            "240e:3b0:2c00::/38",
+            "240e:3b0:3000::/37",
+            "240e:3b0:3800::/38",
+            "240e:3b0:3c00::/39",
+            "240e:3b1:2c00::/38",
+            "240e:3b1:3000::/37",
+            "240e:3b1:3800::/38",
+            "240e:3b1:3c00::/39"
+          ]
+        },
+        {
+          "asn": "136198",
+          "description": "CHINANET-GUANGDONG-YUEXI-MAN CHINANET Guangdong province Yuexi MAN network",
+          "prefix_count": 2,
+          "sample_prefixes": [
+            "240e:3b0:222f::/48",
+            "240e:3b3:22f0::/44"
+          ]
+        },
+        {
+          "asn": "137401",
+          "description": "CHINATELECOM-HUBEI-HUANGSHI-5G-NETWORK CHINATELECOM Hubei province Huangshi 5G network",
+          "prefix_count": 3,
+          "sample_prefixes": [
+            "240e:45c:1b00::/40",
+            "240e:45c:1d00::/40",
+            "240e:45c:1f00::/40"
+          ]
+        },
+        {
+          "asn": "137402",
+          "description": "CHINATELECOM-HUBEI-SHIYAN-5G-NETWORK CHINATELECOM Hubei province Shiyan 5G network",
+          "prefix_count": 3,
+          "sample_prefixes": [
+            "240e:45c:2700::/40",
+            "240e:45c:2900::/40",
+            "240e:45c:2b00::/40"
+          ]
+        },
+        {
+          "asn": "137694",
+          "description": "CHINATELECOM-XINJIANG-KEZHOU-MAN CHINATELECOM Xinjiang Kezhou MAN network",
+          "prefix_count": 12,
+          "sample_prefixes": [
+            "240e:348:5e00::/39",
+            "240e:348:6000::/38",
+            "240e:348:6400::/39",
+            "240e:349:5e00::/39",
+            "240e:349:6000::/38",
+            "240e:349:6400::/39",
+            "240e:34a:5e00::/39",
+            "240e:34a:6000::/38"
+          ]
+        },
+        {
+          "asn": "140061",
+          "description": "CHINANET-QINGHAI-AS-AP Qinghai Telecom",
+          "prefix_count": 5,
+          "sample_prefixes": [
+            "240e:320::/32",
+            "240e:321::/32",
+            "240e:322::/32",
+            "240e:323::/32",
+            "240e:423::/32"
+          ]
+        },
+        {
+          "asn": "140292",
+          "description": "CHINATELECOM-JIANGSU-SUZHOU-5G-NETWORK CHINATELECOM Jiangsu province Suzhou 5G network",
+          "prefix_count": 568,
+          "sample_prefixes": [
+            "240e:3a0:4812::/48",
+            "240e:3a0:4813::/48",
+            "240e:3a0:4814::/48",
+            "240e:3a0:4815::/48",
+            "240e:3a0:4816::/48",
+            "240e:3a0:4817::/48",
+            "240e:3a0:4818::/48",
+            "240e:3a0:4819::/48"
+          ]
+        },
+        {
+          "asn": "140329",
+          "description": "CHINATELECOM-FUJIAN-FUZHOU-5G-NETWORK CHINATELECOM Fujian province Fuzhou 5G network",
+          "prefix_count": 24,
+          "sample_prefixes": [
+            "240e:378:1000::/37",
+            "240e:378:1800::/39",
+            "240e:378::/36",
+            "240e:379:1000::/37",
+            "240e:379:1800::/39",
+            "240e:379::/36",
+            "240e:37a:1000::/37",
+            "240e:37a:1800::/39"
+          ]
+        },
+        {
+          "asn": "140330",
+          "description": "CHINATELECOM-FUJIAN-XIAMEN-5G-NETWORK CHINATELECOM Fujian province Xiamen 5G network",
+          "prefix_count": 40,
+          "sample_prefixes": [
+            "240e:378:1a00::/39",
+            "240e:378:1c00::/38",
+            "240e:378:2000::/38",
+            "240e:378:2400::/39",
+            "240e:378:aa00::/39",
+            "240e:379:1a00::/39",
+            "240e:379:1c00::/38",
+            "240e:379:2000::/38"
+          ]
+        },
+        {
+          "asn": "140345",
+          "description": "CHINATELECOM-YUNNAN-SHENGJI-5G-NETWORK CHINATELECOM Yunnan province Shengji 5G network",
+          "prefix_count": 197,
+          "sample_prefixes": [
+            "240e:44d:1000::/42",
+            "240e:44d:100::/42",
+            "240e:44d:1100::/42",
+            "240e:44d:1200::/42",
+            "240e:44d:1240::/42",
+            "240e:44d:1300::/42",
+            "240e:44d:1340::/42",
+            "240e:44d:1400::/42"
+          ]
+        },
+        {
+          "asn": "140346",
+          "description": "CHINATELECOM-YUNNAN-KUNMING-5G-NETWORK CHINATELECOM Yunnan province Kunming 5G network",
+          "prefix_count": 4,
+          "sample_prefixes": [
+            "240e:44d:140::/42",
+            "240e:44d:240::/42",
+            "240e:44d:340::/42",
+            "240e:44d:40::/42"
+          ]
+        },
+        {
+          "asn": "140347",
+          "description": "CHINATELECOM-YUNNAN-XISHUANGBANNA-5G-NETWORK CHINATELECOM Yunnan province Xishuangbanna 5G network",
+          "prefix_count": 3,
+          "sample_prefixes": [
+            "240e:44d:5440::/42",
+            "240e:44d:5540::/42",
+            "240e:44d:5640::/42"
+          ]
+        },
+        {
+          "asn": "140348",
+          "description": "CHINATELECOM-YUNNAN-BAOSHAN-5G-NETWORK CHINATELECOM Yunnan province Baoshan 5G network",
+          "prefix_count": 4,
+          "sample_prefixes": [
+            "240e:44d:6340::/42",
+            "240e:44d:6440::/42",
+            "240e:44d:6540::/42",
+            "240e:44d:6640::/42"
+          ]
+        },
+        {
+          "asn": "140349",
+          "description": "CHINATELECOM-YUNNAN-CHUXIONG-5G-NETWORK CHINATELECOM Yunnan province Chuxiong 5G network",
+          "prefix_count": 4,
+          "sample_prefixes": [
+            "240e:44d:2b40::/42",
+            "240e:44d:2c40::/42",
+            "240e:44d:2d40::/42",
+            "240e:44d:2e40::/42"
+          ]
+        },
+        {
+          "asn": "140350",
+          "description": "CHINATELECOM-YUNNAN-DALI-5G-NETWORK CHINATELECOM Yunnan province Dali 5G network",
+          "prefix_count": 4,
+          "sample_prefixes": [
+            "240e:44d:5740::/42",
+            "240e:44d:5840::/42",
+            "240e:44d:5940::/42",
+            "240e:44d:5a40::/42"
+          ]
+        },
+        {
+          "asn": "140351",
+          "description": "CHINATELECOM-YUNNAN-DEHONG-5G-NETWORK CHINATELECOM Yunnan province Dehong 5G network",
+          "prefix_count": 4,
+          "sample_prefixes": [
+            "240e:44d:6840::/42",
+            "240e:44d:6940::/42",
+            "240e:44d:6a40::/42",
+            "240e:44d:6b40::/42"
+          ]
+        },
+        {
+          "asn": "140352",
+          "description": "CHINATELECOM-YUNNAN-DIQING-5G-NETWORK CHINATELECOM Yunnan province Diqing 5G network",
+          "prefix_count": 3,
+          "sample_prefixes": [
+            "240e:44d:7640::/42",
+            "240e:44d:7740::/42",
+            "240e:44d:7840::/42"
+          ]
+        },
+        {
+          "asn": "140353",
+          "description": "CHINATELECOM-YUNNAN-HONGHE-5G-NETWORK CHINATELECOM Yunnan province Honghe 5G network",
+          "prefix_count": 4,
+          "sample_prefixes": [
+            "240e:44d:3540::/42",
+            "240e:44d:3640::/42",
+            "240e:44d:3740::/42",
+            "240e:44d:3840::/42"
+          ]
+        },
+        {
+          "asn": "140354",
+          "description": "CHINATELECOM-YUNNAN-LIJIANG-5G-NETWORK CHINATELECOM Yunnan province Lijiang 5G network",
+          "prefix_count": 4,
+          "sample_prefixes": [
+            "240e:44d:6d40::/42",
+            "240e:44d:6e40::/42",
+            "240e:44d:6f40::/42",
+            "240e:44d:7040::/42"
+          ]
+        },
+        {
+          "asn": "140355",
+          "description": "CHINATELECOM-YUNNAN-LINCANG-5G-NETWORK CHINATELECOM Yunnan province Lincang 5G network",
+          "prefix_count": 4,
+          "sample_prefixes": [
+            "240e:44d:7940::/42",
+            "240e:44d:7a40::/42",
+            "240e:44d:7b40::/42",
+            "240e:44d:7c40::/42"
+          ]
+        },
+        {
+          "asn": "140356",
+          "description": "CHINATELECOM-YUNNAN-NUJIANG-5G-NETWORK CHINATELECOM Yunnan province Nujiang 5G network",
+          "prefix_count": 4,
+          "sample_prefixes": [
+            "240e:44d:7240::/42",
+            "240e:44d:7340::/42",
+            "240e:44d:7440::/42",
+            "240e:44d:7540::/42"
+          ]
+        },
+        {
+          "asn": "140357",
+          "description": "CHINATELECOM-YUNNAN-PUER-5G-NETWORK CHINATELECOM Yunnan province Puer 5G network",
+          "prefix_count": 4,
+          "sample_prefixes": [
+            "240e:44d:4a40::/42",
+            "240e:44d:4b40::/42",
+            "240e:44d:4c40::/42",
+            "240e:44d:4d40::/42"
+          ]
+        },
+        {
+          "asn": "140358",
+          "description": "CHINATELECOM-YUNNAN-QUJING-5G-NETWORK CHINATELECOM Yunnan province Qujing 5G network",
+          "prefix_count": 4,
+          "sample_prefixes": [
+            "240e:44d:1040::/42",
+            "240e:44d:1140::/42",
+            "240e:44d:e40::/42",
+            "240e:44d:f40::/42"
+          ]
+        },
+        {
+          "asn": "140359",
+          "description": "CHINATELECOM-YUNNAN-WENSHAN-5G-NETWORK CHINATELECOM Yunnan province Wenshan 5G network",
+          "prefix_count": 4,
+          "sample_prefixes": [
+            "240e:44d:4240::/42",
+            "240e:44d:4340::/42",
+            "240e:44d:4440::/42",
+            "240e:44d:4540::/42"
+          ]
+        },
+        {
+          "asn": "140360",
+          "description": "CHINATELECOM-YUNNAN-YUXI-5G-NETWORK CHINATELECOM Yunnan province Yuxi 5G network",
+          "prefix_count": 4,
+          "sample_prefixes": [
+            "240e:44d:1740::/42",
+            "240e:44d:1840::/42",
+            "240e:44d:1940::/42",
+            "240e:44d:1a40::/42"
+          ]
+        },
+        {
+          "asn": "140361",
+          "description": "CHINATELECOM-YUNNAN-ZHAOTONG-5G-NETWORK CHINATELECOM Yunnan province Zhaotong 5G network",
+          "prefix_count": 4,
+          "sample_prefixes": [
+            "240e:44d:2040::/42",
+            "240e:44d:2140::/42",
+            "240e:44d:2240::/42",
+            "240e:44d:2340::/42"
+          ]
+        },
+        {
+          "asn": "140485",
+          "description": "CHINATELECOM-ZHEJIANG-HANGZHOU-5GC-NETWORK CHINATELECOM ZHEJIANG province HANGZHOU 5GC network",
+          "prefix_count": 7,
+          "sample_prefixes": [
+            "240e:473::/32",
+            "240e:473:ddff::/48",
+            "240e:473:eeec::/48",
+            "240e:473:eeed::/48",
+            "240e:473:eeee::/48",
+            "240e:473:ff00::/48",
+            "240e:473:ffff::/48"
+          ]
+        },
+        {
+          "asn": "140486",
+          "description": "CHINATELECOM-ZHEJIANG-JINHUA-5GC-NETWORK CHINATELECOM ZHEJIANG province JINHUA 5GC network",
+          "prefix_count": 5,
+          "sample_prefixes": [
+            "240e:471::/32",
+            "240e:471:eeec::/48",
+            "240e:471:eeed::/48",
+            "240e:473:ff01::/48",
+            "240e:473:fffe::/48"
+          ]
+        },
+        {
+          "asn": "140494",
+          "description": "CHINATELECOM-ZHEJIANG-HUZHOU-5G-NETWORK CHINATELECOM ZHEJIANG province HUZHOU 5G network",
+          "prefix_count": 11,
+          "sample_prefixes": [
+            "240e:390:5540::/44",
+            "240e:390:5550::/44",
+            "240e:390:5560::/44",
+            "240e:390:5570::/44",
+            "240e:390:5580::/44",
+            "240e:390:5590::/44",
+            "240e:390:5d00::/44",
+            "240e:390:5d10::/44"
+          ]
+        },
+        {
+          "asn": "140528",
+          "description": "CHINATELECOM-HUBEI-YICHANG-5G-NETWORK CHINATELECOM Hubei province Yichang 5G network",
+          "prefix_count": 3,
+          "sample_prefixes": [
+            "240e:45c:3700::/40",
+            "240e:45c:3900::/40",
+            "240e:45c:3b00::/40"
+          ]
+        },
+        {
+          "asn": "140529",
+          "description": "CHINATELECOM-HUBEI-XIANGYANG-5G-NETWORK CHINATELECOM Hubei province Xiangyang 5G network",
+          "prefix_count": 3,
+          "sample_prefixes": [
+            "240e:45c:5100::/40",
+            "240e:45c:5300::/40",
+            "240e:45c:5500::/40"
+          ]
+        },
+        {
+          "asn": "140530",
+          "description": "CHINATELECOM-HUBEI-EZHOU-5G-NETWORK CHINATELECOM Hubei province Ezhou 5G network",
+          "prefix_count": 3,
+          "sample_prefixes": [
+            "240e:45c:6300::/40",
+            "240e:45c:6500::/40",
+            "240e:45c:6700::/40"
+          ]
+        },
+        {
+          "asn": "140531",
+          "description": "CHINATELECOM-HUBEI-JINGMEN-5G-NETWORK CHINATELECOM Hubei province Jingmen 5G network",
+          "prefix_count": 3,
+          "sample_prefixes": [
+            "240e:45c:6900::/40",
+            "240e:45c:6b00::/40",
+            "240e:45c:6d00::/40"
+          ]
+        },
+        {
+          "asn": "140532",
+          "description": "CHINATELECOM-HUBEI-XIAOGAN-5G-NETWORK CHINATELECOM Hubei province Xiaogan 5G network",
+          "prefix_count": 3,
+          "sample_prefixes": [
+            "240e:45c:7300::/40",
+            "240e:45c:7500::/40",
+            "240e:45c:7700::/40"
+          ]
+        },
+        {
+          "asn": "140533",
+          "description": "CHINATELECOM-HUBEI-JINGZHOU-5G-NETWORK CHINATELECOM Hubei province Jingzhou 5G network",
+          "prefix_count": 3,
+          "sample_prefixes": [
+            "240e:45c:8100::/40",
+            "240e:45c:8300::/40",
+            "240e:45c:8500::/40"
+          ]
+        },
+        {
+          "asn": "140534",
+          "description": "CHINATELECOM-HUBEI-HUANGGANG-5G-NETWORK CHINATELECOM Hubei province Huanggang 5G network",
+          "prefix_count": 3,
+          "sample_prefixes": [
+            "240e:45c:9100::/40",
+            "240e:45c:9300::/40",
+            "240e:45c:9500::/40"
+          ]
+        },
+        {
+          "asn": "140535",
+          "description": "CHINATELECOM-HUBEI-XIANNING-5G-NETWORK CHINATELECOM Hubei province Xianning 5G network",
+          "prefix_count": 3,
+          "sample_prefixes": [
+            "240e:45c:a500::/40",
+            "240e:45c:a700::/40",
+            "240e:45c:a900::/40"
+          ]
+        },
+        {
+          "asn": "140536",
+          "description": "CHINATELECOM-HUBEI-SUIZHOU-5G-NETWORK CHINATELECOM Hubei province Suizhou 5G network",
+          "prefix_count": 3,
+          "sample_prefixes": [
+            "240e:45c:c100::/40",
+            "240e:45c:c300::/40",
+            "240e:45c:c500::/40"
+          ]
+        },
+        {
+          "asn": "140537",
+          "description": "CHINATELECOM-HUBEI-ENSHI-5G-NETWORK CHINATELECOM Hubei province Enshi 5G network",
+          "prefix_count": 3,
+          "sample_prefixes": [
+            "240e:45c:b100::/40",
+            "240e:45c:b300::/40",
+            "240e:45c:b500::/40"
+          ]
+        },
+        {
+          "asn": "140538",
+          "description": "CHINATELECOM-HUBEI-XIANTAO-5G-NETWORK CHINATELECOM Hubei province Xiantao 5G network",
+          "prefix_count": 3,
+          "sample_prefixes": [
+            "240e:45c:c700::/40",
+            "240e:45c:c900::/40",
+            "240e:45c:cb00::/40"
+          ]
+        },
+        {
+          "asn": "140553",
+          "description": "CHINATELECOM-XINJIANG-SHENGJI-5G-NETWORK CHINATELECOM XINJIANG province Shengji 5G network",
+          "prefix_count": 1,
+          "sample_prefixes": [
+            "240e:449::/32"
+          ]
+        },
+        {
+          "asn": "140647",
+          "description": "CHINATELECOM-GUIZHOU-SHENGJI-5G-NETWORK CHINATELECOM Guizhou province Shengji 5G network",
+          "prefix_count": 181,
+          "sample_prefixes": [
+            "240e:438:1020::/44",
+            "240e:438:1030::/44",
+            "240e:438:1220::/44",
+            "240e:438:1230::/44",
+            "240e:438:1420::/44",
+            "240e:438:1430::/44",
+            "240e:438:1620::/44",
+            "240e:438:1630::/44"
+          ]
+        },
+        {
+          "asn": "151058",
+          "description": "CT-HAINAN China Telecom",
+          "prefix_count": 12,
+          "sample_prefixes": [
+            "240e:314::/32",
+            "240e:315::/32",
+            "240e:316::/32",
+            "240e:317::/32",
+            "240e:414::/32",
+            "240e:415::/32",
+            "240e:416::/32",
+            "240e:417::/32"
+          ]
+        }
+      ]
+    },
+    "chinaunicom": {
+      "path": "data/ipv6/operators/chinaunicom.txt",
+      "prefix_count": 2983,
+      "bgp_prefixes_by_purpose": {
+        "fixed_broadband": 473,
+        "mobile": 2510
+      },
+      "origin_asns": [
+        {
+          "asn": "4808",
+          "description": "CHINA169-BJ China Unicom Beijing Province Network",
+          "prefix_count": 828,
+          "sample_prefixes": [
+            "2408:8206:4000::/34",
+            "2408:8206:8000::/34",
+            "2408:8206::/34",
+            "2408:8206:c000::/34",
+            "2408:8207:4000::/34",
+            "2408:8207:8000::/34",
+            "2408:8207::/34",
+            "2408:8207:c000::/34"
+          ]
+        },
+        {
+          "asn": "4837",
+          "description": "CHINA169-BACKBONE CHINA UNICOM China169 Backbone",
+          "prefix_count": 202,
+          "sample_prefixes": [
+            "2408:8210::/32",
+            "2408:8211::/32",
+            "2408:8212::/32",
+            "2408:8213::/32",
+            "2408:8214::/32",
+            "2408:8215::/32",
+            "2408:821a::/32",
+            "2408:821b::/32"
+          ]
+        },
+        {
+          "asn": "9929",
+          "description": "CUII CHINA UNICOM Industrial Internet Backbone",
+          "prefix_count": 93,
+          "sample_prefixes": [
+            "2408:8256:226d::/48",
+            "2408:8256:228b::/48",
+            "2408:827a:8ff::/48",
+            "2408:8411:c0c0::/48",
+            "2408:8411:c0c1::/48",
+            "2408:8411:c0c2::/48",
+            "2408:8411:c0c3::/48",
+            "2408:8411:c0c4::/48"
+          ]
+        },
+        {
+          "asn": "17621",
+          "description": "CNCGROUP-SH China Unicom Shanghai network",
+          "prefix_count": 336,
+          "sample_prefixes": [
+            "2408:820c:10::/44",
+            "2408:820c:1a00::/44",
+            "2408:820c:1a10::/44",
+            "2408:820c:1a20::/44",
+            "2408:820c:1a30::/44",
+            "2408:820c:1a40::/44",
+            "2408:820c:1a50::/44",
+            "2408:820c:20::/44"
+          ]
+        },
+        {
+          "asn": "17622",
+          "description": "CNCGROUP-GZ China Unicom Guangzhou network",
+          "prefix_count": 934,
+          "sample_prefixes": [
+            "2408:8256:1000::/37",
+            "2408:8256:1000::/39",
+            "2408:8256:1200::/39",
+            "2408:8256:1400::/39",
+            "2408:8256:1600::/39",
+            "2408:8256:200::/39",
+            "2408:8256:400::/39",
+            "2408:8256:600::/39"
+          ]
+        },
+        {
+          "asn": "17623",
+          "description": "CNCGROUP-SZ China Unicom Shenzen network",
+          "prefix_count": 420,
+          "sample_prefixes": [
+            "2408:8256:2c00::/39",
+            "2408:8256:2c00::/44",
+            "2408:8256:2d00::/44",
+            "2408:8256:2e00::/39",
+            "2408:8256:3000::/39",
+            "2408:8256:3000::/44",
+            "2408:8256:3010::/44",
+            "2408:8256:3020::/44"
+          ]
+        },
+        {
+          "asn": "17816",
+          "description": "CHINA169-GZ China Unicom IP network China169 Guangdong province",
+          "prefix_count": 19,
+          "sample_prefixes": [
+            "2408:8256::/32",
+            "2408:8257::/32",
+            "2408:8258::/32",
+            "2408:8259::/32",
+            "2408:825a::/32",
+            "2408:825b::/32",
+            "2408:8356::/32",
+            "2408:8357::/32"
+          ]
+        },
+        {
+          "asn": "140726",
+          "description": "UNICOM-HEFEI-MAN UNICOM AnHui province network",
+          "prefix_count": 151,
+          "sample_prefixes": [
+            "2408:8244:1000::/40",
+            "2408:8244:100::/40",
+            "2408:8244:1100::/40",
+            "2408:8244:200::/40",
+            "2408:8244:300::/40",
+            "2408:8244:400::/40",
+            "2408:8244:500::/40",
+            "2408:8244:600::/40"
+          ]
+        }
+      ]
     }
   },
   "rejected_bgp_prefixes": {
-    "outside_admitted_registry": 2
+    "chinamobile": {
+      "outside_admitted_registry": 2
+    },
+    "chinatelecom": {
+      "non_operator_origin": 8,
+      "outside_admitted_registry": 2
+    },
+    "chinaunicom": {
+      "non_operator_origin": 786,
+      "outside_admitted_registry": 1
+    }
   }
 }
