@@ -1,4 +1,4 @@
-name: Generate China Telecom IPv6 access prefixes
+name: Generate operator IPv6 access prefixes
 
 on:
   push:
@@ -12,14 +12,14 @@ permissions:
   contents: write
 
 concurrency:
-  group: generate-chinanet-ipv6-${{ github.ref }}
+  group: generate-operator-ipv6-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
   generate:
     runs-on: ubuntu-latest
     env:
-      SOURCE_DIR: ${{ github.workspace }}/.tmp/chinanet-ipv6-sources
+      SOURCE_DIR: ${{ github.workspace }}/.tmp/operator-ipv6-sources
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-go@v6
@@ -44,18 +44,21 @@ jobs:
           test $(stat -c '%s' "$SOURCE_DIR/apnic.db.inet6num.gz") -gt 1000000
       - name: Test
         run: go test ./...
-      - name: Generate China Telecom access prefixes
+      - name: Generate operator access prefixes
         shell: bash
         run: |
           go run ./cmd/build6 \
             --ris "$SOURCE_DIR/riswhois-ipv6.gz" \
             --iptoasn "$SOURCE_DIR/ip2asn-v6.tsv.gz" \
-            --inet6num "$SOURCE_DIR/apnic.db.inet6num.gz"
+            --inet6num "$SOURCE_DIR/apnic.db.inet6num.gz" \
+            --operator-config config/operators.json
           test -s data/ipv6/operators/chinatelecom.txt
+          test -s data/ipv6/operators/chinamobile.txt
+          test -s data/ipv6/operators/chinaunicom.txt
           test -s data/ipv6/manifest.json
       - uses: actions/upload-artifact@v4
         with:
-          name: chinanet-ipv6-access-prefixes
+          name: operator-ipv6-access-prefixes
           path: data/ipv6/
       - name: Commit generated lists
         shell: bash
@@ -64,5 +67,5 @@ jobs:
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add -A data/ipv6
           if git diff --cached --quiet; then exit 0; fi
-          git commit -m 'chore: update China Telecom IPv6 access prefixes'
+          git commit -m 'chore: update operator IPv6 access prefixes'
           git push
