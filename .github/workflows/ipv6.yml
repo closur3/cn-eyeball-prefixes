@@ -26,22 +26,6 @@ jobs:
         with:
           go-version: '1.26'
           cache: true
-          cache-dependency-path: go.mod
-      - name: Resolve IP2Location release
-        id: ip2location
-        shell: bash
-        run: |
-          set -euo pipefail
-          tag=$(curl --fail --silent --show-error --location --retry 3 \
-            'https://api.github.com/repos/renfei/ip2location/releases/latest' | jq -r '.tag_name')
-          test -n "$tag"
-          test "$tag" != null
-          echo "tag=$tag" >> "$GITHUB_OUTPUT"
-      - name: Cache IP2Location DB11 IPv6
-        uses: actions/cache@v5
-        with:
-          path: ${{ env.SOURCE_DIR }}/IP2LOCATION-LITE-DB11.IPV6.BIN
-          key: ip2location-db11-ipv6-${{ steps.ip2location.outputs.tag }}
       - name: Download sources
         shell: bash
         run: |
@@ -51,11 +35,6 @@ jobs:
           curl "${curl_opts[@]}" 'https://www.ris.ripe.net/dumps/riswhoisdump.IPv6.gz' -o "$SOURCE_DIR/riswhois-ipv6.gz"
           curl "${curl_opts[@]}" 'https://iptoasn.com/data/ip2asn-v6.tsv.gz' -o "$SOURCE_DIR/ip2asn-v6.tsv.gz"
           curl "${curl_opts[@]}" 'https://ftp.apnic.net/apnic/whois/apnic.db.inet6num.gz' -o "$SOURCE_DIR/apnic.db.inet6num.gz"
-          if [[ ! -s "$SOURCE_DIR/IP2LOCATION-LITE-DB11.IPV6.BIN" ]]; then
-            curl "${curl_opts[@]}" \
-              "https://github.com/renfei/ip2location/releases/download/${{ steps.ip2location.outputs.tag }}/IP2LOCATION-LITE-DB11.IPV6.BIN" \
-              -o "$SOURCE_DIR/IP2LOCATION-LITE-DB11.IPV6.BIN"
-          fi
       - name: Validate sources
         shell: bash
         run: |
@@ -63,9 +42,6 @@ jobs:
           test $(stat -c '%s' "$SOURCE_DIR/riswhois-ipv6.gz") -gt 1000000
           test $(stat -c '%s' "$SOURCE_DIR/ip2asn-v6.tsv.gz") -gt 100000
           test $(stat -c '%s' "$SOURCE_DIR/apnic.db.inet6num.gz") -gt 1000000
-          test $(stat -c '%s' "$SOURCE_DIR/IP2LOCATION-LITE-DB11.IPV6.BIN") -gt 200000000
-      - name: Resolve Go dependencies
-        run: go mod tidy
       - name: Test
         run: go test ./...
       - name: Generate operator access prefixes
@@ -80,15 +56,6 @@ jobs:
           test -s data/ipv6/operators/chinamobile.txt
           test -s data/ipv6/operators/chinaunicom.txt
           test -s data/ipv6/manifest.json
-      - name: Generate IP2Location province audit
-        shell: bash
-        run: |
-          go run ./cmd/audit6geo \
-            --db "$SOURCE_DIR/IP2LOCATION-LITE-DB11.IPV6.BIN" \
-            --release-tag '${{ steps.ip2location.outputs.tag }}'
-          test -s data/ipv6/audits/ip2location-provinces.json
-          test -s data/ipv6/audits/ip2location-provinces.md
-          test -d data/ipv6/provinces
       - uses: actions/upload-artifact@v4
         with:
           name: operator-ipv6-access-prefixes
@@ -98,7 +65,7 @@ jobs:
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add -A data/ipv6 go.mod go.sum
+          git add -A data/ipv6
           if git diff --cached --quiet; then exit 0; fi
           git commit -m 'chore: update operator IPv6 access prefixes'
           git push
