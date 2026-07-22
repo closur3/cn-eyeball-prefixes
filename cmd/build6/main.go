@@ -44,9 +44,10 @@ type outputMeta struct {
 }
 
 type registryAdmissionMeta struct {
-	Descriptions          []string       `json:"descriptions"`
-	MatchedInet6numRecords map[string]int `json:"matched_inet6num_records"`
-	EffectiveRanges        map[string]int `json:"effective_ranges"`
+	Descriptions           []string            `json:"descriptions"`
+	MatchedInet6numRecords  map[string]int      `json:"matched_inet6num_records"`
+	MatchedInet6numPrefixes map[string][]string `json:"matched_inet6num_prefixes"`
+	EffectiveRanges         map[string]int      `json:"effective_ranges"`
 }
 
 type manifest struct {
@@ -86,14 +87,19 @@ func main() {
 	resolvedRegistrations := apnic6.ResolveMostSpecific(registrations)
 	admissionRanges := buildAdmissionRanges(resolvedRegistrations)
 	matchedInet6numRecords := map[string]int{"fixed_broadband": 0, "mobile": 0}
+	matchedInet6numPrefixes := map[string][]string{"fixed_broadband": {}, "mobile": {}}
 	for _, registration := range registrations {
 		switch registrationPurpose(registration) {
 		case "fixed":
 			matchedInet6numRecords["fixed_broadband"]++
+			matchedInet6numPrefixes["fixed_broadband"] = append(matchedInet6numPrefixes["fixed_broadband"], registration.Prefix.String())
 		case "mobile":
 			matchedInet6numRecords["mobile"]++
+			matchedInet6numPrefixes["mobile"] = append(matchedInet6numPrefixes["mobile"], registration.Prefix.String())
 		}
 	}
+	sort.Strings(matchedInet6numPrefixes["fixed_broadband"])
+	sort.Strings(matchedInet6numPrefixes["mobile"])
 	effectiveRanges := map[string]int{"fixed_broadband": 0, "mobile": 0}
 	for _, admission := range admissionRanges {
 		if admission.Purpose == "fixed" {
@@ -152,8 +158,9 @@ func main() {
 		OutputUnit: "exact_current_bgp_prefix",
 		RegistryAdmission: registryAdmissionMeta{
 			Descriptions:           []string{fixedDescription, mobileDescription},
-			MatchedInet6numRecords: matchedInet6numRecords,
-			EffectiveRanges:        effectiveRanges,
+			MatchedInet6numRecords:  matchedInet6numRecords,
+			MatchedInet6numPrefixes: matchedInet6numPrefixes,
+			EffectiveRanges:         effectiveRanges,
 		},
 		Outputs: map[string]outputMeta{
 			"chinatelecom": {
