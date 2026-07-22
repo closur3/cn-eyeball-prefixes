@@ -1,20 +1,20 @@
 {
-  "generated_at": "2026-07-22T11:58:59.7763378Z",
+  "generated_at": "2026-07-22T18:11:30.334222992Z",
   "sources": {
     "apnic_inet6num": {
       "source": "https://ftp.apnic.net/apnic/whois/apnic.db.inet6num.gz",
-      "bytes": 3381255,
-      "sha256": "021e710f96dd46604f870a515a5aca28b6bb9205aad65420a1976ead51c704c0"
+      "bytes": 3382143,
+      "sha256": "b70039cd6ca4846e3a093f88c2382cbdb0ec5cc2fdb1c237574205515c8b1629"
     },
     "iptoasn_ipv6": {
       "source": "https://iptoasn.com/data/ip2asn-v6.tsv.gz",
-      "bytes": 1976873,
-      "sha256": "d4fb22a9413d34ee8d9b3aba5445c74bcc7283bc86773762956a20557f177c58"
+      "bytes": 1975357,
+      "sha256": "d42fc7633dbd3e8161f9b080b20facd05ae05bb5dd53baac5162723735e4556f"
     },
     "riswhois_ipv6": {
       "source": "https://www.ris.ripe.net/dumps/riswhoisdump.IPv6.gz",
-      "bytes": 1265453,
-      "sha256": "a965d58248a1c18dd5833bb4f83242d808f8a2a7f7f97bec800668b1a3bd849e"
+      "bytes": 1266268,
+      "sha256": "1491ac1bdb1fca7d0a82fc7591f46a652b690c3e0a8d705431c112223776b4ae"
     }
   },
   "output_unit": "exact_current_bgp_prefix",
