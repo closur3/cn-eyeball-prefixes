@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-22T09:09:48.54253184Z",
+  "generated_at": "2026-07-22T09:17:22.059757552Z",
   "sources": {
     "apnic_inet6num": {
       "source": "https://ftp.apnic.net/apnic/whois/apnic.db.inet6num.gz",
@@ -17,7 +17,6 @@
       "sha256": "ba64d1bbfce429dc5a2cef7913eab3400ae4099971c49bf99b13a44a99e95212"
     }
   },
-  "telecom_boundary": "240e::/18",
   "output_unit": "exact_current_bgp_prefix",
   "registry_admission": {
     "descriptions": [
@@ -53,7 +52,6 @@
     }
   },
   "rejected_bgp_prefixes": {
-    "non_telecom_origin": 88,
-    "outside_admitted_registry": 2892
+    "outside_admitted_registry": 2
   }
 }
