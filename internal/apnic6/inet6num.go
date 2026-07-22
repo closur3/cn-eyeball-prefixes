@@ -24,7 +24,7 @@ type Segment struct {
 	Record Record
 }
 
-func Parse(path string, boundary netip.Prefix) ([]Record, error) {
+func Parse(path string) ([]Record, error) {
 	f, err := os.Open(path)
 	if err != nil {
 		return nil, err
@@ -49,10 +49,6 @@ func Parse(path string, boundary netip.Prefix) ([]Record, error) {
 		}
 		prefix = prefix.Masked()
 		lo, hi := prefix.Addr(), lastAddress(prefix)
-		boundaryHi := lastAddress(boundary)
-		if hi.Compare(boundary.Addr()) < 0 || lo.Compare(boundaryHi) > 0 {
-			return nil
-		}
 		record := byPrefix[prefix.String()]
 		if record == nil {
 			record = &Record{Prefix: prefix, Lo: lo, Hi: hi}
@@ -103,7 +99,7 @@ func Parse(path string, boundary netip.Prefix) ([]Record, error) {
 		out = append(out, *record)
 	}
 	if len(out) == 0 {
-		return nil, fmt.Errorf("no inet6num records overlap %s", boundary)
+		return nil, fmt.Errorf("no IPv6 inet6num records")
 	}
 	return out, nil
 }

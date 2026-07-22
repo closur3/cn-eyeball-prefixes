@@ -12,8 +12,8 @@ func TestRegistrationPurposeAcceptsOnlyTwoDescriptions(t *testing.T) {
 		description string
 		want        string
 	}{
-		{fixedDescription, "fixed"},
-		{mobileDescription, "mobile"},
+		{fixedBroadbandInet6numDescription, "fixed"},
+		{mobileInet6numDescription, "mobile"},
 		{"BeiJing Telecom UserAddress", ""},
 		{"Chinatelecom IPv6 address for network", ""},
 		{"Chinatelecom IPv6 address for own platform", ""},
@@ -27,8 +27,8 @@ func TestRegistrationPurposeAcceptsOnlyTwoDescriptions(t *testing.T) {
 
 func TestClassifyPrefixRequiresUniformPositiveCoverage(t *testing.T) {
 	prefix := netip.MustParsePrefix("240e:400::/32")
-	fixed := apnic6.Record{Descriptions: []string{fixedDescription}}
-	mobile := apnic6.Record{Descriptions: []string{mobileDescription}}
+	fixed := apnic6.Record{Descriptions: []string{fixedBroadbandInet6numDescription}}
+	mobile := apnic6.Record{Descriptions: []string{mobileInet6numDescription}}
 	segments := []apnic6.Segment{{Lo: prefix.Addr(), Hi: lastAddress(prefix), Record: mobile}}
 	if got, reason := classifyPrefix(prefix, buildAdmissionRanges(segments)); got != "mobile" || reason != "" {
 		t.Fatalf("uniform mobile prefix: got=%q reason=%q", got, reason)
@@ -46,7 +46,7 @@ func TestClassifyPrefixRequiresUniformPositiveCoverage(t *testing.T) {
 func TestNonAdmittedMoreSpecificRegistrationCreatesAdmissionGap(t *testing.T) {
 	prefix := netip.MustParsePrefix("240e:300::/32")
 	middle := netip.MustParseAddr("240e:300:8000::")
-	fixed := apnic6.Record{Descriptions: []string{fixedDescription}}
+	fixed := apnic6.Record{Descriptions: []string{fixedBroadbandInet6numDescription}}
 	nonAccess := apnic6.Record{Descriptions: []string{"Chinatelecom IPv6 address for IDC"}}
 	segments := []apnic6.Segment{
 		{Lo: prefix.Addr(), Hi: middle.Prev(), Record: fixed},

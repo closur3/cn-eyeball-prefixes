@@ -21,12 +21,11 @@ import (
 )
 
 const (
-	// telecomBlock and the two descriptions are policy. The matching inet6num
-	// prefixes are discovered from the current APNIC database on every build;
-	// they must not be copied into the generator as static admission prefixes.
-	telecomBlock      = "240e::/18"
-	fixedDescription  = "Chinatelecom IPv6 address for fixed broadband"
-	mobileDescription = "Chinatelecom IPv6 address for mobile"
+	// These exact APNIC inet6num descriptions are admission policy. Matching
+	// registration prefixes are discovered across the complete current APNIC
+	// database on every build; no allocation boundary is a static input.
+	fixedBroadbandInet6numDescription = "Chinatelecom IPv6 address for fixed broadband"
+	mobileInet6numDescription         = "Chinatelecom IPv6 address for mobile"
 )
 
 type asMeta struct {
@@ -56,7 +55,6 @@ type registryAdmissionMeta struct {
 type manifest struct {
 	GeneratedAt       string                `json:"generated_at"`
 	Sources           map[string]sourceMeta `json:"sources"`
-	Boundary          string                `json:"telecom_boundary"`
 	OutputUnit        string                `json:"output_unit"`
 	RegistryAdmission registryAdmissionMeta `json:"registry_admission"`
 	Outputs           map[string]outputMeta `json:"outputs"`
@@ -80,12 +78,11 @@ func main() {
 		panic("--ris, --iptoasn, and --inet6num are required")
 	}
 
-	boundary := netip.MustParsePrefix(telecomBlock)
 	metadata, err := readASNMetadata(*iptoasnPath)
 	must(err)
 	bgpRecords, err := riswhois6.Parse(*risPath)
 	must(err)
-	registrations, err := apnic6.Parse(*inet6numPath, boundary)
+	registrations, err := apnic6.Parse(*inet6numPath)
 	must(err)
 	// Resolve the current registry hierarchy first. A more-specific APNIC
 	// object overrides a broader one and can therefore create a denied hole in
@@ -119,16 +116,20 @@ func main() {
 	admissionMatches := map[string]int{"fixed_broadband": 0, "mobile": 0}
 	rejected := map[string]int{}
 	for _, record := range bgpRecords {
-		if !inside(record.Prefix, boundary) {
+		if !overlapsAdmissionRanges(record.Prefix, admissionRanges) {
+			continue
+		}
+		// A BGP prefix is admitted only when its complete address range is
+		// covered by the dynamically discovered fixed/mobile registrations.
+		purpose, reason := classifyPrefix(record.Prefix, admissionRanges)
+		if purpose == "" {
+			rejected[reason]++
 			continue
 		}
 		if !allTelecomOrigins(record.Origins, metadata) {
 			rejected["non_telecom_origin"]++
 			continue
 		}
-		// A BGP prefix is admitted only when its complete address range is
-		// covered by the dynamically discovered fixed/mobile registrations.
-		purpose, reason := classifyPrefix(record.Prefix, admissionRanges)
 		switch purpose {
 		case "fixed":
 			admitted = append(admitted, record.Prefix)
@@ -136,8 +137,6 @@ func main() {
 		case "mobile":
 			admitted = append(admitted, record.Prefix)
 			admissionMatches["mobile"]++
-		default:
-			rejected[reason]++
 		}
 	}
 
@@ -162,10 +161,9 @@ func main() {
 	result := manifest{
 		GeneratedAt: time.Now().UTC().Format(time.RFC3339Nano),
 		Sources: sources,
-		Boundary: telecomBlock,
 		OutputUnit: "exact_current_bgp_prefix",
 		RegistryAdmission: registryAdmissionMeta{
-			Descriptions:           []string{fixedDescription, mobileDescription},
+			Descriptions:           []string{fixedBroadbandInet6numDescription, mobileInet6numDescription},
 			MatchedInet6numRecords:  matchedInet6numRecords,
 			MatchedInet6numPrefixes: matchedInet6numPrefixes,
 			EffectiveRanges:         effectiveRanges,
@@ -220,12 +218,18 @@ func classifyPrefix(prefix netip.Prefix, ranges []admissionRange) (string, strin
 	return "", "outside_admitted_registry"
 }
 
+func overlapsAdmissionRanges(prefix netip.Prefix, ranges []admissionRange) bool {
+	lo, hi := prefix.Masked().Addr(), lastAddress(prefix)
+	i := sort.Search(len(ranges), func(i int) bool { return ranges[i].Hi.Compare(lo) >= 0 })
+	return i < len(ranges) && ranges[i].Lo.Compare(hi) <= 0
+}
+
 func registrationPurpose(record apnic6.Record) string {
 	for _, description := range record.Descriptions {
 		switch {
-		case strings.EqualFold(strings.TrimSpace(description), fixedDescription):
+		case strings.EqualFold(strings.TrimSpace(description), fixedBroadbandInet6numDescription):
 			return "fixed"
-		case strings.EqualFold(strings.TrimSpace(description), mobileDescription):
+		case strings.EqualFold(strings.TrimSpace(description), mobileInet6numDescription):
 			return "mobile"
 		}
 	}
@@ -301,10 +305,6 @@ func readASNMetadata(path string) (map[string]asMeta, error) {
 		out[asn] = best.meta
 	}
 	return out, nil
-}
-
-func inside(prefix, boundary netip.Prefix) bool {
-	return boundary.Contains(prefix.Masked().Addr()) && boundary.Contains(lastAddress(prefix))
 }
 
 func lastAddress(prefix netip.Prefix) netip.Addr {
