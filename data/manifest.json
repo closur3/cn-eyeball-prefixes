@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-22T10:34:28.039462464Z",
+  "generated_at": "2026-07-23T10:34:00.086600729Z",
   "scope": "IPv4; mainland China; current China Telecom, China Mobile, or China Unicom BGP origin plus a covering same-operator APNIC registration; current three-operator BGP units heal internal operator-registration conflict holes after all strong exclusions; small ambiguous customer-use fragments are accepted as best-effort error to keep the ACL deployably compact; dedicated premium backbone ASNs, cloud-provider CIDRs, strong APNIC registrations outside ordinary user access scope, independent holders and route origins, and strong RIPE RIS MOAS evidence are excluded",
   "sources": [
     {
@@ -11,44 +11,44 @@
     {
       "name": "china",
       "url": "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/china.txt",
-      "bytes": 65307,
-      "sha256": "6eaed64ac34348ed6fc1534ffd5cc5a801fbffa97091b930e4db85dbd13b19e1"
+      "bytes": 65308,
+      "sha256": "85e204ad3fe0d025433fed6c0437dba0862e238647fc9b4ee5c33a8d122964db"
     },
     {
       "name": "iptoasn_ipv4",
       "url": "https://iptoasn.com/data/ip2asn-v4.tsv.gz",
-      "bytes": 6887878,
-      "sha256": "de63879fba70128d786b7cb83114a15d43e32bf52d32856aedcff88e6ad3d390"
+      "bytes": 6855977,
+      "sha256": "713ddfa9c3cc6e1f2ea680802c7db92524a34bd4050b2afbaa63fb39f2b21695"
     },
     {
       "name": "apnic_organisation",
       "url": "https://ftp.apnic.net/apnic/whois/apnic.db.organisation.gz",
-      "bytes": 547349,
-      "sha256": "1a0f5b954c781767b2a0e888b97bffdafcc3a378b970f41fe10b19132d2f0f07"
+      "bytes": 547467,
+      "sha256": "4d0ac7dbb1a77f56cc33a3e3b21377523f5e7dcc4ef69bb1e8296dddd1ff55ee"
     },
     {
       "name": "apnic_inetnum",
       "url": "https://ftp.apnic.net/apnic/whois/apnic.db.inetnum.gz",
-      "bytes": 53554125,
-      "sha256": "6f15305f7b85f1d9d7712ecb9c3ef0cc069b4104b298c4fc103d2cad60529b7c"
+      "bytes": 53504431,
+      "sha256": "9a17d3b16e995280b2fe505f8a84d5fb41185d2120c8a1d25aa9cb35655d6a8d"
     },
     {
       "name": "apnic_autnum",
       "url": "https://ftp.apnic.net/apnic/whois/apnic.db.aut-num.gz",
-      "bytes": 2091261,
-      "sha256": "f4973c8d8e92b2feab82302711ec6fb6705c6cb00669e5b86194c204e8a843be"
+      "bytes": 2091495,
+      "sha256": "e53b64cd907132976b4b99b45c242a8245d7b4449529c6608f5b3e09ea67fadc"
     },
     {
       "name": "apnic_route",
       "url": "https://ftp.apnic.net/apnic/whois/apnic.db.route.gz",
-      "bytes": 7903965,
-      "sha256": "e500a5798bfc316421629e19bdd29039d300162c9ed9c5947c5abf841172fa20"
+      "bytes": 7906062,
+      "sha256": "9b205d80d6cbb3fdce0ef11b34fa4d9ab40e623862c66f7d7d425e6ae253a777"
     },
     {
       "name": "riswhois_ipv4",
       "url": "https://www.ris.ripe.net/dumps/riswhoisdump.IPv4.gz",
-      "bytes": 5380641,
-      "sha256": "0d030bb55c244785663a9e98674cd1c989dd9f65d36390febbdf71cd99967d0d"
+      "bytes": 5378340,
+      "sha256": "16a2ff9321f60deb6504e56da31d3ae63ccf0cea6f2ddecc7b966f859279a36d"
     },
     {
       "name": "ip2region_ipv4_source",
@@ -59,8 +59,8 @@
     {
       "name": "ipdata_aliyun",
       "url": "https://raw.githubusercontent.com/axpwx/IP-Data/master/provider/aliyun-cidr-ipv4.txt",
-      "bytes": 4923,
-      "sha256": "87b5b91706794b3f553c9812e72875cb166c1be7fd41d19ad76d0cb1a634f8ab"
+      "bytes": 7623,
+      "sha256": "2e291c5ef75b8ce99beea851ef7dcf129b6d2957e053323181f6d350e42dba10"
     },
     {
       "name": "ipdata_tencent",
@@ -77,8 +77,8 @@
     {
       "name": "ipdata_ucloud",
       "url": "https://raw.githubusercontent.com/axpwx/IP-Data/master/provider/ucloud-cidr-ipv4.txt",
-      "bytes": 216,
-      "sha256": "e0bcdc0cc35fee6bee1db55d2ea94286af2cd0c0b5b03712ee291f74f9bc564d"
+      "bytes": 308,
+      "sha256": "331c317206c1c9fc990448ebf7487df220ffc5ffa5d57de35a6dce3ad40e324e"
     },
     {
       "name": "ipdata_ksyun",
@@ -102,23 +102,23 @@
   "stages": [
     {
       "name": "operator_origin_candidates",
-      "cidr_count": 9809,
-      "address_count": 229276672
+      "cidr_count": 9806,
+      "address_count": 229275904
     },
     {
       "name": "china_origin_intersection",
-      "cidr_count": 9807,
-      "address_count": 229276160
+      "cidr_count": 9804,
+      "address_count": 229275392
     },
     {
       "name": "effective_cloud_prefix_exclusions",
-      "cidr_count": 46,
-      "address_count": 277760
+      "cidr_count": 54,
+      "address_count": 282880
     },
     {
       "name": "effective_apnic_prefix_exclusions",
-      "cidr_count": 2125,
-      "address_count": 861642
+      "cidr_count": 2117,
+      "address_count": 856522
     },
     {
       "name": "effective_apnic_portable_holder_exclusions",
@@ -152,8 +152,8 @@
     },
     {
       "name": "pre_operator_parent_registration_admission",
-      "cidr_count": 15805,
-      "address_count": 223546758
+      "cidr_count": 15802,
+      "address_count": 223545990
     },
     {
       "name": "operator_parent_registration_admissions",
@@ -172,8 +172,8 @@
     },
     {
       "name": "operator_registration_admission_denials",
-      "cidr_count": 1778,
-      "address_count": 2530165
+      "cidr_count": 1775,
+      "address_count": 2529397
     },
     {
       "name": "final_output",
@@ -188,13 +188,13 @@
   ],
   "operator_registration_admission": {
     "mode": "bgp_registration_conflict_healing_with_strong_exclusions",
-    "pre_cidr_count": 15805,
-    "denied_cidr_count": 1778,
+    "pre_cidr_count": 15802,
+    "denied_cidr_count": 1775,
     "hierarchical_cidr_count": 14960,
     "conflict_healed_cidr_count": 146,
     "conflict_healed_address_count": 7519,
     "final_cidr_count": 14075,
-    "cidr_expansion_ratio": 0.890540968048086,
+    "cidr_expansion_ratio": 0.8907100367042147,
     "maximum_cidr_expansion_ratio": 2,
     "conflict_healing_cidr_ratio": 0.9408422459893048,
     "maximum_conflict_healing_cidr_ratio": 1.1,
@@ -205,8 +205,8 @@
     {
       "source": "ipdata_aliyun",
       "provider": "aliyun",
-      "source_cidr_count": 316,
-      "source_address_count": 9360384,
+      "source_cidr_count": 500,
+      "source_address_count": 14882816,
       "effective_cidr_count": 1,
       "effective_address_count": 512
     },
@@ -229,10 +229,10 @@
     {
       "source": "ipdata_ucloud",
       "provider": "ucloud",
-      "source_cidr_count": 14,
-      "source_address_count": 159232,
-      "effective_cidr_count": 12,
-      "effective_address_count": 109568
+      "source_cidr_count": 20,
+      "source_address_count": 167168,
+      "effective_cidr_count": 20,
+      "effective_address_count": 114688
     },
     {
       "source": "ipdata_ksyun",
@@ -260,14 +260,14 @@
     }
   ],
   "apnic_inetnum": {
-    "record_count": 1256931,
-    "relevant_record_count": 448033,
-    "matched_winning_segment_count": 1746,
-    "effective_cidr_count": 2125,
-    "effective_address_count": 861642
+    "record_count": 1255995,
+    "relevant_record_count": 448026,
+    "matched_winning_segment_count": 1740,
+    "effective_cidr_count": 2117,
+    "effective_address_count": 856522
   },
   "apnic_portable_holders": {
-    "autnum_record_count": 25883,
+    "autnum_record_count": 25887,
     "matched_winning_segment_count": 596,
     "effective_cidr_count": 932,
     "effective_address_count": 1576978
@@ -283,7 +283,7 @@
     "effective_address_count": 2659781
   },
   "apnic_route": {
-    "object_count": 832463,
+    "object_count": 832516,
     "relevant_object_count": 2826,
     "relevant_winning_segment_count": 2888,
     "origin_validated_match_count": 0,
@@ -649,13 +649,13 @@
     ]
   },
   "ris_whois": {
-    "row_count": 1247402,
-    "prefix_count": 1225361,
-    "relevant_prefix_count": 46411,
-    "winning_segment_count": 56439,
-    "candidate_moas_segment_count": 200,
+    "row_count": 1245338,
+    "prefix_count": 1223126,
+    "relevant_prefix_count": 46380,
+    "winning_segment_count": 56392,
+    "candidate_moas_segment_count": 199,
     "strong_evidence_segment_count": 0,
-    "retained_ambiguous_moas_segment_count": 200,
+    "retained_ambiguous_moas_segment_count": 199,
     "effective_cidr_count": 0,
     "effective_address_count": 0
   },
@@ -1017,6 +1017,102 @@
       "asn": "9808",
       "operator": "chinamobile",
       "asn_description": "CHINAMOBILE-CN China Mobile Communications Group Co., Ltd.",
+      "matched_by": "IP-Data provider CIDR",
+      "reason": "Prefix is explicitly listed by IP-Data for ucloud"
+    },
+    {
+      "source": "ipdata_ucloud",
+      "category": "cloud_provider_cidr",
+      "provider": "ucloud",
+      "cidr": "43.248.96.0/22",
+      "address_count": 1024,
+      "asn": "56046",
+      "operator": "chinamobile",
+      "asn_description": "CMNET-JIANGSU-AP China Mobile communications corporation",
+      "matched_by": "IP-Data provider CIDR",
+      "reason": "Prefix is explicitly listed by IP-Data for ucloud"
+    },
+    {
+      "source": "ipdata_ucloud",
+      "category": "cloud_provider_cidr",
+      "provider": "ucloud",
+      "cidr": "43.248.100.0/24",
+      "address_count": 256,
+      "asn": "56046",
+      "operator": "chinamobile",
+      "asn_description": "CMNET-JIANGSU-AP China Mobile communications corporation",
+      "matched_by": "IP-Data provider CIDR",
+      "reason": "Prefix is explicitly listed by IP-Data for ucloud"
+    },
+    {
+      "source": "ipdata_ucloud",
+      "category": "cloud_provider_cidr",
+      "provider": "ucloud",
+      "cidr": "43.248.102.0/23",
+      "address_count": 512,
+      "asn": "56046",
+      "operator": "chinamobile",
+      "asn_description": "CMNET-JIANGSU-AP China Mobile communications corporation",
+      "matched_by": "IP-Data provider CIDR",
+      "reason": "Prefix is explicitly listed by IP-Data for ucloud"
+    },
+    {
+      "source": "ipdata_ucloud",
+      "category": "cloud_provider_cidr",
+      "provider": "ucloud",
+      "cidr": "43.248.128.0/22",
+      "address_count": 1024,
+      "asn": "56046",
+      "operator": "chinamobile",
+      "asn_description": "CMNET-JIANGSU-AP China Mobile communications corporation",
+      "matched_by": "IP-Data provider CIDR",
+      "reason": "Prefix is explicitly listed by IP-Data for ucloud"
+    },
+    {
+      "source": "ipdata_ucloud",
+      "category": "cloud_provider_cidr",
+      "provider": "ucloud",
+      "cidr": "43.248.132.0/23",
+      "address_count": 512,
+      "asn": "56046",
+      "operator": "chinamobile",
+      "asn_description": "CMNET-JIANGSU-AP China Mobile communications corporation",
+      "matched_by": "IP-Data provider CIDR",
+      "reason": "Prefix is explicitly listed by IP-Data for ucloud"
+    },
+    {
+      "source": "ipdata_ucloud",
+      "category": "cloud_provider_cidr",
+      "provider": "ucloud",
+      "cidr": "43.248.137.0/24",
+      "address_count": 256,
+      "asn": "56046",
+      "operator": "chinamobile",
+      "asn_description": "CMNET-JIANGSU-AP China Mobile communications corporation",
+      "matched_by": "IP-Data provider CIDR",
+      "reason": "Prefix is explicitly listed by IP-Data for ucloud"
+    },
+    {
+      "source": "ipdata_ucloud",
+      "category": "cloud_provider_cidr",
+      "provider": "ucloud",
+      "cidr": "43.248.138.0/23",
+      "address_count": 512,
+      "asn": "56046",
+      "operator": "chinamobile",
+      "asn_description": "CMNET-JIANGSU-AP China Mobile communications corporation",
+      "matched_by": "IP-Data provider CIDR",
+      "reason": "Prefix is explicitly listed by IP-Data for ucloud"
+    },
+    {
+      "source": "ipdata_ucloud",
+      "category": "cloud_provider_cidr",
+      "provider": "ucloud",
+      "cidr": "43.248.140.0/22",
+      "address_count": 1024,
+      "asn": "56046",
+      "operator": "chinamobile",
+      "asn_description": "CMNET-JIANGSU-AP China Mobile communications corporation",
       "matched_by": "IP-Data provider CIDR",
       "reason": "Prefix is explicitly listed by IP-Data for ucloud"
     },
@@ -22697,102 +22793,6 @@
     {
       "source": "apnic_inetnum",
       "category": "apnic_inetnum",
-      "cidr": "43.248.96.0/22",
-      "address_count": 1024,
-      "asn": "56046",
-      "operator": "chinamobile",
-      "asn_description": "CMNET-JIANGSU-AP China Mobile communications corporation",
-      "registry_netnames": [
-        "DYIDC"
-      ],
-      "registry_descriptions": [
-        "Jiangsu Dongyun Cloud computing co., LTD",
-        "room 2208 building8 22nd floor Huangshan south road no. 36",
-        "Runzhou District Zhenjiang City Jiangsu Province"
-      ],
-      "registry_maintainers": [
-        "MAINT-CNNIC-AP"
-      ],
-      "registry_status": "ALLOCATED PORTABLE",
-      "registry_last_modified": "2022-02-17T06:54:51Z",
-      "matched_by": "exclude_apnic_inetnum_rules: idc(?:[^a-z0-9]|$)|\\binternet data cent(?:er|re)\\b",
-      "reason": "APNIC inetnum registration explicitly identifies an IDC network",
-      "linked_asns": [
-        {
-          "asn": "131483",
-          "description": "DYIDC Jiangsu Dongyun Cloud computing co., LTD",
-          "as_name": "DYIDC",
-          "via": "netname_as_name"
-        }
-      ]
-    },
-    {
-      "source": "apnic_inetnum",
-      "category": "apnic_inetnum",
-      "cidr": "43.248.100.0/24",
-      "address_count": 256,
-      "asn": "56046",
-      "operator": "chinamobile",
-      "asn_description": "CMNET-JIANGSU-AP China Mobile communications corporation",
-      "registry_netnames": [
-        "DYIDC"
-      ],
-      "registry_descriptions": [
-        "Jiangsu Dongyun Cloud computing co., LTD",
-        "room 2208 building8 22nd floor Huangshan south road no. 36",
-        "Runzhou District Zhenjiang City Jiangsu Province"
-      ],
-      "registry_maintainers": [
-        "MAINT-CNNIC-AP"
-      ],
-      "registry_status": "ALLOCATED PORTABLE",
-      "registry_last_modified": "2022-02-17T06:54:52Z",
-      "matched_by": "exclude_apnic_inetnum_rules: idc(?:[^a-z0-9]|$)|\\binternet data cent(?:er|re)\\b",
-      "reason": "APNIC inetnum registration explicitly identifies an IDC network",
-      "linked_asns": [
-        {
-          "asn": "131483",
-          "description": "DYIDC Jiangsu Dongyun Cloud computing co., LTD",
-          "as_name": "DYIDC",
-          "via": "netname_as_name"
-        }
-      ]
-    },
-    {
-      "source": "apnic_inetnum",
-      "category": "apnic_inetnum",
-      "cidr": "43.248.102.0/23",
-      "address_count": 512,
-      "asn": "56046",
-      "operator": "chinamobile",
-      "asn_description": "CMNET-JIANGSU-AP China Mobile communications corporation",
-      "registry_netnames": [
-        "DYIDC"
-      ],
-      "registry_descriptions": [
-        "Jiangsu Dongyun Cloud computing co., LTD",
-        "room 2208 building8 22nd floor Huangshan south road no. 36",
-        "Runzhou District Zhenjiang City Jiangsu Province"
-      ],
-      "registry_maintainers": [
-        "MAINT-CNNIC-AP"
-      ],
-      "registry_status": "ALLOCATED PORTABLE",
-      "registry_last_modified": "2022-02-17T06:54:52Z",
-      "matched_by": "exclude_apnic_inetnum_rules: idc(?:[^a-z0-9]|$)|\\binternet data cent(?:er|re)\\b",
-      "reason": "APNIC inetnum registration explicitly identifies an IDC network",
-      "linked_asns": [
-        {
-          "asn": "131483",
-          "description": "DYIDC Jiangsu Dongyun Cloud computing co., LTD",
-          "as_name": "DYIDC",
-          "via": "netname_as_name"
-        }
-      ]
-    },
-    {
-      "source": "apnic_inetnum",
-      "category": "apnic_inetnum",
       "cidr": "43.248.116.0/22",
       "address_count": 1024,
       "asn": "56046",
@@ -22811,166 +22811,6 @@
       ],
       "registry_status": "ALLOCATED PORTABLE",
       "registry_last_modified": "2023-11-28T00:58:03Z",
-      "matched_by": "exclude_apnic_inetnum_rules: idc(?:[^a-z0-9]|$)|\\binternet data cent(?:er|re)\\b",
-      "reason": "APNIC inetnum registration explicitly identifies an IDC network",
-      "linked_asns": [
-        {
-          "asn": "131483",
-          "description": "DYIDC Jiangsu Dongyun Cloud computing co., LTD",
-          "as_name": "DYIDC",
-          "via": "netname_as_name"
-        }
-      ]
-    },
-    {
-      "source": "apnic_inetnum",
-      "category": "apnic_inetnum",
-      "cidr": "43.248.128.0/22",
-      "address_count": 1024,
-      "asn": "56046",
-      "operator": "chinamobile",
-      "asn_description": "CMNET-JIANGSU-AP China Mobile communications corporation",
-      "registry_netnames": [
-        "DYIDC"
-      ],
-      "registry_descriptions": [
-        "Jiangsu Dongyun Cloud computing co., LTD",
-        "room 2208 building8 22nd floor Huangshan south road no. 36",
-        "Runzhou District Zhenjiang City Jiangsu Province"
-      ],
-      "registry_maintainers": [
-        "MAINT-CNNIC-AP"
-      ],
-      "registry_status": "ALLOCATED PORTABLE",
-      "registry_last_modified": "2022-02-17T06:54:53Z",
-      "matched_by": "exclude_apnic_inetnum_rules: idc(?:[^a-z0-9]|$)|\\binternet data cent(?:er|re)\\b",
-      "reason": "APNIC inetnum registration explicitly identifies an IDC network",
-      "linked_asns": [
-        {
-          "asn": "131483",
-          "description": "DYIDC Jiangsu Dongyun Cloud computing co., LTD",
-          "as_name": "DYIDC",
-          "via": "netname_as_name"
-        }
-      ]
-    },
-    {
-      "source": "apnic_inetnum",
-      "category": "apnic_inetnum",
-      "cidr": "43.248.132.0/23",
-      "address_count": 512,
-      "asn": "56046",
-      "operator": "chinamobile",
-      "asn_description": "CMNET-JIANGSU-AP China Mobile communications corporation",
-      "registry_netnames": [
-        "DYIDC"
-      ],
-      "registry_descriptions": [
-        "Jiangsu Dongyun Cloud computing co., LTD",
-        "room 2208 building8 22nd floor Huangshan south road no. 36",
-        "Runzhou District Zhenjiang City Jiangsu Province"
-      ],
-      "registry_maintainers": [
-        "MAINT-CNNIC-AP"
-      ],
-      "registry_status": "ALLOCATED PORTABLE",
-      "registry_last_modified": "2022-02-17T06:54:54Z",
-      "matched_by": "exclude_apnic_inetnum_rules: idc(?:[^a-z0-9]|$)|\\binternet data cent(?:er|re)\\b",
-      "reason": "APNIC inetnum registration explicitly identifies an IDC network",
-      "linked_asns": [
-        {
-          "asn": "131483",
-          "description": "DYIDC Jiangsu Dongyun Cloud computing co., LTD",
-          "as_name": "DYIDC",
-          "via": "netname_as_name"
-        }
-      ]
-    },
-    {
-      "source": "apnic_inetnum",
-      "category": "apnic_inetnum",
-      "cidr": "43.248.137.0/24",
-      "address_count": 256,
-      "asn": "56046",
-      "operator": "chinamobile",
-      "asn_description": "CMNET-JIANGSU-AP China Mobile communications corporation",
-      "registry_netnames": [
-        "DYIDC"
-      ],
-      "registry_descriptions": [
-        "Jiangsu Dongyun Cloud computing co., LTD",
-        "room 2208 building8 22nd floor Huangshan south road no. 36",
-        "Runzhou District Zhenjiang City Jiangsu Province"
-      ],
-      "registry_maintainers": [
-        "MAINT-CNNIC-AP"
-      ],
-      "registry_status": "ALLOCATED PORTABLE",
-      "registry_last_modified": "2022-02-17T06:54:56Z",
-      "matched_by": "exclude_apnic_inetnum_rules: idc(?:[^a-z0-9]|$)|\\binternet data cent(?:er|re)\\b",
-      "reason": "APNIC inetnum registration explicitly identifies an IDC network",
-      "linked_asns": [
-        {
-          "asn": "131483",
-          "description": "DYIDC Jiangsu Dongyun Cloud computing co., LTD",
-          "as_name": "DYIDC",
-          "via": "netname_as_name"
-        }
-      ]
-    },
-    {
-      "source": "apnic_inetnum",
-      "category": "apnic_inetnum",
-      "cidr": "43.248.138.0/23",
-      "address_count": 512,
-      "asn": "56046",
-      "operator": "chinamobile",
-      "asn_description": "CMNET-JIANGSU-AP China Mobile communications corporation",
-      "registry_netnames": [
-        "DYIDC"
-      ],
-      "registry_descriptions": [
-        "Jiangsu Dongyun Cloud computing co., LTD",
-        "room 2208 building8 22nd floor Huangshan south road no. 36",
-        "Runzhou District Zhenjiang City Jiangsu Province"
-      ],
-      "registry_maintainers": [
-        "MAINT-CNNIC-AP"
-      ],
-      "registry_status": "ALLOCATED PORTABLE",
-      "registry_last_modified": "2022-02-17T06:54:56Z",
-      "matched_by": "exclude_apnic_inetnum_rules: idc(?:[^a-z0-9]|$)|\\binternet data cent(?:er|re)\\b",
-      "reason": "APNIC inetnum registration explicitly identifies an IDC network",
-      "linked_asns": [
-        {
-          "asn": "131483",
-          "description": "DYIDC Jiangsu Dongyun Cloud computing co., LTD",
-          "as_name": "DYIDC",
-          "via": "netname_as_name"
-        }
-      ]
-    },
-    {
-      "source": "apnic_inetnum",
-      "category": "apnic_inetnum",
-      "cidr": "43.248.140.0/22",
-      "address_count": 1024,
-      "asn": "56046",
-      "operator": "chinamobile",
-      "asn_description": "CMNET-JIANGSU-AP China Mobile communications corporation",
-      "registry_netnames": [
-        "DYIDC"
-      ],
-      "registry_descriptions": [
-        "Jiangsu Dongyun Cloud computing co., LTD",
-        "room 2208 building8 22nd floor Huangshan south road no. 36",
-        "Runzhou District Zhenjiang City Jiangsu Province"
-      ],
-      "registry_maintainers": [
-        "MAINT-CNNIC-AP"
-      ],
-      "registry_status": "ALLOCATED PORTABLE",
-      "registry_last_modified": "2022-02-17T06:54:57Z",
       "matched_by": "exclude_apnic_inetnum_rules: idc(?:[^a-z0-9]|$)|\\binternet data cent(?:er|re)\\b",
       "reason": "APNIC inetnum registration explicitly identifies an IDC network",
       "linked_asns": [
@@ -60554,7 +60394,7 @@
       ],
       "registry_descriptions": [
         "Shanghai Highway Information Technology Co.,Ltd",
-        "Floor 9Â£Â¬Hua Sheng Building No.1 Lane 519 Ao Men RoadÂ£Â¬ Shanghai"
+        "Floor 9A?A?A?A?Hua Sheng Building No.1 Lane 519 Ao Men RoadA?A?A?A? Shanghai"
       ],
       "registry_maintainers": [
         "MAINT-CNNIC-AP"
@@ -60585,7 +60425,7 @@
       ],
       "registry_descriptions": [
         "Shanghai Highway Information Technology Co.,Ltd",
-        "Floor 9Â£Â¬Hua Sheng Building No.1 Lane 519 Ao Men RoadÂ£Â¬ Shanghai"
+        "Floor 9A?A?A?A?Hua Sheng Building No.1 Lane 519 Ao Men RoadA?A?A?A? Shanghai"
       ],
       "registry_maintainers": [
         "MAINT-CNNIC-AP"
@@ -60616,7 +60456,7 @@
       ],
       "registry_descriptions": [
         "Shanghai Highway Information Technology Co.,Ltd",
-        "Floor 9Â£Â¬Hua Sheng Building No.1 Lane 519 Ao Men RoadÂ£Â¬ Shanghai"
+        "Floor 9A?A?A?A?Hua Sheng Building No.1 Lane 519 Ao Men RoadA?A?A?A? Shanghai"
       ],
       "registry_maintainers": [
         "MAINT-CNNIC-AP"
@@ -60647,7 +60487,7 @@
       ],
       "registry_descriptions": [
         "Shanghai Highway Information Technology Co.,Ltd",
-        "Floor 9Â£Â¬Hua Sheng Building No.1 Lane 519 Ao Men RoadÂ£Â¬ Shanghai"
+        "Floor 9A?A?A?A?Hua Sheng Building No.1 Lane 519 Ao Men RoadA?A?A?A? Shanghai"
       ],
       "registry_maintainers": [
         "MAINT-CNNIC-AP"
@@ -60678,7 +60518,7 @@
       ],
       "registry_descriptions": [
         "Shanghai Highway Information Technology Co.,Ltd",
-        "Floor 9Â£Â¬Hua Sheng Building No.1 Lane 519 Ao Men RoadÂ£Â¬ Shanghai"
+        "Floor 9A?A?A?A?Hua Sheng Building No.1 Lane 519 Ao Men RoadA?A?A?A? Shanghai"
       ],
       "registry_maintainers": [
         "MAINT-CNNIC-AP"
@@ -84506,7 +84346,7 @@
       ],
       "registry_descriptions": [
         "China Great Wall Network",
-        "±±¾©ÉñÖÝ³¤³ÇÍ¨ÐÅ¼¼Êõ·¢Õ¹ÖÐÐÄ"
+        "A?A?A?A?A?A?A?A?A?A?A?A?A?A?A?A A?A?A?A?A?A?A?A?A?A?A?A?"
       ],
       "registry_maintainers": [
         "MAINT-CNNIC-AP"
@@ -84537,7 +84377,7 @@
       ],
       "registry_descriptions": [
         "China Great Wall Network",
-        "±±¾©ÉñÖÝ³¤³ÇÍ¨ÐÅ¼¼Êõ·¢Õ¹ÖÐÐÄ"
+        "A?A?A?A?A?A?A?A?A?A?A?A?A?A?A?A A?A?A?A?A?A?A?A?A?A?A?A?"
       ],
       "registry_maintainers": [
         "MAINT-CNNIC-AP"
@@ -84568,7 +84408,7 @@
       ],
       "registry_descriptions": [
         "China Great Wall Network",
-        "±±¾©ÉñÖÝ³¤³ÇÍ¨ÐÅ¼¼Êõ·¢Õ¹ÖÐÐÄ"
+        "A?A?A?A?A?A?A?A?A?A?A?A?A?A?A?A A?A?A?A?A?A?A?A?A?A?A?A?"
       ],
       "registry_maintainers": [
         "MAINT-CNNIC-AP"
@@ -84599,7 +84439,7 @@
       ],
       "registry_descriptions": [
         "China Great Wall Network",
-        "±±¾©ÉñÖÝ³¤³ÇÍ¨ÐÅ¼¼Êõ·¢Õ¹ÖÐÐÄ"
+        "A?A?A?A?A?A?A?A?A?A?A?A?A?A?A?A A?A?A?A?A?A?A?A?A?A?A?A?"
       ],
       "registry_maintainers": [
         "MAINT-CNNIC-AP"
@@ -84630,7 +84470,7 @@
       ],
       "registry_descriptions": [
         "China Great Wall Network",
-        "±±¾©ÉñÖÝ³¤³ÇÍ¨ÐÅ¼¼Êõ·¢Õ¹ÖÐÐÄ"
+        "A?A?A?A?A?A?A?A?A?A?A?A?A?A?A?A A?A?A?A?A?A?A?A?A?A?A?A?"
       ],
       "registry_maintainers": [
         "MAINT-CNNIC-AP"
@@ -84661,7 +84501,7 @@
       ],
       "registry_descriptions": [
         "China Great Wall Network",
-        "±±¾©ÉñÖÝ³¤³ÇÍ¨ÐÅ¼¼Êõ·¢Õ¹ÖÐÐÄ"
+        "A?A?A?A?A?A?A?A?A?A?A?A?A?A?A?A A?A?A?A?A?A?A?A?A?A?A?A?"
       ],
       "registry_maintainers": [
         "MAINT-CNNIC-AP"
@@ -84692,7 +84532,7 @@
       ],
       "registry_descriptions": [
         "China Great Wall Network",
-        "±±¾©ÉñÖÝ³¤³ÇÍ¨ÐÅ¼¼Êõ·¢Õ¹ÖÐÐÄ"
+        "A?A?A?A?A?A?A?A?A?A?A?A?A?A?A?A A?A?A?A?A?A?A?A?A?A?A?A?"
       ],
       "registry_maintainers": [
         "MAINT-CNNIC-AP"
@@ -84723,7 +84563,7 @@
       ],
       "registry_descriptions": [
         "China Great Wall Network",
-        "±±¾©ÉñÖÝ³¤³ÇÍ¨ÐÅ¼¼Êõ·¢Õ¹ÖÐÐÄ"
+        "A?A?A?A?A?A?A?A?A?A?A?A?A?A?A?A A?A?A?A?A?A?A?A?A?A?A?A?"
       ],
       "registry_maintainers": [
         "MAINT-CNNIC-AP"
@@ -84754,7 +84594,7 @@
       ],
       "registry_descriptions": [
         "China Great Wall Network",
-        "±±¾©ÉñÖÝ³¤³ÇÍ¨ÐÅ¼¼Êõ·¢Õ¹ÖÐÐÄ"
+        "A?A?A?A?A?A?A?A?A?A?A?A?A?A?A?A A?A?A?A?A?A?A?A?A?A?A?A?"
       ],
       "registry_maintainers": [
         "MAINT-CNNIC-AP"
@@ -84785,7 +84625,7 @@
       ],
       "registry_descriptions": [
         "China Great Wall Network",
-        "±±¾©ÉñÖÝ³¤³ÇÍ¨ÐÅ¼¼Êõ·¢Õ¹ÖÐÐÄ"
+        "A?A?A?A?A?A?A?A?A?A?A?A?A?A?A?A A?A?A?A?A?A?A?A?A?A?A?A?"
       ],
       "registry_maintainers": [
         "MAINT-CNNIC-AP"
@@ -84816,7 +84656,7 @@
       ],
       "registry_descriptions": [
         "China Great Wall Network",
-        "±±¾©ÉñÖÝ³¤³ÇÍ¨ÐÅ¼¼Êõ·¢Õ¹ÖÐÐÄ"
+        "A?A?A?A?A?A?A?A?A?A?A?A?A?A?A?A A?A?A?A?A?A?A?A?A?A?A?A?"
       ],
       "registry_maintainers": [
         "MAINT-CNNIC-AP"
@@ -86998,7 +86838,7 @@
         "TNSNET"
       ],
       "registry_descriptions": [
-        "±±¾©Ê±´úÍøÐÇ¿Æ¼¼ÓÐÏÞ¹«Ë¾",
+        "A?A?A?A?A?A?A?A?A?A?A?A?A?A?A?A?A?A?A?A?A?A?A?A?",
         "Beijing Times Netstar Technology Co., Ltd."
       ],
       "registry_maintainers": [
@@ -107430,7 +107270,7 @@
       "operator": "chinatelecom",
       "description": "CHINANET-BACKBONE No.31,Jin-rong Street",
       "matched_by": "description_patterns: chinanet",
-      "origin_address_count": 99916032,
+      "origin_address_count": 99915776,
       "retained_address_count": 99763587
     },
     {
@@ -107462,7 +107302,7 @@
       "operator": "chinatelecom",
       "description": "CNIX-AP China Networks Inter-Exchange",
       "matched_by": "include_asns: China Telecom Beijing provincial network; public description is China Networks Inter-Exchange",
-      "origin_address_count": 3549696,
+      "origin_address_count": 3549184,
       "retained_address_count": 704672
     },
     {
@@ -108090,7 +107930,7 @@
       "matched_by": "description_patterns: china ?telecom",
       "exclusion_source": "explicit_policy",
       "reason": "China Telecom CN2 dedicated premium backbone; outside ordinary Internet user access scope",
-      "origin_address_count": 542720
+      "origin_address_count": 542976
     },
     {
       "asn": "4816",
@@ -108099,7 +107939,7 @@
       "matched_by": "description_patterns: china ?telecom",
       "exclusion_source": "description_rule",
       "reason": "ASN description explicitly identifies a dedicated IDC network",
-      "origin_address_count": 48128
+      "origin_address_count": 47872
     },
     {
       "asn": "4835",
@@ -108783,7 +108623,7 @@
       "matched_by": "description_patterns: china ?telecom",
       "exclusion_source": "description_rule",
       "reason": "ASN description explicitly identifies a dedicated IDC network",
-      "origin_address_count": 27136
+      "origin_address_count": 27392
     },
     {
       "asn": "147038",
