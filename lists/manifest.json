@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "content_id": "sha256:ae572242ad63115e74b130b8c1653a09e0f0c32594a7cb3a5741d01900ef1ea0",
+  "content_id": "sha256:87a80814d99d9c7a0704e108f28057002f686c95173ba3f59b5afd82caa83eab",
   "files": {
     "ipv4/chinamobile.txt": {
       "prefix_count": 677,
@@ -19,128 +19,128 @@
       "sha256": "cab9f28cf82465f1ab1e2b0cc89acbb569668b6b1ed1df6299c765d9527b3551"
     },
     "ipv4/provinces/anhui.txt": {
-      "prefix_count": 406,
-      "sha256": "a2c97ef5e69ee600a83ff320509946dd77c058a4ef7e182737764b8f582ab072"
+      "prefix_count": 424,
+      "sha256": "f1efe1695027f826339d467af6bdd8b590b849cf1193f66c5e87f65acee7ea9d"
     },
     "ipv4/provinces/beijing.txt": {
-      "prefix_count": 2785,
-      "sha256": "a925dc91884d8287280af9797d0521301ddaf0d760614355c077973a94782f3c"
+      "prefix_count": 2242,
+      "sha256": "4fe496fd796f5edd416a6acb11fcda7a71fddc06be7df65d2f63c40286043fe5"
     },
     "ipv4/provinces/chongqing.txt": {
-      "prefix_count": 543,
-      "sha256": "8bb030f8573f0fff823cea609502474045ec764efbc90c101e8c75e56cb2fe2b"
+      "prefix_count": 518,
+      "sha256": "2c4126bec60f6ce093ddcf4b57f8df91ca5e4f1572fdc9d0424b4a7c3909990c"
     },
     "ipv4/provinces/fujian.txt": {
-      "prefix_count": 870,
-      "sha256": "855862a81e69bb0e268678cf5dbdc68f6af626ff443dea06fff9a5f54695ad89"
+      "prefix_count": 833,
+      "sha256": "bd0964289dca45bafac709077ef9577bb2e96bf4126c79790a78b8236c0a24d1"
     },
     "ipv4/provinces/gansu.txt": {
-      "prefix_count": 362,
-      "sha256": "a5068d4d68539e62d079766f4268bb0ffdcecc2996cedc84ec3d56f15a59ee6a"
+      "prefix_count": 393,
+      "sha256": "ece94850c613adcf9ba719559ef2b63cb3190d740b1f222c8b8fd3ffe755f35e"
     },
     "ipv4/provinces/guangdong.txt": {
-      "prefix_count": 3206,
-      "sha256": "830682a9297e38ea1b2856e950edac6ab38f534308744774b758c47d1af25fb3"
+      "prefix_count": 3144,
+      "sha256": "730519e792c2c1b07e4bd3dd4120f4cf12b5550bd8f8bdbe916abc0da7fae0e6"
     },
     "ipv4/provinces/guangxi.txt": {
-      "prefix_count": 654,
-      "sha256": "883e66c9d3cd41cdc902be4b188fdeb3fd035479170712768599629d5419d9b3"
+      "prefix_count": 575,
+      "sha256": "1cb4901eb86913900efd183f89258a4cb40735ff27df99d7d8980abe2bc5cb8c"
     },
     "ipv4/provinces/guizhou.txt": {
-      "prefix_count": 310,
-      "sha256": "27c2d6e70454c0ebb114c72ef4f9cae07ae45ae8cad90c45a5e7d36e92e06fbe"
+      "prefix_count": 303,
+      "sha256": "2e547d3670b23240a87cf010d83a8cfd5f783c71da11c1c2b60218320059f78f"
     },
     "ipv4/provinces/hainan.txt": {
-      "prefix_count": 192,
-      "sha256": "ee668c864ea87395bfc74a7a39f4a42e149f3133a48d37b1f8fac95caf4e8c5e"
+      "prefix_count": 202,
+      "sha256": "e16366df8ae10fb0ff6134b877e8d27d3dadb52488b95b23aec1487bc41436fa"
     },
     "ipv4/provinces/hebei.txt": {
-      "prefix_count": 464,
-      "sha256": "aa6a63af6a228d927476b76afad45e2540ac2c17a0810730ad5d58c7204a8e1f"
+      "prefix_count": 443,
+      "sha256": "06d56e752499b2de3c1ac6ab4ef5b00828aa1ab2d1cde1c7ab7af27dc3aee2c8"
     },
     "ipv4/provinces/heilongjiang.txt": {
-      "prefix_count": 360,
-      "sha256": "a259d5b00311d008fd18ac6167a351864b437acbb296db8f3282d3f43d84ed19"
+      "prefix_count": 383,
+      "sha256": "270071f08156dc35ffa97b7cfe4e9667f138aaad2b12e8877955aa10cec65460"
     },
     "ipv4/provinces/henan.txt": {
-      "prefix_count": 611,
-      "sha256": "71bf9b67f79c159e130688fab1417fad0f5ef27edb8bab1da00c85a8ea5970fd"
+      "prefix_count": 588,
+      "sha256": "b37813ff7c8e36a3f245d5013bc0e2fe4b193f50fa9e60d4f1ba0d0b29b491fb"
     },
     "ipv4/provinces/hubei.txt": {
-      "prefix_count": 839,
-      "sha256": "87e04fa27bd9df32f6a0c7217078b7ca47e120c9e573eb452335ab6173e5b3f7"
+      "prefix_count": 702,
+      "sha256": "15c5dbaae20f7736dd95fd602803cf6bcf5af60e1982f21f0be4e980228a0600"
     },
     "ipv4/provinces/hunan.txt": {
-      "prefix_count": 413,
-      "sha256": "e1b61d14ea4ad1ebb90898ca6090738741c7ca02d66996f6ae0d0cda4de8dd9d"
+      "prefix_count": 425,
+      "sha256": "32a04d816c3608b6a6af6f119cef0770177f9999155494ae425622a29027d03f"
     },
     "ipv4/provinces/jiangsu.txt": {
-      "prefix_count": 2610,
-      "sha256": "0a9dbbe27881c23a246a403dc9f87a3d5f92d15d3a684780026fa50936d77615"
+      "prefix_count": 2611,
+      "sha256": "967d138ae0be6c78f2fda64c9e13f2cfa11dfc7e4ca821cd7e2fc055f2060f7b"
     },
     "ipv4/provinces/jiangxi.txt": {
-      "prefix_count": 474,
-      "sha256": "e87febde5acd27e3f4f441775df93320c3c7497c8ccaf22928757abdfb10680f"
+      "prefix_count": 471,
+      "sha256": "a3a56111221ec06064c8ff469083a70c9cfc6b946f1719fa380f5eb57710d6eb"
     },
     "ipv4/provinces/jilin.txt": {
-      "prefix_count": 223,
-      "sha256": "f88e822cfb578f95d90664111b4e4f2a05fd6064ba83143a7a55399ae3ec9575"
+      "prefix_count": 195,
+      "sha256": "5933a05e9f22c9d05ef9b20922d5c109416bf237ca146bb1207db9a3937c39be"
     },
     "ipv4/provinces/liaoning.txt": {
-      "prefix_count": 526,
-      "sha256": "1108250868bd725c2aaa007e5a2ad3464441b129a41133e5cb50c76b9e1d2b88"
+      "prefix_count": 369,
+      "sha256": "f62eba298f7c159f35bab6804da724edcb37a5bb6d8b94cc484634930bb189d0"
     },
     "ipv4/provinces/neimenggu.txt": {
-      "prefix_count": 429,
-      "sha256": "68b7d65248364543580f218784b32a0b4422ab6c702747cdbefa2c7192d1fd82"
+      "prefix_count": 394,
+      "sha256": "ae885905727971c6d4129ef3b075015e4ca549e627d842a76b5c51978489d692"
     },
     "ipv4/provinces/ningxia.txt": {
-      "prefix_count": 166,
-      "sha256": "4c022967a551e5ea28f9a62c0e640c4271ab94bcc72b5c98767e03485be50749"
+      "prefix_count": 133,
+      "sha256": "252a0dd41482172dbc4cb7d3e1368695a5db8248c6953cb5ac43ba33afe74735"
     },
     "ipv4/provinces/qinghai.txt": {
-      "prefix_count": 228,
-      "sha256": "ea0c26f4ead70e47d43f01a84b896503017384c9783d77bd4c1346d1bec0ee47"
+      "prefix_count": 199,
+      "sha256": "85a83f048b620f1dfe5b762ab8cd7cd71cad1709abcdfaf7aede933feacc6935"
     },
     "ipv4/provinces/shaanxi.txt": {
-      "prefix_count": 718,
-      "sha256": "a4c3c9a88da51de3444b4236076130d35a3476bbbf5140c85dafbd7f86ebe14a"
+      "prefix_count": 608,
+      "sha256": "9676541582db4ab3f6f1d4473a1556bfb5f77502830c264ffa1dbcb6a301fef6"
     },
     "ipv4/provinces/shandong.txt": {
-      "prefix_count": 916,
-      "sha256": "56a3df62a3dd444085d0a6d9251ef715017d9b97f97ea1029ab217ce11355971"
+      "prefix_count": 882,
+      "sha256": "517470415b6a671b80aef0173acb37e68aadb44866a4424d1ca9223c67f3da3d"
     },
     "ipv4/provinces/shanghai.txt": {
-      "prefix_count": 1698,
-      "sha256": "28ccd10f990307128c2038e8d36129313a84577e54cce4ce6c09ec60daa6ee93"
+      "prefix_count": 1524,
+      "sha256": "42702630445530b28ca1989171eb30baf69d4cc0141e796881f205a7f9ac2f7d"
     },
     "ipv4/provinces/shanxi.txt": {
-      "prefix_count": 370,
-      "sha256": "8d08dadc19f9f54512d748219e47f177c505ba0723fb91893e223eb01e0fa235"
+      "prefix_count": 364,
+      "sha256": "8748b611e0150e4c8b8120ccbffbd8bb1069ddd7a31f270029592a3fc22203be"
     },
     "ipv4/provinces/sichuan.txt": {
-      "prefix_count": 1352,
-      "sha256": "50e14c966bf106d986e1682370dd46a5add84b1d44c32614b34209cf13c6468f"
+      "prefix_count": 1294,
+      "sha256": "1b345ed25de3361f066ffba818c08d652b2973c3afb332bc3abe71a70ba7eeb4"
     },
     "ipv4/provinces/tianjin.txt": {
-      "prefix_count": 519,
-      "sha256": "fa720492886f50538e2f036a6cc3ece01121d4ff4a04b7dd92d68237ae5d64a5"
+      "prefix_count": 486,
+      "sha256": "997c016bf9b85225bb64c6c320d70ea7828088bd6067686f55f1c3b0b08764a0"
     },
     "ipv4/provinces/xinjiang.txt": {
-      "prefix_count": 237,
-      "sha256": "4b7ccef2e4cdd1f702b3c498cbc6bdc32eb86b6af990db04fe8b25f9f21f103e"
+      "prefix_count": 215,
+      "sha256": "c481688e6dfa461c2083fc4cdee9ebfa23d742e8ae1dc7587433e81d4ce0e59d"
     },
     "ipv4/provinces/xizang.txt": {
-      "prefix_count": 105,
-      "sha256": "202d8e2aef168dadb7207aabc4682c97d1247b44c0991258559cb25b06c26df2"
+      "prefix_count": 100,
+      "sha256": "b1c55df01c646b3e9b5463dba2e82e50d7aaa7adf9dd0fc5d9f2b140e43b47aa"
     },
     "ipv4/provinces/yunnan.txt": {
-      "prefix_count": 416,
-      "sha256": "5dfbaf59154b3042ef0364c461aec8003532705c6b80d965222c4af9b0998339"
+      "prefix_count": 469,
+      "sha256": "45f905554b9a60e9b24a41e2aecf861e520e6ed3f246b7155e9e378cd891b816"
     },
     "ipv4/provinces/zhejiang.txt": {
-      "prefix_count": 2456,
-      "sha256": "0be0090303f2af93c078d8689137f0eed0b60b415742f79209a87e038b9f64fe"
+      "prefix_count": 2339,
+      "sha256": "d0aef3b130ecbdffeca5468f04884e0e040a32bf14dd2d0397915fe8430f73fc"
     },
     "ipv6/chinamobile.txt": {
       "prefix_count": 62,
