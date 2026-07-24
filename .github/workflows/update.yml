@@ -85,8 +85,8 @@ jobs:
             -o "$source_dir/riswhois_ipv6.gz"
 
           curl "${curl_opts[@]}" \
-            'https://raw.githubusercontent.com/lionsoul2014/ip2region/master/data/ipv4_source.txt' \
-            -o "$source_dir/ip2region_ipv4_source.txt"
+            'https://github.com/ljxi/GeoCN/releases/latest/download/GeoCN.mmdb' \
+            -L -o "$source_dir/geocn.mmdb"
 
           ipdata_base='https://raw.githubusercontent.com/axpwx/IP-Data/master/provider'
           curl "${curl_opts[@]}" "$ipdata_base/aliyun-cidr-ipv4.txt" \
@@ -136,6 +136,7 @@ jobs:
           check_minimum_size "$source_dir/riswhois_ipv4.gz" 1000000
           check_minimum_size "$source_dir/riswhois_ipv6.gz" 500000
           check_minimum_size "$source_dir/iptoasn_ipv6.tsv.gz" 500000
+          check_minimum_size "$source_dir/geocn.mmdb" 5000000
 
           sha256sum "$source_dir"/* > "$AUDIT_DIR/source-sha256.txt"
 

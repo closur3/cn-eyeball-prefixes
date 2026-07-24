@@ -532,6 +532,9 @@ func sourcePath(dir, name string) string {
 	if name == "apnic_inetnum" || name == "apnic_autnum" || name == "apnic_organisation" || name == "apnic_route" || name == "riswhois_ipv4" {
 		return filepath.Join(dir, name+".gz")
 	}
+	if name == "geocn" {
+		return filepath.Join(dir, name+".mmdb")
+	}
 	return filepath.Join(dir, name+".txt")
 }
 
@@ -1060,7 +1063,7 @@ func Main() {
 	if m.OperatorAdmission.Mode != "bgp_registration_conflict_healing_with_strong_exclusions" || m.OperatorAdmission.PreCIDRCount != preAdmissionCIDRCount || m.OperatorAdmission.DeniedCIDRCount != cidrCount(admissionDeniedRanges) || m.OperatorAdmission.HierarchicalCIDRCount != hierarchicalCIDRCount || m.OperatorAdmission.ConflictHealedCIDRCount != cidrCount(bgpConflictHealedAdded) || m.OperatorAdmission.ConflictHealedAddressCount != addressCount(bgpConflictHealedAdded) || m.OperatorAdmission.FinalCIDRCount != finalCIDRCount || m.OperatorAdmission.CIDRExpansionRatio != admissionExpansionRatio || m.OperatorAdmission.MaximumCIDRExpansionRatio != maxAdmissionCIDRExpansionRatio || m.OperatorAdmission.ConflictHealingCIDRRatio != conflictHealingCIDRRatio || m.OperatorAdmission.MaximumConflictHealingCIDRRatio != maxConflictHealingCIDRRatio || m.OperatorAdmission.ConflictHealedAddressRatio != conflictHealedAddressRatio || m.OperatorAdmission.MaximumConflictHealedAddressRatio != maxConflictHealedAddressRatio {
 		panic("manifest BGP conflict-healing metadata mismatch")
 	}
-	expectedSourceNames := append([]string{"china", "iptoasn_ipv4", "apnic_organisation", "apnic_inetnum", "apnic_autnum", "apnic_route", "riswhois_ipv4", "ip2region_ipv4_source"}, cloudSources...)
+	expectedSourceNames := append([]string{"china", "iptoasn_ipv4", "apnic_organisation", "apnic_inetnum", "apnic_autnum", "apnic_route", "riswhois_ipv4", "geocn"}, cloudSources...)
 	if len(m.Sources) != len(expectedSourceNames)+1 {
 		panic("manifest source count mismatch")
 	}

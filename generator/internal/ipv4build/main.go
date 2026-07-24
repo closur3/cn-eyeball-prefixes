@@ -20,6 +20,7 @@ import (
 	"github.com/closur3/cn-eyeball-prefixes/generator/internal/apnicinetnum"
 	"github.com/closur3/cn-eyeball-prefixes/generator/internal/apnicorg"
 	"github.com/closur3/cn-eyeball-prefixes/generator/internal/apnicroute"
+	"github.com/closur3/cn-eyeball-prefixes/generator/internal/geocn"
 	"github.com/closur3/cn-eyeball-prefixes/generator/internal/operatorconfig"
 	"github.com/closur3/cn-eyeball-prefixes/generator/internal/riswhois"
 )
@@ -305,7 +306,7 @@ var aliases = map[string]string{"北京": "北京市", "天津": "天津市", "�
 var urls = map[string]string{
 	"china":                 "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/china.txt",
 	"iptoasn_ipv4":          "https://iptoasn.com/data/ip2asn-v4.tsv.gz",
-	"ip2region_ipv4_source": "https://raw.githubusercontent.com/lionsoul2014/ip2region/master/data/ipv4_source.txt",
+	"geocn": "https://github.com/ljxi/GeoCN/releases/latest/download/GeoCN.mmdb",
 	"apnic_inetnum":         "https://ftp.apnic.net/apnic/whois/apnic.db.inetnum.gz",
 	"apnic_autnum":          "https://ftp.apnic.net/apnic/whois/apnic.db.aut-num.gz",
 	"apnic_organisation":    "https://ftp.apnic.net/apnic/whois/apnic.db.organisation.gz",
@@ -704,6 +705,9 @@ func sourcePath(dir, name string) string {
 	}
 	if name == "apnic_inetnum" || name == "apnic_autnum" || name == "apnic_organisation" || name == "apnic_route" || name == "riswhois_ipv4" {
 		return filepath.Join(dir, name+".gz")
+	}
+	if name == "geocn" {
+		return filepath.Join(dir, name+".mmdb")
 	}
 	return filepath.Join(dir, name+".txt")
 }
@@ -1317,25 +1321,17 @@ func Main() {
 	provinceSourceRanges := map[string][]span{}
 	provinceNames := provinceSet()
 
-	b, e := os.ReadFile(filepath.Join(*src, "ip2region_ipv4_source.txt"))
-	if e != nil {
-		panic(e)
+	provincePrefixes, err := geocn.ProvinceRanges(filepath.Join(*src, "geocn.mmdb"))
+	if err != nil {
+		panic(err)
 	}
-	for _, line := range strings.Split(strings.TrimSpace(string(b)), "\n") {
-		x := strings.Split(line, "|")
-		if len(x) != 7 || x[2] != "中国" {
-			continue
-		}
-		p := x[3]
-		if a, ok := aliases[p]; ok {
-			p = a
-		}
+	for p, prefixes := range provincePrefixes {
 		if !provinceNames[p] {
 			continue
 		}
-		a, _ := netip.ParseAddr(x[0])
-		z, _ := netip.ParseAddr(x[1])
-		provinceSourceRanges[p] = append(provinceSourceRanges[p], span{n(a), n(z)})
+		for _, prefix := range prefixes {
+			provinceSourceRanges[p] = append(provinceSourceRanges[p], span{n(prefix.Addr()), end(prefix)})
+		}
 	}
 	for _, p := range provinces {
 		provinceRanges := merge(provinceSourceRanges[p.Name])
@@ -1351,7 +1347,7 @@ func Main() {
 	}
 	provinceAttributed = merge(provinceAttributed)
 	if addressCount(provinceAttributed)*100 < addressCount(finalRanges)*90 {
-		panic("ip2region attributes fewer than 90% of final output addresses to provinces")
+		panic("GeoCN attributes fewer than 90% of final output addresses to provinces")
 	}
 	logPhase("final and province ranges")
 
@@ -1404,7 +1400,7 @@ func Main() {
 		panic(e)
 	}
 	m.Sources = append(m.Sources, configSource)
-	for _, o := range append([]string{"china", "iptoasn_ipv4", "apnic_organisation", "apnic_inetnum", "apnic_autnum", "apnic_route", "riswhois_ipv4", "ip2region_ipv4_source"}, cloudSources...) {
+	for _, o := range append([]string{"china", "iptoasn_ipv4", "apnic_organisation", "apnic_inetnum", "apnic_autnum", "apnic_route", "riswhois_ipv4", "geocn"}, cloudSources...) {
 		path := sourcePath(*src, o)
 		sourceEntry, e := source(path, o, urls[o], "")
 		if e != nil {
