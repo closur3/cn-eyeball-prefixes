@@ -140,6 +140,12 @@ jobs:
 
           sha256sum "$source_dir"/* > "$AUDIT_DIR/source-sha256.txt"
 
+      - name: Resolve Go dependencies
+        shell: bash
+        run: |
+          set -euo pipefail
+          go -C generator mod tidy
+
       - name: Run Go tests
         shell: bash
         run: |
@@ -236,7 +242,7 @@ jobs:
         run: |
           set -euo pipefail
           if [[ -n "$(git status --porcelain=v1 --untracked-files=all -- \
-            lists/ipv4 lists/ipv6 lists/manifest.json)" ]]; then
+            lists/ipv4 lists/ipv6 lists/manifest.json generator/go.sum)" ]]; then
             echo 'changed=true' >> "$GITHUB_OUTPUT"
           else
             echo 'changed=false' >> "$GITHUB_OUTPUT"
@@ -251,6 +257,6 @@ jobs:
           git config user.email \
             '41898282+github-actions[bot]@users.noreply.github.com'
           git add -A -- lists/ipv4 lists/ipv6
-          git add -- lists/manifest.json
+          git add -- lists/manifest.json generator/go.sum
           git commit -m 'chore: update cn eyeball prefixes'
           git push
