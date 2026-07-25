@@ -23,6 +23,10 @@ type Record struct {
 	Prefix  string
 	Origins []Origin
 }
+
+func (r Record) GetLo() uint32 { return r.Lo }
+func (r Record) GetHi() uint32 { return r.Hi }
+
 type Segment struct {
 	Lo, Hi uint32
 	Record Record
@@ -128,17 +132,17 @@ func Resolve(records []Record) []Segment {
 		return !ev[i].a && ev[j].a
 	})
 	active := make([]bool, len(records))
-	h := &rh{r: records}
+	h := &iputil.SpanHeap[Record]{Data: records}
 	heap.Init(h)
 	prev := ev[0].p
 	out := []Segment{}
 	for i := 0; i < len(ev); {
 		p := ev[i].p
-		for h.Len() > 0 && !active[h.x[0]] {
+		for h.Len() > 0 && !active[h.Top()] {
 			heap.Pop(h)
 		}
 		if prev < p && h.Len() > 0 {
-			out = append(out, Segment{uint32(prev), uint32(p - 1), records[h.x[0]]})
+			out = append(out, Segment{uint32(prev), uint32(p - 1), records[h.Top()]})
 		}
 		for i < len(ev) && ev[i].p == p {
 			q := ev[i]
@@ -152,21 +156,3 @@ func Resolve(records []Record) []Segment {
 	}
 	return out
 }
-
-type rh struct {
-	r []Record
-	x []int
-}
-
-func (h rh) Len() int { return len(h.x) }
-func (h rh) Less(i, j int) bool {
-	a, b := h.r[h.x[i]], h.r[h.x[j]]
-	as, bs := uint64(a.Hi)-uint64(a.Lo), uint64(b.Hi)-uint64(b.Lo)
-	if as != bs {
-		return as < bs
-	}
-	return h.x[i] < h.x[j]
-}
-func (h rh) Swap(i, j int) { h.x[i], h.x[j] = h.x[j], h.x[i] }
-func (h *rh) Push(v any)   { h.x = append(h.x, v.(int)) }
-func (h *rh) Pop() any     { x := h.x[len(h.x)-1]; h.x = h.x[:len(h.x)-1]; return x }
