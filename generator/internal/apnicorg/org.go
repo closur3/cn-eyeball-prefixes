@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"os"
 	"strings"
+
+	"github.com/closur3/cn-eyeball-prefixes/generator/internal/iputil"
 )
 
 // Parse returns APNIC organisation handles mapped to their structured org-name.
@@ -24,7 +26,7 @@ func Parse(path string) (map[string]string, error) {
 	fields := map[string][]string{}
 	last := ""
 	finish := func() {
-		if h, name := first(fields["organisation"]), first(fields["org-name"]); h != "" && name != "" {
+		if h, name := iputil.First(fields["organisation"]), iputil.First(fields["org-name"]); h != "" && name != "" {
 			out[h] = name
 		}
 		fields, last = map[string][]string{}, ""
@@ -61,11 +63,4 @@ func Parse(path string) (map[string]string, error) {
 		return nil, fmt.Errorf("%s contains no organisation records", path)
 	}
 	return out, nil
-}
-
-func first(v []string) string {
-	if len(v) == 0 {
-		return ""
-	}
-	return v[0]
 }

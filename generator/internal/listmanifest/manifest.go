@@ -13,6 +13,8 @@ import (
 	"sort"
 	"strings"
 	"time"
+
+	"github.com/closur3/cn-eyeball-prefixes/generator/internal/iputil"
 )
 
 // SourceEntry records the identity of an upstream data source or local config
@@ -95,7 +97,7 @@ func ComputeSourceHashes(sourceDir string) map[string]SourceEntry {
 	return entries
 }
 
-var operators = []string{"chinatelecom", "chinamobile", "chinaunicom"}
+var operators = iputil.Operators
 
 var provinces = []string{
 	"anhui",

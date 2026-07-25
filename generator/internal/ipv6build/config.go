@@ -8,6 +8,8 @@ import (
 	"os"
 	"sort"
 	"strings"
+
+	"github.com/closur3/cn-eyeball-prefixes/generator/internal/iputil"
 )
 
 const (
@@ -15,7 +17,7 @@ const (
 	expectedProvinceCount   = 31
 )
 
-var operatorNames = []string{"chinatelecom", "chinamobile", "chinaunicom"}
+var operatorNames = iputil.Operators
 
 // AllocationConfig is the machine-readable source of truth for provincial
 // IPv6 access allocations. Access type remains available to admission and

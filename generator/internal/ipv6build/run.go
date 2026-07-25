@@ -18,6 +18,7 @@ import (
 	"time"
 
 	"github.com/closur3/cn-eyeball-prefixes/generator/internal/apnic6"
+	"github.com/closur3/cn-eyeball-prefixes/generator/internal/iputil"
 	"github.com/closur3/cn-eyeball-prefixes/generator/internal/operatorconfig"
 	"github.com/closur3/cn-eyeball-prefixes/generator/internal/riswhois6"
 )
@@ -323,7 +324,7 @@ func rangesFromPrefixes(byPurpose map[string][]string) []admissionRange {
 		purposeName := strings.TrimSuffix(purpose, "_broadband")
 		for _, value := range values {
 			prefix := netip.MustParsePrefix(value).Masked()
-			out = append(out, admissionRange{Lo: prefix.Addr(), Hi: lastAddress(prefix), Purpose: purposeName})
+			out = append(out, admissionRange{Lo: prefix.Addr(), Hi: iputil.LastAddress(prefix), Purpose: purposeName})
 		}
 	}
 	sort.Slice(out, func(i, j int) bool { return out[i].Lo.Compare(out[j].Lo) < 0 })
@@ -354,7 +355,7 @@ func summarizeOrigins(values map[string]*originAccumulator, metadata map[string]
 }
 
 func classifyPrefix(prefix netip.Prefix, ranges []admissionRange) (string, string) {
-	lo, hi := prefix.Masked().Addr(), lastAddress(prefix)
+	lo, hi := prefix.Masked().Addr(), iputil.LastAddress(prefix)
 	i := sort.Search(len(ranges), func(i int) bool { return ranges[i].Hi.Compare(lo) >= 0 })
 	cursor := lo
 	purpose := ""
@@ -376,7 +377,7 @@ func classifyPrefix(prefix netip.Prefix, ranges []admissionRange) (string, strin
 }
 
 func overlapsAdmissionRanges(prefix netip.Prefix, ranges []admissionRange) bool {
-	lo, hi := prefix.Masked().Addr(), lastAddress(prefix)
+	lo, hi := prefix.Masked().Addr(), iputil.LastAddress(prefix)
 	i := sort.Search(len(ranges), func(i int) bool { return ranges[i].Hi.Compare(lo) >= 0 })
 	return i < len(ranges) && ranges[i].Lo.Compare(hi) <= 0
 }
@@ -464,25 +465,6 @@ func readASNMetadata(path string) (map[string]asMeta, error) {
 		out[asn] = best.meta
 	}
 	return out, nil
-}
-
-func lastAddress(prefix netip.Prefix) netip.Addr {
-	b := prefix.Masked().Addr().As16()
-	for bit := prefix.Bits(); bit < 128; bit++ {
-		b[bit/8] |= 1 << uint(7-bit%8)
-	}
-	return netip.AddrFrom16(b)
-}
-
-func writePrefixes(path string, prefixes []netip.Prefix) error {
-	if len(prefixes) == 0 {
-		return fmt.Errorf("refusing to write empty prefix list: %s", path)
-	}
-	var b strings.Builder
-	for _, prefix := range prefixes {
-		fmt.Fprintln(&b, prefix)
-	}
-	return writeFile(path, []byte(b.String()))
 }
 
 func fileMetadata(path string) (sourceMeta, error) {

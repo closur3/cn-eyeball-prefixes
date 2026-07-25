@@ -10,6 +10,8 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+
+	"github.com/closur3/cn-eyeball-prefixes/generator/internal/iputil"
 )
 
 type Origin struct {
@@ -63,7 +65,7 @@ func Parse(path string, relevant func(uint32, uint32) bool) ([]Record, Stats, er
 		stats.Rows++
 		r := group[p.String()]
 		if r == nil {
-			lo, hi := number(p.Addr()), end(p)
+			lo, hi := iputil.Number(p.Addr()), iputil.End(p)
 			if relevant != nil && !relevant(lo, hi) {
 				group[p.String()] = &Record{Prefix: "-"}
 				continue
@@ -168,10 +170,3 @@ func (h rh) Less(i, j int) bool {
 func (h rh) Swap(i, j int) { h.x[i], h.x[j] = h.x[j], h.x[i] }
 func (h *rh) Push(v any)   { h.x = append(h.x, v.(int)) }
 func (h *rh) Pop() any     { x := h.x[len(h.x)-1]; h.x = h.x[:len(h.x)-1]; return x }
-func number(a netip.Addr) uint32 {
-	b := a.As4()
-	return uint32(b[0])<<24 | uint32(b[1])<<16 | uint32(b[2])<<8 | uint32(b[3])
-}
-func end(p netip.Prefix) uint32 {
-	return uint32(uint64(number(p.Addr())) + (uint64(1) << uint(32-p.Bits())) - 1)
-}

@@ -21,16 +21,15 @@ import (
 	"github.com/closur3/cn-eyeball-prefixes/generator/internal/apnicinetnum"
 	"github.com/closur3/cn-eyeball-prefixes/generator/internal/apnicorg"
 	"github.com/closur3/cn-eyeball-prefixes/generator/internal/apnicroute"
+	"github.com/closur3/cn-eyeball-prefixes/generator/internal/iputil"
 	"github.com/closur3/cn-eyeball-prefixes/generator/internal/operatorconfig"
 	"github.com/closur3/cn-eyeball-prefixes/generator/internal/riswhois"
 )
 
 type span struct{ lo, hi uint32 }
 
-var cloudSources = []string{
-	"ipdata_aliyun", "ipdata_tencent", "ipdata_huawei", "ipdata_ucloud", "ipdata_ksyun", "ipdata_baidu", "ipdata_jdcloud",
-}
-var operators = []string{"chinatelecom", "chinamobile", "chinaunicom"}
+var cloudSources = iputil.CloudSources
+var operators = iputil.Operators
 
 const maxAdmissionCIDRExpansionRatio = 2.0
 const maxConflictHealingCIDRRatio = 1.10

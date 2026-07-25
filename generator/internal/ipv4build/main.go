@@ -20,6 +20,7 @@ import (
 	"github.com/closur3/cn-eyeball-prefixes/generator/internal/apnicinetnum"
 	"github.com/closur3/cn-eyeball-prefixes/generator/internal/apnicorg"
 	"github.com/closur3/cn-eyeball-prefixes/generator/internal/apnicroute"
+	"github.com/closur3/cn-eyeball-prefixes/generator/internal/iputil"
 	"github.com/closur3/cn-eyeball-prefixes/generator/internal/operatorconfig"
 	"github.com/closur3/cn-eyeball-prefixes/generator/internal/riswhois"
 )
@@ -259,15 +260,13 @@ type province struct {
 	Slug string
 }
 
-var operators = []string{"chinatelecom", "chinamobile", "chinaunicom"}
+var operators = iputil.Operators
 
 const maxAdmissionCIDRExpansionRatio = 2.0
 const maxConflictHealingCIDRRatio = 1.10
 const maxConflictHealedAddressRatio = 0.001
 
-var cloudSources = []string{
-	"ipdata_aliyun", "ipdata_tencent", "ipdata_huawei", "ipdata_ucloud", "ipdata_ksyun", "ipdata_baidu", "ipdata_jdcloud",
-}
+var cloudSources = iputil.CloudSources
 var provinces = []province{
 	{"北京市", "beijing"},
 	{"天津市", "tianjin"},

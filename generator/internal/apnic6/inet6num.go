@@ -9,6 +9,8 @@ import (
 	"os"
 	"sort"
 	"strings"
+
+	"github.com/closur3/cn-eyeball-prefixes/generator/internal/iputil"
 )
 
 type Record struct {
@@ -48,7 +50,7 @@ func Parse(path string) ([]Record, error) {
 			return fmt.Errorf("invalid inet6num %q", fields["inet6num"][0])
 		}
 		prefix = prefix.Masked()
-		lo, hi := prefix.Addr(), lastAddress(prefix)
+		lo, hi := prefix.Addr(), iputil.LastAddress(prefix)
 		record := byPrefix[prefix.String()]
 		if record == nil {
 			record = &Record{Prefix: prefix, Lo: lo, Hi: hi}
@@ -148,14 +150,6 @@ func ResolveMostSpecific(records []Record) []Segment {
 		previous = position
 	}
 	return out
-}
-
-func lastAddress(prefix netip.Prefix) netip.Addr {
-	b := prefix.Masked().Addr().As16()
-	for bit := prefix.Bits(); bit < 128; bit++ {
-		b[bit/8] |= 1 << uint(7-bit%8)
-	}
-	return netip.AddrFrom16(b)
 }
 
 func contains(values []string, want string) bool {

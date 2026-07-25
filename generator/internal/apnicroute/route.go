@@ -10,6 +10,8 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+
+	"github.com/closur3/cn-eyeball-prefixes/generator/internal/iputil"
 )
 
 type Variant struct {
@@ -53,25 +55,25 @@ func Parse(path string, orgNames map[string]string, relevant func(uint32, uint32
 			return fmt.Errorf("invalid route %q", fields["route"][0])
 		}
 		p = p.Masked()
-		origin := strings.TrimPrefix(strings.ToUpper(first(fields["origin"])), "AS")
+		origin := strings.TrimPrefix(strings.ToUpper(iputil.First(fields["origin"])), "AS")
 		if _, e = strconv.ParseUint(origin, 10, 32); e != nil {
-			return fmt.Errorf("invalid route origin %q", first(fields["origin"]))
+			return fmt.Errorf("invalid route origin %q", iputil.First(fields["origin"]))
 		}
 		objects++
-		lo, hi := number(p.Addr()), end(p)
+		lo, hi := iputil.Number(p.Addr()), iputil.End(p)
 		if relevant != nil && !relevant(lo, hi) {
 			return nil
 		}
 		relevantObjects++
-		orgs := clean(fields["org"])
+		orgs := iputil.Clean(fields["org"])
 		var names []string
 		for _, h := range orgs {
 			if n := orgNames[h]; n != "" {
-				names = appendUnique(names, n)
+				names = iputil.AppendUnique(names, n)
 			}
 		}
-		maintainers := append(clean(fields["mnt-by"]), clean(fields["mnt-routes"])...)
-		raw = append(raw, Record{lo, hi, p.String(), []Variant{{origin, clean(fields["descr"]), orgs, names, clean(maintainers), first(fields["last-modified"])}}})
+		maintainers := append(iputil.Clean(fields["mnt-by"]), iputil.Clean(fields["mnt-routes"])...)
+		raw = append(raw, Record{lo, hi, p.String(), []Variant{{origin, iputil.Clean(fields["descr"]), orgs, names, iputil.Clean(maintainers), iputil.First(fields["last-modified"])}}})
 		return nil
 	}
 	s := bufio.NewScanner(z)
@@ -194,30 +196,3 @@ func (h rh) Less(i, j int) bool {
 func (h rh) Swap(i, j int)      { h.items[i], h.items[j] = h.items[j], h.items[i] }
 func (h *rh) Push(v any)        { h.items = append(h.items, v.(int)) }
 func (h *rh) Pop() any          { x := h.items[len(h.items)-1]; h.items = h.items[:len(h.items)-1]; return x }
-func clean(v []string) []string { return appendUnique(nil, v...) }
-func appendUnique(v []string, a ...string) []string {
-	m := map[string]bool{}
-	for _, x := range v {
-		m[x] = true
-	}
-	for _, x := range a {
-		if x != "" && !m[x] {
-			v = append(v, x)
-			m[x] = true
-		}
-	}
-	return v
-}
-func first(v []string) string {
-	if len(v) == 0 {
-		return ""
-	}
-	return v[0]
-}
-func number(a netip.Addr) uint32 {
-	b := a.As4()
-	return uint32(b[0])<<24 | uint32(b[1])<<16 | uint32(b[2])<<8 | uint32(b[3])
-}
-func end(p netip.Prefix) uint32 {
-	return uint32(uint64(number(p.Addr())) + (uint64(1) << uint(32-p.Bits())) - 1)
-}

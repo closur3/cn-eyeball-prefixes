@@ -8,6 +8,8 @@ import (
 	"sort"
 	"strings"
 	"unicode"
+
+	"github.com/closur3/cn-eyeball-prefixes/generator/internal/iputil"
 )
 
 type Record struct {
@@ -38,10 +40,10 @@ func Parse(path string) ([]Record, error) {
 	finish := func() {
 		if len(fields["aut-num"]) > 0 {
 			asn := strings.TrimPrefix(strings.ToUpper(fields["aut-num"][0]), "AS")
-			name := first(fields["as-name"])
-			if asn != "" && name != "" {
-				maintainers := append(clean(fields["mnt-by"]), clean(fields["mnt-routes"])...)
-				out = append(out, Record{asn, name, clean(fields["org"]), clean(maintainers)})
+			name := iputil.First(fields["as-name"])
+			if name != "" {
+				maintainers := append(iputil.Clean(fields["mnt-by"]), iputil.Clean(fields["mnt-routes"])...)
+				out = append(out, Record{asn, name, iputil.Clean(fields["org"]), iputil.Clean(maintainers)})
 			}
 		}
 		fields = map[string][]string{}
@@ -190,20 +192,4 @@ func Normalize(s string) string {
 	}
 	return b.String()
 }
-func first(v []string) string {
-	if len(v) == 0 {
-		return ""
-	}
-	return v[0]
-}
-func clean(v []string) []string {
-	seen := map[string]bool{}
-	out := []string{}
-	for _, x := range v {
-		if x != "" && !seen[x] {
-			seen[x] = true
-			out = append(out, x)
-		}
-	}
-	return out
-}
+

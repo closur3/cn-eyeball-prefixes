@@ -9,6 +9,8 @@ import (
 	"os"
 	"sort"
 	"strings"
+
+	"github.com/closur3/cn-eyeball-prefixes/generator/internal/iputil"
 )
 
 type Record struct {
@@ -28,7 +30,7 @@ func AttachOrganizationNames(records []Record, names map[string]string) {
 	for i := range records {
 		for _, handle := range records[i].Organizations {
 			if name := names[handle]; name != "" {
-				records[i].OrganizationNames = appendUnique(records[i].OrganizationNames, name)
+				records[i].OrganizationNames = iputil.AppendUnique(records[i].OrganizationNames, name)
 			}
 		}
 	}
@@ -80,15 +82,15 @@ func Parse(path string) ([]Record, error) {
 			return fmt.Errorf("invalid IPv4 inetnum %q", values[0])
 		}
 		records = append(records, Record{
-			Lo:            number(lo),
-			Hi:            number(hi),
-			Netnames:      clean(fields["netname"]),
-			Descriptions:  clean(fields["descr"]),
-			Organizations: clean(fields["org"]),
-			Maintainers:   clean(fields["mnt-by"]),
-			Country:       first(fields["country"]),
-			Status:        first(fields["status"]),
-			LastModified:  first(fields["last-modified"]),
+			Lo:            iputil.Number(lo),
+			Hi:            iputil.Number(hi),
+			Netnames:      iputil.Clean(fields["netname"]),
+			Descriptions:  iputil.Clean(fields["descr"]),
+			Organizations: iputil.Clean(fields["org"]),
+			Maintainers:   iputil.Clean(fields["mnt-by"]),
+			Country:       iputil.First(fields["country"]),
+			Status:        iputil.First(fields["status"]),
+			LastModified:  iputil.First(fields["last-modified"]),
 		})
 		fields = map[string][]string{}
 		lastKey = ""
@@ -252,11 +254,11 @@ func mergeExact(records []Record) []Record {
 			continue
 		}
 		last := &out[len(out)-1]
-		last.Netnames = appendUnique(last.Netnames, record.Netnames...)
-		last.Descriptions = appendUnique(last.Descriptions, record.Descriptions...)
-		last.Organizations = appendUnique(last.Organizations, record.Organizations...)
-		last.OrganizationNames = appendUnique(last.OrganizationNames, record.OrganizationNames...)
-		last.Maintainers = appendUnique(last.Maintainers, record.Maintainers...)
+		last.Netnames = iputil.AppendUnique(last.Netnames, record.Netnames...)
+		last.Descriptions = iputil.AppendUnique(last.Descriptions, record.Descriptions...)
+		last.Organizations = iputil.AppendUnique(last.Organizations, record.Organizations...)
+		last.OrganizationNames = iputil.AppendUnique(last.OrganizationNames, record.OrganizationNames...)
+		last.Maintainers = iputil.AppendUnique(last.Maintainers, record.Maintainers...)
 		if last.Country == "" {
 			last.Country = record.Country
 		}
@@ -281,38 +283,8 @@ func appendSegment(out *[]Segment, segment Segment) {
 	*out = append(*out, segment)
 }
 
-func appendUnique(values []string, additions ...string) []string {
-	seen := map[string]bool{}
-	for _, value := range values {
-		seen[value] = true
-	}
-	for _, value := range additions {
-		if value != "" && !seen[value] {
-			values = append(values, value)
-			seen[value] = true
-		}
-	}
-	return values
-}
-
-func clean(values []string) []string {
-	return appendUnique(nil, values...)
-}
-
-func first(values []string) string {
-	if len(values) == 0 {
-		return ""
-	}
-	return values[0]
-}
-
-func number(a netip.Addr) uint32 {
-	b := a.As4()
-	return uint32(b[0])<<24 | uint32(b[1])<<16 | uint32(b[2])<<8 | uint32(b[3])
-}
-
 func compare(a, b netip.Addr) int {
-	an, bn := number(a), number(b)
+	an, bn := iputil.Number(a), iputil.Number(b)
 	if an < bn {
 		return -1
 	}

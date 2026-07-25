@@ -7,6 +7,8 @@ import (
 	"os"
 	"path/filepath"
 	"sort"
+
+	"github.com/closur3/cn-eyeball-prefixes/generator/internal/iputil"
 )
 
 // PublicLists is the public, access-type-neutral IPv6 output. Fixed/mobile
@@ -171,12 +173,12 @@ func rejectCrossOperatorOverlaps(byOperator map[string][]netip.Prefix) error {
 		return nil
 	}
 	active := values[0]
-	activeHi := lastAddress(active.prefix)
+	activeHi := iputil.LastAddress(active.prefix)
 	for _, current := range values[1:] {
 		if current.prefix.Addr().Compare(activeHi) <= 0 {
 			return fmt.Errorf("cross-operator IPv6 overlap: %s %s and %s %s", active.operator, active.prefix, current.operator, current.prefix)
 		}
-		currentHi := lastAddress(current.prefix)
+		currentHi := iputil.LastAddress(current.prefix)
 		if currentHi.Compare(activeHi) > 0 {
 			active, activeHi = current, currentHi
 		}
