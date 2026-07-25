@@ -211,7 +211,34 @@ jobs:
           sync_txt_tree "$STAGE_DIR/ipv6" lists/ipv6
           rm -f -- lists/ipv4/manifest.json lists/ipv6/manifest.json
 
-          go -C generator run ./cmd/generate manifest --root ../lists \
+          # ---- Generator commit ----
+          generator_commit="${GITHUB_SHA:-$(git rev-parse HEAD)}"
+          generator_dirty=false
+          if [[ -n "$(git status --porcelain)" ]]; then
+            generator_dirty=true
+          fi
+
+          # ---- Config hashes ----
+          config_hashes="$RUNNER_TEMP/config-hashes.json"
+          {
+            echo '{'
+            for f in generator/config/operators.json generator/config/ipv6-province-prefixes.json; do
+              sum=$(sha256sum "$f" | cut -d' ' -f1)
+              echo "  \"$(basename "$f")\": {\"sha256\": \"$sum\"},"
+            done
+            # remove trailing comma, close brace
+          } | sed '$ s/,$//' > "$config_hashes"
+          echo '}' >> "$config_hashes"
+
+          # ---- Source hashes (computed by Go, URL map in listmanifest/manifest.go) ----
+
+          # ---- Generate public manifest ----
+          go -C generator run ./cmd/generate manifest \
+            --root ../lists \
+            --commit "$generator_commit" \
+            --dirty=$generator_dirty \
+            --config-hashes "$config_hashes" \
+            --source-dir "$SOURCE_DIR" \
             2>&1 | tee "$AUDIT_DIR/generate-public-manifest.log"
 
           cp "$STAGE_DIR/ipv4/manifest.json" "$AUDIT_DIR/ipv4-manifest.json"

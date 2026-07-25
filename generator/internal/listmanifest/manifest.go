@@ -12,9 +12,88 @@ import (
 	"path/filepath"
 	"sort"
 	"strings"
+	"time"
 )
 
-const SchemaVersion = 2
+// SourceEntry records the identity of an upstream data source or local config
+// file used to generate the public lists.  Comparing these across commits
+// makes it possible to tell which upstream change drove a list change.
+type SourceEntry struct {
+	SHA256 string `json:"sha256"`
+	URL    string `json:"url,omitempty"`
+}
+
+// GeneratorInfo describes the version of the generator program that built the
+// lists.  Comparing commits tells you whether a list change was caused by a
+// code change rather than a data-source or config change.
+type GeneratorInfo struct {
+	Commit string `json:"commit"`
+	Dirty  bool   `json:"dirty"`
+}
+
+// FileEntry records the identity of a single output list file.
+type FileEntry struct {
+	PrefixCount int    `json:"prefix_count"`
+	SHA256      string `json:"sha256"`
+}
+
+type Manifest struct {
+	SchemaVersion int                    `json:"schema_version"`
+	ContentID     string                 `json:"content_id"`
+	GeneratedAt   string                 `json:"generated_at,omitempty"`
+	Generator     *GeneratorInfo         `json:"generator,omitempty"`
+	Configs       map[string]SourceEntry `json:"configs,omitempty"`
+	Sources       map[string]SourceEntry `json:"sources,omitempty"`
+	Files         map[string]FileEntry   `json:"files"`
+}
+
+const SchemaVersion = 4
+
+var sourceURLs = map[string]string{
+	"china.txt":              "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/china.txt",
+	"iptoasn_ipv4.tsv.gz":    "https://iptoasn.com/data/ip2asn-v4.tsv.gz",
+	"iptoasn_ipv6.tsv.gz":    "https://iptoasn.com/data/ip2asn-v6.tsv.gz",
+	"apnic_inetnum.gz":       "https://ftp.apnic.net/apnic/whois/apnic.db.inetnum.gz",
+	"apnic_inet6num.gz":      "https://ftp.apnic.net/apnic/whois/apnic.db.inet6num.gz",
+	"apnic_autnum.gz":        "https://ftp.apnic.net/apnic/whois/apnic.db.aut-num.gz",
+	"apnic_organisation.gz":  "https://ftp.apnic.net/apnic/whois/apnic.db.organisation.gz",
+	"apnic_route.gz":         "https://ftp.apnic.net/apnic/whois/apnic.db.route.gz",
+	"riswhois_ipv4.gz":       "https://www.ris.ripe.net/dumps/riswhoisdump.IPv4.gz",
+	"riswhois_ipv6.gz":       "https://www.ris.ripe.net/dumps/riswhoisdump.IPv6.gz",
+	"ip2region_ipv4_source.txt": "https://raw.githubusercontent.com/lionsoul2014/ip2region/master/data/ipv4_source.txt",
+	"ipdata_aliyun.txt":      "https://raw.githubusercontent.com/axpwx/IP-Data/master/provider/aliyun-cidr-ipv4.txt",
+	"ipdata_tencent.txt":     "https://raw.githubusercontent.com/axpwx/IP-Data/master/provider/tencent-cidr-ipv4.txt",
+	"ipdata_huawei.txt":      "https://raw.githubusercontent.com/axpwx/IP-Data/master/provider/huawei-cidr-ipv4.txt",
+	"ipdata_ucloud.txt":      "https://raw.githubusercontent.com/axpwx/IP-Data/master/provider/ucloud-cidr-ipv4.txt",
+	"ipdata_ksyun.txt":       "https://raw.githubusercontent.com/axpwx/IP-Data/master/provider/ksyun-cidr-ipv4.txt",
+	"ipdata_baidu.txt":       "https://raw.githubusercontent.com/axpwx/IP-Data/master/provider/baidu-cidr-ipv4.txt",
+	"ipdata_jdcloud.txt":     "https://raw.githubusercontent.com/axpwx/IP-Data/master/provider/jdcloud-cidr-ipv4.txt",
+}
+
+func ComputeSourceHashes(sourceDir string) map[string]SourceEntry {
+	entries := make(map[string]SourceEntry)
+	dh, err := os.Open(sourceDir)
+	if err != nil {
+		return nil
+	}
+	names, _ := dh.Readdirnames(-1)
+	dh.Close()
+	sort.Strings(names)
+	for _, name := range names {
+		path := filepath.Join(sourceDir, name)
+		data, err := os.ReadFile(path)
+		if err != nil {
+			continue
+		}
+		h := sha256.Sum256(data)
+		entry := SourceEntry{SHA256: hex.EncodeToString(h[:])}
+		if url, ok := sourceURLs[name]; ok {
+			entry.URL = url
+		}
+		entries[name] = entry
+	}
+	return entries
+}
 
 var operators = []string{"chinatelecom", "chinamobile", "chinaunicom"}
 
@@ -52,27 +131,25 @@ var provinces = []string{
 	"zhejiang",
 }
 
-type File struct {
-	PrefixCount int    `json:"prefix_count"`
-	SHA256      string `json:"sha256"`
-}
-
-type Manifest struct {
-	SchemaVersion int             `json:"schema_version"`
-	ContentID     string          `json:"content_id"`
-	Files         map[string]File `json:"files"`
-}
-
-// Generate validates the complete public list contract and writes a deterministic
-// manifest. It returns false without touching the file when its bytes are already
-// current.
-func Generate(root string) (bool, error) {
+// Generate validates the complete public list contract and writes a
+// deterministic manifest.  It returns false without touching the file when the
+// list content is already current (contentID unchanged), even if metadata
+// (sources, configs, generator) have changed.  This keeps manifest updates
+// aligned with actual list changes so that metadata-only churn never produces
+// a spurious commit.
+//
+// Optional fields:
+//   - generatedAt: zero time skips the generated_at field
+//   - gen:         nil skips the generator field
+//   - configs:     nil skips the configs field
+//   - sources:     nil skips the sources field
+func Generate(root string, generatedAt time.Time, gen *GeneratorInfo, configs, sources map[string]SourceEntry) (bool, error) {
 	paths := expectedPaths()
 	if err := rejectUnexpectedLists(root, paths); err != nil {
 		return false, err
 	}
 
-	files := make(map[string]File, len(paths))
+	files := make(map[string]FileEntry, len(paths))
 	for _, rel := range paths {
 		meta, err := inspect(filepath.Join(root, filepath.FromSlash(rel)), strings.HasPrefix(rel, "ipv4/"))
 		if err != nil {
@@ -81,10 +158,20 @@ func Generate(root string) (bool, error) {
 		files[rel] = meta
 	}
 
+	id := contentID(paths, files)
+
 	manifest := Manifest{
 		SchemaVersion: SchemaVersion,
-		ContentID:     contentID(paths, files),
+		ContentID:     id,
 		Files:         files,
+		Configs:       configs,
+		Sources:       sources,
+	}
+	if !generatedAt.IsZero() {
+		manifest.GeneratedAt = generatedAt.UTC().Format(time.RFC3339Nano)
+	}
+	if gen != nil {
+		manifest.Generator = gen
 	}
 	data, err := json.MarshalIndent(manifest, "", "  ")
 	if err != nil {
@@ -94,10 +181,12 @@ func Generate(root string) (bool, error) {
 
 	path := filepath.Join(root, "manifest.json")
 	current, err := os.ReadFile(path)
-	if err == nil && bytes.Equal(current, data) {
-		return false, nil
-	}
-	if err != nil && !os.IsNotExist(err) {
+	if err == nil {
+		var prev Manifest
+		if json.Unmarshal(current, &prev) == nil && prev.ContentID == id {
+			return false, nil
+		}
+	} else if !os.IsNotExist(err) {
 		return false, err
 	}
 	if err := os.MkdirAll(root, 0755); err != nil {
@@ -160,10 +249,10 @@ func rejectUnexpectedLists(root string, expected []string) error {
 	return nil
 }
 
-func inspect(path string, ipv4 bool) (File, error) {
+func inspect(path string, ipv4 bool) (FileEntry, error) {
 	data, err := os.ReadFile(path)
 	if err != nil {
-		return File{}, err
+		return FileEntry{}, err
 	}
 	sum := sha256.Sum256(data)
 
@@ -173,36 +262,36 @@ func inspect(path string, ipv4 bool) (File, error) {
 	for scanner.Scan() {
 		line := strings.TrimSpace(scanner.Text())
 		if line == "" {
-			return File{}, fmt.Errorf("blank line at line %d", count+1)
+			return FileEntry{}, fmt.Errorf("blank line at line %d", count+1)
 		}
 		prefix, err := netip.ParsePrefix(line)
 		if err != nil {
-			return File{}, fmt.Errorf("invalid CIDR at line %d: %w", count+1, err)
+			return FileEntry{}, fmt.Errorf("invalid CIDR at line %d: %w", count+1, err)
 		}
 		if prefix != prefix.Masked() {
-			return File{}, fmt.Errorf("non-canonical CIDR at line %d: %s", count+1, line)
+			return FileEntry{}, fmt.Errorf("non-canonical CIDR at line %d: %s", count+1, line)
 		}
 		if line != prefix.String() {
-			return File{}, fmt.Errorf("non-canonical CIDR text at line %d: use %s", count+1, prefix)
+			return FileEntry{}, fmt.Errorf("non-canonical CIDR text at line %d: use %s", count+1, prefix)
 		}
 		if prefix.Addr().Is4() != ipv4 {
-			return File{}, fmt.Errorf("wrong address family at line %d: %s", count+1, line)
+			return FileEntry{}, fmt.Errorf("wrong address family at line %d: %s", count+1, line)
 		}
 		if count != 0 {
 			if compare(previous, prefix) >= 0 {
-				return File{}, fmt.Errorf("CIDRs are not strictly sorted at line %d", count+1)
+				return FileEntry{}, fmt.Errorf("CIDRs are not strictly sorted at line %d", count+1)
 			}
 			if previous.Contains(prefix.Addr()) {
-				return File{}, fmt.Errorf("CIDRs overlap at line %d: %s contains %s", count+1, previous, prefix)
+				return FileEntry{}, fmt.Errorf("CIDRs overlap at line %d: %s contains %s", count+1, previous, prefix)
 			}
 		}
 		previous = prefix
 		count++
 	}
 	if err := scanner.Err(); err != nil {
-		return File{}, err
+		return FileEntry{}, err
 	}
-	return File{PrefixCount: count, SHA256: hex.EncodeToString(sum[:])}, nil
+	return FileEntry{PrefixCount: count, SHA256: hex.EncodeToString(sum[:])}, nil
 }
 
 func compare(a, b netip.Prefix) int {
@@ -219,7 +308,7 @@ func compare(a, b netip.Prefix) int {
 	}
 }
 
-func contentID(paths []string, files map[string]File) string {
+func contentID(paths []string, files map[string]FileEntry) string {
 	hash := sha256.New()
 	fmt.Fprintf(hash, "schema=%d\n", SchemaVersion)
 	for _, path := range paths {
