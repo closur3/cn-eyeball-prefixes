@@ -8,7 +8,6 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
-	"math/bits"
 	"net/netip"
 	"os"
 	"path/filepath"
