@@ -268,16 +268,21 @@ func Run(options Options) error {
 		}
 	}
 	sources := map[string]sourceMeta{}
-	for name, item := range map[string]struct{ path, source string }{
-		"riswhois_ipv6":  {options.RISPath, "https://www.ris.ripe.net/dumps/riswhoisdump.IPv6.gz"},
-		"iptoasn_ipv6":   {options.IPToASNPath, "https://iptoasn.com/data/ip2asn-v6.tsv.gz"},
-		"apnic_inet6num": {options.Inet6numPath, "https://ftp.apnic.net/apnic/whois/apnic.db.inet6num.gz"},
-	} {
-		meta, err := fileMetadata(item.path)
+	for _, name := range []string{"riswhois_ipv6", "iptoasn_ipv6", "apnic_inet6num"} {
+		var path string
+		switch name {
+		case "riswhois_ipv6":
+			path = options.RISPath
+		case "iptoasn_ipv6":
+			path = options.IPToASNPath
+		case "apnic_inet6num":
+			path = options.Inet6numPath
+		}
+		meta, err := fileMetadata(path)
 		if err != nil {
 			return err
 		}
-		meta.Source = item.source
+		meta.Source = iputil.SourceURLs[iputil.SourceFilename(name)]
 		sources[name] = meta
 	}
 	result := auditReport{

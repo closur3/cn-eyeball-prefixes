@@ -301,30 +301,7 @@ var provinces = []province{
 	{"新疆维吾尔自治区", "xinjiang"},
 }
 var aliases = map[string]string{"北京": "北京市", "天津": "天津市", "上海": "上海市", "重庆": "重庆市", "内蒙古": "内蒙古自治区", "广西": "广西壮族自治区", "宁夏": "宁夏回族自治区", "新疆": "新疆维吾尔自治区", "西藏": "西藏自治区"}
-var urls = map[string]string{
-	"china":                 "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/china.txt",
-	"iptoasn_ipv4":          "https://iptoasn.com/data/ip2asn-v4.tsv.gz",
-	"ip2region_ipv4_source": "https://raw.githubusercontent.com/lionsoul2014/ip2region/master/data/ipv4_source.txt",
-	"apnic_inetnum":         "https://ftp.apnic.net/apnic/whois/apnic.db.inetnum.gz",
-	"apnic_autnum":          "https://ftp.apnic.net/apnic/whois/apnic.db.aut-num.gz",
-	"apnic_organisation":    "https://ftp.apnic.net/apnic/whois/apnic.db.organisation.gz",
-	"apnic_route":           "https://ftp.apnic.net/apnic/whois/apnic.db.route.gz",
-	"riswhois_ipv4":         "https://www.ris.ripe.net/dumps/riswhoisdump.IPv4.gz",
-	"ipdata_aliyun":         "https://raw.githubusercontent.com/axpwx/IP-Data/master/provider/aliyun-cidr-ipv4.txt",
-	"ipdata_tencent":        "https://raw.githubusercontent.com/axpwx/IP-Data/master/provider/tencent-cidr-ipv4.txt",
-	"ipdata_huawei":         "https://raw.githubusercontent.com/axpwx/IP-Data/master/provider/huawei-cidr-ipv4.txt",
-	"ipdata_ucloud":         "https://raw.githubusercontent.com/axpwx/IP-Data/master/provider/ucloud-cidr-ipv4.txt",
-	"ipdata_ksyun":          "https://raw.githubusercontent.com/axpwx/IP-Data/master/provider/ksyun-cidr-ipv4.txt",
-	"ipdata_baidu":          "https://raw.githubusercontent.com/axpwx/IP-Data/master/provider/baidu-cidr-ipv4.txt",
-	"ipdata_jdcloud":        "https://raw.githubusercontent.com/axpwx/IP-Data/master/provider/jdcloud-cidr-ipv4.txt",
-}
 
-func n(a netip.Addr) uint32 {
-	return uint32(a.As4()[0])<<24 | uint32(a.As4()[1])<<16 | uint32(a.As4()[2])<<8 | uint32(a.As4()[3])
-}
-func end(p netip.Prefix) uint32 {
-	return uint32(uint64(n(p.Addr())) + (uint64(1) << uint(32-p.Bits())) - 1)
-}
 
 func fromSpans(in []span) []iputil.Span {
 	s := make([]iputil.Span, len(in))
@@ -359,13 +336,8 @@ func relevantAPNICRecords(records []apnicinetnum.Record, candidates []span) []ap
 	return out
 }
 
-func addressCount(rows []span) uint64 {
-	var count uint64
-	for _, row := range merge(rows) {
-		count += uint64(row.hi) - uint64(row.lo) + 1
-	}
-	return count
-}
+func addressCount(rows []span) uint64    { return iputil.AddressCount(fromSpans(rows)) }
+func spanCIDRs(rows []span) []string     { return iputil.SpanCIDRs(fromSpans(rows)) }
 
 func lessOperatorASN(aOperator, aASN, bOperator, bASN string) bool {
 	aRank, bRank := len(operators), len(operators)
@@ -397,7 +369,7 @@ func cidrs(path string) ([]span, error) {
 		if e != nil || !p.Addr().Is4() || p.Addr() != p.Masked().Addr() {
 			return nil, fmt.Errorf("%s:%d", path, i+1)
 		}
-		out = append(out, span{n(p.Addr()), end(p)})
+		out = append(out, span{iputil.Number(p.Addr()), iputil.End(p)})
 	}
 	return merge(out), nil
 }
@@ -439,7 +411,7 @@ func operatorRanges(path string, classifier *operatorconfig.Classifier) (map[str
 		if ea != nil || ez != nil || !a.Is4() || !z.Is4() {
 			return nil, nil, nil, nil, fmt.Errorf("invalid IPtoASN range: %s", scanner.Text())
 		}
-		row := span{n(a), n(z)}
+		row := span{iputil.Number(a), iputil.Number(z)}
 		if result.Excluded {
 			entry := excluded[x[2]]
 			if entry == nil {
@@ -520,7 +492,7 @@ func auditIndependentRouteOrigins(inetSegments []apnicinetnum.Segment, routeSegm
 		}
 		for i := inetStart; i < len(inetSegments) && inetSegments[i].Lo <= routeSegment.Hi; i++ {
 			inetSegment := inetSegments[i]
-			lo, hi := max32(inetSegment.Lo, routeSegment.Lo), min32(inetSegment.Hi, routeSegment.Hi)
+			lo, hi := max(inetSegment.Lo, routeSegment.Lo), min(inetSegment.Hi, routeSegment.Hi)
 			base := intersect(finalRanges, []span{{lo: lo, hi: hi}})
 			if len(base) == 0 {
 				continue
@@ -578,7 +550,7 @@ func auditIndependentRouteOrigins(inetSegments []apnicinetnum.Segment, routeSegm
 		if a.Operator != b.Operator || a.ASN != b.ASN {
 			return lessOperatorASN(a.Operator, a.ASN, b.Operator, b.ASN)
 		}
-		ai, bi := n(netip.MustParsePrefix(a.CIDR).Addr()), n(netip.MustParsePrefix(b.CIDR).Addr())
+		ai, bi := iputil.Number(netip.MustParsePrefix(a.CIDR).Addr()), iputil.Number(netip.MustParsePrefix(b.CIDR).Addr())
 		if ai != bi {
 			return ai < bi
 		}
@@ -607,20 +579,6 @@ func routeOriginExclusionMeta(candidate routeOriginCandidateMeta) prefixExclusio
 	}
 }
 
-func min32(a, b uint32) uint32 {
-	if a < b {
-		return a
-	}
-	return b
-}
-
-func max32(a, b uint32) uint32 {
-	if a > b {
-		return a
-	}
-	return b
-}
-
 func summarizeOperators(included []includedASNMeta) []operatorSummary {
 	var out []operatorSummary
 	for _, operator := range operators {
@@ -636,16 +594,6 @@ func summarizeOperators(included []includedASNMeta) []operatorSummary {
 		out = append(out, summary)
 	}
 	return out
-}
-
-func sourcePath(dir, name string) string {
-	if name == "iptoasn_ipv4" {
-		return filepath.Join(dir, name+".tsv.gz")
-	}
-	if name == "apnic_inetnum" || name == "apnic_autnum" || name == "apnic_organisation" || name == "apnic_route" || name == "riswhois_ipv4" {
-		return filepath.Join(dir, name+".gz")
-	}
-	return filepath.Join(dir, name+".txt")
 }
 
 func sha(path string) (string, error) {
@@ -669,32 +617,7 @@ func source(path, name, url, manifestPath string) (sourceMeta, error) {
 	return sourceMeta{Name: name, URL: url, Path: manifestPath, Bytes: info.Size(), SHA256: sum}, nil
 }
 
-func spanCIDRs(rows []span) []string {
-	rows = merge(rows)
-	var lines []string
-	for _, row := range rows {
-		r := row
-		for r.lo <= r.hi {
-			remaining := uint64(r.hi) - uint64(r.lo) + 1
-			align := bits.TrailingZeros32(r.lo)
-			if r.lo == 0 {
-				align = 32
-			}
-			sizeBits := align
-			if max := bits.Len64(remaining) - 1; max < sizeBits {
-				sizeBits = max
-			}
-			size := uint64(1) << uint(sizeBits)
-			a := netip.AddrFrom4([4]byte{byte(r.lo >> 24), byte(r.lo >> 16), byte(r.lo >> 8), byte(r.lo)})
-			lines = append(lines, netip.PrefixFrom(a, 32-sizeBits).String())
-			if size == remaining {
-				break
-			}
-			r.lo += uint32(size)
-		}
-	}
-	return lines
-}
+
 
 func stage(name string, rows []span) stageMeta {
 	return stageMeta{Name: name, CIDRCount: len(spanCIDRs(rows)), AddressCount: addressCount(rows)}
@@ -790,7 +713,7 @@ func intersectSortedSpan(rows []span, lo, hi uint32) []span {
 	i := sort.Search(len(rows), func(i int) bool { return rows[i].hi >= lo })
 	var out []span
 	for ; i < len(rows) && rows[i].lo <= hi; i++ {
-		out = append(out, span{max32(lo, rows[i].lo), min32(hi, rows[i].hi)})
+		out = append(out, span{max(lo, rows[i].lo), min(hi, rows[i].hi)})
 	}
 	return out
 }
@@ -1165,7 +1088,7 @@ func Main() {
 		if a.Operator != b.Operator || a.ASN != b.ASN {
 			return lessOperatorASN(a.Operator, a.ASN, b.Operator, b.ASN)
 		}
-		aAddress, bAddress := n(netip.MustParsePrefix(a.CIDR).Addr()), n(netip.MustParsePrefix(b.CIDR).Addr())
+		aAddress, bAddress := iputil.Number(netip.MustParsePrefix(a.CIDR).Addr()), iputil.Number(netip.MustParsePrefix(b.CIDR).Addr())
 		if aAddress != bAddress {
 			return aAddress < bAddress
 		}
@@ -1275,7 +1198,7 @@ func Main() {
 		}
 		a, _ := netip.ParseAddr(x[0])
 		z, _ := netip.ParseAddr(x[1])
-		provinceSourceRanges[p] = append(provinceSourceRanges[p], span{n(a), n(z)})
+		provinceSourceRanges[p] = append(provinceSourceRanges[p], span{iputil.Number(a), iputil.Number(z)})
 	}
 	for _, p := range provinces {
 		provinceRanges := merge(provinceSourceRanges[p.Name])
@@ -1345,8 +1268,8 @@ func Main() {
 	}
 	m.Sources = append(m.Sources, configSource)
 	for _, o := range append([]string{"china", "iptoasn_ipv4", "apnic_organisation", "apnic_inetnum", "apnic_autnum", "apnic_route", "riswhois_ipv4", "ip2region_ipv4_source"}, cloudSources...) {
-		path := sourcePath(*src, o)
-		sourceEntry, e := source(path, o, urls[o], "")
+		path := iputil.SourcePath(*src, o)
+		sourceEntry, e := source(path, o, iputil.SourceURLs[iputil.SourceFilename(o)], "")
 		if e != nil {
 			panic(e)
 		}

@@ -220,10 +220,6 @@ type allowedASNRecord struct {
 	ranges      []span
 }
 
-func n(a netip.Addr) uint32 {
-	return uint32(a.As4()[0])<<24 | uint32(a.As4()[1])<<16 | uint32(a.As4()[2])<<8 | uint32(a.As4()[3])
-}
-
 func readCIDRs(path string, ordered bool) []span {
 	b, e := os.ReadFile(path)
 	if e != nil {
@@ -237,7 +233,7 @@ func readCIDRs(path string, ordered bool) []span {
 		if e != nil || !p.Addr().Is4() || p.Addr() != p.Masked().Addr() {
 			panic("invalid CIDR: " + path)
 		}
-		lo := n(p.Addr())
+		lo := iputil.Number(p.Addr())
 		hi := uint32(uint64(lo) + (uint64(1) << uint(32-p.Bits())) - 1)
 		if ordered && !first && lo <= prev {
 			panic("unordered or overlapping: " + path)
@@ -333,13 +329,7 @@ func assertEqual(a, b []span, message string) {
 	}
 }
 
-func addressCount(rows []span) uint64 {
-	var count uint64
-	for _, row := range merge(rows) {
-		count += uint64(row.hi) - uint64(row.lo) + 1
-	}
-	return count
-}
+func addressCount(rows []span) uint64 { return iputil.AddressCount(fromSpans(rows)) }
 
 func apnicOperatorAdmissionRanges(records []apnicinetnum.Record, classifier *operatorconfig.Classifier) map[string][]span {
 	out := map[string][]span{}
@@ -378,7 +368,7 @@ func intersectSortedSpan(rows []span, lo, hi uint32) []span {
 	i := sort.Search(len(rows), func(i int) bool { return rows[i].hi >= lo })
 	var out []span
 	for ; i < len(rows) && rows[i].lo <= hi; i++ {
-		out = append(out, span{max32(lo, rows[i].lo), min32(hi, rows[i].hi)})
+		out = append(out, span{max(lo, rows[i].lo), min(hi, rows[i].hi)})
 	}
 	return out
 }
@@ -471,16 +461,6 @@ func fileSHA(path string) string {
 	return hex.EncodeToString(sum[:])
 }
 
-func sourcePath(dir, name string) string {
-	if name == "iptoasn_ipv4" {
-		return filepath.Join(dir, name+".tsv.gz")
-	}
-	if name == "apnic_inetnum" || name == "apnic_autnum" || name == "apnic_organisation" || name == "apnic_route" || name == "riswhois_ipv4" {
-		return filepath.Join(dir, name+".gz")
-	}
-	return filepath.Join(dir, name+".txt")
-}
-
 func operatorRanges(path string, classifier *operatorconfig.Classifier) (map[string][]span, map[string]*allowedASNRecord, map[string]string) {
 	f, e := os.Open(path)
 	if e != nil {
@@ -516,7 +496,7 @@ func operatorRanges(path string, classifier *operatorconfig.Classifier) (map[str
 		if ea != nil || eb != nil || !a.Is4() || !b.Is4() {
 			panic("invalid IPtoASN range")
 		}
-		rangeValue := span{n(a), n(b)}
+		rangeValue := span{iputil.Number(a), iputil.Number(b)}
 		out[operator] = append(out[operator], rangeValue)
 		record := records[x[2]]
 		if record == nil {
@@ -559,7 +539,7 @@ func auditIndependentRouteOrigins(inetSegments []apnicinetnum.Segment, routeSegm
 		}
 		for i := inetStart; i < len(inetSegments) && inetSegments[i].Lo <= routeSegment.Hi; i++ {
 			inetSegment := inetSegments[i]
-			lo, hi := max32(inetSegment.Lo, routeSegment.Lo), min32(inetSegment.Hi, routeSegment.Hi)
+			lo, hi := max(inetSegment.Lo, routeSegment.Lo), min(inetSegment.Hi, routeSegment.Hi)
 			base := intersect(finalRanges, []span{{lo: lo, hi: hi}})
 			if len(base) == 0 {
 				continue
@@ -623,7 +603,7 @@ func auditIndependentRouteOrigins(inetSegments []apnicinetnum.Segment, routeSegm
 			}
 			return a.ASN < b.ASN
 		}
-		ai, bi := n(netip.MustParsePrefix(a.CIDR).Addr()), n(netip.MustParsePrefix(b.CIDR).Addr())
+		ai, bi := iputil.Number(netip.MustParsePrefix(a.CIDR).Addr()), iputil.Number(netip.MustParsePrefix(b.CIDR).Addr())
 		if ai != bi {
 			return ai < bi
 		}
@@ -652,46 +632,7 @@ func routeOriginExclusionMeta(candidate routeOriginCandidateMeta) prefixExclusio
 	}
 }
 
-func spanCIDRs(rows []span) []string {
-	rows = merge(rows)
-	var lines []string
-	for _, row := range rows {
-		r := row
-		for r.lo <= r.hi {
-			remaining := uint64(r.hi) - uint64(r.lo) + 1
-			align := bits.TrailingZeros32(r.lo)
-			if r.lo == 0 {
-				align = 32
-			}
-			sizeBits := align
-			if max := bits.Len64(remaining) - 1; max < sizeBits {
-				sizeBits = max
-			}
-			size := uint64(1) << uint(sizeBits)
-			a := netip.AddrFrom4([4]byte{byte(r.lo >> 24), byte(r.lo >> 16), byte(r.lo >> 8), byte(r.lo)})
-			lines = append(lines, netip.PrefixFrom(a, 32-sizeBits).String())
-			if size == remaining {
-				break
-			}
-			r.lo += uint32(size)
-		}
-	}
-	return lines
-}
-
-func min32(a, b uint32) uint32 {
-	if a < b {
-		return a
-	}
-	return b
-}
-
-func max32(a, b uint32) uint32 {
-	if a > b {
-		return a
-	}
-	return b
-}
+func spanCIDRs(rows []span) []string { return iputil.SpanCIDRs(fromSpans(rows)) }
 
 func Main() {
 	data := flag.String("data", "", "staging data directory")
@@ -1021,7 +962,7 @@ func Main() {
 			if entry.Name != expectedSourceNames[i-1] {
 				panic("manifest source order mismatch")
 			}
-			path = sourcePath(*sources, entry.Name)
+			path = iputil.SourcePath(*sources, entry.Name)
 		}
 		info, e := os.Stat(path)
 		if e != nil || entry.Bytes != info.Size() || entry.SHA256 != fileSHA(path) {
@@ -1101,7 +1042,7 @@ func Main() {
 		if e != nil || !prefix.Addr().Is4() || prefix != prefix.Masked() {
 			panic("invalid excluded prefix in manifest: " + entry.CIDR)
 		}
-		row := span{n(prefix.Addr()), uint32(uint64(n(prefix.Addr())) + (uint64(1) << uint(32-prefix.Bits())) - 1)}
+		row := span{iputil.Number(prefix.Addr()), iputil.End(prefix)}
 		if entry.AddressCount != uint64(row.hi)-uint64(row.lo)+1 {
 			panic("excluded prefix address count mismatch: " + entry.CIDR)
 		}

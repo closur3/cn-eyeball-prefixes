@@ -1,6 +1,10 @@
 package iputil
 
-import "sort"
+import (
+	"math/bits"
+	"net/netip"
+	"sort"
+)
 
 type Span struct{ Lo, Hi uint32 }
 
@@ -78,4 +82,39 @@ func IntersectSpans(a, b []Span) []Span {
 func OverlapsSorted(rows []Span, lo, hi uint32) bool {
 	i := sort.Search(len(rows), func(i int) bool { return rows[i].Hi >= lo })
 	return i < len(rows) && rows[i].Lo <= hi
+}
+
+func AddressCount(rows []Span) uint64 {
+	var count uint64
+	for _, row := range MergeSpans(rows) {
+		count += uint64(row.Hi) - uint64(row.Lo) + 1
+	}
+	return count
+}
+
+func SpanCIDRs(rows []Span) []string {
+	rows = MergeSpans(rows)
+	var lines []string
+	for _, row := range rows {
+		r := row
+		for r.Lo <= r.Hi {
+			remaining := uint64(r.Hi) - uint64(r.Lo) + 1
+			align := bits.TrailingZeros32(r.Lo)
+			if r.Lo == 0 {
+				align = 32
+			}
+			sizeBits := align
+			if max := bits.Len64(remaining) - 1; max < sizeBits {
+				sizeBits = max
+			}
+			size := uint64(1) << uint(sizeBits)
+			a := netip.AddrFrom4([4]byte{byte(r.Lo >> 24), byte(r.Lo >> 16), byte(r.Lo >> 8), byte(r.Lo)})
+			lines = append(lines, netip.PrefixFrom(a, 32-sizeBits).String())
+			if size == remaining {
+				break
+			}
+			r.Lo += uint32(size)
+		}
+	}
+	return lines
 }
