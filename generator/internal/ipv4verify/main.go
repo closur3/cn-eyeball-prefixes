@@ -249,49 +249,27 @@ func readCIDRs(path string, ordered bool) []span {
 	return out
 }
 
-func merge(in []span) []span {
-	sort.Slice(in, func(i, j int) bool { return in[i].lo < in[j].lo })
-	var out []span
-	for _, x := range in {
-		if len(out) == 0 || (out[len(out)-1].hi != ^uint32(0) && x.lo > out[len(out)-1].hi+1) {
-			out = append(out, x)
-			continue
-		}
-		if x.hi > out[len(out)-1].hi {
-			out[len(out)-1].hi = x.hi
-		}
+func fromSpans(in []span) []iputil.Span {
+	s := make([]iputil.Span, len(in))
+	for i := range in {
+		s[i] = iputil.Span{Lo: in[i].lo, Hi: in[i].hi}
 	}
-	return out
+	return s
+}
+func toSpans(in []iputil.Span) []span {
+	s := make([]span, len(in))
+	for i := range in {
+		s[i] = span{lo: in[i].Lo, hi: in[i].Hi}
+	}
+	return s
 }
 
-func intersect(a, b []span) []span {
-	a, b = merge(a), merge(b)
-	var out []span
-	for i, j := 0, 0; i < len(a) && j < len(b); {
-		lo, hi := a[i].lo, a[i].hi
-		if b[j].lo > lo {
-			lo = b[j].lo
-		}
-		if b[j].hi < hi {
-			hi = b[j].hi
-		}
-		if lo <= hi {
-			out = append(out, span{lo, hi})
-		}
-		if a[i].hi < b[j].hi {
-			i++
-		} else {
-			j++
-		}
-	}
-	return out
-}
+func merge(in []span) []span     { return toSpans(iputil.MergeSpans(fromSpans(in))) }
+func subtract(in, excluded []span) []span { return toSpans(iputil.SubtractSpans(fromSpans(in), fromSpans(excluded))) }
+func intersect(a, b []span) []span        { return toSpans(iputil.IntersectSpans(fromSpans(a), fromSpans(b))) }
 
-// overlapsSorted reports whether a normalized, address-sorted span set
-// intersects [lo, hi] without repeatedly sorting it for point queries.
 func overlapsSorted(rows []span, lo, hi uint32) bool {
-	i := sort.Search(len(rows), func(i int) bool { return rows[i].hi >= lo })
-	return i < len(rows) && rows[i].lo <= hi
+	return iputil.OverlapsSorted(fromSpans(rows), lo, hi)
 }
 
 func relevantAPNICRecords(records []apnicinetnum.Record, candidates []span) []apnicinetnum.Record {
@@ -299,37 +277,6 @@ func relevantAPNICRecords(records []apnicinetnum.Record, candidates []span) []ap
 	for _, record := range records {
 		if overlapsSorted(candidates, record.Lo, record.Hi) {
 			out = append(out, record)
-		}
-	}
-	return out
-}
-
-func subtract(in, excluded []span) []span {
-	in, excluded = merge(in), merge(excluded)
-	var out []span
-	j := 0
-	for _, r := range in {
-		for j < len(excluded) && excluded[j].hi < r.lo {
-			j++
-		}
-		pos := r.lo
-		covered := false
-		for k := j; k < len(excluded) && excluded[k].lo <= r.hi; k++ {
-			x := excluded[k]
-			if x.hi < pos {
-				continue
-			}
-			if x.lo > pos {
-				out = append(out, span{pos, x.lo - 1})
-			}
-			if x.hi >= r.hi {
-				covered = true
-				break
-			}
-			pos = x.hi + 1
-		}
-		if !covered {
-			out = append(out, span{pos, r.hi})
 		}
 	}
 	return out
