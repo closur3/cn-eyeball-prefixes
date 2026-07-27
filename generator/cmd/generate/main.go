@@ -56,7 +56,11 @@ func main() {
 
 		var sources map[string]listmanifest.SourceEntry
 		if *sourceDir != "" {
-			sources = listmanifest.ComputeSourceHashes(*sourceDir)
+			var err error
+			sources, err = listmanifest.ComputeSourceHashes(*sourceDir)
+			if err != nil {
+				panic(err)
+			}
 		}
 
 		changed, err := listmanifest.Generate(*root, time.Now(), gen, configs, sources)

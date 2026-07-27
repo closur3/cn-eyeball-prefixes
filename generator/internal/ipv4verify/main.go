@@ -8,6 +8,7 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	"io"
 	"math/bits"
 	"net/netip"
 	"os"
@@ -44,6 +45,7 @@ type listMeta struct {
 
 type sourceMeta struct {
 	Name   string `json:"name"`
+	URL    string `json:"url"`
 	Path   string `json:"path"`
 	Bytes  int64  `json:"bytes"`
 	SHA256 string `json:"sha256"`
@@ -168,6 +170,8 @@ type prefixExclusionMeta struct {
 	Source                    string               `json:"source"`
 	Category                  string               `json:"category"`
 	Provider                  string               `json:"provider"`
+	PolicyCIDR                string               `json:"policy_cidr"`
+	EvidenceURLs              []string             `json:"evidence_urls"`
 	CIDR                      string               `json:"cidr"`
 	AddressCount              uint64               `json:"address_count"`
 	ASN                       string               `json:"asn"`
@@ -220,6 +224,120 @@ type allowedASNRecord struct {
 	ranges      []span
 }
 
+type reviewedBackboneRecordKey struct {
+	lo uint32
+	hi uint32
+}
+
+type reviewedBackbonePolicyRange struct {
+	cidr     string
+	operator string
+	lo       uint32
+	hi       uint32
+}
+
+type reviewedBackboneAccessRecord struct {
+	lo        uint32
+	hi        uint32
+	matchedBy string
+}
+
+type reviewedBackboneIndex struct {
+	policyRanges      []reviewedBackbonePolicyRange
+	registrantByRange map[reviewedBackboneRecordKey]string
+	parentRecords     map[string][]apnicinetnum.Record
+	parentSegments    map[string][]apnicinetnum.Segment
+	accessByPolicy    map[string][]reviewedBackboneAccessRecord
+	admissionRanges   map[string][]span
+	conflictRanges    map[string][]span
+	finalized         bool
+}
+
+func newReviewedBackboneIndex(policies []operatorconfig.BackboneIPv4Prefix) *reviewedBackboneIndex {
+	index := &reviewedBackboneIndex{
+		registrantByRange: map[reviewedBackboneRecordKey]string{},
+		parentRecords:     map[string][]apnicinetnum.Record{},
+		parentSegments:    map[string][]apnicinetnum.Segment{},
+		accessByPolicy:    map[string][]reviewedBackboneAccessRecord{},
+		admissionRanges:   map[string][]span{},
+		conflictRanges:    map[string][]span{},
+	}
+	for _, policy := range policies {
+		prefix := netip.MustParsePrefix(policy.CIDR)
+		index.policyRanges = append(index.policyRanges, reviewedBackbonePolicyRange{
+			cidr:     policy.CIDR,
+			operator: policy.Operator,
+			lo:       iputil.Number(prefix.Addr()),
+			hi:       iputil.End(prefix),
+		})
+	}
+	sort.Slice(index.policyRanges, func(i, j int) bool {
+		return index.policyRanges[i].lo < index.policyRanges[j].lo
+	})
+	return index
+}
+
+func (index *reviewedBackboneIndex) Observe(record apnicinetnum.Record, registrantOperator string, access operatorconfig.PrefixResult) {
+	if index.finalized {
+		panic("reviewed backbone index observed an APNIC record after finalization")
+	}
+	key := reviewedBackboneRecordKey{lo: record.Lo, hi: record.Hi}
+	if _, exists := index.registrantByRange[key]; exists {
+		panic(fmt.Sprintf("reviewed backbone index observed duplicate APNIC range %d-%d", record.Lo, record.Hi))
+	}
+	index.registrantByRange[key] = registrantOperator
+	if registrantOperator != "" {
+		index.admissionRanges[registrantOperator] = append(index.admissionRanges[registrantOperator], span{lo: record.Lo, hi: record.Hi})
+	}
+	start := sort.Search(len(index.policyRanges), func(i int) bool {
+		return index.policyRanges[i].hi >= record.Lo
+	})
+	for i := start; i < len(index.policyRanges) && index.policyRanges[i].lo <= record.Hi; i++ {
+		policy := index.policyRanges[i]
+		if registrantOperator == policy.operator {
+			index.parentRecords[policy.cidr] = append(index.parentRecords[policy.cidr], record)
+		}
+		if access.Reason != "" {
+			index.accessByPolicy[policy.cidr] = append(index.accessByPolicy[policy.cidr], reviewedBackboneAccessRecord{
+				lo: record.Lo, hi: record.Hi, matchedBy: access.MatchedBy,
+			})
+		}
+	}
+}
+
+func (index *reviewedBackboneIndex) Finalize(allSegments []apnicinetnum.Segment) {
+	if index.finalized {
+		panic("reviewed backbone index finalized more than once")
+	}
+	for _, policy := range index.policyRanges {
+		index.parentSegments[policy.cidr] = apnicinetnum.ResolveAll(index.parentRecords[policy.cidr], func(apnicinetnum.Record) apnicinetnum.Match {
+			return apnicinetnum.Match{}
+		})
+	}
+	for _, operator := range operators {
+		index.admissionRanges[operator] = merge(index.admissionRanges[operator])
+	}
+	for _, segment := range allSegments {
+		key := reviewedBackboneRecordKey{lo: segment.Record.Lo, hi: segment.Record.Hi}
+		registrantOperator, ok := index.registrantByRange[key]
+		if !ok {
+			panic(fmt.Sprintf("reviewed backbone index lacks APNIC range %d-%d", segment.Record.Lo, segment.Record.Hi))
+		}
+		if registrantOperator == "" {
+			continue
+		}
+		for _, operator := range operators {
+			if operator != registrantOperator {
+				index.conflictRanges[operator] = append(index.conflictRanges[operator], span{lo: segment.Lo, hi: segment.Hi})
+			}
+		}
+	}
+	for _, operator := range operators {
+		index.conflictRanges[operator] = merge(index.conflictRanges[operator])
+	}
+	index.finalized = true
+}
+
 func readCIDRs(path string, ordered bool) []span {
 	b, e := os.ReadFile(path)
 	if e != nil {
@@ -265,7 +383,8 @@ func subtract(in, excluded []span) []span { return toSpans(iputil.SubtractSpans(
 func intersect(a, b []span) []span        { return toSpans(iputil.IntersectSpans(fromSpans(a), fromSpans(b))) }
 
 func overlapsSorted(rows []span, lo, hi uint32) bool {
-	return iputil.OverlapsSorted(fromSpans(rows), lo, hi)
+	i := sort.Search(len(rows), func(i int) bool { return rows[i].hi >= lo })
+	return i < len(rows) && rows[i].lo <= hi
 }
 
 func relevantAPNICRecords(records []apnicinetnum.Record, candidates []span) []apnicinetnum.Record {
@@ -279,18 +398,13 @@ func relevantAPNICRecords(records []apnicinetnum.Record, candidates []span) []ap
 }
 
 func containingAPNICSegment(segments []apnicinetnum.Segment, row span) *apnicinetnum.Segment {
-	for i := range segments {
-		if segments[i].Hi < row.lo {
-			continue
-		}
-		if segments[i].Lo > row.lo {
-			return nil
-		}
-		if segments[i].Hi >= row.hi {
-			return &segments[i]
-		}
+	i := sort.Search(len(segments), func(i int) bool {
+		return segments[i].Hi >= row.lo
+	})
+	if i == len(segments) || segments[i].Lo > row.lo || segments[i].Hi < row.hi {
+		return nil
 	}
-	return nil
+	return &segments[i]
 }
 
 func assertNoOverlap(a, b []span, message string) {
@@ -362,6 +476,80 @@ func apnicOperatorConflictRanges(segments []apnicinetnum.Segment, classifier *op
 		out[operator] = merge(out[operator])
 	}
 	return out
+}
+
+func reviewedBackboneExclusions(
+	policies []operatorconfig.BackboneIPv4Prefix,
+	originByOperator map[string][]span,
+	chinaRanges []span,
+	index *reviewedBackboneIndex,
+	allowed map[string]*allowedASNRecord,
+	existingExcluded []span,
+) ([]span, []prefixExclusionMeta) {
+	if !index.finalized {
+		panic("reviewed backbone exclusions used an unfinalized APNIC index")
+	}
+
+	var reviewedRanges []span
+	var audit []prefixExclusionMeta
+	for _, policy := range policies {
+		prefix := netip.MustParsePrefix(policy.CIDR)
+		policyRange := span{lo: iputil.Number(prefix.Addr()), hi: iputil.End(prefix)}
+
+		var accessRanges []span
+		for _, record := range index.accessByPolicy[policy.CIDR] {
+			strictlyMoreSpecific := record.lo >= policyRange.lo && record.hi <= policyRange.hi &&
+				(record.lo > policyRange.lo || record.hi < policyRange.hi)
+			if !strictlyMoreSpecific {
+				panic(fmt.Sprintf("reviewed backbone prefix %s overlaps same-level or wider APNIC access registration %d-%d matched by %s",
+					policy.CIDR, record.lo, record.hi, record.matchedBy))
+			}
+			accessRanges = append(accessRanges, span{lo: record.lo, hi: record.hi})
+		}
+
+		effective := intersect([]span{policyRange}, originByOperator[policy.Operator])
+		effective = intersect(effective, chinaRanges)
+		effective = subtract(effective, index.conflictRanges[policy.Operator])
+		effective = subtract(effective, merge(accessRanges))
+
+		parents := index.parentSegments[policy.CIDR]
+		for _, candidate := range effective {
+			start := sort.Search(len(parents), func(i int) bool {
+				return parents[i].Hi >= candidate.lo
+			})
+			for i := start; i < len(parents) && parents[i].Lo <= candidate.hi; i++ {
+				parent := parents[i]
+				parentEffective := []span{{lo: max(candidate.lo, parent.Lo), hi: min(candidate.hi, parent.Hi)}}
+				reviewedRanges = append(reviewedRanges, parentEffective...)
+				auditable := subtract(parentEffective, existingExcluded)
+				if len(auditable) == 0 {
+					continue
+				}
+				for asn, record := range allowed {
+					if record.operator != policy.Operator {
+						continue
+					}
+					hits := intersect(auditable, record.ranges)
+					for _, cidr := range spanCIDRs(hits) {
+						hitPrefix := netip.MustParsePrefix(cidr)
+						audit = append(audit, prefixExclusionMeta{
+							Source: "operator_config", Category: "reviewed_backbone_prefix",
+							PolicyCIDR: policy.CIDR, EvidenceURLs: append([]string(nil), policy.EvidenceURLs...),
+							CIDR: cidr, AddressCount: uint64(1) << uint(32-hitPrefix.Bits()),
+							ASN: asn, Operator: policy.Operator, ASNDescription: record.description,
+							RegistryNetnames: parent.Record.Netnames, RegistryDescriptions: parent.Record.Descriptions,
+							RegistryOrganizations: parent.Record.Organizations, RegistryOrganizationNames: parent.Record.OrganizationNames,
+							RegistryMaintainers: parent.Record.Maintainers, RegistryStatus: parent.Record.Status,
+							RegistryLastModified: parent.Record.LastModified,
+							MatchedBy: "reviewed backbone prefix; current same-operator BGP origin; covering same-operator APNIC registration",
+							Reason:    policy.Reason,
+						})
+					}
+				}
+			}
+		}
+	}
+	return merge(reviewedRanges), audit
 }
 
 func intersectSortedSpan(rows []span, lo, hi uint32) []span {
@@ -453,12 +641,20 @@ func cidrCount(rows []span) int {
 }
 
 func fileSHA(path string) string {
-	b, err := os.ReadFile(path)
+	file, err := os.Open(path)
 	if err != nil {
 		panic(err)
 	}
-	sum := sha256.Sum256(b)
-	return hex.EncodeToString(sum[:])
+	hash := sha256.New()
+	if _, err = io.Copy(hash, file); err == nil {
+		err = file.Close()
+	} else {
+		_ = file.Close()
+	}
+	if err != nil {
+		panic(err)
+	}
+	return hex.EncodeToString(hash.Sum(nil))
 }
 
 func operatorRanges(path string, classifier *operatorconfig.Classifier) (map[string][]span, map[string]*allowedASNRecord, map[string]string) {
@@ -692,6 +888,8 @@ func Main() {
 	if e != nil {
 		panic(e)
 	}
+	reviewedBackbonePolicies := classifier.ReviewedBackboneIPv4Prefixes()
+	reviewedBackboneAPNICIndex := newReviewedBackboneIndex(reviewedBackbonePolicies)
 	chinaRanges := readCIDRs(filepath.Join(*sources, "china.txt"), false)
 	assertContained(cnRanges, chinaRanges)
 	allowedByOperator, allowedByASN, asnDescriptions := operatorRanges(filepath.Join(*sources, "iptoasn_ipv4.tsv.gz"), classifier)
@@ -712,7 +910,7 @@ func Main() {
 		panic(e)
 	}
 	apnicRecordCount := len(apnicRecords)
-	apnicRecords = relevantAPNICRecords(apnicRecords, postCloudCandidates)
+	apnicRecords = relevantAPNICRecords(apnicRecords, preCloudCandidates)
 	apnicinetnum.AttachOrganizationNames(apnicRecords, orgNames)
 	autnumRecords, e := apnicautnum.Parse(filepath.Join(*sources, "apnic_autnum.gz"))
 	if e != nil {
@@ -720,27 +918,35 @@ func Main() {
 	}
 	autnumIndex := apnicautnum.NewIndex(autnumRecords, asnDescriptions)
 	registryAutnumIndex := apnicautnum.NewRegistryIndex(autnumRecords)
-	apnicAllSegments := apnicinetnum.ResolveAll(apnicRecords, func(record apnicinetnum.Record) apnicinetnum.Match {
-		result := classifier.ClassifyAPNICInetnum(apnicinetnum.SearchText(record))
+	classifyAPNICPolicy := func(record apnicinetnum.Record) apnicinetnum.Match {
+		text := apnicinetnum.SearchText(record)
+		result, access := classifier.ClassifyAPNICPolicy(text)
+		registrant := classifier.Classify("0", text)
+		reviewedBackboneAPNICIndex.Observe(record, registrant.Operator, access)
+		base := apnicinetnum.Match{Access: access.Reason != ""}
 		if result.Excluded {
-			return apnicinetnum.Match{Category: "apnic_inetnum", Reason: result.Reason, MatchedBy: result.MatchedBy}
+			return apnicinetnum.Match{
+				Category: "apnic_inetnum", Reason: result.Reason, MatchedBy: result.MatchedBy,
+				Inherit: result.Inherit, Hard: result.Hard, Access: base.Access,
+			}
 		}
 		status := strings.ToUpper(record.Status)
-		registrant := classifier.Classify("0", apnicinetnum.SearchText(record))
 		independent := (registrant.Operator == "" || registrant.Excluded) && len(independentAutnumLinks(record, autnumIndex, classifier, asnDescriptions)) != 0
 		if (status == "ALLOCATED PORTABLE" || status == "ASSIGNED PORTABLE") && independent {
-			return apnicinetnum.Match{Category: "apnic_portable_holder", Reason: "Most-specific APNIC portable registration is linked to a currently active independent ASN", MatchedBy: "APNIC portable holder linked through aut-num"}
+			return apnicinetnum.Match{Category: "apnic_portable_holder", Reason: "Most-specific APNIC portable registration is linked to a currently active independent ASN", MatchedBy: "APNIC portable holder linked through aut-num", Access: base.Access}
 		}
 		if (status == "ALLOCATED NON-PORTABLE" || status == "ASSIGNED NON-PORTABLE") && independent {
-			return apnicinetnum.Match{Category: "apnic_delegated_holder", Reason: "Most-specific APNIC non-portable registration is linked to a currently active independent ASN", MatchedBy: "APNIC delegated holder linked through aut-num"}
+			return apnicinetnum.Match{Category: "apnic_delegated_holder", Reason: "Most-specific APNIC non-portable registration is linked to a currently active independent ASN", MatchedBy: "APNIC delegated holder linked through aut-num", Access: base.Access}
 		}
 		registryLinks := independentAutnumLinks(record, registryAutnumIndex, classifier, asnDescriptions)
 		if (registrant.Operator == "" || registrant.Excluded) && classifier.IsIndependentLegalEntity(apnicinetnum.RegistrantText(record)) && len(registryLinks) != 0 {
-			return apnicinetnum.Match{Category: "apnic_independent_legal_entity_holder", Reason: "Most-specific APNIC registration names an independent legal entity and is exactly linked to an APNIC aut-num", MatchedBy: "APNIC legal entity plus exact aut-num org/netname link"}
+			return apnicinetnum.Match{Category: "apnic_independent_legal_entity_holder", Reason: "Most-specific APNIC registration names an independent legal entity and is exactly linked to an APNIC aut-num", MatchedBy: "APNIC legal entity plus exact aut-num org/netname link", Access: base.Access}
 		}
-		return apnicinetnum.Match{}
-	})
-	apnicSegments := apnicinetnum.Matched(apnicAllSegments)
+		return base
+	}
+	apnicPolicySegments, apnicAllSegments := apnicinetnum.ResolvePolicyAndAll(apnicRecords, classifyAPNICPolicy)
+	reviewedBackboneAPNICIndex.Finalize(apnicAllSegments)
+	apnicSegments := apnicinetnum.Matched(apnicPolicySegments)
 	var matchedAPNICRanges, matchedPurposeRanges, matchedPortableRanges, matchedDelegatedRanges, matchedLegalEntityRanges []span
 	purposeSegments, portableSegments, delegatedSegments, legalEntityHolderSegments := 0, 0, 0, 0
 	for _, segment := range apnicSegments {
@@ -845,11 +1051,23 @@ func Main() {
 		}
 	}
 	risRanges = merge(risRanges)
-	excludedRanges := merge(append(append([]span{}, preRISExcluded...), risRanges...))
+	preReviewedBackboneExcluded := merge(append(append([]span{}, preRISExcluded...), risRanges...))
 	logPhase("RIPE RISWhois")
-	assertNoOverlap(cnRanges, excludedRanges, "cn.txt overlaps an explicit cloud, APNIC, independent route-origin, or strong RIS MOAS exclusion")
-	operatorAdmissionRanges := apnicOperatorAdmissionRanges(apnicRecords, classifier)
-	operatorConflictRanges := apnicOperatorConflictRanges(apnicAllSegments, classifier)
+
+	reviewedBackboneRanges, reviewedBackboneAudit := reviewedBackboneExclusions(
+		reviewedBackbonePolicies,
+		allowedByOperator,
+		chinaRanges,
+		reviewedBackboneAPNICIndex,
+		allowedByASN,
+		preReviewedBackboneExcluded,
+	)
+	excludedRanges := merge(append(append([]span{}, preReviewedBackboneExcluded...), reviewedBackboneRanges...))
+	logPhase("reviewed backbone prefixes")
+
+	operatorAdmissionRanges := reviewedBackboneAPNICIndex.admissionRanges
+	assertNoOverlap(cnRanges, excludedRanges, "cn.txt overlaps an explicit cloud, APNIC, independent route-origin, strong RIS MOAS, or reviewed backbone-prefix exclusion")
+	operatorConflictRanges := reviewedBackboneAPNICIndex.conflictRanges
 	preAdmissionByOperator := map[string][]span{}
 	hierarchicalByOperator := map[string][]span{}
 	admissionDeniedByOperator := map[string][]span{}
@@ -952,17 +1170,19 @@ func Main() {
 		panic("manifest source count mismatch")
 	}
 	for i, entry := range m.Sources {
-		var path string
+		var path, expectedName, expectedPath, expectedURL string
 		if i == 0 {
-			if entry.Name != "operator_config" || entry.Path != filepath.ToSlash(*operatorConfig) {
-				panic("manifest operator config source mismatch")
-			}
 			path = *operatorConfig
+			expectedName = "operator_config"
+			expectedPath = filepath.ToSlash(*operatorConfig)
 		} else {
-			if entry.Name != expectedSourceNames[i-1] {
-				panic("manifest source order mismatch")
-			}
-			path = iputil.SourcePath(*sources, entry.Name)
+			expectedName = expectedSourceNames[i-1]
+			filename := iputil.SourceFilename(expectedName)
+			path = filepath.Join(*sources, filename)
+			expectedURL = iputil.SourceURLs[filename]
+		}
+		if entry.Name != expectedName || entry.Path != expectedPath || entry.URL != expectedURL {
+			panic("manifest source identity mismatch for " + expectedName)
 		}
 		info, e := os.Stat(path)
 		if e != nil || entry.Bytes != info.Size() || entry.SHA256 != fileSHA(path) {
@@ -987,6 +1207,7 @@ func Main() {
 		{"effective_apnic_route_exclusions", routeRanges},
 		{"effective_apnic_independent_route_origin_exclusions", routeOriginCandidateRanges},
 		{"effective_ris_moas_exclusions", risRanges},
+		{"effective_reviewed_backbone_prefix_exclusions", reviewedBackboneRanges},
 		{"pre_operator_parent_registration_admission", preAdmissionRanges},
 		{"operator_parent_registration_admissions", hierarchicalRanges},
 		{"bgp_conflict_healed_additions", bgpConflictHealedAdded},
@@ -1036,6 +1257,7 @@ func Main() {
 	if m.RISWhois.RowCount != risStats.Rows || m.RISWhois.PrefixCount != risStats.Prefixes || m.RISWhois.RelevantPrefixCount != risStats.RelevantPrefixes || m.RISWhois.WinningSegmentCount != len(risSegments) || m.RISWhois.CandidateMOASSegmentCount != candidateMOAS || m.RISWhois.StrongEvidenceSegmentCount != strongMOAS || m.RISWhois.RetainedAmbiguousMOASSegmentCount != candidateMOAS-strongMOAS || m.RISWhois.EffectiveCIDRCount != cidrCount(risRanges) || m.RISWhois.EffectiveAddressCount != addressCount(risRanges) {
 		panic("manifest RIPE RIS metadata mismatch")
 	}
+	matchedReviewedBackboneAudit := make([]bool, len(reviewedBackboneAudit))
 	var manifestExcludedRanges []span
 	for _, entry := range m.ExcludedPrefixes {
 		prefix, e := netip.ParsePrefix(entry.CIDR)
@@ -1049,6 +1271,9 @@ func Main() {
 		asnRecord := allowedByASN[entry.ASN]
 		if asnRecord == nil || entry.Operator != asnRecord.operator || entry.ASNDescription != asnRecord.description {
 			panic("excluded prefix ASN metadata mismatch: " + entry.CIDR)
+		}
+		if entry.Category != "reviewed_backbone_prefix" && (entry.PolicyCIDR != "" || len(entry.EvidenceURLs) != 0) {
+			panic("non-reviewed exclusion carries reviewed-backbone metadata: " + entry.CIDR)
 		}
 		assertContained([]span{row}, intersect(asnRecord.ranges, chinaRanges))
 		switch entry.Category {
@@ -1172,10 +1397,31 @@ func Main() {
 				panic("excluded RIS MOAS evidence does not recompute: " + entry.CIDR)
 			}
 			assertContained([]span{row}, risRanges)
+		case "reviewed_backbone_prefix":
+			if entry.Source != "operator_config" || entry.Provider != "" {
+				panic("excluded reviewed-backbone prefix source mismatch: " + entry.CIDR)
+			}
+			matched := false
+			for i := range reviewedBackboneAudit {
+				if !matchedReviewedBackboneAudit[i] && reflect.DeepEqual(entry, reviewedBackboneAudit[i]) {
+					matchedReviewedBackboneAudit[i] = true
+					matched = true
+					break
+				}
+			}
+			if !matched {
+				panic("excluded reviewed-backbone evidence does not recompute: " + entry.CIDR)
+			}
+			assertContained([]span{row}, subtract(reviewedBackboneRanges, preReviewedBackboneExcluded))
 		default:
 			panic("unknown excluded prefix category: " + entry.Category)
 		}
 		manifestExcludedRanges = append(manifestExcludedRanges, row)
+	}
+	for i, matched := range matchedReviewedBackboneAudit {
+		if !matched {
+			panic("manifest is missing reviewed-backbone exclusion: " + reviewedBackboneAudit[i].CIDR)
+		}
 	}
 	assertEqual(manifestExcludedRanges, intersect(preCloudCandidates, excludedRanges), "manifest excluded-prefix union mismatch")
 	if len(m.Lists) != len(files) {
@@ -1198,7 +1444,7 @@ func Main() {
 	}
 	logPhase("output and manifest checks")
 	fmt.Printf("timing: %-28s %s\n", "total", time.Since(pipelineStarted).Round(time.Millisecond))
-	fmt.Println("OK: all lists and manifest metadata are valid; operator/province relations, China boundary, ASN policy, cloud CIDRs, APNIC inetnum, portable/delegated-holder aut-num, origin-validated and strongly linked independent route-origin exclusions, and conservative RIPE RIS MOAS exclusions hold.")
+	fmt.Println("OK: all lists and manifest metadata are valid; operator/province relations, China boundary, ASN policy, cloud CIDRs, APNIC inetnum, portable/delegated-holder aut-num, origin-validated and strongly linked independent route-origin exclusions, conservative RIPE RIS MOAS exclusions, and reviewed backbone-prefix exclusions hold.")
 }
 
 func mustRead(path string) []byte {

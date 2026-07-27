@@ -25,6 +25,137 @@
       "include_asns": {}
     }
   },
+  "exclude_backbone_ipv4_prefixes": [
+    {
+      "cidr": "59.43.0.0/16",
+      "operator": "chinatelecom",
+      "reason": "APNIC registers the complete prefix as CN2-BB and explicitly describes it as the Chinatelecom Next Carrying Network backbone",
+      "evidence_urls": [
+        "https://rdap.apnic.net/ip/59.43.0.0/16",
+        "https://wq.apnic.net/static/search.html?query=59.43.0.0"
+      ]
+    },
+    {
+      "cidr": "202.97.0.0/17",
+      "operator": "chinatelecom",
+      "reason": "APNIC records partition the complete prefix into CHINANET-BB ranges from 202.97.0.0 through 202.97.95.255 and the CHINANET-HK operator-infrastructure range 202.97.96.0/19",
+      "evidence_urls": [
+        "https://rdap.apnic.net/ip/202.97.0.0",
+        "https://rdap.apnic.net/ip/202.97.32.0",
+        "https://rdap.apnic.net/ip/202.97.64.0",
+        "https://rdap.apnic.net/ip/202.97.80.0",
+        "https://rdap.apnic.net/ip/202.97.96.0"
+      ]
+    },
+    {
+      "cidr": "111.5.64.0/19",
+      "operator": "chinamobile",
+      "reason": "Manual review classifies the prefix as Henan Mobile provincial backbone infrastructure; APNIC confirms the covering CMNET registration, the current covering BGP route originates from AS24445, and public measurements identify router interfaces throughout nearly every constituent /24",
+      "evidence_urls": [
+        "https://rdap.apnic.net/ip/111.5.64.0",
+        "https://stat.ripe.net/data/network-info/data.json?resource=111.5.64.0%2F19",
+        "https://ipinfo.io/ips/111.5.0.0/16"
+      ]
+    },
+    {
+      "cidr": "111.24.0.0/19",
+      "operator": "chinamobile",
+      "reason": "Manual review classifies the prefix as China Mobile backbone infrastructure; APNIC confirms the covering CMNET registration, the current covering BGP route originates from AS9808, and public measurements identify a dense contiguous concentration of router interfaces",
+      "evidence_urls": [
+        "https://rdap.apnic.net/ip/111.24.0.0",
+        "https://stat.ripe.net/data/network-info/data.json?resource=111.24.0.0%2F19",
+        "https://ipinfo.io/ips/111.24.0.0/16"
+      ]
+    },
+    {
+      "cidr": "183.203.224.0/19",
+      "operator": "chinamobile",
+      "reason": "Manual review classifies the prefix as Shanxi Mobile provincial backbone infrastructure; APNIC confirms the covering CMNET registration, the complete prefix is currently originated by AS56042, and public measurements identify a broad concentration of router interfaces",
+      "evidence_urls": [
+        "https://rdap.apnic.net/ip/183.203.224.0",
+        "https://stat.ripe.net/data/network-info/data.json?resource=183.203.224.0%2F19",
+        "https://ipinfo.io/ips/183.203.0.0/16"
+      ]
+    },
+    {
+      "cidr": "211.138.48.0/21",
+      "operator": "chinamobile",
+      "reason": "Manual review classifies the prefix as Ningxia Mobile provincial backbone infrastructure; APNIC assigns the exact address range to Ningxia Mobile, the current covering BGP route originates from AS9808, and public measurements identify router interfaces throughout the prefix",
+      "evidence_urls": [
+        "https://rdap.apnic.net/ip/211.138.48.0",
+        "https://stat.ripe.net/data/network-info/data.json?resource=211.138.48.0%2F21",
+        "https://ipinfo.io/ips/211.138.0.0/16"
+      ]
+    },
+    {
+      "cidr": "218.203.32.0/20",
+      "operator": "chinamobile",
+      "reason": "Manual review classifies the prefix as Heilongjiang Mobile provincial backbone infrastructure; APNIC assigns the covering range to Heilongjiang Mobile, the current covering BGP route originates from AS132525, and public measurements identify a dense contiguous concentration of router interfaces",
+      "evidence_urls": [
+        "https://rdap.apnic.net/ip/218.203.32.0",
+        "https://stat.ripe.net/data/network-info/data.json?resource=218.203.32.0%2F20",
+        "https://ipinfo.io/ips/218.203.0.0/16"
+      ]
+    },
+    {
+      "cidr": "218.205.32.0/20",
+      "operator": "chinamobile",
+      "reason": "Manual review classifies the prefix as Jiangsu Mobile provincial backbone infrastructure; APNIC assigns the exact deaggregated range to Jiangsu Mobile, the complete prefix is currently originated by AS56046, and public measurements identify a dense concentration of router interfaces within the same boundary",
+      "evidence_urls": [
+        "https://rdap.apnic.net/ip/218.205.32.0",
+        "https://stat.ripe.net/data/network-info/data.json?resource=218.205.32.0%2F20",
+        "https://ipinfo.io/ips/218.205.0.0/16"
+      ]
+    },
+    {
+      "cidr": "221.176.0.0/18",
+      "operator": "chinamobile",
+      "reason": "Manual review classifies the prefix as China Mobile backbone infrastructure; APNIC confirms the covering CMNET registration and public router-observation measurements provide supporting operational evidence",
+      "evidence_urls": [
+        "https://rdap.apnic.net/ip/221.176.0.0",
+        "https://ipinfo.io/ips/221.176.0.0/16"
+      ]
+    },
+    {
+      "cidr": "221.176.64.0/19",
+      "operator": "chinamobile",
+      "reason": "Manual review classifies the prefix as China Mobile backbone infrastructure; APNIC confirms the covering CMNET registration and public router-observation measurements provide supporting operational evidence",
+      "evidence_urls": [
+        "https://rdap.apnic.net/ip/221.176.64.0",
+        "https://ipinfo.io/ips/221.176.0.0/16"
+      ]
+    },
+    {
+      "cidr": "221.176.96.0/19",
+      "operator": "chinamobile",
+      "reason": "Manual review classifies the prefix as China Mobile provincial backbone infrastructure; APNIC confirms the covering CMNET registration, current routing assigns the complete prefix to Henan Mobile, and public measurements identify a concentrated set of router interfaces",
+      "evidence_urls": [
+        "https://rdap.apnic.net/ip/221.176.96.0",
+        "https://bgp.tools/prefix/221.176.96.0/19",
+        "https://ipinfo.io/ips/221.176.0.0/16"
+      ]
+    },
+    {
+      "cidr": "221.183.0.0/16",
+      "operator": "chinamobile",
+      "reason": "Manual review classifies the prefix as China Mobile backbone infrastructure; APNIC confirms the covering CMNET registration and public measurements identify a dense concentration of router interfaces across the prefix",
+      "evidence_urls": [
+        "https://rdap.apnic.net/ip/221.183.0.0",
+        "https://ipinfo.io/ips/221.183.0.0/16"
+      ]
+    },
+    {
+      "cidr": "219.158.0.0/17",
+      "operator": "chinaunicom",
+      "reason": "Manual review classifies the prefix as China Unicom 169 backbone infrastructure; APNIC explicitly registers its first half as backbone pools and public measurements identify a dense concentration of router interfaces across the covering 219.158.0.0/16",
+      "evidence_urls": [
+        "https://rdap.apnic.net/ip/219.158.0.0",
+        "https://rdap.apnic.net/ip/219.158.32.0",
+        "https://rdap.apnic.net/ip/219.158.96.0",
+        "https://ipinfo.io/ips/219.158.0.0/16"
+      ]
+    }
+  ],
   "exclude_description_rules": [
     {
       "pattern": "idc",
@@ -60,6 +191,32 @@
     }
   ],
   "exclude_apnic_inetnum_rules": [
+    {
+      "pattern": "(?:^| \\| )netname=(?:chinanet-hk|chinanet-us-pop)(?: \\| |$)",
+      "reason": "APNIC inetnum registration explicitly identifies a CHINANET network outside mainland China",
+      "inherit": true,
+      "hard": true
+    },
+    {
+      "pattern": "(?:^| \\| )netname=chinanet-bb(?: \\| |$).*\\bchinanet backbone network\\b",
+      "reason": "APNIC inetnum registration explicitly identifies a legacy CHINANET backbone pool",
+      "inherit": true
+    },
+    {
+      "pattern": "(?:^| \\| )netname=(?:cninfonet-bb|cninanet-ip-phone-bb)(?: \\| |$)",
+      "reason": "APNIC inetnum registration explicitly identifies a CNINFONET backbone pool",
+      "inherit": true
+    },
+    {
+      "pattern": "(?:^| \\| )netname=chinaunicom-backbone(?: \\| |$).*\\bbackbone of china unicom\\b|(?:^| \\| )netname=cncgroup-backbone(?: \\| |$).*\\bbackbone of cnc group\\b",
+      "reason": "APNIC inetnum registration explicitly identifies a China Unicom backbone pool",
+      "inherit": true
+    },
+    {
+      "pattern": "(?:^| \\| )netname=(?:[#a-z0-9._-]*loopback(?:[0-9._#-][#a-z0-9._-]*)?|[a-z0-9]*ipbone-links)(?: \\| |$)",
+      "reason": "APNIC inetnum registration explicitly identifies an operator infrastructure loopback or IP-backbone link pool",
+      "inherit": true
+    },
     {
       "pattern": "idc(?:[^a-z0-9]|$)|\\binternet data cent(?:er|re)\\b",
       "reason": "APNIC inetnum registration explicitly identifies an IDC network"
@@ -157,13 +314,43 @@
       "reason": "APNIC inetnum registration explicitly identifies a cloud-company or cloud-service address range"
     }
   ],
+  "access_apnic_inetnum_rules": [
+    {
+      "pattern": "(?:^| \\| )netname=[^|]+ \\| (?:[^|]+ \\| )*[^|]*(?:\\bresidential[ -]+broad[ -]?band\\b[^|]*\\b(?:users?|subscribers?|customers?|(?:ip|address)[ -]?pool|dynamic[ -]+(?:ip|address)(?:[ -]+pool)?)\\b|\\bresidential[ -]+area\\b[^|]{0,80}\\bbroad[ -]+ip[ -]+access[ -]+users?\\b)[^|]*(?: \\| |$)",
+      "reason": "APNIC inetnum registration explicitly identifies residential broadband users or their address pool"
+    },
+    {
+      "pattern": "(?:^| \\| )netname=[^|]+ \\| (?:[^|]+ \\| )*[^|]*(?:\\b(?:adsl|vdsl|xdsl|ftth|fttb|gpon)\\b[^|]{0,80}\\b(?:users?|subscribers?|customers?|dynamic(?:[ -]+(?:ip|address))?[ -]+pool)\\b|\\b(?:users?|subscribers?|customers?)\\b[^|]{0,80}\\b(?:adsl|vdsl|xdsl|ftth|fttb|gpon)\\b)[^|]*(?: \\| |$)",
+      "reason": "APNIC inetnum registration explicitly identifies fixed-broadband access users or a dynamic pool"
+    },
+    {
+      "pattern": "(?:^| \\| )netname=[^|]+ \\| (?:[^|]+ \\| )*[^|]*\\b(?:adsl|vdsl|xdsl)\\b[^|]{0,80}\\b(?:ip|address)[ -]+pool\\b[^|]*(?: \\| |$)",
+      "reason": "APNIC inetnum registration explicitly identifies a DSL subscriber address pool"
+    },
+    {
+      "pattern": "(?:^| \\| )netname=[^|]+ \\| (?:[^|]+ \\| )*[^|]*\\b(?:broad[ -]?band|wide[ -]?band)\\b[^|]{0,80}\\b(?:dial|dail)(?:[ -]?up)?[ -]+pool\\b[^|]*(?: \\| |$)",
+      "reason": "APNIC inetnum registration explicitly identifies a broadband dial-up pool"
+    },
+    {
+      "pattern": "(?:^| \\| )netname=[^|]+ \\| (?:[^|]+ \\| )*[^|]*\\bpppoe\\b[^|]{0,80}\\b(?:dhcp[ -]+address|(?:ip|address|dial(?:[ -]?up)?)[ -]+pool|users?|subscribers?|customers?)\\b[^|]*(?: \\| |$)",
+      "reason": "APNIC inetnum registration explicitly identifies a PPPoE user or address pool"
+    },
+    {
+      "pattern": "(?:^| \\| )netname=[^|]+ \\| (?:[^|]+ \\| )*[^|]*\\b(?:gprs|3g|4g|5g|lte|mobile[ -]?broadband|wlan)\\b[^|]{0,80}\\b(?:users?|subscribers?|customers?|dynamic[ -]+(?:ip|address)|(?:ip|address)[ -]+pool)\\b[^|]*(?: \\| |$)",
+      "reason": "APNIC inetnum registration explicitly identifies mobile or WLAN access users or their address pool"
+    }
+  ],
   "independent_legal_entity_patterns": [
     "\\b(?:[a-z][a-z0-9&()'.,-]*[ .,-]+)+(?:co(?:mpany)?[ .,-]+)?(?:ltd|limited)\\b"
   ],
   "exclude_asns": {
     "4809": "China Telecom CN2 dedicated premium backbone; outside ordinary Internet user access scope",
     "9929": "China Unicom CUII dedicated premium backbone; outside ordinary Internet user access scope",
+    "10099": "China Unicom Global Hong Kong international gateway; outside mainland China ordinary Internet user access scope",
     "17442": "ChinaNetCenter/Wangsu CDN, not China Telecom",
+    "23764": "CTGNet Hong Kong international network; outside mainland China ordinary Internet user access scope",
+    "58453": "China Mobile International Hong Kong network; outside mainland China ordinary Internet user access scope",
+    "58807": "China Mobile International Hong Kong network; outside mainland China ordinary Internet user access scope",
     "133118": "China Unicom Cloud Data Company network; IPtoASN description is only UNICOM-CN",
     "133119": "China Unicom Cloud Data and third-party cloud/hosting network; IPtoASN description is only UNICOM-CN",
     "134542": "China Unicom Cloud Data Company network; IPtoASN description is only UNICOM-GUIAN",

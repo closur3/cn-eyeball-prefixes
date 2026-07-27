@@ -7,6 +7,7 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/netip"
 	"os"
 	"path/filepath"
@@ -51,29 +52,44 @@ type Manifest struct {
 
 const SchemaVersion = 4
 
-func ComputeSourceHashes(sourceDir string) map[string]SourceEntry {
+func ComputeSourceHashes(sourceDir string) (map[string]SourceEntry, error) {
 	entries := make(map[string]SourceEntry)
 	dh, err := os.Open(sourceDir)
 	if err != nil {
-		return nil
+		return nil, err
 	}
-	names, _ := dh.Readdirnames(-1)
-	dh.Close()
+	names, err := dh.Readdirnames(-1)
+	if closeErr := dh.Close(); err == nil {
+		err = closeErr
+	}
+	if err != nil {
+		return nil, err
+	}
 	sort.Strings(names)
 	for _, name := range names {
 		path := filepath.Join(sourceDir, name)
-		data, err := os.ReadFile(path)
+		file, err := os.Open(path)
 		if err != nil {
-			continue
+			return nil, err
 		}
-		h := sha256.Sum256(data)
-		entry := SourceEntry{SHA256: hex.EncodeToString(h[:])}
-		if url, ok := iputil.SourceURLs[name]; ok {
-			entry.URL = url
+		hash := sha256.New()
+		if _, err = io.Copy(hash, file); err == nil {
+			err = file.Close()
+		} else {
+			_ = file.Close()
 		}
+		if err != nil {
+			return nil, err
+		}
+		entry := SourceEntry{SHA256: hex.EncodeToString(hash.Sum(nil))}
+		url, hasURLMetadata := iputil.SourceURLs[name]
+		if !hasURLMetadata {
+			return nil, fmt.Errorf("source %s has no declared URL metadata", name)
+		}
+		entry.URL = url
 		entries[name] = entry
 	}
-	return entries
+	return entries, nil
 }
 
 var operators = iputil.Operators

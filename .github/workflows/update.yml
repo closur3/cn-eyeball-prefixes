@@ -20,7 +20,7 @@ concurrency:
 jobs:
   generate:
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    timeout-minutes: 90
     steps:
       - uses: actions/checkout@v7
 
@@ -222,7 +222,9 @@ jobs:
           config_hashes="$RUNNER_TEMP/config-hashes.json"
           {
             echo '{'
-            for f in generator/config/operators.json generator/config/ipv6-province-prefixes.json; do
+            for f in \
+              generator/config/operators.json \
+              generator/config/ipv6-province-prefixes.json; do
               sum=$(sha256sum "$f" | cut -d' ' -f1)
               echo "  \"$(basename "$f")\": {\"sha256\": \"$sum\"},"
             done
@@ -230,7 +232,7 @@ jobs:
           } | sed '$ s/,$//' > "$config_hashes"
           echo '}' >> "$config_hashes"
 
-          # ---- Source hashes (computed by Go, URL map in listmanifest/manifest.go) ----
+          # ---- Source hashes (computed by Go; URLs come from the static map) ----
 
           # ---- Generate public manifest ----
           go -C generator run ./cmd/generate manifest \

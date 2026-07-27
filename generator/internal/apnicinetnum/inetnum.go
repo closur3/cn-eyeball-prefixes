@@ -40,6 +40,9 @@ type Match struct {
 	Category  string
 	Reason    string
 	MatchedBy string
+	Inherit   bool
+	Hard      bool
+	Access    bool
 }
 
 type Segment struct {
@@ -137,6 +140,45 @@ func Parse(path string) ([]Record, error) {
 }
 
 func ResolveAll(records []Record, classify func(Record) Match) []Segment {
+	_, all := resolve(records, classify, resolveOptions{
+		all:              true,
+		preserveAllMatch: true,
+	})
+	return all
+}
+
+// ResolvePolicy resolves the effective exclusion policy across nested APNIC
+// registrations. Inherited exclusions survive opaque child registrations,
+// explicit access evidence may override a softer inherited exclusion, and a
+// hard inherited exclusion cannot be overridden.
+//
+// ResolveAll deliberately remains a plain most-specific resolver because its
+// Record field is also used by registrant and operator-conflict audits.
+func ResolvePolicy(records []Record, classify func(Record) Match) []Segment {
+	policy, _ := resolve(records, classify, resolveOptions{policy: true})
+	return policy
+}
+
+// ResolvePolicyAndAll resolves both views with one classification pass, one
+// event sort, and one sweep. The all-record view deliberately carries an empty
+// Match, exactly as ResolveAll(records, func(Record) Match { return Match{} }).
+func ResolvePolicyAndAll(records []Record, classify func(Record) Match) ([]Segment, []Segment) {
+	return resolve(records, classify, resolveOptions{
+		policy: true,
+		all:    true,
+	})
+}
+
+type resolveOptions struct {
+	policy           bool
+	all              bool
+	preserveAllMatch bool
+}
+
+func resolve(records []Record, classify func(Record) Match, options resolveOptions) ([]Segment, []Segment) {
+	if len(records) == 0 {
+		return nil, nil
+	}
 	type event struct {
 		position uint64
 		index    int
@@ -145,7 +187,9 @@ func ResolveAll(records []Record, classify func(Record) Match) []Segment {
 	events := make([]event, 0, len(records)*2)
 	matches := make([]Match, len(records))
 	for i, record := range records {
-		matches[i] = classify(record)
+		if options.policy || options.preserveAllMatch {
+			matches[i] = classify(record)
+		}
 		events = append(events, event{position: uint64(record.Lo), index: i, add: true})
 		events = append(events, event{position: uint64(record.Hi) + 1, index: i})
 	}
@@ -156,31 +200,76 @@ func ResolveAll(records []Record, classify func(Record) Match) []Segment {
 		return !events[i].add && events[j].add
 	})
 	active := make([]bool, len(records))
-	h := &recordHeap{records: records}
-	heap.Init(h)
-	var out []Segment
+	all := &recordHeap{records: records}
+	inherited := &recordHeap{records: records}
+	hard := &recordHeap{records: records}
+	access := &recordHeap{records: records}
+	heap.Init(all)
+	if options.policy {
+		heap.Init(inherited)
+		heap.Init(hard)
+		heap.Init(access)
+	}
+	var policyOut []Segment
+	var allOut []Segment
 	previous := events[0].position
 	for i := 0; i < len(events); {
 		position := events[i].position
-		for h.Len() > 0 && !active[h.items[0]] {
-			heap.Pop(h)
+		pruneInactive(all, active)
+		if options.policy {
+			pruneInactive(inherited, active)
+			pruneInactive(hard, active)
+			pruneInactive(access, active)
 		}
-		if previous < position && h.Len() > 0 {
-			index := h.items[0]
-			match := matches[index]
-			appendSegment(&out, Segment{Lo: uint32(previous), Hi: uint32(position - 1), Record: records[index], Match: match})
+		if previous < position && all.Len() > 0 {
+			index := all.items[0]
+			if options.all {
+				match := Match{}
+				if options.preserveAllMatch {
+					match = matches[index]
+				}
+				appendSegment(&allOut, Segment{Lo: uint32(previous), Hi: uint32(position - 1), Record: records[index], Match: match})
+			}
+			if options.policy {
+				match := matches[index]
+				if hard.Len() > 0 {
+					index = hard.items[0]
+					match = matches[index]
+				} else if match.Reason == "" || match.Inherit {
+					if inherited.Len() > 0 {
+						inheritedIndex := inherited.items[0]
+						accessOverrides := access.Len() > 0 && strictlyMoreSpecific(records[access.items[0]], records[inheritedIndex])
+						if !accessOverrides {
+							index = inheritedIndex
+							match = matches[index]
+						}
+					}
+				}
+				appendSegment(&policyOut, Segment{Lo: uint32(previous), Hi: uint32(position - 1), Record: records[index], Match: match})
+			}
 		}
 		for i < len(events) && events[i].position == position {
 			e := events[i]
 			active[e.index] = e.add
 			if e.add {
-				heap.Push(h, e.index)
+				heap.Push(all, e.index)
+				if options.policy {
+					if matches[e.index].Inherit {
+						heap.Push(inherited, e.index)
+					}
+					if matches[e.index].Hard {
+						heap.Push(hard, e.index)
+					}
+					if matches[e.index].Access {
+						heap.Push(access, e.index)
+					}
+				}
 			}
 			i++
 		}
 		previous = position
 	}
-	return out
+	return policyOut, allOut
 }
 
 func Matched(segments []Segment) []Segment {
@@ -195,7 +284,11 @@ func Matched(segments []Segment) []Segment {
 
 func SearchText(record Record) string {
 	parts := make([]string, 0, len(record.Netnames)+len(record.Descriptions)+len(record.OrganizationNames))
-	parts = append(parts, record.Netnames...)
+	for _, netname := range record.Netnames {
+		// Preserve the field type so purpose rules can require an exact netname
+		// without also matching the same token in a description or ASN name.
+		parts = append(parts, "netname="+netname)
+	}
 	parts = append(parts, record.Descriptions...)
 	parts = append(parts, record.OrganizationNames...)
 	return strings.Join(parts, " | ")
@@ -238,6 +331,18 @@ func (h *recordHeap) Pop() any {
 	value := h.items[last]
 	h.items = h.items[:last]
 	return value
+}
+
+func pruneInactive(h *recordHeap, active []bool) {
+	for h.Len() > 0 && !active[h.items[0]] {
+		heap.Pop(h)
+	}
+}
+
+func strictlyMoreSpecific(child, parent Record) bool {
+	return child.Lo >= parent.Lo &&
+		child.Hi <= parent.Hi &&
+		(child.Lo > parent.Lo || child.Hi < parent.Hi)
 }
 
 func mergeExact(records []Record) []Record {
