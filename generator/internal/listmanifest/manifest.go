@@ -50,6 +50,12 @@ type Manifest struct {
 	Files         map[string]FileEntry   `json:"files"`
 }
 
+type VerifyOptions struct {
+	RequirePublicationProvenance bool
+	CurrentRoot                  string
+	ExpectedNewGeneratorCommit   string
+}
+
 const SchemaVersion = 4
 
 func ComputeSourceHashes(sourceDir string) (map[string]SourceEntry, error) {
@@ -141,18 +147,9 @@ var provinces = []string{
 //   - configs:     nil skips the configs field
 //   - sources:     nil skips the sources field
 func Generate(root string, generatedAt time.Time, gen *GeneratorInfo, configs, sources map[string]SourceEntry) (bool, error) {
-	paths := expectedPaths()
-	if err := rejectUnexpectedLists(root, paths); err != nil {
+	paths, files, err := inspectTree(root, true)
+	if err != nil {
 		return false, err
-	}
-
-	files := make(map[string]FileEntry, len(paths))
-	for _, rel := range paths {
-		meta, err := inspect(filepath.Join(root, filepath.FromSlash(rel)), strings.HasPrefix(rel, "ipv4/"))
-		if err != nil {
-			return false, fmt.Errorf("%s: %w", rel, err)
-		}
-		files[rel] = meta
 	}
 
 	id := contentID(paths, files)
@@ -195,6 +192,242 @@ func Generate(root string, generatedAt time.Time, gen *GeneratorInfo, configs, s
 	return true, nil
 }
 
+// ComputeContentID validates a complete public list tree and returns the same
+// deterministic content identifier used by manifest.json.
+func ComputeContentID(root string) (string, error) {
+	paths, files, err := inspectTree(root, false)
+	if err != nil {
+		return "", err
+	}
+	return contentID(paths, files), nil
+}
+
+// Verify checks that the manifest and public list tree form one complete,
+// self-consistent release. It does not rewrite any files.
+func Verify(root string) error {
+	return VerifyWithOptions(root, VerifyOptions{})
+}
+
+// VerifyWithOptions applies Verify plus publication-specific provenance
+// requirements.
+func VerifyWithOptions(root string, options VerifyOptions) error {
+	paths, files, err := inspectTree(root, true)
+	if err != nil {
+		return err
+	}
+
+	data, err := os.ReadFile(filepath.Join(root, "manifest.json"))
+	if err != nil {
+		return err
+	}
+	var manifest Manifest
+	decoder := json.NewDecoder(bytes.NewReader(data))
+	decoder.DisallowUnknownFields()
+	if err := decoder.Decode(&manifest); err != nil {
+		return fmt.Errorf("manifest.json: %w", err)
+	}
+	if err := ensureJSONEOF(decoder); err != nil {
+		return fmt.Errorf("manifest.json: %w", err)
+	}
+	if manifest.SchemaVersion != SchemaVersion {
+		return fmt.Errorf(
+			"manifest.json: schema_version is %d, want %d",
+			manifest.SchemaVersion,
+			SchemaVersion,
+		)
+	}
+	if options.RequirePublicationProvenance ||
+		options.CurrentRoot != "" ||
+		options.ExpectedNewGeneratorCommit != "" {
+		if err := validatePublicationProvenance(&manifest); err != nil {
+			return err
+		}
+	}
+	if len(manifest.Files) != len(paths) {
+		return fmt.Errorf(
+			"manifest.json: contains %d file entries, want %d",
+			len(manifest.Files),
+			len(paths),
+		)
+	}
+
+	expected := make(map[string]bool, len(paths))
+	for _, rel := range paths {
+		expected[rel] = true
+		recorded, ok := manifest.Files[rel]
+		if !ok {
+			return fmt.Errorf("manifest.json: missing file entry %s", rel)
+		}
+		actual := files[rel]
+		if recorded != actual {
+			return fmt.Errorf(
+				"manifest.json: metadata mismatch for %s: got count=%d sha256=%s, want count=%d sha256=%s",
+				rel,
+				recorded.PrefixCount,
+				recorded.SHA256,
+				actual.PrefixCount,
+				actual.SHA256,
+			)
+		}
+	}
+	for rel := range manifest.Files {
+		if !expected[rel] {
+			return fmt.Errorf("manifest.json: unexpected file entry %s", rel)
+		}
+	}
+
+	actualID := contentID(paths, files)
+	if manifest.ContentID != actualID {
+		return fmt.Errorf(
+			"manifest.json: content_id is %q, want %q",
+			manifest.ContentID,
+			actualID,
+		)
+	}
+	if options.CurrentRoot != "" || options.ExpectedNewGeneratorCommit != "" {
+		if options.CurrentRoot == "" || options.ExpectedNewGeneratorCommit == "" {
+			return fmt.Errorf(
+				"publication comparison requires both current root and expected new generator commit",
+			)
+		}
+		if !isLowerHex(options.ExpectedNewGeneratorCommit, 40) {
+			return fmt.Errorf("expected new generator commit must be 40 lowercase hex digits")
+		}
+		if err := Verify(options.CurrentRoot); err != nil {
+			return fmt.Errorf("current release: %w", err)
+		}
+		currentData, err := os.ReadFile(filepath.Join(options.CurrentRoot, "manifest.json"))
+		if err != nil {
+			return fmt.Errorf("current release manifest: %w", err)
+		}
+		var current Manifest
+		if err := json.Unmarshal(currentData, &current); err != nil {
+			return fmt.Errorf("current release manifest: %w", err)
+		}
+		if manifest.ContentID == current.ContentID {
+			if !bytes.Equal(data, currentData) {
+				return fmt.Errorf(
+					"manifest.json: metadata changed without a public-list content change",
+				)
+			}
+		} else if manifest.Generator.Commit != options.ExpectedNewGeneratorCommit {
+			return fmt.Errorf(
+				"manifest.json: generator commit is %s, want current workflow commit %s",
+				manifest.Generator.Commit,
+				options.ExpectedNewGeneratorCommit,
+			)
+		}
+	}
+	return nil
+}
+
+func validatePublicationProvenance(manifest *Manifest) error {
+	generatedAt, err := time.Parse(time.RFC3339Nano, manifest.GeneratedAt)
+	if err != nil || generatedAt.UTC().Format(time.RFC3339Nano) != manifest.GeneratedAt {
+		return fmt.Errorf("manifest.json: generated_at must be canonical UTC RFC3339")
+	}
+	switch {
+	case manifest.Generator == nil:
+		return fmt.Errorf("manifest.json: generator metadata is required")
+	case !isLowerHex(manifest.Generator.Commit, 40):
+		return fmt.Errorf("manifest.json: generator commit must be 40 lowercase hex digits")
+	case manifest.Generator.Dirty:
+		return fmt.Errorf("manifest.json: generator must not be dirty")
+	}
+
+	expectedConfigs := map[string]string{
+		"ipv6-province-prefixes.json": "",
+		"operators.json":              "",
+	}
+	if err := validateSourceEntries("configs", manifest.Configs, expectedConfigs); err != nil {
+		return err
+	}
+	if err := validateSourceEntries("sources", manifest.Sources, iputil.SourceURLs); err != nil {
+		return err
+	}
+	return nil
+}
+
+func validateSourceEntries(
+	label string,
+	entries map[string]SourceEntry,
+	expectedURLs map[string]string,
+) error {
+	if len(entries) != len(expectedURLs) {
+		return fmt.Errorf(
+			"manifest.json: %s contains %d entries, want %d",
+			label,
+			len(entries),
+			len(expectedURLs),
+		)
+	}
+	for name, expectedURL := range expectedURLs {
+		entry, ok := entries[name]
+		if !ok {
+			return fmt.Errorf("manifest.json: %s is missing %s", label, name)
+		}
+		if !isLowerHex(entry.SHA256, 64) {
+			return fmt.Errorf(
+				"manifest.json: %s %s sha256 must be 64 lowercase hex digits",
+				label,
+				name,
+			)
+		}
+		if entry.URL != expectedURL {
+			return fmt.Errorf(
+				"manifest.json: %s %s URL is %q, want %q",
+				label,
+				name,
+				entry.URL,
+				expectedURL,
+			)
+		}
+	}
+	return nil
+}
+
+func isLowerHex(value string, length int) bool {
+	if len(value) != length {
+		return false
+	}
+	for _, character := range value {
+		if (character < '0' || character > '9') && (character < 'a' || character > 'f') {
+			return false
+		}
+	}
+	return true
+}
+
+func inspectTree(root string, requireCoreLists bool) ([]string, map[string]FileEntry, error) {
+	paths := expectedPaths()
+	if err := rejectUnexpectedLists(root, paths); err != nil {
+		return nil, nil, err
+	}
+	files := make(map[string]FileEntry, len(paths))
+	for _, rel := range paths {
+		meta, err := inspect(filepath.Join(root, filepath.FromSlash(rel)), strings.HasPrefix(rel, "ipv4/"))
+		if err != nil {
+			return nil, nil, fmt.Errorf("%s: %w", rel, err)
+		}
+		if requireCoreLists && isRequiredList(rel) && meta.PrefixCount == 0 {
+			return nil, nil, fmt.Errorf("%s: required public list is empty", rel)
+		}
+		files[rel] = meta
+	}
+	return paths, files, nil
+}
+
+func ensureJSONEOF(decoder *json.Decoder) error {
+	var extra any
+	if err := decoder.Decode(&extra); err != io.EOF {
+		if err == nil {
+			return fmt.Errorf("contains multiple JSON values")
+		}
+		return err
+	}
+	return nil
+}
+
 func expectedPaths() []string {
 	var paths []string
 	for _, family := range []string{"ipv4", "ipv6"} {
@@ -208,6 +441,16 @@ func expectedPaths() []string {
 	}
 	sort.Strings(paths)
 	return paths
+}
+
+// ExpectedPaths returns the complete, sorted public list contract. Callers
+// receive a fresh slice and may modify it without affecting later calls.
+func ExpectedPaths() []string {
+	return expectedPaths()
+}
+
+func isRequiredList(relative string) bool {
+	return strings.Count(filepath.ToSlash(relative), "/") == 1
 }
 
 func rejectUnexpectedLists(root string, expected []string) error {
@@ -271,7 +514,8 @@ func inspect(path string, ipv4 bool) (FileEntry, error) {
 		if line != prefix.String() {
 			return FileEntry{}, fmt.Errorf("non-canonical CIDR text at line %d: use %s", count+1, prefix)
 		}
-		if prefix.Addr().Is4() != ipv4 {
+		if ipv4 != prefix.Addr().Is4() ||
+			(!ipv4 && (!prefix.Addr().Is6() || prefix.Addr().Is4In6())) {
 			return FileEntry{}, fmt.Errorf("wrong address family at line %d: %s", count+1, line)
 		}
 		if count != 0 {

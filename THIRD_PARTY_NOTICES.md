@@ -60,13 +60,24 @@ The MIT License text applying to the upstream material listed above follows:
 APNIC data is not used for IP geolocation mapping or marketing. This repository
 does not redistribute the raw APNIC bulk database.
 
+The published prefix lists are classifications derived from multiple sources,
+not copies of APNIC records. This notice does not assert that every downstream
+redistribution or commercial use of those derived classifications is permitted
+by APNIC. Users with those use cases must review the agreement and obtain any
+approval or legal advice their use requires.
+
 ## RIPE Routing Information Service
 
 - Source: <https://www.ris.ripe.net/dumps/>
 - Terms: [RIPE NCC Website and Publicly Available RIPE NCC Services Terms of
   Service](https://www.ripe.net/about-us/legal/terms-of-service/)
-- Use in this project: personal, non-commercial Internet routing research
+- Commercial derivatives: [RIS Commercial Use Terms and
+  Conditions](https://www.ripe.net/analyse/internet-measurements/routing-information-service-ris/commercial-use/)
+- Use in this project: Internet routing research and operational prefix
+  classification
 
 This repository does not redistribute raw RIPE RIS or RISWhois dump files.
-Commercial users of derived lists must independently review and comply with
-the terms applicable to RIPE RIS data.
+Commercial services, products, reports, or other derivatives based on RIPE RIS
+data are subject to RIPE NCC's additional attribution and use conditions.
+Downstream users must independently review and comply with the terms applicable
+to their use.

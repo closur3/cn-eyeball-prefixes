@@ -4,7 +4,7 @@
   "generated_at": "2026-07-27T12:28:10.799893349Z",
   "generator": {
     "commit": "848b05a682283ea02b46d86fcef9ed70abda64a4",
-    "dirty": true
+    "dirty": false
   },
   "configs": {
     "ipv6-province-prefixes.json": {

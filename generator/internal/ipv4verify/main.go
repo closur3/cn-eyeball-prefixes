@@ -884,6 +884,9 @@ func Main() {
 		cloudRanges = append(cloudRanges, cloudBySource[source]...)
 	}
 	cnRanges := readCIDRs(filepath.Join(*data, "cn.txt"), true)
+	if len(cnRanges) == 0 {
+		panic("cn.txt contains no IPv4 prefixes")
+	}
 	classifier, e := operatorconfig.Load(*operatorConfig, operators)
 	if e != nil {
 		panic(e)
@@ -1137,6 +1140,9 @@ func Main() {
 	for _, operator := range operators {
 		path := filepath.Join(*data, operator+".txt")
 		ranges := readCIDRs(path, true)
+		if len(ranges) == 0 {
+			panic(operator + ".txt contains no IPv4 prefixes")
+		}
 		generatedByOperator[operator] = ranges
 		expected := expectedByOperator[operator]
 		assertEqual(ranges, expected, "operator address set does not recompute: "+operator)

@@ -11,7 +11,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
   group: generate-operator-allowlist-${{ github.ref }}
@@ -36,12 +36,19 @@ jobs:
           source_dir="$RUNNER_TEMP/cn-operator-sources"
           stage_dir="$RUNNER_TEMP/cn-operator-stage"
           audit_dir="$RUNNER_TEMP/cn-operator-audit"
-          rm -rf -- "$source_dir" "$stage_dir" "$audit_dir"
-          mkdir -p "$source_dir" "$stage_dir/ipv4" "$stage_dir/ipv6" "$audit_dir"
+          publish_dir="$RUNNER_TEMP/cn-operator-publish"
+          rm -rf -- "$source_dir" "$stage_dir" "$audit_dir" "$publish_dir"
+          mkdir -p \
+            "$source_dir" \
+            "$stage_dir/ipv4" \
+            "$stage_dir/ipv6" \
+            "$audit_dir" \
+            "$publish_dir"
           {
             echo "SOURCE_DIR=$source_dir"
             echo "STAGE_DIR=$stage_dir"
             echo "AUDIT_DIR=$audit_dir"
+            echo "PUBLISH_DIR=$publish_dir"
           } >> "$GITHUB_ENV"
 
       - name: Download sources
@@ -190,11 +197,50 @@ jobs:
             --allocation-config config/ipv6-province-prefixes.json \
             2>&1 | tee "$AUDIT_DIR/verify-ipv6.log"
 
-      - name: Publish verified lists and manifest
+      - name: Report candidate changes against current release
         shell: bash
         run: |
           set -euo pipefail
           set -o pipefail
+
+          go -C generator run ./cmd/verify release \
+            --current ../lists \
+            --candidate "$STAGE_DIR" \
+            --report "$AUDIT_DIR/release-change-report.json" \
+            2>&1 | tee "$AUDIT_DIR/verify-release-change.log"
+
+          warning_count="$(jq '.warnings | length' \
+            "$AUDIT_DIR/release-change-report.json")"
+          if (( warning_count > 0 )); then
+            while IFS= read -r warning; do
+              echo "::warning title=Public list change::$warning"
+            done < <(jq -r '.warnings[]' \
+              "$AUDIT_DIR/release-change-report.json")
+            {
+              echo '### Public list change warnings'
+              jq -r '.warnings[] | "- " + .' \
+                "$AUDIT_DIR/release-change-report.json"
+            } >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Prepare verified publication
+        shell: bash
+        run: |
+          set -euo pipefail
+          set -o pipefail
+
+          # Capture provenance before any generated output is copied. Only
+          # generator inputs, not lists/** outputs, can make this tree dirty.
+          generator_commit="${GITHUB_SHA:-$(git rev-parse HEAD)}"
+          generator_dirty=false
+          if [[ -n "$(git status --porcelain=v1 --untracked-files=all -- \
+            generator .github/workflows/update.yml)" ]]; then
+            generator_dirty=true
+          fi
+          if [[ "${GITHUB_ACTIONS:-}" == "true" && "$generator_dirty" == true ]]; then
+            echo "refusing to publish from a dirty generator tree" >&2
+            exit 1
+          fi
 
           sync_txt_tree() {
             local source="$1"
@@ -207,15 +253,10 @@ jobs:
             done < <(find "$source" -type f -name '*.txt' -print0)
           }
 
-          sync_txt_tree "$STAGE_DIR/ipv4" lists/ipv4
-          sync_txt_tree "$STAGE_DIR/ipv6" lists/ipv6
-          rm -f -- lists/ipv4/manifest.json lists/ipv6/manifest.json
-
-          # ---- Generator commit ----
-          generator_commit="${GITHUB_SHA:-$(git rev-parse HEAD)}"
-          generator_dirty=false
-          if [[ -n "$(git status --porcelain)" ]]; then
-            generator_dirty=true
+          sync_txt_tree "$STAGE_DIR/ipv4" "$PUBLISH_DIR/ipv4"
+          sync_txt_tree "$STAGE_DIR/ipv6" "$PUBLISH_DIR/ipv6"
+          if [[ -f lists/manifest.json ]]; then
+            cp lists/manifest.json "$PUBLISH_DIR/manifest.json"
           fi
 
           # ---- Config hashes ----
@@ -236,18 +277,26 @@ jobs:
 
           # ---- Generate public manifest ----
           go -C generator run ./cmd/generate manifest \
-            --root ../lists \
+            --root "$PUBLISH_DIR" \
             --commit "$generator_commit" \
             --dirty=$generator_dirty \
             --config-hashes "$config_hashes" \
             --source-dir "$SOURCE_DIR" \
             2>&1 | tee "$AUDIT_DIR/generate-public-manifest.log"
 
+          go -C generator run ./cmd/verify manifest \
+            --root "$PUBLISH_DIR" \
+            --require-publication-provenance \
+            --current-root ../lists \
+            --expected-new-generator-commit "$GITHUB_SHA" \
+            2>&1 | tee "$AUDIT_DIR/verify-public-manifest.log"
+
+          go -C generator run ./cmd/verify public \
+            --root "$PUBLISH_DIR" \
+            2>&1 | tee "$AUDIT_DIR/verify-public-relations.log"
+
           cp "$STAGE_DIR/ipv4/manifest.json" "$AUDIT_DIR/ipv4-manifest.json"
-          cp lists/manifest.json "$AUDIT_DIR/public-manifest.json"
-          git status --short -- lists > "$AUDIT_DIR/git-status.txt"
-          git diff --no-ext-diff -- lists/ipv4 lists/ipv6 \
-            > "$AUDIT_DIR/list-content.diff"
+          cp "$PUBLISH_DIR/manifest.json" "$AUDIT_DIR/public-manifest.json"
 
       - name: Upload audit artifact
         if: always()
@@ -258,27 +307,99 @@ jobs:
           if-no-files-found: warn
           retention-days: 30
 
-      - name: Detect list content changes
-        id: list_changes
+      - name: Upload verified publication
+        uses: actions/upload-artifact@v7
+        with:
+          name: cn-operator-publication-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/cn-operator-publish
+          if-no-files-found: error
+          retention-days: 1
+
+  publish:
+    needs: generate
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-go@v7
+        with:
+          go-version: '1.26'
+          cache: false
+
+      - name: Download verified publication
+        uses: actions/download-artifact@v8
+        with:
+          name: cn-operator-publication-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/cn-operator-publish
+
+      - name: Verify downloaded publication
         shell: bash
         run: |
           set -euo pipefail
-          if [[ -n "$(git status --porcelain=v1 --untracked-files=all -- \
+          publish_dir="$RUNNER_TEMP/cn-operator-publish"
+          test -d "$publish_dir/ipv4"
+          test -d "$publish_dir/ipv6"
+          test -s "$publish_dir/manifest.json"
+          go -C generator run ./cmd/verify manifest \
+            --root "$publish_dir" \
+            --require-publication-provenance \
+            --current-root ../lists \
+            --expected-new-generator-commit "$GITHUB_SHA"
+          go -C generator run ./cmd/verify public --root "$publish_dir"
+          go -C generator run ./cmd/verify ipv6 \
+            --data "$publish_dir/ipv6" \
+            --allocation-config config/ipv6-province-prefixes.json
+
+      - name: Prepare verified list commit
+        id: prepare_commit
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          publish_dir="$RUNNER_TEMP/cn-operator-publish"
+          sync_txt_tree() {
+            local source="$1"
+            local destination="$2"
+            mkdir -p "$destination"
+            find "$destination" -type f -name '*.txt' -delete
+            while IFS= read -r -d '' file; do
+              local relative="${file#"$source"/}"
+              install -D -m 0644 "$file" "$destination/$relative"
+            done < <(find "$source" -type f -name '*.txt' -print0)
+          }
+
+          sync_txt_tree "$publish_dir/ipv4" lists/ipv4
+          sync_txt_tree "$publish_dir/ipv6" lists/ipv6
+          install -m 0644 "$publish_dir/manifest.json" lists/manifest.json
+
+          if [[ -z "$(git status --porcelain=v1 --untracked-files=all -- \
             lists/ipv4 lists/ipv6 lists/manifest.json)" ]]; then
-            echo 'changed=true' >> "$GITHUB_OUTPUT"
-          else
-            echo 'changed=false' >> "$GITHUB_OUTPUT"
+            echo "verified public lists are unchanged"
+            echo "created=false" >> "$GITHUB_OUTPUT"
+            exit 0
           fi
 
-      - name: Commit generated lists
-        if: steps.list_changes.outputs.changed == 'true'
-        shell: bash
-        run: |
-          set -euo pipefail
           git config user.name 'github-actions[bot]'
           git config user.email \
             '41898282+github-actions[bot]@users.noreply.github.com'
           git add -A -- lists/ipv4 lists/ipv6
           git add -- lists/manifest.json
           git commit -m 'chore: update cn eyeball prefixes'
-          git push
+          echo "created=true" >> "$GITHUB_OUTPUT"
+
+      - name: Push verified list commit
+        if: steps.prepare_commit.outputs.created == 'true'
+        shell: bash
+        env:
+          PUSH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          basic_auth="$(printf 'x-access-token:%s' "$PUSH_TOKEN" | base64 --wrap=0)"
+          git \
+            -c "http.https://github.com/.extraheader=AUTHORIZATION: basic $basic_auth" \
+            push origin "HEAD:${GITHUB_REF_NAME}"

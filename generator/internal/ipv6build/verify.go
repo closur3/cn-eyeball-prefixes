@@ -59,12 +59,18 @@ func VerifyPublicLists(dataDir string, cfg *AllocationConfig) error {
 	if err != nil {
 		return err
 	}
+	if len(cn) == 0 {
+		return fmt.Errorf("cn.txt contains no IPv6 prefixes")
+	}
 	byOperator := make(map[string][]netip.Prefix, len(operatorNames))
 	var operatorUnion []netip.Prefix
 	for _, operator := range operatorNames {
 		prefixes, err := readPublicPrefixFile(filepath.Join(dataDir, operator+".txt"))
 		if err != nil {
 			return err
+		}
+		if len(prefixes) == 0 {
+			return fmt.Errorf("%s.txt contains no IPv6 prefixes", operator)
 		}
 		byOperator[operator] = prefixes
 		operatorUnion = append(operatorUnion, prefixes...)

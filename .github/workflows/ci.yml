@@ -1,0 +1,137 @@
+name: Generator CI
+
+on:
+  pull_request:
+    paths:
+      - 'generator/**'
+      - 'lists/**'
+      - '.github/workflows/**'
+  push:
+    branches:
+      - main
+      - dev
+    paths:
+      - 'generator/**'
+      - 'lists/**'
+      - '.github/workflows/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: generator-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-go@v7
+        with:
+          go-version: '1.26'
+          cache: false
+
+      - name: Run Go tests
+        run: go -C generator test ./...
+
+      - name: Run Go vet
+        run: go -C generator vet ./...
+
+      - name: Verify public manifest
+        run: |
+          go -C generator run ./cmd/verify manifest \
+            --root ../lists \
+            --require-publication-provenance
+
+      - name: Verify current release baseline
+        run: |
+          go -C generator run ./cmd/verify release \
+            --current ../lists \
+            --candidate ../lists
+
+      - name: Verify public-list relations
+        run: go -C generator run ./cmd/verify public --root ../lists
+
+      - name: Verify IPv6 public-list relations
+        run: |
+          go -C generator run ./cmd/verify ipv6 \
+            --data ../lists/ipv6 \
+            --allocation-config config/ipv6-province-prefixes.json
+
+      - name: Report changed lists and verify provenance
+        if: >-
+          github.event_name == 'pull_request' ||
+          (github.event_name == 'push' &&
+          github.event.before != '0000000000000000000000000000000000000000')
+        shell: bash
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+        run: |
+          set -euo pipefail
+          base_root="$RUNNER_TEMP/cn-operator-base"
+          rm -rf -- "$base_root"
+          mkdir -p "$base_root"
+          git archive "$BASE_SHA" lists | tar -x -C "$base_root"
+          go -C generator run ./cmd/verify release \
+            --current "$base_root/lists" \
+            --candidate ../lists \
+            --report "$RUNNER_TEMP/release-change-report.json"
+
+          warning_count="$(jq '.warnings | length' \
+            "$RUNNER_TEMP/release-change-report.json")"
+          if (( warning_count > 0 )); then
+            while IFS= read -r warning; do
+              echo "::warning title=Public list change::$warning"
+            done < <(jq -r '.warnings[]' \
+              "$RUNNER_TEMP/release-change-report.json")
+            {
+              echo '### Public list change warnings'
+              jq -r '.warnings[] | "- " + .' \
+                "$RUNNER_TEMP/release-change-report.json"
+            } >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+          candidate_content_id="$(jq -er '.content_id' lists/manifest.json)"
+          base_content_id="$(
+            jq -er '.content_id' "$base_root/lists/manifest.json"
+          )"
+          if [[ "$candidate_content_id" == "$base_content_id" ]]; then
+            echo "public-list content ID is unchanged"
+            exit 0
+          fi
+
+          # Skip metadata-only commits and find the commit that first
+          # introduced this contiguous content-ID version.
+          content_commit=''
+          while IFS= read -r commit; do
+            commit_content_id="$(
+              git show "${commit}:lists/manifest.json" | jq -er '.content_id'
+            )"
+            if [[ "$commit_content_id" != "$candidate_content_id" ]]; then
+              break
+            fi
+            content_commit="$commit"
+          done < <(git log --format=%H "$GITHUB_SHA" -- lists/manifest.json)
+          if [[ -z "$content_commit" ]]; then
+            echo "could not identify the commit that introduced candidate content" >&2
+            exit 1
+          fi
+
+          expected_generator_commit="$(git rev-parse "${content_commit}^")"
+          recorded_generator_commit="$(jq -er '.generator.commit' lists/manifest.json)"
+          if [[ "$recorded_generator_commit" != "$expected_generator_commit" ]]; then
+            echo "manifest generator commit does not match the content-producing commit parent" >&2
+            exit 1
+          fi
+
+          go -C generator run ./cmd/verify manifest \
+            --root ../lists \
+            --require-publication-provenance \
+            --current-root "$base_root/lists" \
+            --expected-new-generator-commit "$expected_generator_commit"
