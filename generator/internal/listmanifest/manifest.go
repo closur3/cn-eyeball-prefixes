@@ -145,7 +145,6 @@ func Generate(root string, generatedAt time.Time, gen *GeneratorInfo, configs, s
 	if err := rejectUnexpectedLists(root, paths); err != nil {
 		return false, err
 	}
-
 	files := make(map[string]FileEntry, len(paths))
 	for _, rel := range paths {
 		meta, err := inspect(filepath.Join(root, filepath.FromSlash(rel)), strings.HasPrefix(rel, "ipv4/"))
@@ -210,6 +209,12 @@ func expectedPaths() []string {
 	return paths
 }
 
+// ExpectedPaths returns the complete, sorted public list contract. Callers
+// receive a fresh slice and may modify it without affecting later calls.
+func ExpectedPaths() []string {
+	return expectedPaths()
+}
+
 func rejectUnexpectedLists(root string, expected []string) error {
 	want := make(map[string]bool, len(expected))
 	for _, rel := range expected {
@@ -271,7 +276,8 @@ func inspect(path string, ipv4 bool) (FileEntry, error) {
 		if line != prefix.String() {
 			return FileEntry{}, fmt.Errorf("non-canonical CIDR text at line %d: use %s", count+1, prefix)
 		}
-		if prefix.Addr().Is4() != ipv4 {
+		if ipv4 != prefix.Addr().Is4() ||
+			(!ipv4 && (!prefix.Addr().Is6() || prefix.Addr().Is4In6())) {
 			return FileEntry{}, fmt.Errorf("wrong address family at line %d: %s", count+1, line)
 		}
 		if count != 0 {

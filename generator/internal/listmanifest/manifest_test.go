@@ -106,39 +106,44 @@ func TestGenerateWithMetadata(t *testing.T) {
 		t.Fatal("first generation should write the manifest")
 	}
 
-	b, err := os.ReadFile(filepath.Join(root, "manifest.json"))
+	data, err := os.ReadFile(filepath.Join(root, "manifest.json"))
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	var m Manifest
-	if err := json.Unmarshal(b, &m); err != nil {
+	var manifest Manifest
+	if err := json.Unmarshal(data, &manifest); err != nil {
 		t.Fatal(err)
 	}
-	if m.SchemaVersion != SchemaVersion {
-		t.Fatalf("schema: got %d, want %d", m.SchemaVersion, SchemaVersion)
+	if manifest.SchemaVersion != SchemaVersion {
+		t.Fatalf("schema: got %d, want %d", manifest.SchemaVersion, SchemaVersion)
 	}
-	if m.GeneratedAt != "2026-07-25T08:00:00Z" {
-		t.Fatalf("generated_at: got %q, want %q", m.GeneratedAt, "2026-07-25T08:00:00Z")
+	if manifest.GeneratedAt != "2026-07-25T08:00:00Z" {
+		t.Fatalf("generated_at: got %q, want %q", manifest.GeneratedAt, "2026-07-25T08:00:00Z")
 	}
-	if m.Generator == nil || m.Generator.Commit != "abc123" || !m.Generator.Dirty {
+	if manifest.Generator == nil || manifest.Generator.Commit != "abc123" || !manifest.Generator.Dirty {
 		t.Fatal("unexpected generator field")
 	}
-	if m.Configs == nil || m.Configs["operators.json"].SHA256 != "cfg1hash" {
+	if manifest.Configs == nil || manifest.Configs["operators.json"].SHA256 != "cfg1hash" {
 		t.Fatal("unexpected configs field")
 	}
-	if m.Sources == nil || m.Sources["china.txt"].SHA256 != "srchash" {
+	if manifest.Sources == nil || manifest.Sources["china.txt"].SHA256 != "srchash" {
 		t.Fatal("unexpected sources field")
 	}
-	if len(m.Files) != 70 {
-		t.Fatalf("files: got %d, want 70", len(m.Files))
+	if len(manifest.Files) != 70 {
+		t.Fatalf("files: got %d, want 70", len(manifest.Files))
 	}
-	if m.ContentID == "" {
+	if manifest.ContentID == "" {
 		t.Fatal("content_id must not be empty")
 	}
 
-	// Second call with same lists but different metadata must not rewrite.
-	changed, err = Generate(root, time.Now(), &GeneratorInfo{Commit: "def456"}, map[string]SourceEntry{}, map[string]SourceEntry{})
+	changed, err = Generate(
+		root,
+		time.Now(),
+		&GeneratorInfo{Commit: "def456"},
+		map[string]SourceEntry{},
+		map[string]SourceEntry{},
+	)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -154,5 +159,16 @@ func TestInspectRejectsOverlap(t *testing.T) {
 	}
 	if _, err := inspect(path, true); err == nil {
 		t.Fatal("expected overlapping CIDRs to be rejected")
+	}
+}
+
+func TestInspectRejectsIPv4MappedIPv6(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "mapped.txt")
+	if err := os.WriteFile(path, []byte("::ffff:192.0.2.0/120\n"), 0644); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := inspect(path, false); err == nil ||
+		!strings.Contains(err.Error(), "wrong address family") {
+		t.Fatalf("got %v, want wrong-address-family error", err)
 	}
 }

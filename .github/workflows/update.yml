@@ -190,6 +190,17 @@ jobs:
             --allocation-config config/ipv6-province-prefixes.json \
             2>&1 | tee "$AUDIT_DIR/verify-ipv6.log"
 
+      - name: Report candidate changes against current release
+        shell: bash
+        run: |
+          set -euo pipefail
+          set -o pipefail
+
+          go -C generator run ./cmd/verify release \
+            --current ../lists \
+            --candidate "$STAGE_DIR" \
+            2>&1 | tee "$AUDIT_DIR/verify-release-change.log"
+
       - name: Publish verified lists and manifest
         shell: bash
         run: |
@@ -207,16 +218,15 @@ jobs:
             done < <(find "$source" -type f -name '*.txt' -print0)
           }
 
-          sync_txt_tree "$STAGE_DIR/ipv4" lists/ipv4
-          sync_txt_tree "$STAGE_DIR/ipv6" lists/ipv6
-          rm -f -- lists/ipv4/manifest.json lists/ipv6/manifest.json
-
-          # ---- Generator commit ----
           generator_commit="${GITHUB_SHA:-$(git rev-parse HEAD)}"
           generator_dirty=false
           if [[ -n "$(git status --porcelain)" ]]; then
             generator_dirty=true
           fi
+
+          sync_txt_tree "$STAGE_DIR/ipv4" lists/ipv4
+          sync_txt_tree "$STAGE_DIR/ipv6" lists/ipv6
+          rm -f -- lists/ipv4/manifest.json lists/ipv6/manifest.json
 
           # ---- Config hashes ----
           config_hashes="$RUNNER_TEMP/config-hashes.json"

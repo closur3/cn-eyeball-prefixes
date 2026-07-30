@@ -6,6 +6,7 @@ import (
 
 	"github.com/closur3/cn-eyeball-prefixes/generator/internal/ipv4verify"
 	"github.com/closur3/cn-eyeball-prefixes/generator/internal/ipv6build"
+	"github.com/closur3/cn-eyeball-prefixes/generator/internal/releasecheck"
 )
 
 func main() {
@@ -20,12 +21,14 @@ func main() {
 		ipv4verify.Main()
 	case "ipv6":
 		ipv6build.VerifyMain()
+	case "release":
+		releasecheck.Main()
 	default:
 		usage()
 	}
 }
 
 func usage() {
-	fmt.Fprintln(os.Stderr, "usage: verify <ipv4|ipv6> [flags]")
+	fmt.Fprintln(os.Stderr, "usage: verify <ipv4|ipv6|release> [flags]")
 	os.Exit(2)
 }

@@ -1391,6 +1391,11 @@ func Main() {
 	if addressCount(finalRanges) < 100000000 {
 		panic("final output contains fewer than 100,000,000 IPv4 addresses")
 	}
+	for _, operator := range operators {
+		if len(ranges[operator]) == 0 {
+			panic("final IPv4 operator list is empty: " + operator)
+		}
+	}
 	by := map[string]map[string][]span{}
 	for _, o := range operators {
 		by[o] = map[string][]span{}

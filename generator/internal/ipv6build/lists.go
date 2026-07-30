@@ -64,7 +64,29 @@ func BuildPublicLists(admitted map[string][]netip.Prefix, cfg *AllocationConfig)
 	for slug, prefixes := range result.Provinces {
 		result.Provinces[slug] = CollapsePrefixes(prefixes)
 	}
+	if err := validateRequiredPublicLists(result); err != nil {
+		return nil, err
+	}
 	return result, nil
+}
+
+// validateRequiredPublicLists enforces the availability contract for public
+// IPv6 output. Provinces are intentionally allowed to be empty: a province may
+// temporarily have no admitted BGP prefix even while the national and operator
+// lists remain healthy.
+func validateRequiredPublicLists(lists *PublicLists) error {
+	if lists == nil {
+		return fmt.Errorf("public IPv6 lists are nil")
+	}
+	if len(lists.CN) == 0 {
+		return fmt.Errorf("public IPv6 cn list is empty")
+	}
+	for _, operator := range operatorNames {
+		if len(lists.Operators[operator]) == 0 {
+			return fmt.Errorf("public IPv6 operator list %s is empty", operator)
+		}
+	}
+	return nil
 }
 
 func canonicalIPv6Prefix(prefix netip.Prefix) (netip.Prefix, error) {
@@ -202,8 +224,8 @@ func (lists *PublicLists) Files() map[string][]netip.Prefix {
 // WritePublicLists writes cn.txt, three operator files, and all 31 province
 // files directly below the supplied IPv6 family directory.
 func WritePublicLists(outputDir string, lists *PublicLists) error {
-	if lists == nil {
-		return fmt.Errorf("public IPv6 lists are nil")
+	if err := validateRequiredPublicLists(lists); err != nil {
+		return err
 	}
 	for relativePath, prefixes := range lists.Files() {
 		var content bytes.Buffer

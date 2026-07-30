@@ -1,5 +1,7 @@
 # 中国三网终端用户接入网 IP 前缀列表
 
+[![Daily generation](https://github.com/closur3/cn-eyeball-prefixes/actions/workflows/update.yml/badge.svg?branch=main)](https://github.com/closur3/cn-eyeball-prefixes/actions/workflows/update.yml)
+
 本仓库自动维护中国电信、中国移动和中国联通终端用户接入网的 IPv4、IPv6 CIDR 候选列表，可用于 ACL、路由策略和流量分析。
 
 这里的“终端用户接入网”主要指固定宽带接入和移动网络接入，不包括 IDC、云计算、CDN、企业专线、机构统一出口和专用骨干。结果是依据当前公开 BGP 与注册数据生成的 **best-effort 候选集**，不是地址实际用途、归属或安全性的保证。使用方应按自己的风险边界叠加认证、限速和审计策略，而不应把 IP 白名单当作唯一信任依据。
@@ -27,6 +29,8 @@
 省级文件覆盖中国大陆 31 个省级行政区，使用拼音文件名，例如 `beijing.txt`、`guangdong.txt`、`shaanxi.txt` 和 `xinjiang.txt`。每个文本文件每行一个规范化 CIDR，按地址排序，文件内部无重叠。
 
 [`lists/manifest.json`](lists/manifest.json) 的 `content_id` 标识整套公开列表的确定内容；下载后可用其中每个文件的 SHA-256 校验完整性。
+
+Manifest 的 `generated_at` 是当前 manifest 所对应内容的生成时间；它只在相对上一发布版的 `content_id` 变化时更新，不是最近一次无变化校验的时间。默认分支最近一次完整校验是否成功以本页的 `Daily generation` 状态和 [Actions 运行记录](https://github.com/closur3/cn-eyeball-prefixes/actions/workflows/update.yml) 为准。
 
 ## 收录范围
 
@@ -69,7 +73,7 @@ IPv6 生成器从 RIPE RISWhois 读取当前 BGP 前缀和全部 Origin，并用
 - `generator/config/ipv6-province-prefixes.json` 是 31 个省级 IPv6 分配的仓库内事实表，同时区分运营商、固定宽带接入与移动网络接入；公开列表不再拆分接入类型。
 - 每个运营商列表必须完全落入省级分配表。三网互不重叠，运营商并集和省级并集都必须严格等于 `lists/ipv6/cn.txt`。
 
-IPv6 的详细准入来源、Origin、拒绝原因和输入摘要作为 CI 审计产物上传并保留 30 天，不写入精简的公开 manifest。
+IPv6 的详细准入来源、Origin、拒绝原因和输入摘要作为更新工作流的审计产物上传并保留 30 天，不写入精简的公开 manifest。
 
 ## 外部上游
 
@@ -109,9 +113,10 @@ IP-Data 的七个文件均来自其 [`provider/`](https://github.com/axpwx/IP-Da
 1. 下载全部上游并拒绝空文件或异常小的数据；
 2. 运行全部 Go 测试和静态检查；
 3. 在临时目录分别生成 IPv4、IPv6；
-4. 使用独立校验器检查规范化、重叠、并集、省级映射和安全阈值；
-5. 生成公开 manifest，并上传包含来源哈希和详细证据的审计产物；
-6. 仅在公开列表确有变化时提交更新。
+4. 使用独立校验器检查规范化、非空核心列表、重叠、并集和省级映射；
+5. 将全部 70 个候选列表与当前发布版比较；任一列表单次增加或删除超过当前地址空间的 10%、CIDR 数增长超过三倍，或从空基线变为非空时，记录告警但不阻止发布；
+6. 生成公开 manifest，并上传来源哈希、详细证据和变更日志等审计产物；
+7. 仅在公开列表确有变化时提交更新。数据完整性校验失败会保留上一版正式列表，变化幅度告警不会阻止发布。
 
 本地代码检查：
 
@@ -119,8 +124,6 @@ IP-Data 的七个文件均来自其 [`provider/`](https://github.com/axpwx/IP-Da
 go -C generator test ./...
 go -C generator vet ./...
 ```
-
-完整再生成需要工作流中列出的全部上游文件；命令和参数以 [`.github/workflows/update.yml`](.github/workflows/update.yml) 为准。
 
 ## 许可证与第三方数据
 
