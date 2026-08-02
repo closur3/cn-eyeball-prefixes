@@ -4,8 +4,8 @@ import "path/filepath"
 
 var SourceURLs = map[string]string{
 	"china.txt":              "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/china.txt",
-	"iptoasn_ipv4.tsv.gz":    "https://iptoasn.com/data/ip2asn-v4.tsv.gz",
-	"iptoasn_ipv6.tsv.gz":    "https://iptoasn.com/data/ip2asn-v6.tsv.gz",
+	"iptoasn_ipv4.tsv.gz":    "https://api.iptoasn.com/data/ip2asn-v4.tsv.gz",
+	"iptoasn_ipv6.tsv.gz":    "https://api.iptoasn.com/data/ip2asn-v6.tsv.gz",
 	"apnic_inetnum.gz":       "https://ftp.apnic.net/apnic/whois/apnic.db.inetnum.gz",
 	"apnic_inet6num.gz":      "https://ftp.apnic.net/apnic/whois/apnic.db.inet6num.gz",
 	"apnic_autnum.gz":        "https://ftp.apnic.net/apnic/whois/apnic.db.aut-num.gz",

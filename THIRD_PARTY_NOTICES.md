@@ -44,7 +44,7 @@ The MIT License text applying to the upstream material listed above follows:
 
 ## IPtoASN
 
-- Source: <https://iptoasn.com/>
+- Source: <https://api.iptoasn.com/>
 - License: [Open Data Commons Public Domain Dedication and License 1.0
   (PDDL-1.0)](https://opendatacommons.org/licenses/pddl/1-0/)
 - Files used: `ip2asn-v4.tsv.gz`, `ip2asn-v6.tsv.gz`

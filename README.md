@@ -82,8 +82,8 @@ IPv6 的详细准入来源、Origin、拒绝原因和输入摘要作为更新工
 | 上游来源 | 下载项 | 地址族 | 用途 |
 | --- | --- | --- | --- |
 | [gaoyifan/china-operator-ip](https://github.com/gaoyifan/china-operator-ip/tree/ip-lists) | [`china.txt`](https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/china.txt) | IPv4 | 限制中国地址候选边界 |
-| [IPtoASN](https://iptoasn.com/) | [`ip2asn-v4.tsv.gz`](https://iptoasn.com/data/ip2asn-v4.tsv.gz) | IPv4 | 当前前缀 Origin ASN、国家和 ASN 描述 |
-| [IPtoASN](https://iptoasn.com/) | [`ip2asn-v6.tsv.gz`](https://iptoasn.com/data/ip2asn-v6.tsv.gz) | IPv6 | Origin ASN 的国家和描述元数据 |
+| [IPtoASN](https://api.iptoasn.com/) | [`ip2asn-v4.tsv.gz`](https://api.iptoasn.com/data/ip2asn-v4.tsv.gz) | IPv4 | 当前前缀 Origin ASN、国家和 ASN 描述 |
+| [IPtoASN](https://api.iptoasn.com/) | [`ip2asn-v6.tsv.gz`](https://api.iptoasn.com/data/ip2asn-v6.tsv.gz) | IPv6 | Origin ASN 的国家和描述元数据 |
 | [APNIC Whois Database](https://ftp.apnic.net/apnic/whois/) | [`apnic.db.inetnum.gz`](https://ftp.apnic.net/apnic/whois/apnic.db.inetnum.gz) | IPv4 | 地址登记层级、用途与父级准入 |
 | APNIC Whois Database | [`apnic.db.inet6num.gz`](https://ftp.apnic.net/apnic/whois/apnic.db.inet6num.gz) | IPv6 | 中国电信接入地址准入范围 |
 | APNIC Whois Database | [`apnic.db.aut-num.gz`](https://ftp.apnic.net/apnic/whois/apnic.db.aut-num.gz) | IPv4 | ASN 登记与独立主体关联 |

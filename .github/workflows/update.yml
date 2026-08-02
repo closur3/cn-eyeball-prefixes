@@ -55,10 +55,10 @@ jobs:
           curl "${curl_opts[@]}" "$base/china.txt" -o "$source_dir/china.txt"
 
           curl "${curl_opts[@]}" \
-            'https://iptoasn.com/data/ip2asn-v4.tsv.gz' \
+            'https://api.iptoasn.com/data/ip2asn-v4.tsv.gz' \
             -o "$source_dir/iptoasn_ipv4.tsv.gz"
           curl "${curl_opts[@]}" \
-            'https://iptoasn.com/data/ip2asn-v6.tsv.gz' \
+            'https://api.iptoasn.com/data/ip2asn-v6.tsv.gz' \
             -o "$source_dir/iptoasn_ipv6.tsv.gz"
 
           curl "${curl_opts[@]}" \
