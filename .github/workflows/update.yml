@@ -49,60 +49,63 @@ jobs:
         run: |
           set -euo pipefail
           source_dir="$SOURCE_DIR"
-          curl_opts=(--fail --silent --show-error --location --retry 3)
+          curl_opts=(--fail --silent --show-error --location --http1.1 \
+            --retry 5 --retry-all-errors --retry-delay 2)
 
-          base='https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists'
-          curl "${curl_opts[@]}" "$base/china.txt" -o "$source_dir/china.txt"
+          download() {
+            local url="$1"
+            local out="$2"
+            echo "==> downloading $url"
+            curl "${curl_opts[@]}" "$url" -o "$out"
+            echo "==> done $out ($(du -h "$out" | cut -f1))"
+          }
 
-          curl "${curl_opts[@]}" \
+          download \
+            'https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/china.txt' \
+            "$source_dir/china.txt"
+
+          download \
             'https://api.iptoasn.com/data/ip2asn-v4.tsv.gz' \
-            -o "$source_dir/iptoasn_ipv4.tsv.gz"
-          curl "${curl_opts[@]}" \
+            "$source_dir/iptoasn_ipv4.tsv.gz"
+          download \
             'https://api.iptoasn.com/data/ip2asn-v6.tsv.gz' \
-            -o "$source_dir/iptoasn_ipv6.tsv.gz"
+            "$source_dir/iptoasn_ipv6.tsv.gz"
 
-          curl "${curl_opts[@]}" \
+          download \
             'https://ftp.apnic.net/apnic/whois/apnic.db.inetnum.gz' \
-            -o "$source_dir/apnic_inetnum.gz"
-          curl "${curl_opts[@]}" \
+            "$source_dir/apnic_inetnum.gz"
+          download \
             'https://ftp.apnic.net/apnic/whois/apnic.db.inet6num.gz' \
-            -o "$source_dir/apnic_inet6num.gz"
-          curl "${curl_opts[@]}" \
+            "$source_dir/apnic_inet6num.gz"
+          download \
             'https://ftp.apnic.net/apnic/whois/apnic.db.aut-num.gz' \
-            -o "$source_dir/apnic_autnum.gz"
-          curl "${curl_opts[@]}" \
+            "$source_dir/apnic_autnum.gz"
+          download \
             'https://ftp.apnic.net/apnic/whois/apnic.db.organisation.gz' \
-            -o "$source_dir/apnic_organisation.gz"
-          curl "${curl_opts[@]}" \
+            "$source_dir/apnic_organisation.gz"
+          download \
             'https://ftp.apnic.net/apnic/whois/apnic.db.route.gz' \
-            -o "$source_dir/apnic_route.gz"
+            "$source_dir/apnic_route.gz"
 
-          curl "${curl_opts[@]}" \
+          download \
             'https://www.ris.ripe.net/dumps/riswhoisdump.IPv4.gz' \
-            -o "$source_dir/riswhois_ipv4.gz"
-          curl "${curl_opts[@]}" \
+            "$source_dir/riswhois_ipv4.gz"
+          download \
             'https://www.ris.ripe.net/dumps/riswhoisdump.IPv6.gz' \
-            -o "$source_dir/riswhois_ipv6.gz"
+            "$source_dir/riswhois_ipv6.gz"
 
-          curl "${curl_opts[@]}" \
+          download \
             'https://raw.githubusercontent.com/lionsoul2014/ip2region/master/data/ipv4_source.txt' \
-            -o "$source_dir/ip2region_ipv4_source.txt"
+            "$source_dir/ip2region_ipv4_source.txt"
 
           ipdata_base='https://raw.githubusercontent.com/axpwx/IP-Data/master/provider'
-          curl "${curl_opts[@]}" "$ipdata_base/aliyun-cidr-ipv4.txt" \
-            -o "$source_dir/ipdata_aliyun.txt"
-          curl "${curl_opts[@]}" "$ipdata_base/tencent-cidr-ipv4.txt" \
-            -o "$source_dir/ipdata_tencent.txt"
-          curl "${curl_opts[@]}" "$ipdata_base/huawei-cidr-ipv4.txt" \
-            -o "$source_dir/ipdata_huawei.txt"
-          curl "${curl_opts[@]}" "$ipdata_base/ucloud-cidr-ipv4.txt" \
-            -o "$source_dir/ipdata_ucloud.txt"
-          curl "${curl_opts[@]}" "$ipdata_base/ksyun-cidr-ipv4.txt" \
-            -o "$source_dir/ipdata_ksyun.txt"
-          curl "${curl_opts[@]}" "$ipdata_base/baidu-cidr-ipv4.txt" \
-            -o "$source_dir/ipdata_baidu.txt"
-          curl "${curl_opts[@]}" "$ipdata_base/jdcloud-cidr-ipv4.txt" \
-            -o "$source_dir/ipdata_jdcloud.txt"
+          download "$ipdata_base/aliyun-cidr-ipv4.txt" "$source_dir/ipdata_aliyun.txt"
+          download "$ipdata_base/tencent-cidr-ipv4.txt" "$source_dir/ipdata_tencent.txt"
+          download "$ipdata_base/huawei-cidr-ipv4.txt" "$source_dir/ipdata_huawei.txt"
+          download "$ipdata_base/ucloud-cidr-ipv4.txt" "$source_dir/ipdata_ucloud.txt"
+          download "$ipdata_base/ksyun-cidr-ipv4.txt" "$source_dir/ipdata_ksyun.txt"
+          download "$ipdata_base/baidu-cidr-ipv4.txt" "$source_dir/ipdata_baidu.txt"
+          download "$ipdata_base/jdcloud-cidr-ipv4.txt" "$source_dir/ipdata_jdcloud.txt"
 
           du -h "$source_dir"/*
 
