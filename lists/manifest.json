@@ -1,9 +1,9 @@
 {
   "schema_version": 4,
-  "content_id": "sha256:393ee6b58a7eb8c568c91acd4d8a6a23728dd88b3c1b9ef3a51978454d1fb89f",
-  "generated_at": "2026-10-21T13:44:48.006750691Z",
+  "content_id": "sha256:e2e72a044b7acbf1df06bebeb0f5abfc5f242855785c1f44b4dad47ec9ddddef",
+  "generated_at": "2026-10-23T13:24:13.666336991Z",
   "generator": {
-    "commit": "b3c1ecea224b0d846d0fb2bc42fedc3b9b0f343a",
+    "commit": "58db9e546895c32f8d28a07943e15882c392ab74",
     "dirty": false
   },
   "configs": {
@@ -16,27 +16,27 @@
   },
   "sources": {
     "apnic_autnum.gz": {
-      "sha256": "27861619bbc11ebdf1557a96f89527e95f48207419f0fe175b38f7ed0877f368",
+      "sha256": "75dbccc325521af35512225f635566b745293021100b6ca308ac180e7b59c986",
       "url": "https://ftp.apnic.net/apnic/whois/apnic.db.aut-num.gz"
     },
     "apnic_inet6num.gz": {
-      "sha256": "e0763ce3e7118b715ebd7697870d4979186a3ede06e205892289fb94531bfe81",
+      "sha256": "6924e52dfb41939039a49b092384d99b877249c3caf1a7b7da208ba5b7782681",
       "url": "https://ftp.apnic.net/apnic/whois/apnic.db.inet6num.gz"
     },
     "apnic_inetnum.gz": {
-      "sha256": "2e9adb0f4d3b88a75ba82aadd27c681f40e90e605a4ae0ee8766630233787900",
+      "sha256": "eb536a68311cb76d1f80bd3df89d61c09d80fe99bd472665a5005f442aa62f9e",
       "url": "https://ftp.apnic.net/apnic/whois/apnic.db.inetnum.gz"
     },
     "apnic_organisation.gz": {
-      "sha256": "88bc47e826fa5c105711bf6a9da55aad8afc47dab78ccee2b66dfdfb15163261",
+      "sha256": "a804986d0af47491bb3e0c2533b6b5853a9f95af0fa182a146989c61119aa8f9",
       "url": "https://ftp.apnic.net/apnic/whois/apnic.db.organisation.gz"
     },
     "apnic_route.gz": {
-      "sha256": "fcedb955fdc654266230b5ee3a225afc421293013d4ff954146c15e4df6e6351",
+      "sha256": "105f6ad2105218f339d3e328583bed91e28a5d2793b8a7eb4478cd79855c1e64",
       "url": "https://ftp.apnic.net/apnic/whois/apnic.db.route.gz"
     },
     "china.txt": {
-      "sha256": "329f319fc3fff6234393ce549c2ff0933ebaf12600efef48644dc037cb56be5a",
+      "sha256": "5d9b433d89ba7c452c79a18b7f9e49c09544cb27ed7cddfd17a3c3397f274756",
       "url": "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/china.txt"
     },
     "ip2region_ipv4_source.txt": {
@@ -72,19 +72,19 @@
       "url": "https://raw.githubusercontent.com/axpwx/IP-Data/master/provider/ucloud-cidr-ipv4.txt"
     },
     "iptoasn_ipv4.tsv.gz": {
-      "sha256": "e385f76cb380d7a7bee6ac9f5f574028b5cda7d899627544f2f9993132ad1e16",
+      "sha256": "4cad53991e30538d293f5b8b0372dae2a16f08533deb9aca86204990629ba68e",
       "url": "https://api.iptoasn.com/data/ip2asn-v4.tsv.gz"
     },
     "iptoasn_ipv6.tsv.gz": {
-      "sha256": "879ec8e4e1d2fc31c619997a564c996fa30a5c6172f65ed646e5429fbdbd146d",
+      "sha256": "055057cc3b70576915c0d50fa528d07fec73f8297c870ec68feab1ff12ba1b54",
       "url": "https://api.iptoasn.com/data/ip2asn-v6.tsv.gz"
     },
     "riswhois_ipv4.gz": {
-      "sha256": "8418cee241949e55e41bafa8f6691caf24d078df7cd0b2da74f5b387b3e10de7",
+      "sha256": "8944848aa17276e3331c64ae2138aedf174ef67dd7a3f8b9582ef9fdbad5576c",
       "url": "https://www.ris.ripe.net/dumps/riswhoisdump.IPv4.gz"
     },
     "riswhois_ipv6.gz": {
-      "sha256": "6119f03ac93057bc56f9c0d4add885b8039944c676613c94f17dea96c0e6f487",
+      "sha256": "3a4a650ee1a6ba37dd662d4e6d539fc1dfd926a833e8b54787c865d83bbdbaf4",
       "url": "https://www.ris.ripe.net/dumps/riswhoisdump.IPv6.gz"
     }
   },
@@ -94,16 +94,16 @@
       "sha256": "b08b1a703e41cf105d01544c39822f24866bfe00a615c588a9e432aeebb8cb51"
     },
     "ipv4/chinatelecom.txt": {
-      "prefix_count": 8745,
-      "sha256": "5a2b8f417efb47fc3b8c1e7b3295a76748aafd97eb179a994817db49989654a6"
+      "prefix_count": 8746,
+      "sha256": "ce9e604df7e21487b1afe6ed6b74bebf4a73342e02c04a14c80e7d05a48b3e3e"
     },
     "ipv4/chinaunicom.txt": {
-      "prefix_count": 4825,
-      "sha256": "c5fe1d5d297045323aff551fa8c515b548acc0246fceba629066105dd495e1f6"
+      "prefix_count": 4824,
+      "sha256": "c9fadd4e260084d4f1914cfec38126b35ebcd1ac9831960e8068fe241562916c"
     },
     "ipv4/cn.txt": {
       "prefix_count": 14234,
-      "sha256": "00ed9ea9150d2cc9b03c6032eb63c4feae731e651259689d4d9f42828670a847"
+      "sha256": "bf0cad558c96a70dac41c91a69f490245db6d81dde5e2cb043f6d5a50c2b93ff"
     },
     "ipv4/provinces/anhui.txt": {
       "prefix_count": 277,
@@ -126,8 +126,8 @@
       "sha256": "d6ba4d4b448a745f709a94ae9c71097fe4bb243baf050d55fb4628f6207074c5"
     },
     "ipv4/provinces/guangdong.txt": {
-      "prefix_count": 2136,
-      "sha256": "aecaa03e6ff7cac14d8f882b2baebb320b9bdcd784cb1d4569ae6f18bb3e26d4"
+      "prefix_count": 2135,
+      "sha256": "e975c7b114b9818600cbb17916bb426428b2c3df3ba6f0ad41783c7b8666b887"
     },
     "ipv4/provinces/guangxi.txt": {
       "prefix_count": 492,
@@ -154,8 +154,8 @@
       "sha256": "583e0dda8bd470f66c00a653dc388db8be9a5d5a137ed171ea69d4075a583ad8"
     },
     "ipv4/provinces/hubei.txt": {
-      "prefix_count": 486,
-      "sha256": "d35d990fcb606c38b3ffdf0ef7dbda85bfb6a86fa3b41ba069584c41eefd1a89"
+      "prefix_count": 487,
+      "sha256": "918004fbed5d5ac5b2da228fd32b5928ad4384acfbe43e3fff2c5b4f4bba6b92"
     },
     "ipv4/provinces/hunan.txt": {
       "prefix_count": 247,
