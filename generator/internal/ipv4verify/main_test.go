@@ -4,8 +4,10 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/closur3/cn-eyeball-prefixes/generator/internal/apnicautnum"
 	"github.com/closur3/cn-eyeball-prefixes/generator/internal/apnicinetnum"
 	"github.com/closur3/cn-eyeball-prefixes/generator/internal/operatorconfig"
+	"github.com/closur3/cn-eyeball-prefixes/generator/internal/riswhois"
 )
 
 func TestOverlapsSorted(t *testing.T) {
@@ -239,6 +241,26 @@ func TestReviewedBackboneIndexPolicyScopedParentsMatchLegacyResolver(t *testing.
 		if !reflect.DeepEqual(got, want) {
 			t.Fatalf("policy-scoped parent segments for %s = %#v, want %#v", tt.cidr, got, want)
 		}
+	}
+}
+
+func TestSingleOriginIDCDecisionUsesAPNICAutnum(t *testing.T) {
+	classifier, err := operatorconfig.Load("../../config/operators.json", operators)
+	if err != nil {
+		t.Fatal(err)
+	}
+	descriptions := apnicautnum.DescriptionMap(
+		map[string]string{"4134": "CHINANET-BACKBONE - No.31,Jin-rong Street"},
+		[]apnicautnum.Record{{ASN: "137687", ASName: "CHINATELECOM-HENAN-LUOYANG-IDC"}},
+	)
+	segment := riswhois.Segment{
+		Lo: 0, Hi: 1023,
+		Record: riswhois.Record{Lo: 0, Hi: 1023, Prefix: "0.0.0.0/22", Origins: []riswhois.Origin{{ASN: "137687", SeenPeers: 13}}},
+	}
+	_, strong, maxPeers := classifyRISOrigins(segment, descriptions, classifier)
+	decision, excluded := decideRISExclusion(segment, "4134", 0, strong, maxPeers)
+	if !excluded || decision.CandidateMOAS || decision.StrongMOAS || decision.Category != "ris_excluded_origin" {
+		t.Fatalf("unexpected single-origin exclusion decision: %+v excluded=%v", decision, excluded)
 	}
 }
 

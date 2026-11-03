@@ -14,6 +14,7 @@ import (
 
 type Record struct {
 	ASN, ASName                string
+	Descriptions               []string
 	Organizations, Maintainers []string
 }
 type Link struct{ ASN, ASName, Via string }
@@ -43,7 +44,12 @@ func Parse(path string) ([]Record, error) {
 			name := iputil.First(fields["as-name"])
 			if name != "" {
 				maintainers := append(iputil.Clean(fields["mnt-by"]), iputil.Clean(fields["mnt-routes"])...)
-				out = append(out, Record{asn, name, iputil.Clean(fields["org"]), iputil.Clean(maintainers)})
+				out = append(out, Record{
+					ASN: asn, ASName: name,
+					Descriptions:  iputil.Clean(fields["descr"]),
+					Organizations: iputil.Clean(fields["org"]),
+					Maintainers:   iputil.Clean(maintainers),
+				})
 			}
 		}
 		fields = map[string][]string{}
@@ -78,6 +84,41 @@ func Parse(path string) ([]Record, error) {
 		return nil, fmt.Errorf("%s contains no aut-num records", path)
 	}
 	return out, nil
+}
+
+// DescriptionMap merges the registry descriptions from aut-num objects into
+// an existing ASN-description map. IPtoASN covers most BGP origins but can be
+// coarse or incomplete; APNIC aut-num names and descriptions remain available
+// for an explicitly registered ASN even when IPtoASN has no row for it.
+func DescriptionMap(base map[string]string, records []Record) map[string]string {
+	out := make(map[string]string, len(base)+len(records))
+	for asn, description := range base {
+		out[asn] = description
+	}
+	for _, record := range records {
+		existing := out[record.ASN]
+		parts := []string{existing}
+		seen := strings.ToUpper(existing)
+		if existing == "" {
+			parts = nil
+		}
+		for _, description := range append([]string{record.ASName}, record.Descriptions...) {
+			key := strings.ToUpper(strings.TrimSpace(description))
+			if key == "" || strings.Contains(seen, key) {
+				continue
+			}
+			parts = append(parts, description)
+			if seen == "" {
+				seen = key
+			} else {
+				seen += " | " + key
+			}
+		}
+		if len(parts) != 0 {
+			out[record.ASN] = strings.Join(parts, " | ")
+		}
+	}
+	return out
 }
 
 func NewIndex(records []Record, active map[string]string) *Index {
@@ -192,4 +233,3 @@ func Normalize(s string) string {
 	}
 	return b.String()
 }
-

@@ -56,7 +56,7 @@ IPv4 生成器先用 IPtoASN 识别当前 Origin ASN，并与 `gaoyifan/china-op
 1. `generator/config/operators.json` 中的三网 ASN 识别与显式例外；
 2. 引用自 IP-Data 的七家云厂商独立 CIDR 强排除；
 3. APNIC `inetnum`、`organisation`、`aut-num` 和 `route` 登记证据；
-4. RIPE RISWhois 的当前多 Origin、可见度和登记冲突证据；
+4. RIPE RISWhois 的当前 Origin、可见度和登记冲突证据；Origin 描述同时使用 IPtoASN 与 APNIC `aut-num` 的 `as-name`/`descr`，单 Origin 和多 Origin 前缀都会执行强排除；
 5. 同运营商 APNIC 父级准入及受安全阈值约束的 BGP 登记冲突孔洞修复；
 6. ip2region 的省级归属切分。
 
@@ -86,10 +86,10 @@ IPv6 的详细准入来源、Origin、拒绝原因和输入摘要作为更新工
 | [IPtoASN](https://api.iptoasn.com/) | [`ip2asn-v6.tsv.gz`](https://api.iptoasn.com/data/ip2asn-v6.tsv.gz) | IPv6 | Origin ASN 的国家和描述元数据 |
 | [APNIC Whois Database](https://ftp.apnic.net/apnic/whois/) | [`apnic.db.inetnum.gz`](https://ftp.apnic.net/apnic/whois/apnic.db.inetnum.gz) | IPv4 | 地址登记层级、用途与父级准入 |
 | APNIC Whois Database | [`apnic.db.inet6num.gz`](https://ftp.apnic.net/apnic/whois/apnic.db.inet6num.gz) | IPv6 | 中国电信接入地址准入范围 |
-| APNIC Whois Database | [`apnic.db.aut-num.gz`](https://ftp.apnic.net/apnic/whois/apnic.db.aut-num.gz) | IPv4 | ASN 登记与独立主体关联 |
+| APNIC Whois Database | [`apnic.db.aut-num.gz`](https://ftp.apnic.net/apnic/whois/apnic.db.aut-num.gz) | IPv4 | ASN 登记、名称/描述与独立主体关联 |
 | APNIC Whois Database | [`apnic.db.organisation.gz`](https://ftp.apnic.net/apnic/whois/apnic.db.organisation.gz) | IPv4 | 组织句柄和结构化组织名称 |
 | APNIC Whois Database | [`apnic.db.route.gz`](https://ftp.apnic.net/apnic/whois/apnic.db.route.gz) | IPv4 | route Origin 与用途登记证据 |
-| [RIPE RISWhois](https://ris.ripe.net/docs/ris-whois/) | [`riswhoisdump.IPv4.gz`](https://www.ris.ripe.net/dumps/riswhoisdump.IPv4.gz) | IPv4 | 当前 BGP 宣告、MOAS 与可见度 |
+| [RIPE RISWhois](https://ris.ripe.net/docs/ris-whois/) | [`riswhoisdump.IPv4.gz`](https://www.ris.ripe.net/dumps/riswhoisdump.IPv4.gz) | IPv4 | 当前 BGP 宣告、Origin/MOAS 与可见度 |
 | RIPE RISWhois | [`riswhoisdump.IPv6.gz`](https://www.ris.ripe.net/dumps/riswhoisdump.IPv6.gz) | IPv6 | 当前 BGP 前缀及全部 Origin |
 | [lionsoul2014/ip2region](https://github.com/lionsoul2014/ip2region) | [`ipv4_source.txt`](https://raw.githubusercontent.com/lionsoul2014/ip2region/master/data/ipv4_source.txt) | IPv4 | 最终地址池的省级切分 |
 | [axpwx/IP-Data](https://github.com/axpwx/IP-Data/tree/master/provider) | [`aliyun-cidr-ipv4.txt`](https://raw.githubusercontent.com/axpwx/IP-Data/master/provider/aliyun-cidr-ipv4.txt) | IPv4 | 阿里云 CIDR 强排除 |

@@ -2,8 +2,10 @@ package ipv4build
 
 import (
 	"reflect"
+	"strings"
 	"testing"
 
+	"github.com/closur3/cn-eyeball-prefixes/generator/internal/apnicautnum"
 	"github.com/closur3/cn-eyeball-prefixes/generator/internal/apnicinetnum"
 	"github.com/closur3/cn-eyeball-prefixes/generator/internal/operatorconfig"
 	"github.com/closur3/cn-eyeball-prefixes/generator/internal/riswhois"
@@ -347,6 +349,58 @@ func TestReviewedBackboneIndexPolicyScopedParentsMatchLegacyResolver(t *testing.
 		if !reflect.DeepEqual(got, want) {
 			t.Fatalf("policy-scoped parent segments for %s = %#v, want %#v", tt.cidr, got, want)
 		}
+	}
+}
+
+func TestSingleOriginIDCExcludedThroughAPNICAutnum(t *testing.T) {
+	classifier, err := operatorconfig.Load("../../config/operators.json", operators)
+	if err != nil {
+		t.Fatal(err)
+	}
+	descriptions := apnicautnum.DescriptionMap(
+		map[string]string{"4134": "CHINANET-BACKBONE - No.31,Jin-rong Street"},
+		[]apnicautnum.Record{{ASN: "137687", ASName: "CHINATELECOM-HENAN-LUOYANG-IDC"}},
+	)
+	segment := riswhois.Segment{
+		Lo: 0, Hi: 1023,
+		Record: riswhois.Record{Lo: 0, Hi: 1023, Prefix: "0.0.0.0/22", Origins: []riswhois.Origin{{ASN: "137687", SeenPeers: 13}}},
+	}
+	_, strong, maxPeers := classifyRISOrigins(segment, descriptions, classifier)
+	if len(strong) != 1 || strong[0].meta.ASN != "137687" {
+		t.Fatalf("single-origin APNIC IDC was not classified as strong evidence: %#v", strong)
+	}
+	if !strings.Contains(strong[0].result.Reason, "IDC") {
+		t.Fatalf("IDC exclusion reason missing: %+v", strong[0].result)
+	}
+	decision, excluded := decideRISExclusion(segment, "4134", 0, strong, maxPeers)
+	if !excluded || decision.CandidateMOAS || decision.StrongMOAS || decision.Category != "ris_excluded_origin" {
+		t.Fatalf("unexpected single-origin exclusion decision: %+v excluded=%v", decision, excluded)
+	}
+	if !strings.Contains(decision.Reason, "AS137687") {
+		t.Fatalf("single-origin decision did not identify the actual BGP origin: %+v", decision)
+	}
+}
+
+func TestMultiOriginIDCStillUsesMOASSemantics(t *testing.T) {
+	classifier, err := operatorconfig.Load("../../config/operators.json", operators)
+	if err != nil {
+		t.Fatal(err)
+	}
+	descriptions := apnicautnum.DescriptionMap(
+		map[string]string{"4134": "CHINANET-BACKBONE - No.31,Jin-rong Street"},
+		[]apnicautnum.Record{{ASN: "137687", ASName: "CHINATELECOM-HENAN-LUOYANG-IDC"}},
+	)
+	segment := riswhois.Segment{
+		Lo: 0, Hi: 1023,
+		Record: riswhois.Record{Lo: 0, Hi: 1023, Prefix: "0.0.0.0/22", Origins: []riswhois.Origin{
+			{ASN: "4134", SeenPeers: 100},
+			{ASN: "137687", SeenPeers: 13},
+		}},
+	}
+	_, strong, maxPeers := classifyRISOrigins(segment, descriptions, classifier)
+	decision, excluded := decideRISExclusion(segment, "4134", 100, strong, maxPeers)
+	if !excluded || !decision.CandidateMOAS || !decision.StrongMOAS || decision.Category != "ris_moas" {
+		t.Fatalf("unexpected multi-origin exclusion decision: %+v excluded=%v", decision, excluded)
 	}
 }
 

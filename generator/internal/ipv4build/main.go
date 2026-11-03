@@ -185,6 +185,7 @@ type risSourceMeta struct {
 	CandidateMOASSegmentCount         int    `json:"candidate_moas_segment_count"`
 	StrongEvidenceSegmentCount        int    `json:"strong_evidence_segment_count"`
 	RetainedAmbiguousMOASSegmentCount int    `json:"retained_ambiguous_moas_segment_count"`
+	StrongExcludedOriginSegmentCount  int    `json:"strong_excluded_origin_segment_count"`
 	EffectiveCIDRCount                int    `json:"effective_cidr_count"`
 	EffectiveAddressCount             uint64 `json:"effective_address_count"`
 }
@@ -193,11 +194,84 @@ type observedOriginMeta struct {
 	Description string `json:"description,omitempty"`
 	SeenPeers   int    `json:"seen_peers"`
 }
+
+type risOriginEvidence struct {
+	meta   observedOriginMeta
+	result operatorconfig.PrefixResult
+}
+
+type risExclusionDecision struct {
+	Category      string
+	MatchedBy     string
+	Reason        string
+	CandidateMOAS bool
+	StrongMOAS    bool
+}
 type linkedASNMeta struct {
 	ASN         string `json:"asn"`
 	Description string `json:"description"`
 	ASName      string `json:"as_name"`
 	Via         string `json:"via"`
+}
+
+// classifyRISOrigins combines every observed BGP origin with the strongest
+// available registry description. IPtoASN supplies the ASN descriptions used
+// for candidate selection, while APNIC aut-num names and descriptions cover
+// origins that IPtoASN does not carry. Strongly out-of-scope origins are
+// returned regardless of whether the RIS segment is single- or multi-origin.
+func classifyRISOrigins(segment riswhois.Segment, descriptions map[string]string, classifier *operatorconfig.Classifier) (observed []observedOriginMeta, strong []risOriginEvidence, maxPeers int) {
+	for _, origin := range segment.Record.Origins {
+		if origin.SeenPeers > maxPeers {
+			maxPeers = origin.SeenPeers
+		}
+	}
+	observed = make([]observedOriginMeta, 0, len(segment.Record.Origins))
+	for _, origin := range segment.Record.Origins {
+		description := descriptions[origin.ASN]
+		meta := observedOriginMeta{ASN: origin.ASN, Description: description, SeenPeers: origin.SeenPeers}
+		observed = append(observed, meta)
+		result := classifier.ClassifyAPNICInetnum(description)
+		if origin.SeenPeers >= 10 && origin.SeenPeers*20 >= maxPeers && result.Excluded {
+			strong = append(strong, risOriginEvidence{meta: meta, result: result})
+		}
+	}
+	return observed, strong, maxPeers
+}
+
+func decideRISExclusion(segment riswhois.Segment, targetASN string, currentSeen int, strongOrigins []risOriginEvidence, maxPeers int) (risExclusionDecision, bool) {
+	targetQualifies := len(segment.Record.Origins) >= 2 && currentSeen >= 10 && currentSeen*20 >= maxPeers
+	decision := risExclusionDecision{CandidateMOAS: targetQualifies}
+	var evidence *risOriginEvidence
+	if targetQualifies {
+		for i := range strongOrigins {
+			if strongOrigins[i].meta.ASN != targetASN {
+				evidence = &strongOrigins[i]
+				decision.Category = "ris_moas"
+				decision.StrongMOAS = true
+				break
+			}
+		}
+	}
+	if evidence == nil {
+		for i := range strongOrigins {
+			if !targetQualifies || strongOrigins[i].meta.ASN == targetASN {
+				evidence = &strongOrigins[i]
+				decision.Category = "ris_excluded_origin"
+				break
+			}
+		}
+	}
+	if evidence == nil {
+		return decision, false
+	}
+	if decision.Category == "ris_moas" {
+		decision.MatchedBy = evidence.result.MatchedBy + "; RIPE RIS multi-observer MOAS"
+		decision.Reason = "Alternate origin AS" + evidence.meta.ASN + " is strongly identified as outside ordinary Internet user access scope: " + evidence.result.Reason
+	} else {
+		decision.MatchedBy = evidence.result.MatchedBy + "; RIPE RIS most-specific origin"
+		decision.Reason = "Most-specific BGP origin AS" + evidence.meta.ASN + " is strongly identified as outside ordinary Internet user access scope: " + evidence.result.Reason
+	}
+	return decision, true
 }
 
 type prefixExclusionMeta struct {
@@ -433,9 +507,11 @@ func toSpans(in []iputil.Span) []span {
 	return s
 }
 
-func merge(in []span) []span        { return toSpans(iputil.MergeSpans(fromSpans(in))) }
-func subtract(in, excluded []span) []span { return toSpans(iputil.SubtractSpans(fromSpans(in), fromSpans(excluded))) }
-func intersect(a, b []span) []span  { return toSpans(iputil.IntersectSpans(fromSpans(a), fromSpans(b))) }
+func merge(in []span) []span { return toSpans(iputil.MergeSpans(fromSpans(in))) }
+func subtract(in, excluded []span) []span {
+	return toSpans(iputil.SubtractSpans(fromSpans(in), fromSpans(excluded)))
+}
+func intersect(a, b []span) []span { return toSpans(iputil.IntersectSpans(fromSpans(a), fromSpans(b))) }
 
 func overlapsSorted(rows []span, lo, hi uint32) bool {
 	i := sort.Search(len(rows), func(i int) bool { return rows[i].hi >= lo })
@@ -452,8 +528,8 @@ func relevantAPNICRecords(records []apnicinetnum.Record, candidates []span) []ap
 	return out
 }
 
-func addressCount(rows []span) uint64    { return iputil.AddressCount(fromSpans(rows)) }
-func spanCIDRs(rows []span) []string     { return iputil.SpanCIDRs(fromSpans(rows)) }
+func addressCount(rows []span) uint64 { return iputil.AddressCount(fromSpans(rows)) }
+func spanCIDRs(rows []span) []string  { return iputil.SpanCIDRs(fromSpans(rows)) }
 
 func lessOperatorASN(aOperator, aASN, bOperator, bASN string) bool {
 	aRank, bRank := len(operators), len(operators)
@@ -741,8 +817,6 @@ func source(path, name, url, manifestPath string) (sourceMeta, error) {
 	return sourceMeta{Name: name, URL: url, Path: manifestPath, Bytes: info.Size(), SHA256: sum}, nil
 }
 
-
-
 func stage(name string, rows []span) stageMeta {
 	return stageMeta{Name: name, CIDRCount: len(spanCIDRs(rows)), AddressCount: addressCount(rows)}
 }
@@ -896,8 +970,8 @@ func reviewedBackboneExclusions(
 							RegistryOrganizations: parent.Record.Organizations, RegistryOrganizationNames: parent.Record.OrganizationNames,
 							RegistryMaintainers: parent.Record.Maintainers, RegistryStatus: parent.Record.Status,
 							RegistryLastModified: parent.Record.LastModified,
-							MatchedBy: "reviewed backbone prefix; current same-operator BGP origin; covering same-operator APNIC registration",
-							Reason:    policy.Reason,
+							MatchedBy:            "reviewed backbone prefix; current same-operator BGP origin; covering same-operator APNIC registration",
+							Reason:               policy.Reason,
 						})
 					}
 				}
@@ -1086,6 +1160,7 @@ func Main() {
 	}
 	autnumIndex := apnicautnum.NewIndex(autnumRecords, asnDescriptions)
 	registryAutnumIndex := apnicautnum.NewRegistryIndex(autnumRecords)
+	originDescriptions := apnicautnum.DescriptionMap(asnDescriptions, autnumRecords)
 	classifyAPNICPolicy := func(record apnicinetnum.Record) apnicinetnum.Match {
 		text := apnicinetnum.SearchText(record)
 		result, access := classifier.ClassifyAPNICPolicy(text)
@@ -1212,7 +1287,7 @@ func Main() {
 	}
 	routeRanges = merge(routeRanges)
 	preRISExcluded := merge(append(append([]span{}, preRouteExcluded...), routeRanges...))
-	routeOriginCandidates, routeOriginCandidateRanges := auditIndependentRouteOrigins(apnicAllSegments, routeSegments, subtract(preCloudCandidates, preRISExcluded), includedASNRecords, autnumIndex, classifier, asnDescriptions)
+	routeOriginCandidates, routeOriginCandidateRanges := auditIndependentRouteOrigins(apnicAllSegments, routeSegments, subtract(preCloudCandidates, preRISExcluded), includedASNRecords, autnumIndex, classifier, originDescriptions)
 	for _, candidate := range routeOriginCandidates {
 		excludedPrefixes = append(excludedPrefixes, routeOriginExclusionMeta(candidate))
 	}
@@ -1225,17 +1300,13 @@ func Main() {
 	}
 	risSegments := riswhois.Resolve(risRecords)
 	var risRanges []span
-	candidateMOAS, strongMOAS := 0, 0
+	candidateMOAS, strongMOAS, strongExcludedOriginSegments := 0, 0, 0
 	for _, segment := range risSegments {
-		if len(segment.Record.Origins) < 2 {
+		if len(segment.Record.Origins) == 0 {
 			continue
 		}
-		maxPeers := 0
-		for _, origin := range segment.Record.Origins {
-			if origin.SeenPeers > maxPeers {
-				maxPeers = origin.SeenPeers
-			}
-		}
+		observed, strongOrigins, maxPeers := classifyRISOrigins(segment, originDescriptions, classifier)
+		segmentOriginExcluded := false
 		for asn, record := range includedASNRecords {
 			currentSeen := 0
 			for _, origin := range segment.Record.Origins {
@@ -1243,37 +1314,30 @@ func Main() {
 					currentSeen = origin.SeenPeers
 				}
 			}
-			if currentSeen < 10 || currentSeen*20 < maxPeers {
-				continue
-			}
+			decision, excluded := decideRISExclusion(segment, asn, currentSeen, strongOrigins, maxPeers)
 			hits := intersect(subtract(intersect(record.ranges, chinaRanges), preRISExcluded), []span{{segment.Lo, segment.Hi}})
 			if len(hits) == 0 {
 				continue
 			}
-			candidateMOAS++
-			matchedBy, reason := "", ""
-			observed := make([]observedOriginMeta, 0, len(segment.Record.Origins))
-			for _, origin := range segment.Record.Origins {
-				description := asnDescriptions[origin.ASN]
-				observed = append(observed, observedOriginMeta{origin.ASN, description, origin.SeenPeers})
-				if origin.ASN == asn || origin.SeenPeers < 10 || origin.SeenPeers*20 < maxPeers {
-					continue
-				}
-				result := classifier.ClassifyAPNICInetnum(description)
-				if result.Excluded && matchedBy == "" {
-					matchedBy = result.MatchedBy + "; RIPE RIS multi-observer MOAS"
-					reason = "Alternate origin AS" + origin.ASN + " is strongly identified as outside ordinary Internet user access scope: " + result.Reason
-				}
+			if decision.CandidateMOAS {
+				candidateMOAS++
 			}
-			if matchedBy == "" {
+			if !excluded {
 				continue
 			}
-			strongMOAS++
+			if decision.StrongMOAS {
+				strongMOAS++
+			} else {
+				segmentOriginExcluded = true
+			}
 			risRanges = append(risRanges, hits...)
 			for _, cidr := range spanCIDRs(hits) {
 				prefix := netip.MustParsePrefix(cidr)
-				excludedPrefixes = append(excludedPrefixes, prefixExclusionMeta{Source: "riswhois_ipv4", Category: "ris_moas", CIDR: cidr, AddressCount: uint64(1) << uint(32-prefix.Bits()), ASN: asn, Operator: record.meta.Operator, ASNDescription: record.meta.Description, MatchedBy: matchedBy, Reason: reason, ObservedOrigins: observed})
+				excludedPrefixes = append(excludedPrefixes, prefixExclusionMeta{Source: "riswhois_ipv4", Category: decision.Category, CIDR: cidr, AddressCount: uint64(1) << uint(32-prefix.Bits()), ASN: asn, Operator: record.meta.Operator, ASNDescription: record.meta.Description, MatchedBy: decision.MatchedBy, Reason: decision.Reason, ObservedOrigins: observed})
 			}
+		}
+		if segmentOriginExcluded {
+			strongExcludedOriginSegments++
 		}
 	}
 	risRanges = merge(risRanges)
@@ -1462,7 +1526,7 @@ func Main() {
 			stage("effective_apnic_independent_legal_entity_exclusions", legalEntityHolderRanges),
 			stage("effective_apnic_route_exclusions", routeRanges),
 			stage("effective_apnic_independent_route_origin_exclusions", routeOriginCandidateRanges),
-			stage("effective_ris_moas_exclusions", risRanges),
+			stage("effective_ris_exclusions", risRanges),
 			stage("effective_reviewed_backbone_prefix_exclusions", reviewedBackboneRanges),
 			stage("pre_operator_parent_registration_admission", preAdmissionRanges),
 			stage("operator_parent_registration_admissions", hierarchicalRanges),
@@ -1482,7 +1546,7 @@ func Main() {
 		APNICIndependentLegalEntities: delegatedHolderMeta{MatchedWinningSegmentCount: legalEntityHolderSegments, EffectiveCIDRCount: len(spanCIDRs(legalEntityHolderRanges)), EffectiveAddressCount: addressCount(legalEntityHolderRanges)},
 		APNICRoute:                    routeSourceMeta{ObjectCount: routeObjectCount, RelevantObjectCount: relevantRouteObjectCount, RelevantWinningSegmentCount: len(routeSegments), OriginValidatedMatchCount: routeValidatedMatches, EffectiveCIDRCount: len(spanCIDRs(routeRanges)), EffectiveAddressCount: addressCount(routeRanges)},
 		APNICRouteOriginAudit:         routeOriginAuditMeta{Enforced: true, CandidateEvidenceCount: len(routeOriginCandidates), CandidateCIDRCount: len(spanCIDRs(routeOriginCandidateRanges)), CandidateAddressCount: addressCount(routeOriginCandidateRanges), Candidates: routeOriginCandidates},
-		RISWhois:                      risSourceMeta{RowCount: risStats.Rows, PrefixCount: risStats.Prefixes, RelevantPrefixCount: risStats.RelevantPrefixes, WinningSegmentCount: len(risSegments), CandidateMOASSegmentCount: candidateMOAS, StrongEvidenceSegmentCount: strongMOAS, RetainedAmbiguousMOASSegmentCount: candidateMOAS - strongMOAS, EffectiveCIDRCount: len(spanCIDRs(risRanges)), EffectiveAddressCount: addressCount(risRanges)},
+		RISWhois:                      risSourceMeta{RowCount: risStats.Rows, PrefixCount: risStats.Prefixes, RelevantPrefixCount: risStats.RelevantPrefixes, WinningSegmentCount: len(risSegments), CandidateMOASSegmentCount: candidateMOAS, StrongEvidenceSegmentCount: strongMOAS, RetainedAmbiguousMOASSegmentCount: candidateMOAS - strongMOAS, StrongExcludedOriginSegmentCount: strongExcludedOriginSegments, EffectiveCIDRCount: len(spanCIDRs(risRanges)), EffectiveAddressCount: addressCount(risRanges)},
 		ExcludedPrefixes:              excludedPrefixes,
 		OperatorSummary:               summarizeOperators(includedASNs), IncludedASNs: includedASNs, ExcludedASNs: excludedASNs,
 	}
