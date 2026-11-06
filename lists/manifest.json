@@ -1,9 +1,9 @@
 {
   "schema_version": 4,
-  "content_id": "sha256:30b81d409538eccf6d1da6234fd0810ab72147c394876dc7cd1350f5af14e9d3",
-  "generated_at": "2026-11-04T16:24:14.207251807Z",
+  "content_id": "sha256:4d50f8af389c8a4b814b4c2cd262b38fdb622ff1138566942eb1e1e19ca0b061",
+  "generated_at": "2026-11-06T16:05:05.746427984Z",
   "generator": {
-    "commit": "3c420cbb8cfdd303b72d65c9b80a7a1d6316622a",
+    "commit": "51fb39c88789ed53d87f797d95bdd1695df5f8d0",
     "dirty": false
   },
   "configs": {
@@ -16,27 +16,27 @@
   },
   "sources": {
     "apnic_autnum.gz": {
-      "sha256": "ca2707539777f236794424a9d81f9e48c3b2ac6972a125c0f49ccb2273b4a21d",
+      "sha256": "cdb97b17cd993add4b8aea3c32b3a7546e3712480f8fb90159f37783dba935d8",
       "url": "https://ftp.apnic.net/apnic/whois/apnic.db.aut-num.gz"
     },
     "apnic_inet6num.gz": {
-      "sha256": "f1377dc67e3cbf69ab4365ce56ed6d1d11f5429cea793e88a1e75db4323c326b",
+      "sha256": "32dfdf29b6824857e726efc7d36e50d93ce8ee32515329102c968bb3d7233495",
       "url": "https://ftp.apnic.net/apnic/whois/apnic.db.inet6num.gz"
     },
     "apnic_inetnum.gz": {
-      "sha256": "33092bfe8eb8f727894a11607222d5a801121aeb9daff9a51827bcf233db850e",
+      "sha256": "1f109242279faba418231218dfe483dad6195b4d1dc38b2b28ffdfb1921e8268",
       "url": "https://ftp.apnic.net/apnic/whois/apnic.db.inetnum.gz"
     },
     "apnic_organisation.gz": {
-      "sha256": "7e4af6f4d670261866e3dcb9c08228fea221686a7b36a20dd04b73a3badac156",
+      "sha256": "2c6cbd7e6a067224f848f4105e805e76803cf4a11d04724ba0ba9f097ef2b580",
       "url": "https://ftp.apnic.net/apnic/whois/apnic.db.organisation.gz"
     },
     "apnic_route.gz": {
-      "sha256": "a9430f5f8597bbab04b9062bc44c6aa5fe0b02e57bc6fdfe4b8d3b13ebb65558",
+      "sha256": "3d6242c422088fa60051ec4a0c368c69d39cf8c37a006a0296196fd7117252e3",
       "url": "https://ftp.apnic.net/apnic/whois/apnic.db.route.gz"
     },
     "china.txt": {
-      "sha256": "4ea3ac959cd9cdf94a3cb67ebe672b80f21fe1fb9e6fdc9c984044d0a930cb93",
+      "sha256": "1b7c2c74c475fd5732bb4eda9c5d82e2e99d7d62872f3ff7938550d752fb4849",
       "url": "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/china.txt"
     },
     "ip2region_ipv4_source.txt": {
@@ -80,11 +80,11 @@
       "url": "https://api.iptoasn.com/data/ip2asn-v6.tsv.gz"
     },
     "riswhois_ipv4.gz": {
-      "sha256": "6fd67eeca1c3aea2bebf944c49213b23fdce48a01254c045c9f757ab1bc6258b",
+      "sha256": "b19f8b2341ca0bbf57acedffb42674c8f649cdf8106dead566a0c997cb64aea1",
       "url": "https://www.ris.ripe.net/dumps/riswhoisdump.IPv4.gz"
     },
     "riswhois_ipv6.gz": {
-      "sha256": "8cb73d977b7aa012860aaf7dd478dbefeed387a985231079f6ddf783ccb66eb4",
+      "sha256": "646c56ef81759d93422fd19ea30b764a5c45b593ccb58dbfe70dc34d99653ef3",
       "url": "https://www.ris.ripe.net/dumps/riswhoisdump.IPv6.gz"
     }
   },
@@ -94,16 +94,16 @@
       "sha256": "e87140685efe0fb93ef43a999af8e1a52d36d9b024f70a1345d9370d8aec312e"
     },
     "ipv4/chinatelecom.txt": {
-      "prefix_count": 8986,
-      "sha256": "bbc1f36e5c449c026fbe407c7a7fab711561ef7c2ec74b1136b9803edf2f71dd"
+      "prefix_count": 8993,
+      "sha256": "eb8a3d6c3b70368b8d2313bb0285eae2b0709403825e063c7f407dd43f6c20ba"
     },
     "ipv4/chinaunicom.txt": {
       "prefix_count": 4825,
       "sha256": "38e0371387c30339c1606e777f8466745618818bbedde4a4aeba7fb4892f0899"
     },
     "ipv4/cn.txt": {
-      "prefix_count": 14662,
-      "sha256": "d41cfb40277c4d280a08fb070e0e9fe3cdf0b5dded7b9cf2d9fdaa293f47ddb6"
+      "prefix_count": 14669,
+      "sha256": "5c396f834177e71826f48e37efa5e308cbf0d15737de0c5b64fee18acc6cea1d"
     },
     "ipv4/provinces/anhui.txt": {
       "prefix_count": 277,
@@ -162,8 +162,8 @@
       "sha256": "229f18e618511ef65a1a203f9d5de821aced9efe1738257233af4d2c1c68d4f1"
     },
     "ipv4/provinces/jiangsu.txt": {
-      "prefix_count": 2171,
-      "sha256": "e757483be4dfc95bd0541400ceb74393a3ac18fccc377b78b29d4ae715b87604"
+      "prefix_count": 2178,
+      "sha256": "c84cb121081dfe2329530b0f3e584759c9345509b6dbca1fad35ff2b6c9410b3"
     },
     "ipv4/provinces/jiangxi.txt": {
       "prefix_count": 277,
